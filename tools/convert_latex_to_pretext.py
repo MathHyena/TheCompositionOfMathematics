@@ -7,8 +7,8 @@ import html
 # CONFIGURATION
 # ============================================================
 
-LATEX_FILE = Path("overleaf_source/00_foundations/07_elementary_logic.tex")
-PTX_FILE = Path("source/01_foundations/07_elementary_logic.ptx")
+LATEX_FILE = Path("overleaf_source/00_foundations/10_mathematical_writing_problem_solving.tex")
+PTX_FILE = Path("source/01_foundations/10_mathematical_writing_problem_solving.ptx")
 
 PLACEHOLDER_TEXT = "Content for this section will be added here."
 
