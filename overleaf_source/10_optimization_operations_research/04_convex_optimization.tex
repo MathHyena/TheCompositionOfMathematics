@@ -1,0 +1,3997 @@
+t%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.4 CONVEX OPTIMIZATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Convex Optimization}
+\label{sec:convex-optimization}
+
+\prerequisite{
+Optimization fundamentals, linear programming, nonlinear programming,
+convex sets, convex functions, gradients, Hessians, affine geometry,
+Lagrange multipliers, KKT conditions, and basic linear algebra.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define convex sets and convex optimization problems;
+    \item verify convexity using geometric and algebraic criteria;
+    \item recognize affine sets, half-spaces, balls, cones, and
+          intersections as convex sets;
+    \item define convex combinations and convex hulls;
+    \item define convex functions and strictly convex functions;
+    \item use first-order and second-order convexity criteria;
+    \item distinguish convexity from strict and strong convexity;
+    \item define epigraphs and use them to characterize convexity;
+    \item understand preservation rules for convex functions;
+    \item recognize convexity under affine transformations;
+    \item understand pointwise maxima and supremum constructions;
+    \item recognize perspective functions;
+    \item define convex cones;
+    \item understand dual cones;
+    \item recognize second-order and positive-semidefinite cones;
+    \item formulate convex quadratic programs;
+    \item understand conic optimization conceptually;
+    \item recognize second-order cone programming;
+    \item recognize semidefinite programming;
+    \item understand why local minima of convex problems are global;
+    \item understand uniqueness under strict convexity;
+    \item formulate the Lagrange dual function;
+    \item understand weak duality;
+    \item define the dual problem;
+    \item understand strong duality under Slater's condition;
+    \item interpret KKT conditions as sufficient for convex problems;
+    \item understand complementary slackness;
+    \item understand supporting hyperplanes and subgradients;
+    \item define subgradients for nonsmooth convex functions;
+    \item understand subgradient optimality conditions;
+    \item recognize proximal operators conceptually;
+    \item understand projection onto convex sets;
+    \item recognize projected gradient methods;
+    \item understand gradient descent for smooth convex functions;
+    \item understand strong convexity and convergence rates conceptually;
+    \item recognize accelerated first-order methods conceptually;
+    \item understand interior-point methods for convex programs;
+    \item recognize barrier functions and self-concordance conceptually;
+    \item understand convex relaxations;
+    \item connect convex optimization with statistics, machine learning,
+          signal processing, control, finance, and operations research.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Convex Optimization Is Special}
+\label{subsec:why-convex-optimization-special}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Convex optimization is the study of minimizing a convex function over a
+convex feasible set.
+
+A standard convex problem has form
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f_0(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+f_i(\mathbf{x})\leq0,
+\qquad
+i=1,\ldots,m,
+\\
+&
+A\mathbf{x}=\mathbf{b},
+\end{aligned}
+}
+\]
+
+where:
+
+\[
+f_0,f_1,\ldots,f_m
+\]
+
+are convex functions and the equality constraints are affine.
+
+Convex optimization is especially important because
+
+\[
+\boxed{
+\text{every local minimum is global}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Combinations}
+\label{subsec:convex-combinations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A convex combination of points
+
+\[
+\mathbf{x}_1,\ldots,\mathbf{x}_k
+\]
+
+is a vector of the form
+
+\[
+\boxed{
+\sum_{i=1}^{k}
+\theta_i\mathbf{x}_i,
+}
+\]
+
+where
+
+\[
+\boxed{
+\theta_i\geq0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\sum_{i=1}^{k}
+\theta_i=1.
+}
+\]
+
+For two points,
+
+\[
+\boxed{
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y},
+\qquad
+0\leq\theta\leq1,
+}
+\]
+
+describes the line segment between them.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Sets}
+\label{subsec:convex-sets-convex-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Convex Set}
+A set \(C\subseteq\mathbb{R}^n\) is convex if every line segment between
+two points of \(C\) lies entirely in \(C\).
+\end{definitionbox}
+
+Thus, for all
+
+\[
+\mathbf{x},\mathbf{y}\in C
+\]
+
+and
+
+\[
+0\leq\theta\leq1,
+\]
+
+we require
+
+\[
+\boxed{
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+\in C.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: A Convex Set}
+\label{subsec:worked-convex-set}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Half-Space}
+
+Consider
+
+\[
+C
+=
+\{
+\mathbf{x}\in\mathbb{R}^n:
+\mathbf{a}^T\mathbf{x}\leq b
+\}.
+\]
+
+Take
+
+\[
+\mathbf{x},\mathbf{y}\in C.
+\]
+
+Then
+
+\[
+\mathbf{a}^T\mathbf{x}\leq b,
+\]
+
+and
+
+\[
+\mathbf{a}^T\mathbf{y}\leq b.
+\]
+
+For
+
+\[
+0\leq\theta\leq1,
+\]
+
+\[
+\mathbf{a}^T
+[
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+]
+=
+\theta\mathbf{a}^T\mathbf{x}
++
+(1-\theta)\mathbf{a}^T\mathbf{y}.
+\]
+
+Therefore,
+
+\[
+\mathbf{a}^T
+[
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+]
+\leq
+\theta b+(1-\theta)b
+=
+b.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+C
+\text{ is convex}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Affine Sets}
+\label{subsec:affine-sets-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An affine set has form
+
+\[
+\boxed{
+C
+=
+\{
+\mathbf{x}:
+A\mathbf{x}=\mathbf{b}
+\}.
+}
+\]
+
+Every affine set is convex.
+
+Indeed, if
+
+\[
+A\mathbf{x}=\mathbf{b},
+\qquad
+A\mathbf{y}=\mathbf{b},
+\]
+
+then
+
+\[
+A
+[
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+]
+=
+\mathbf{b}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Balls and Norm Constraints}
+\label{subsec:balls-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For any norm \(\|\cdot\|\), the ball
+
+\[
+\boxed{
+B
+=
+\{
+\mathbf{x}:
+\|\mathbf{x}-\mathbf{x}_0\|\leq r
+\}
+}
+\]
+
+is convex.
+
+This follows from the triangle inequality:
+
+\[
+\|
+\theta(\mathbf{x}-\mathbf{x}_0)
++
+(1-\theta)(\mathbf{y}-\mathbf{x}_0)
+\|
+\leq
+\theta
+\|\mathbf{x}-\mathbf{x}_0\|
++
+(1-\theta)
+\|\mathbf{y}-\mathbf{x}_0\|.
+\]
+
+Thus norm constraints are fundamental convex constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Hull}
+\label{subsec:convex-hull}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Convex Hull}
+The convex hull of a set \(S\) is the smallest convex set containing
+\(S\).
+\end{definitionbox}
+
+It consists of all finite convex combinations of points in \(S\):
+
+\[
+\boxed{
+\operatorname{conv}(S)
+=
+\left\{
+\sum_{i=1}^{k}
+\theta_i\mathbf{x}_i:
+\mathbf{x}_i\in S,
+\;
+\theta_i\geq0,
+\;
+\sum_i\theta_i=1
+\right\}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intersection of Convex Sets}
+\label{subsec:intersection-convex-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The intersection of any collection of convex sets is convex.
+
+If
+
+\[
+C_\alpha
+\]
+
+is convex for every index \(\alpha\), then
+
+\[
+\boxed{
+\bigcap_\alpha C_\alpha
+}
+\]
+
+is convex.
+
+This is why systems of convex constraints preserve convexity of the
+feasible region.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Functions}
+\label{subsec:convex-functions-convex-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Convex Function}
+A function \(f:C\to\mathbb{R}\) on a convex domain \(C\) is convex if
+
+\[
+\boxed{
+f
+\left(
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+\right)
+\leq
+\theta f(\mathbf{x})
++
+(1-\theta)f(\mathbf{y})
+}
+\]
+
+for all
+
+\[
+\mathbf{x},\mathbf{y}\in C,
+\qquad
+0\leq\theta\leq1.
+\]
+\end{definitionbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Meaning of Convexity}
+\label{subsec:geometric-meaning-convexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a convex function, the graph lies below the chord joining any two
+points of the graph.
+
+Thus,
+
+\[
+\boxed{
+\text{chords lie above the function}.
+}
+\]
+
+This geometric property is the source of many strong optimization
+guarantees.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strict Convexity}
+\label{subsec:strict-convexity-convex-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A function is strictly convex if
+
+\[
+\boxed{
+f
+\left(
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+\right)
+<
+\theta f(\mathbf{x})
++
+(1-\theta)f(\mathbf{y})
+}
+\]
+
+for distinct \(\mathbf{x}\neq\mathbf{y}\) and
+
+\[
+0<\theta<1.
+\]
+
+Strict convexity implies at most one minimizer over a convex set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Convexity}
+\label{subsec:strong-convexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A differentiable function is \(m\)-strongly convex if there exists
+
+\[
+m>0
+\]
+
+such that
+
+\[
+\boxed{
+f(\mathbf{y})
+\geq
+f(\mathbf{x})
++
+\nabla f(\mathbf{x})^T
+(\mathbf{y}-\mathbf{x})
++
+\frac{m}{2}
+\|
+\mathbf{y}-\mathbf{x}
+\|_2^2.
+}
+\]
+
+Strong convexity provides a uniform positive curvature condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Convexity and Hessians}
+\label{subsec:strong-convexity-hessian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f\) is twice differentiable, a sufficient condition for
+\(m\)-strong convexity is
+
+\[
+\boxed{
+\nabla^2f(\mathbf{x})
+\succeq
+mI
+}
+\]
+
+for every \(\mathbf{x}\) in the domain.
+
+This means every Hessian eigenvalue is at least \(m\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{First-Order Convexity Criterion}
+\label{subsec:first-order-convexity-criterion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For differentiable \(f\), convexity is equivalent to
+
+\[
+\boxed{
+f(\mathbf{y})
+\geq
+f(\mathbf{x})
++
+\nabla f(\mathbf{x})^T
+(
+\mathbf{y}-\mathbf{x}
+)
+}
+\]
+
+for all \(\mathbf{x},\mathbf{y}\) in the convex domain.
+
+The tangent hyperplane globally underestimates a convex function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Optimality from the Gradient}
+\label{subsec:convex-gradient-global-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(f\) is differentiable and convex and
+
+\[
+\boxed{
+\nabla f(\mathbf{x}^*)=0.
+}
+\]
+
+Then, by the first-order convexity inequality,
+
+\[
+f(\mathbf{y})
+\geq
+f(\mathbf{x}^*)
+\]
+
+for every \(\mathbf{y}\).
+
+Therefore,
+
+\[
+\boxed{
+\mathbf{x}^*
+\text{ is a global minimizer}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Global Convex Minimum}
+\label{subsec:worked-global-convex-minimum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Quadratic Convex Function}
+
+Consider
+
+\[
+f(x,y)
+=
+x^2+2y^2-4x+8y.
+\]
+
+The gradient is
+
+\[
+\nabla f
+=
+\begin{pmatrix}
+2x-4\\
+4y+8
+\end{pmatrix}.
+\]
+
+Set
+
+\[
+\nabla f=0.
+\]
+
+Then
+
+\[
+x=2,
+\qquad
+y=-2.
+\]
+
+The Hessian is
+
+\[
+\nabla^2f
+=
+\begin{pmatrix}
+2&0\\
+0&4
+\end{pmatrix}.
+\]
+
+Since
+
+\[
+\nabla^2f\succ0,
+\]
+
+the function is strictly convex.
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+(2,-2)
+}
+\]
+
+is the unique global minimizer.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Convexity Criterion}
+\label{subsec:second-order-convexity-criterion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f\) is twice differentiable on a convex domain, then
+
+\[
+\boxed{
+\nabla^2f(\mathbf{x})
+\succeq0
+}
+\]
+
+for every \(\mathbf{x}\) implies \(f\) is convex.
+
+If
+
+\[
+\boxed{
+\nabla^2f(\mathbf{x})
+\succ0
+}
+\]
+
+for every \(\mathbf{x}\), then \(f\) is strictly convex.
+
+Positive definiteness everywhere is sufficient for strict convexity, but
+strict convexity can hold even when the Hessian is singular at isolated
+points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Examples of Convex Functions}
+\label{subsec:examples-convex-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Common convex functions include:
+
+\[
+\boxed{
+f(x)=x^2,
+}
+\]
+
+\[
+\boxed{
+f(x)=e^x,
+}
+\]
+
+\[
+\boxed{
+f(x)=-\log x,
+\qquad
+x>0,
+}
+\]
+
+\[
+\boxed{
+f(\mathbf{x})=\|\mathbf{x}\|,
+}
+\]
+
+and
+
+\[
+\boxed{
+f(\mathbf{x})
+=
+\frac12
+\mathbf{x}^TQ\mathbf{x}
+}
+\]
+
+when
+
+\[
+Q\succeq0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Epigraph}
+\label{subsec:epigraph}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Epigraph}
+The epigraph of \(f\) is
+
+\[
+\boxed{
+\operatorname{epi}f
+=
+\{
+(\mathbf{x},t):
+f(\mathbf{x})\leq t
+\}.
+}
+\]
+\end{definitionbox}
+
+A function is convex if and only if its epigraph is a convex set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Epigraph Form of Optimization}
+\label{subsec:epigraph-form-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The problem
+
+\[
+\min_{\mathbf{x}}
+f(\mathbf{x})
+\]
+
+can be rewritten as
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x},t}
+\quad&
+t
+\\
+\text{subject to}
+\quad&
+f(\mathbf{x})\leq t.
+\end{aligned}
+}
+\]
+
+This is called epigraph form.
+
+It converts a nonlinear objective into a linear objective with an
+additional constraint.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sublevel Sets}
+\label{subsec:sublevel-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(\alpha\)-sublevel set of \(f\) is
+
+\[
+\boxed{
+C_\alpha
+=
+\{
+\mathbf{x}:
+f(\mathbf{x})\leq\alpha
+\}.
+}
+\]
+
+If \(f\) is convex, every sublevel set is convex.
+
+The converse is not generally true; functions whose sublevel sets are
+convex are called quasiconvex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preserving Convexity by Nonnegative Sums}
+\label{subsec:convex-nonnegative-sums}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f_1,\ldots,f_k\) are convex and
+
+\[
+\alpha_i\geq0,
+\]
+
+then
+
+\[
+\boxed{
+f
+=
+\sum_{i=1}^{k}
+\alpha_if_i
+}
+\]
+
+is convex.
+
+This allows complex convex objectives to be constructed from simpler
+ones.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Affine Composition}
+\label{subsec:convex-affine-composition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f\) is convex, then
+
+\[
+\boxed{
+g(\mathbf{x})
+=
+f(A\mathbf{x}+\mathbf{b})
+}
+\]
+
+is convex on its domain.
+
+Affine transformations therefore preserve convexity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pointwise Maximum}
+\label{subsec:pointwise-maximum-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+f_1,\ldots,f_k
+\]
+
+are convex, then
+
+\[
+\boxed{
+f(\mathbf{x})
+=
+\max_{i}
+f_i(\mathbf{x})
+}
+\]
+
+is convex.
+
+More generally, the pointwise supremum of convex functions is convex when
+finite on the domain of interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Maximum of Affine Functions}
+\label{subsec:worked-max-affine-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Piecewise Linear Convex Function}
+
+Consider
+
+\[
+f(x)
+=
+\max
+\{
+2x+1,
+-x+3
+\}.
+\]
+
+Both component functions are affine and therefore convex.
+
+The pointwise maximum of convex functions is convex.
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+f(x)
+\text{ is convex}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composition Rules}
+\label{subsec:convex-composition-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(h\) is convex and nondecreasing in each argument, and
+\(g_1,\ldots,g_k\) are convex.
+
+Then under appropriate domain conditions,
+
+\[
+\boxed{
+f(\mathbf{x})
+=
+h
+(
+g_1(\mathbf{x}),
+\ldots,
+g_k(\mathbf{x})
+)
+}
+\]
+
+is convex.
+
+Composition rules are powerful but require monotonicity conditions to be
+checked carefully.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Perspective Function}
+\label{subsec:perspective-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+f:\mathbb{R}^n\to\mathbb{R}
+\]
+
+is convex, its perspective is
+
+\[
+\boxed{
+g(\mathbf{x},t)
+=
+t
+f
+\left(
+\frac{\mathbf{x}}{t}
+\right),
+\qquad
+t>0.
+}
+\]
+
+The perspective of a convex function is convex.
+
+This construction appears frequently in conic and statistical models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Cones}
+\label{subsec:convex-cones}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Convex Cone}
+A set \(K\) is a convex cone if for every
+\(\mathbf{x},\mathbf{y}\in K\) and every
+\(\alpha,\beta\geq0\),
+
+\[
+\boxed{
+\alpha\mathbf{x}
++
+\beta\mathbf{y}
+\in K.
+}
+\]
+\end{definitionbox}
+
+Examples include:
+
+\[
+\boxed{
+\mathbb{R}_+^n,
+}
+\]
+
+and the cone of positive-semidefinite matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dual Cone}
+\label{subsec:dual-cone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a cone \(K\), the dual cone is
+
+\[
+\boxed{
+K^*
+=
+\{
+\mathbf{y}:
+\mathbf{y}^T\mathbf{x}\geq0
+\text{ for every }
+\mathbf{x}\in K
+\}.
+}
+\]
+
+For the nonnegative orthant,
+
+\[
+\boxed{
+(\mathbb{R}_+^n)^*
+=
+\mathbb{R}_+^n.
+}
+\]
+
+Such a cone is self-dual.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Cone}
+\label{subsec:second-order-cone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The second-order cone, also called the Lorentz cone, is
+
+\[
+\boxed{
+\mathcal{Q}^{n+1}
+=
+\left\{
+(t,\mathbf{x}):
+\|\mathbf{x}\|_2\leq t
+\right\}.
+}
+\]
+
+It is a convex cone.
+
+Problems involving Euclidean norm constraints can often be written using
+second-order cones.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Cone Programming}
+\label{subsec:second-order-cone-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A second-order cone program, abbreviated SOCP, has constraints of the form
+
+\[
+\boxed{
+\|
+A_i\mathbf{x}
++
+\mathbf{b}_i
+\|_2
+\leq
+\mathbf{c}_i^T\mathbf{x}
++
+d_i.
+}
+\]
+
+A typical SOCP has a linear objective and affine equality constraints.
+
+SOCP includes linear programming as a special case.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Norm Constraint}
+\label{subsec:worked-socp-norm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Minimum Distance with a Linear Constraint}
+
+Consider
+
+\[
+\min_{\mathbf{x}}
+\|\mathbf{x}\|_2
+\]
+
+subject to
+
+\[
+A\mathbf{x}=\mathbf{b}.
+\]
+
+Introduce \(t\) and write
+
+\[
+\|\mathbf{x}\|_2\leq t.
+\]
+
+Then the problem becomes
+
+\begin{answerbox}
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x},t}
+\quad&
+t
+\\
+\text{subject to}
+\quad&
+\|\mathbf{x}\|_2\leq t,
+\\
+&
+A\mathbf{x}=\mathbf{b}.
+\end{aligned}
+}
+\]
+\end{answerbox}
+
+This is an SOCP formulation.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Positive-Semidefinite Cone}
+\label{subsec:positive-semidefinite-cone}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(\mathbb{S}^n\) denote the symmetric \(n\times n\) matrices.
+
+The positive-semidefinite cone is
+
+\[
+\boxed{
+\mathbb{S}_+^n
+=
+\{
+X\in\mathbb{S}^n:
+X\succeq0
+\}.
+}
+\]
+
+It is convex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Semidefinite Programming}
+\label{subsec:semidefinite-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A semidefinite program, abbreviated SDP, has a linear objective and
+positive-semidefinite matrix constraints.
+
+A standard form is
+
+\[
+\boxed{
+\begin{aligned}
+\min_X
+\quad&
+\langle C,X\rangle
+\\
+\text{subject to}
+\quad&
+\langle A_i,X\rangle=b_i,
+\qquad
+i=1,\ldots,m,
+\\
+&
+X\succeq0.
+\end{aligned}
+}
+\]
+
+Here
+
+\[
+\boxed{
+\langle A,X\rangle
+=
+\operatorname{tr}(A^TX).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Semidefinite Programming Matters}
+\label{subsec:why-sdp-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+SDPs can represent or relax problems involving:
+
+\[
+\boxed{
+\text{matrix inequalities},
+}
+\]
+
+\[
+\boxed{
+\text{control stability},
+}
+\]
+
+\[
+\boxed{
+\text{quadratic optimization},
+}
+\]
+
+\[
+\boxed{
+\text{combinatorial optimization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{moment problems}.
+}
+\]
+
+They form one of the major classes of conic optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Quadratic Programming}
+\label{subsec:convex-quadratic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A convex quadratic program has form
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+\frac12
+\mathbf{x}^TQ\mathbf{x}
++
+\mathbf{c}^T\mathbf{x}
+\\
+\text{subject to}
+\quad&
+A\mathbf{x}\leq\mathbf{b},
+\\
+&
+E\mathbf{x}=\mathbf{d},
+\end{aligned}
+}
+\]
+
+where
+
+\[
+\boxed{
+Q\succeq0.
+}
+\]
+
+If
+
+\[
+Q\succ0,
+\]
+
+the objective is strictly convex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Convex Quadratic Program}
+\label{subsec:worked-convex-qp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Projection onto a Half-Space}
+
+Minimize
+
+\[
+\frac12
+\left[
+(x-3)^2
++
+(y-2)^2
+\right]
+\]
+
+subject to
+
+\[
+x+y\leq2.
+\]
+
+This finds the Euclidean projection of \((3,2)\) onto the half-space.
+
+Write
+
+\[
+g(x,y)=x+y-2\leq0.
+\]
+
+The Lagrangian is
+
+\[
+\mathcal{L}
+=
+\frac12
+\left[
+(x-3)^2+(y-2)^2
+\right]
++
+\mu(x+y-2).
+\]
+
+Stationarity gives
+
+\[
+x-3+\mu=0,
+\]
+
+\[
+y-2+\mu=0.
+\]
+
+Thus,
+
+\[
+x=3-\mu,
+\]
+
+\[
+y=2-\mu.
+\]
+
+The unconstrained point \((3,2)\) is infeasible, so the constraint is
+active:
+
+\[
+x+y=2.
+\]
+
+Therefore,
+
+\[
+5-2\mu=2,
+\]
+
+so
+
+\[
+\mu=\frac32.
+\]
+
+Hence,
+
+\[
+x=\frac32,
+\qquad
+y=\frac12.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+(x^*,y^*)
+=
+\left(
+\frac32,
+\frac12
+\right).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projection onto a Convex Set}
+\label{subsec:projection-convex-set}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a closed convex set \(C\), the Euclidean projection of
+\(\mathbf{x}\) onto \(C\) is
+
+\[
+\boxed{
+P_C(\mathbf{x})
+=
+\operatorname*{arg\,min}_{\mathbf{y}\in C}
+\frac12
+\|
+\mathbf{x}-\mathbf{y}
+\|_2^2.
+}
+\]
+
+For nonempty closed convex \(C\), this projection exists and is unique.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projection Characterization}
+\label{subsec:projection-characterization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A point
+
+\[
+\mathbf{y}=P_C(\mathbf{x})
+\]
+
+if and only if
+
+\[
+\boxed{
+(\mathbf{x}-\mathbf{y})^T
+(\mathbf{z}-\mathbf{y})
+\leq0
+}
+\]
+
+for every
+
+\[
+\mathbf{z}\in C.
+\]
+
+Geometrically, the vector from the projection to the original point forms
+an obtuse or right angle with every feasible direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Supporting Hyperplanes}
+\label{subsec:supporting-hyperplanes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A hyperplane
+
+\[
+\boxed{
+\mathbf{a}^T\mathbf{x}=b
+}
+\]
+
+supports a convex set \(C\) at \(\mathbf{x}_0\in C\) if
+
+\[
+\boxed{
+\mathbf{a}^T\mathbf{x}
+\leq b
+}
+\]
+
+for every \(\mathbf{x}\in C\), while
+
+\[
+\boxed{
+\mathbf{a}^T\mathbf{x}_0=b.
+}
+\]
+
+Supporting hyperplanes generalize tangent lines to convex sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Separating Hyperplanes}
+\label{subsec:separating-hyperplanes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If two convex sets do not intersect under suitable regularity
+conditions, a hyperplane can often separate them.
+
+This geometric principle underlies:
+
+\[
+\boxed{
+\text{duality},
+}
+\]
+
+\[
+\boxed{
+\text{optimality certificates},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{alternative theorems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subgradients}
+\label{subsec:subgradients}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a convex function \(f\), a vector \(\mathbf{g}\) is a subgradient at
+\(\mathbf{x}\) if
+
+\[
+\boxed{
+f(\mathbf{y})
+\geq
+f(\mathbf{x})
++
+\mathbf{g}^T
+(
+\mathbf{y}-\mathbf{x}
+)
+}
+\]
+
+for every \(\mathbf{y}\).
+
+The set of all subgradients is the subdifferential:
+
+\[
+\boxed{
+\partial f(\mathbf{x}).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Differentiable Case}
+\label{subsec:subgradient-differentiable-case}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f\) is convex and differentiable at \(\mathbf{x}\), then
+
+\[
+\boxed{
+\partial f(\mathbf{x})
+=
+\{
+\nabla f(\mathbf{x})
+\}.
+}
+\]
+
+Thus subgradients extend gradients to nonsmooth convex functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subgradient of Absolute Value}
+\label{subsec:subgradient-absolute-value}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f(x)=|x|,
+\]
+
+we have
+
+\[
+\boxed{
+\partial f(x)
+=
+\begin{cases}
+\{1\},
+&
+x>0,
+\\
+[-1,1],
+&
+x=0,
+\\
+\{-1\},
+&
+x<0.
+\end{cases}
+}
+\]
+
+The interval at \(x=0\) replaces the missing ordinary derivative.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subgradient Optimality}
+\label{subsec:subgradient-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a convex function \(f\),
+
+\[
+\boxed{
+\mathbf{x}^*
+\text{ minimizes }f
+\iff
+\mathbf{0}
+\in
+\partial f(\mathbf{x}^*).
+}
+\]
+
+This is the nonsmooth analogue of
+
+\[
+\nabla f(\mathbf{x}^*)=0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Nonsmooth Convex Minimum}
+\label{subsec:worked-subgradient-minimum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Absolute Value}
+
+Consider
+
+\[
+f(x)=|x-2|.
+\]
+
+At
+
+\[
+x=2,
+\]
+
+the subdifferential is
+
+\[
+\partial f(2)
+=
+[-1,1].
+\]
+
+Since
+
+\[
+0\in[-1,1],
+\]
+
+we conclude
+
+\begin{answerbox}
+\[
+\boxed{
+x^*=2
+}
+\]
+
+is the global minimizer.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normal Cone}
+\label{subsec:normal-cone-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a convex set \(C\) and \(\mathbf{x}\in C\), the normal cone is
+
+\[
+\boxed{
+N_C(\mathbf{x})
+=
+\{
+\mathbf{v}:
+\mathbf{v}^T
+(
+\mathbf{y}-\mathbf{x}
+)
+\leq0
+\text{ for all }
+\mathbf{y}\in C
+\}.
+}
+\]
+
+At an interior point,
+
+\[
+\boxed{
+N_C(\mathbf{x})=\{\mathbf{0}\}.
+}
+\]
+
+At a boundary point, it contains outward normal directions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constrained Convex Optimality}
+\label{subsec:constrained-convex-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For differentiable convex \(f\) over a closed convex set \(C\),
+\(\mathbf{x}^*\) is optimal if and only if
+
+\[
+\boxed{
+-\nabla f(\mathbf{x}^*)
+\in
+N_C(\mathbf{x}^*).
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+\nabla f(\mathbf{x}^*)^T
+(
+\mathbf{x}-\mathbf{x}^*
+)
+\geq0
+}
+\]
+
+for every
+
+\[
+\mathbf{x}\in C.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrange Dual Function}
+\label{subsec:convex-lagrange-dual-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider the primal problem
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f_0(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+f_i(\mathbf{x})\leq0,
+\\
+&
+h_j(\mathbf{x})=0.
+\end{aligned}
+}
+\]
+
+The Lagrangian is
+
+\[
+\boxed{
+\mathcal{L}
+(
+\mathbf{x},
+\boldsymbol{\lambda},
+\boldsymbol{\nu}
+)
+=
+f_0(\mathbf{x})
++
+\sum_{i=1}^{m}
+\lambda_if_i(\mathbf{x})
++
+\sum_{j=1}^{p}
+\nu_jh_j(\mathbf{x}),
+}
+\]
+
+with
+
+\[
+\lambda_i\geq0.
+\]
+
+The dual function is
+
+\[
+\boxed{
+q
+(
+\boldsymbol{\lambda},
+\boldsymbol{\nu}
+)
+=
+\inf_{\mathbf{x}}
+\mathcal{L}
+(
+\mathbf{x},
+\boldsymbol{\lambda},
+\boldsymbol{\nu}
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dual Function Gives Lower Bounds}
+\label{subsec:dual-function-lower-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(\mathbf{x}\) is primal feasible and
+\(\boldsymbol{\lambda}\geq0\).
+
+Then
+
+\[
+f_i(\mathbf{x})\leq0,
+\]
+
+so
+
+\[
+\sum_i
+\lambda_if_i(\mathbf{x})
+\leq0.
+\]
+
+Also,
+
+\[
+h_j(\mathbf{x})=0.
+\]
+
+Therefore,
+
+\[
+\mathcal{L}
+(
+\mathbf{x},
+\boldsymbol{\lambda},
+\boldsymbol{\nu}
+)
+\leq
+f_0(\mathbf{x}).
+\]
+
+Since the dual function is the infimum over \(\mathbf{x}\),
+
+\[
+\boxed{
+q
+(
+\boldsymbol{\lambda},
+\boldsymbol{\nu}
+)
+\leq
+f_0(\mathbf{x})
+}
+\]
+
+for every primal feasible \(\mathbf{x}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrange Dual Problem}
+\label{subsec:lagrange-dual-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because the dual function produces lower bounds on the primal minimum,
+the dual problem maximizes that bound:
+
+\[
+\boxed{
+\begin{aligned}
+\max_{\boldsymbol{\lambda},\boldsymbol{\nu}}
+\quad&
+q
+(
+\boldsymbol{\lambda},
+\boldsymbol{\nu}
+)
+\\
+\text{subject to}
+\quad&
+\boldsymbol{\lambda}\geq0.
+\end{aligned}
+}
+\]
+
+The dual problem is always a convex optimization problem because the dual
+function is concave in its dual variables.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Duality}
+\label{subsec:convex-weak-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+p^*
+\]
+
+be the primal optimal value and
+
+\[
+d^*
+\]
+
+the dual optimal value.
+
+Then
+
+\[
+\boxed{
+d^*\leq p^*.
+}
+\]
+
+This is weak duality.
+
+The difference
+
+\[
+\boxed{
+p^*-d^*
+}
+\]
+
+is the duality gap.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Duality}
+\label{subsec:convex-strong-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Strong duality means
+
+\[
+\boxed{
+d^*=p^*.
+}
+\]
+
+For convex problems, strong duality holds under important regularity
+conditions.
+
+One of the most useful is Slater's condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slater's Condition}
+\label{subsec:slaters-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a convex problem with affine equalities, Slater's condition requires
+existence of a point satisfying
+
+\[
+\boxed{
+f_i(\mathbf{x})<0
+}
+\]
+
+for every nonlinear inequality constraint, together with all affine
+equalities.
+
+Such a point is called strictly feasible.
+
+Under standard assumptions, Slater's condition implies strong duality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KKT Sufficiency in Convex Optimization}
+\label{subsec:kkt-sufficiency-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a convex optimization problem, suppose:
+
+\[
+f_0
+\]
+
+and all inequality functions \(f_i\) are convex,
+
+\[
+h_j
+\]
+
+are affine, and KKT conditions hold.
+
+Then the KKT point is globally optimal.
+
+Under Slater's condition, the KKT conditions are also necessary for
+optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex KKT Conditions}
+\label{subsec:convex-kkt-conditions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The conditions are:
+
+\[
+\boxed{
+\nabla f_0(\mathbf{x}^*)
++
+\sum_i
+\lambda_i^*
+\nabla f_i(\mathbf{x}^*)
++
+\sum_j
+\nu_j^*
+\nabla h_j(\mathbf{x}^*)
+=
+0,
+}
+\]
+
+\[
+\boxed{
+f_i(\mathbf{x}^*)\leq0,
+}
+\]
+
+\[
+\boxed{
+h_j(\mathbf{x}^*)=0,
+}
+\]
+
+\[
+\boxed{
+\lambda_i^*\geq0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\lambda_i^*
+f_i(\mathbf{x}^*)
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Convex KKT Certificate}
+\label{subsec:worked-convex-kkt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Global Optimality from KKT}
+
+Minimize
+
+\[
+f(x)=x^2
+\]
+
+subject to
+
+\[
+1-x\leq0.
+\]
+
+The problem is convex.
+
+The Lagrangian is
+
+\[
+\mathcal{L}
+=
+x^2+\lambda(1-x).
+\]
+
+Stationarity gives
+
+\[
+2x-\lambda=0.
+\]
+
+The unconstrained minimizer \(x=0\) is infeasible, so the constraint is
+active:
+
+\[
+x=1.
+\]
+
+Thus,
+
+\[
+\lambda=2.
+\]
+
+All KKT conditions hold.
+
+Because the problem is convex,
+
+\begin{answerbox}
+\[
+\boxed{
+x^*=1
+}
+\]
+
+is the global minimizer.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dual Interpretation of Multipliers}
+\label{subsec:convex-dual-multiplier-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dual variables quantify the value of relaxing constraints.
+
+Suppose the \(i\)-th constraint becomes
+
+\[
+f_i(\mathbf{x})\leq u_i.
+\]
+
+Under suitable differentiability and regularity, the optimal multiplier
+can describe local sensitivity of the optimal value with respect to
+\(u_i\).
+
+This generalizes shadow prices from linear programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Conjugate}
+\label{subsec:convex-conjugate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The convex conjugate of \(f\) is
+
+\[
+\boxed{
+f^*(\mathbf{y})
+=
+\sup_{\mathbf{x}}
+\left[
+\mathbf{y}^T\mathbf{x}
+-
+f(\mathbf{x})
+\right].
+}
+\]
+
+This is also called the Fenchel conjugate.
+
+The conjugate is always convex, even if the original function is not.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fenchel--Young Inequality}
+\label{subsec:fenchel-young}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By the definition of the conjugate,
+
+\[
+f^*(\mathbf{y})
+\geq
+\mathbf{y}^T\mathbf{x}
+-
+f(\mathbf{x}).
+\]
+
+Therefore,
+
+\[
+\boxed{
+f(\mathbf{x})
++
+f^*(\mathbf{y})
+\geq
+\mathbf{x}^T\mathbf{y}.
+}
+\]
+
+This is the Fenchel--Young inequality.
+
+Equality holds precisely under an appropriate subgradient relation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fenchel Duality Preview}
+\label{subsec:fenchel-duality-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Problems of the form
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+f(\mathbf{x})
++
+g(A\mathbf{x})
+}
+\]
+
+can often be dualized using convex conjugates.
+
+Fenchel duality provides a powerful framework extending ordinary
+Lagrange duality.
+
+It is particularly important in signal processing and machine learning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proximal Operator}
+\label{subsec:proximal-operator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a proper convex function \(f\), the proximal operator is
+
+\[
+\boxed{
+\operatorname{prox}_{\lambda f}(\mathbf{v})
+=
+\operatorname*{arg\,min}_{\mathbf{x}}
+\left[
+f(\mathbf{x})
++
+\frac{1}{2\lambda}
+\|
+\mathbf{x}-\mathbf{v}
+\|_2^2
+\right],
+}
+\]
+
+where
+
+\[
+\lambda>0.
+\]
+
+The quadratic term keeps the solution near \(\mathbf{v}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projection as a Proximal Operator}
+\label{subsec:projection-proximal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let the indicator function of a convex set \(C\) be
+
+\[
+\boxed{
+I_C(\mathbf{x})
+=
+\begin{cases}
+0,
+&
+\mathbf{x}\in C,
+\\
++\infty,
+&
+\mathbf{x}\notin C.
+\end{cases}
+}
+\]
+
+Then
+
+\[
+\boxed{
+\operatorname{prox}_{I_C}(\mathbf{v})
+=
+P_C(\mathbf{v}).
+}
+\]
+
+Thus projection is a special proximal operation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Soft Thresholding}
+\label{subsec:soft-thresholding}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f(x)=|x|,
+\]
+
+the proximal operator is
+
+\[
+\boxed{
+\operatorname{prox}_{\lambda|\cdot|}(v)
+=
+\operatorname{sign}(v)
+\max
+\{
+|v|-\lambda,
+0
+\}.
+}
+\]
+
+This is called soft thresholding.
+
+It is fundamental in sparse optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient Descent for Convex Functions}
+\label{subsec:gradient-descent-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For differentiable convex \(f\),
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+\mathbf{x}_k
+-
+\alpha_k
+\nabla f(\mathbf{x}_k).
+}
+\]
+
+If the gradient is Lipschitz continuous and the step size is chosen
+appropriately, the method converges to a global minimizer under standard
+assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lipschitz Gradient}
+\label{subsec:lipschitz-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A gradient is \(L\)-Lipschitz if
+
+\[
+\boxed{
+\|
+\nabla f(\mathbf{x})
+-
+\nabla f(\mathbf{y})
+\|_2
+\leq
+L
+\|
+\mathbf{x}-\mathbf{y}
+\|_2.
+}
+\]
+
+For twice-differentiable functions, a sufficient condition is
+
+\[
+\boxed{
+\nabla^2f(\mathbf{x})
+\preceq
+LI.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Descent Lemma}
+\label{subsec:descent-lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(\nabla f\) is \(L\)-Lipschitz, then
+
+\[
+\boxed{
+f(\mathbf{y})
+\leq
+f(\mathbf{x})
++
+\nabla f(\mathbf{x})^T
+(
+\mathbf{y}-\mathbf{x}
+)
++
+\frac{L}{2}
+\|
+\mathbf{y}-\mathbf{x}
+\|_2^2.
+}
+\]
+
+This inequality is central to convergence analysis of gradient methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed-Step Gradient Descent}
+\label{subsec:fixed-step-gradient-descent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an \(L\)-smooth convex function, a common choice is
+
+\[
+\boxed{
+\alpha
+=
+\frac1L.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+\mathbf{x}_k
+-
+\frac1L
+\nabla f(\mathbf{x}_k).
+}
+\]
+
+The objective converges sublinearly under standard assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strongly Convex Convergence}
+\label{subsec:strong-convex-gradient-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f\) is both:
+
+\[
+\boxed{
+m\text{-strongly convex},
+}
+\]
+
+and
+
+\[
+\boxed{
+L\text{-smooth},
+}
+\]
+
+gradient descent can converge linearly.
+
+The ratio
+
+\[
+\boxed{
+\kappa
+=
+\frac{L}{m}
+}
+\]
+
+is a condition-number-like measure.
+
+Large \(\kappa\) generally means slower convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subgradient Method}
+\label{subsec:subgradient-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonsmooth convex \(f\), choose
+
+\[
+\mathbf{g}_k
+\in
+\partial f(\mathbf{x}_k)
+\]
+
+and update
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+\mathbf{x}_k
+-
+\alpha_k
+\mathbf{g}_k.
+}
+\]
+
+The subgradient method is simple but typically converges more slowly than
+gradient descent on smooth functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projected Gradient Descent}
+\label{subsec:projected-gradient-descent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a closed convex feasible set \(C\),
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+P_C
+\left(
+\mathbf{x}_k
+-
+\alpha_k
+\nabla f(\mathbf{x}_k)
+\right).
+}
+\]
+
+The gradient step reduces the objective locally, while projection restores
+feasibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proximal Gradient Method}
+\label{subsec:proximal-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+F(\mathbf{x})
+=
+f(\mathbf{x})
++
+g(\mathbf{x}),
+}
+\]
+
+where \(f\) is smooth convex and \(g\) is convex but possibly nonsmooth.
+
+The proximal-gradient update is
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+\operatorname{prox}_{\alpha g}
+\left[
+\mathbf{x}_k
+-
+\alpha
+\nabla f(\mathbf{x}_k)
+\right].
+}
+\]
+
+This method is central to sparse and composite optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Accelerated Gradient Methods Preview}
+\label{subsec:accelerated-gradient-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Accelerated first-order methods combine gradient steps with momentum-like
+extrapolation.
+
+For smooth convex optimization, acceleration can improve the objective
+convergence rate from roughly
+
+\[
+\boxed{
+O\left(\frac1k\right)
+}
+\]
+
+to
+
+\[
+\boxed{
+O\left(\frac1{k^2}\right)
+}
+\]
+
+under standard assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coordinate Descent Preview}
+\label{subsec:coordinate-descent-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Coordinate descent updates only one or a small group of variables at a
+time.
+
+A generic step changes
+
+\[
+\boxed{
+x_i
+}
+\]
+
+while holding other components fixed.
+
+This can be effective for very large problems with simple coordinatewise
+structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interior-Point Methods}
+\label{subsec:convex-interior-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a convex problem with inequalities
+
+\[
+f_i(\mathbf{x})\leq0,
+\]
+
+replace the constraints temporarily with the logarithmic barrier
+
+\[
+\boxed{
+\phi(\mathbf{x})
+=
+-
+\sum_i
+\log
+[
+-f_i(\mathbf{x})
+].
+}
+\]
+
+Then solve
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+t f_0(\mathbf{x})
++
+\phi(\mathbf{x}),
+}
+\]
+
+for increasing \(t\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Barrier Central Path}
+\label{subsec:convex-barrier-central-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For each \(t>0\), let \(\mathbf{x}^*(t)\) solve the barrier problem.
+
+The collection
+
+\[
+\boxed{
+\{
+\mathbf{x}^*(t):
+t>0
+\}
+}
+\]
+
+is the central path.
+
+As
+
+\[
+t\to\infty,
+\]
+
+the barrier solution approaches the constrained optimum under standard
+conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Barrier Multipliers}
+\label{subsec:barrier-multipliers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For barrier solution \(\mathbf{x}^*(t)\), define
+
+\[
+\boxed{
+\lambda_i
+=
+-
+\frac{
+1
+}{
+t f_i(\mathbf{x}^*(t))
+}.
+}
+\]
+
+Then
+
+\[
+\lambda_i>0
+\]
+
+and
+
+\[
+\boxed{
+-\lambda_i f_i(\mathbf{x}^*)
+=
+\frac1t.
+}
+\]
+
+Thus barrier methods satisfy an approximate complementary-slackness
+condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Self-Concordance Preview}
+\label{subsec:self-concordance-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interior-point complexity theory relies on special barrier functions whose
+third derivatives are controlled by their second derivatives.
+
+Such functions are called self-concordant.
+
+Self-concordance makes Newton steps predictable even near curved
+boundaries.
+
+This concept underlies polynomial-time complexity results for many convex
+optimization classes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Relaxations}
+\label{subsec:convex-relaxations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A relaxation replaces a difficult feasible set by a larger convex set.
+
+If the original minimization problem is
+
+\[
+\boxed{
+\min_{\mathbf{x}\in S}
+f(\mathbf{x}),
+}
+\]
+
+and
+
+\[
+S\subseteq C,
+\]
+
+then the relaxed problem is
+
+\[
+\boxed{
+\min_{\mathbf{x}\in C}
+f(\mathbf{x}).
+}
+\]
+
+Its optimal value provides a lower bound on the original problem when
+minimizing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Convex Relaxations Matter}
+\label{subsec:why-convex-relaxations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Convex relaxations are useful because they can:
+
+\[
+\boxed{
+\text{produce rigorous bounds},
+}
+\]
+
+\[
+\boxed{
+\text{provide good approximate solutions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{support branch-and-bound methods}.
+}
+\]
+
+They are especially important in integer and combinatorial optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Relaxation Example}
+\label{subsec:quadratic-relaxation-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a binary variable satisfies
+
+\[
+x\in\{0,1\}.
+\]
+
+A simple convex relaxation is
+
+\[
+\boxed{
+0\leq x\leq1.
+}
+\]
+
+The relaxed feasible set contains the original discrete set.
+
+The relaxation may be much easier to optimize over.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robust Optimization Preview}
+\label{subsec:robust-convex-optimization-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a constraint contains uncertain data \(u\):
+
+\[
+f(\mathbf{x},u)\leq0.
+\]
+
+A robust constraint requires
+
+\[
+\boxed{
+f(\mathbf{x},u)\leq0
+\quad
+\text{for every }
+u\in\mathcal{U}.
+}
+\]
+
+Under suitable uncertainty sets and functional structure, the robust
+counterpart can remain convex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Entropy Example}
+\label{subsec:maximum-entropy-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For probabilities
+
+\[
+p_i\geq0,
+\qquad
+\sum_i p_i=1,
+\]
+
+entropy is
+
+\[
+\boxed{
+H(\mathbf{p})
+=
+-
+\sum_i
+p_i\log p_i.
+}
+\]
+
+Entropy is concave.
+
+Therefore maximizing entropy subject to affine constraints is a convex
+optimization problem in the standard sense of maximizing a concave
+objective over a convex feasible set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Portfolio Optimization}
+\label{subsec:portfolio-convex-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\mathbf{w}
+\]
+
+be portfolio weights and let
+
+\[
+\Sigma\succeq0
+\]
+
+be the covariance matrix.
+
+Portfolio variance is
+
+\[
+\boxed{
+\mathbf{w}^T
+\Sigma
+\mathbf{w}.
+}
+\]
+
+A minimum-variance portfolio problem is
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{w}}
+\quad&
+\mathbf{w}^T
+\Sigma
+\mathbf{w}
+\\
+\text{subject to}
+\quad&
+\mathbf{1}^T\mathbf{w}=1,
+\\
+&
+\boldsymbol{\mu}^T\mathbf{w}
+\geq
+r_0.
+\end{aligned}
+}
+\]
+
+This is a convex quadratic program.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regularized Regression}
+\label{subsec:regularized-regression-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ridge regression solves
+
+\[
+\boxed{
+\min_{\boldsymbol{\beta}}
+\frac12
+\|
+X\boldsymbol{\beta}-\mathbf{y}
+\|_2^2
++
+\frac{\lambda}{2}
+\|
+\boldsymbol{\beta}
+\|_2^2.
+}
+\]
+
+This objective is convex.
+
+Lasso solves
+
+\[
+\boxed{
+\min_{\boldsymbol{\beta}}
+\frac12
+\|
+X\boldsymbol{\beta}-\mathbf{y}
+\|_2^2
++
+\lambda
+\|
+\boldsymbol{\beta}
+\|_1.
+}
+\]
+
+This is convex but nonsmooth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logistic Regression as Convex Optimization}
+\label{subsec:logistic-regression-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For binary responses \(y_i\in\{0,1\}\), logistic regression can be
+estimated by minimizing the negative log-likelihood.
+
+A common form is
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+\left[
+\log
+\left(
+1+e^{\mathbf{x}_i^T\boldsymbol{\beta}}
+\right)
+-
+y_i
+\mathbf{x}_i^T\boldsymbol{\beta}
+\right].
+}
+\]
+
+This objective is convex in \(\boldsymbol{\beta}\).
+
+Regularization can also be added while preserving convexity for many
+common penalties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Support Vector Machines Preview}
+\label{subsec:svm-convex-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A soft-margin support vector machine can be written as a convex quadratic
+program:
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{w},b,\boldsymbol{\xi}}
+\quad&
+\frac12
+\|\mathbf{w}\|_2^2
++
+C
+\sum_i
+\xi_i
+\\
+\text{subject to}
+\quad&
+y_i
+(
+\mathbf{w}^T\mathbf{x}_i+b
+)
+\geq
+1-\xi_i,
+\\
+&
+\xi_i\geq0.
+\end{aligned}
+}
+\]
+
+Convexity guarantees global optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Applications}
+\label{subsec:convex-control-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many control-design conditions can be written as linear matrix
+inequalities.
+
+For example, stability of
+
+\[
+x'=Ax
+\]
+
+can be certified by finding
+
+\[
+P\succ0
+\]
+
+such that
+
+\[
+\boxed{
+A^TP+PA\prec0.
+}
+\]
+
+This is a convex matrix inequality in \(P\).
+
+Such formulations lead naturally to semidefinite programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Programming Preview}
+\label{subsec:geometric-programming-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some nonlinear problems involving positive variables and monomials or
+posynomials can be transformed into convex problems using logarithmic
+changes of variables.
+
+These are called geometric programs.
+
+For example, multiplicative structure becomes additive after taking
+logarithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Optimization Workflow}
+\label{subsec:convex-optimization-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the decision variables;
+    \item write the objective and constraints;
+    \item determine the domain;
+    \item verify that the feasible set is convex;
+    \item verify that the objective is convex for minimization;
+    \item verify that inequality functions are convex;
+    \item verify that equality constraints are affine;
+    \item use algebraic convexity-preservation rules when possible;
+    \item check strict or strong convexity if uniqueness matters;
+    \item derive KKT conditions when useful;
+    \item check Slater's condition for strong duality;
+    \item formulate the dual problem when it provides insight;
+    \item identify special structure such as LP, QP, SOCP, or SDP;
+    \item choose an appropriate first-order or interior-point method;
+    \item scale the problem;
+    \item verify feasibility and duality gap;
+    \item interpret multipliers and sensitivity.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recognizing Convex Structure}
+\label{subsec:recognizing-convex-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A problem may look nonlinear but still be convex.
+
+Useful questions include:
+
+\begin{enumerate}
+    \item Is the objective a known convex function?
+    \item Is it a nonnegative sum of convex functions?
+    \item Is it a convex function composed with an affine mapping?
+    \item Are inequality functions convex?
+    \item Are equality constraints affine?
+    \item Can an epigraph transformation reveal convex structure?
+    \item Can a norm or cone formulation simplify the model?
+\end{enumerate}
+
+Recognizing convexity is often more valuable than manipulating the model
+into an arbitrary nonlinear-programming form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:convex-optimization-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Calling Every Nonlinear Problem Nonconvex}
+
+Nonlinearity does not imply nonconvexity.
+
+For example,
+
+\[
+x^2
+\]
+
+is nonlinear but convex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Checking Only the Objective}
+
+For a convex optimization problem, the feasible region must also be
+convex.
+
+A convex objective over a nonconvex set is not a convex optimization
+problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Allowing Nonaffine Equality Constraints}
+
+A constraint such as
+
+\[
+x^2+y^2=1
+\]
+
+does not define a convex feasible set.
+
+Standard convex optimization permits affine equality constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Positive Semidefinite Hessian at One Point Proves Convexity}
+
+To prove convexity by the Hessian criterion, one needs
+
+\[
+\boxed{
+\nabla^2f(\mathbf{x})
+\succeq0
+}
+\]
+
+throughout the convex domain.
+
+Checking one point is insufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Strict and Strong Convexity}
+
+Strong convexity implies strict convexity.
+
+Strict convexity does not necessarily imply strong convexity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Convex Functions Are Always Differentiable}
+
+Functions such as
+
+\[
+|x|
+\]
+
+and
+
+\[
+\|\mathbf{x}\|_1
+\]
+
+are convex but nonsmooth.
+
+Subgradients are required at nondifferentiable points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting Domain Restrictions}
+
+The function
+
+\[
+-\log x
+\]
+
+is convex only on its domain
+
+\[
+\boxed{
+x>0.
+}
+\]
+
+Convexity statements must include the domain.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Composition Rules Without Checking Monotonicity}
+
+A convex outer function composed with a convex inner function is not
+automatically convex.
+
+Monotonicity and domain conditions matter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Slater's Condition Is Necessary for Strong Duality}
+
+Slater's condition is an important sufficient condition.
+
+Strong duality may still hold even when Slater's condition fails.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Weak and Strong Duality}
+
+Weak duality always gives
+
+\[
+\boxed{
+d^*\leq p^*.
+}
+\]
+
+Strong duality additionally states
+
+\[
+\boxed{
+d^*=p^*.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Complementary Slackness}
+
+At a convex KKT point,
+
+\[
+\boxed{
+\lambda_i f_i(x^*)=0.
+}
+\]
+
+A strictly inactive inequality must have zero multiplier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Any KKT Point Is Globally Optimal}
+
+Global sufficiency requires convex problem structure.
+
+For nonconvex problems, KKT conditions alone do not give global
+optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating a Convex Relaxation as the Original Problem}
+
+A relaxation enlarges the feasible set.
+
+Its solution may be infeasible for the original problem.
+
+Its objective value is primarily a bound until a feasible original
+solution is recovered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Conditioning}
+
+A convex problem may still be numerically difficult.
+
+Convexity guarantees global structure, not necessarily good numerical
+conditioning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:convex-optimization-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Statistics.}
+Least squares, logistic regression, regularized regression, covariance
+estimation, and many likelihood problems are convex.
+
+\medskip
+
+\textbf{Machine Learning.}
+Support vector machines, sparse regression, and many classification and
+estimation problems rely on convex optimization.
+
+\medskip
+
+\textbf{Signal Processing.}
+Denoising, sparse reconstruction, compressed sensing, and inverse
+problems frequently use convex norms and regularization.
+
+\medskip
+
+\textbf{Finance.}
+Mean-variance portfolio optimization and many risk-constrained allocation
+problems are convex quadratic or conic programs.
+
+\medskip
+
+\textbf{Control Theory.}
+Linear matrix inequalities and Lyapunov stability conditions lead to
+semidefinite programs.
+
+\medskip
+
+\textbf{Engineering Design.}
+Norm constraints, quadratic models, robust design, and geometric programs
+often admit convex formulations.
+
+\medskip
+
+\textbf{Operations Research.}
+Linear programming, network models, convex resource allocation, and
+relaxations of discrete problems all fit within convex optimization.
+
+\medskip
+
+\textbf{Inverse Problems.}
+Convex regularizers transform ill-posed estimation into stable
+optimization problems.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:convex-optimization-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a convex set.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a convex combination.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the convex hull.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a convex function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define strict convexity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define strong convexity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the epigraph of a function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a subgradient.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a convex cone.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the Lagrange dual function.
+\end{exercise}
+
+\begin{exercise}[1]
+State weak duality.
+\end{exercise}
+
+\begin{exercise}[1]
+State Slater's condition.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+\{
+(x,y):
+x+y\leq4
+\}
+\]
+
+is convex.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+\{
+(x,y):
+x^2+y^2\leq1
+\}
+\]
+
+is convex.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+\{
+(x,y):
+x^2+y^2=1
+\}
+\]
+
+is convex.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+f(x)=x^4
+\]
+
+is convex.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+f(x)=e^x
+\]
+
+is convex.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+f(x)=-\log x
+\]
+
+is convex on \(x>0\).
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the Hessian of
+
+\[
+f(x,y)
+=
+x^2+xy+y^2.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether the previous function is convex.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the subdifferential of
+
+\[
+|x|
+\]
+
+at \(x=0\).
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+0\in\partial|x|
+\]
+
+at \(x=0\), and interpret the result.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that every affine set is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that intersections of convex sets are convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that every norm ball is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that a nonnegative weighted sum of convex functions is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that affine composition preserves convexity.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that the pointwise maximum of convex functions is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that the epigraph of a convex function is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that every local minimizer of a convex function on a convex set is
+global.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that a strictly convex function has at most one minimizer.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the Hessian to test convexity of
+
+\[
+f(x,y)
+=
+3x^2+2xy+2y^2.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Write
+
+\[
+\min_x |x|
+\]
+
+in epigraph form.
+\end{exercise}
+
+\begin{exercise}[3]
+Write
+
+\[
+\min_x
+\max
+\{
+2x+1,
+-x+3
+\}
+\]
+
+in epigraph form.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the second-order cone is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the positive-semidefinite cone is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a Euclidean norm minimization problem as an SOCP.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a convex quadratic program with three variables and two affine
+constraints.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the dual function for
+
+\[
+\min_x x^2
+\]
+
+subject to
+
+\[
+1-x\leq0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Solve the previous problem using KKT conditions.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify strong duality for the previous problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Check Slater's condition for
+
+\[
+x^2-4<0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Find the projection of \((3,4)\) onto the unit Euclidean ball.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the projection of a point onto a half-space.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the proximal operator of
+
+\[
+\lambda|x|
+\]
+
+and derive soft thresholding.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the projected-gradient update for a box-constrained problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate ridge regression as a convex optimization problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate lasso regression as a convex optimization problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the logistic-regression negative log-likelihood is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a minimum-variance portfolio problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the Lyapunov inequality
+
+\[
+A^TP+PA\prec0
+\]
+
+is affine in \(P\).
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the first-order characterization of convexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the second-order Hessian characterization of convexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study quasiconvex functions and quasiconvex optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study perspective transformations of convex functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study supporting-hyperplane theorems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study separating-hyperplane theorems.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the subgradient optimality condition.
+\end{exercise}
+
+\begin{exercise}[4]
+Study normal cones and constrained convex optimality.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Lagrange duality from lower-bounding arguments.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove weak duality for general convex programs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study strong duality under Slater's condition.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive KKT necessity and sufficiency for convex problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study convex conjugates.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the Fenchel--Young inequality.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Fenchel duality.
+\end{exercise}
+
+\begin{exercise}[4]
+Study proximal operators and monotone mappings.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive convergence rates for smooth convex gradient descent.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive linear convergence under strong convexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Nesterov acceleration.
+\end{exercise}
+
+\begin{exercise}[4]
+Study proximal-gradient convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study primal-dual first-order algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study conic duality.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the dual of an SOCP.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the dual of a semidefinite program.
+\end{exercise}
+
+\begin{exercise}[4]
+Study self-concordant barriers.
+\end{exercise}
+
+\begin{exercise}[4]
+Study polynomial-time complexity of interior-point methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct convex relaxations for binary quadratic problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study semidefinite relaxations of combinatorial optimization problems.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:convex-optimization-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A convex optimization problem has form
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f_0(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+f_i(\mathbf{x})\leq0,
+\\
+&
+A\mathbf{x}=\mathbf{b},
+\end{aligned}
+}
+\]
+
+where the objective and inequality functions are convex.
+
+A set \(C\) is convex when
+
+\[
+\boxed{
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+\in C
+}
+\]
+
+for all
+
+\[
+\mathbf{x},\mathbf{y}\in C
+\]
+
+and
+
+\[
+0\leq\theta\leq1.
+\]
+
+A differentiable function is convex when
+
+\[
+\boxed{
+f(\mathbf{y})
+\geq
+f(\mathbf{x})
++
+\nabla f(\mathbf{x})^T
+(
+\mathbf{y}-\mathbf{x}
+).
+}
+\]
+
+For twice-differentiable functions,
+
+\[
+\boxed{
+\nabla^2f(\mathbf{x})\succeq0
+}
+\]
+
+throughout the domain implies convexity.
+
+For convex problems,
+
+\[
+\boxed{
+\text{local optimum}
+=
+\text{global optimum}.
+}
+\]
+
+The Lagrange dual function is
+
+\[
+\boxed{
+q(\lambda,\nu)
+=
+\inf_x
+\mathcal{L}(x,\lambda,\nu).
+}
+\]
+
+Weak duality gives
+
+\[
+\boxed{
+d^*\leq p^*.
+}
+\]
+
+Under suitable conditions such as Slater's condition,
+
+\[
+\boxed{
+d^*=p^*.
+}
+\]
+
+Convex optimization therefore combines
+
+\[
+\boxed{
+\text{geometry}
++
+\text{duality}
++
+\text{linear algebra}
++
+\text{analysis}
++
+\text{efficient algorithms}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:convex-optimization-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Convex Optimization identifies the globally tractable structure hidden
+inside many nonlinear models. Convex sets, subgradients, duality,
+conic formulations, proximal methods, and interior-point methods connect
+the general nonlinear theory of Section~\ref{sec:nonlinear-programming}
+with linear programming and modern large-scale optimization. Convex
+relaxations also provide essential lower bounds for discrete problems.
+The next section, Integer Programming, introduces decision variables that
+must take integral values and develops branch-and-bound, cutting planes,
+relaxations, and mixed-integer modeling.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.4 Convex Optimization
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard convex analysis.
+%   - Standard convex optimization and duality theory.
+%   - Standard conic and first-order optimization methods.
+%
+% Used for:
+%   - convex combinations;
+%   - convex sets;
+%   - affine sets and norm balls;
+%   - convex hulls;
+%   - intersections of convex sets;
+%   - convex, strict, and strongly convex functions;
+%   - first- and second-order convexity criteria;
+%   - epigraphs and sublevel sets;
+%   - convexity-preservation rules;
+%   - affine composition;
+%   - pointwise maxima;
+%   - perspective functions;
+%   - convex cones and dual cones;
+%   - second-order cones;
+%   - SOCP;
+%   - positive-semidefinite cones;
+%   - semidefinite programming;
+%   - convex quadratic programming;
+%   - projections onto convex sets;
+%   - supporting and separating hyperplanes;
+%   - subgradients and subdifferentials;
+%   - normal cones;
+%   - constrained convex optimality;
+%   - Lagrange dual functions;
+%   - weak and strong duality;
+%   - Slater's condition;
+%   - KKT sufficiency;
+%   - convex conjugates;
+%   - Fenchel--Young inequality;
+%   - proximal operators;
+%   - soft thresholding;
+%   - gradient, subgradient, projected-gradient, and proximal-gradient
+%     methods;
+%   - accelerated and coordinate methods preview;
+%   - interior-point methods;
+%   - central paths;
+%   - self-concordance preview;
+%   - convex relaxations;
+%   - robust optimization preview;
+%   - statistical, machine-learning, financial, signal-processing, and
+%     control applications;
+%   - exercises.
+%
+% Notes:
+%   - Integer Programming is developed next in Section 10.5.
+%   - Combinatorial Optimization follows in Section 10.6.
+%   - Numerical optimization methods are developed more deeply in
+%     Chapter 11.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

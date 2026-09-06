@@ -1,0 +1,4983 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.19 COMPUTATIONAL STATISTICS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Computational Statistics}
+\label{sec:computational-statistics}
+
+\prerequisite{
+Probability, random variables, statistical estimation, hypothesis
+testing, regression, mathematical statistics, Bayesian statistics,
+statistical learning, numerical methods, optimization, linear algebra,
+and basic programming concepts.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain why computation is fundamental to modern statistics;
+    \item distinguish exact analytical methods from numerical methods;
+    \item understand floating-point and numerical-precision issues;
+    \item recognize numerical instability;
+    \item understand numerical optimization in statistical estimation;
+    \item recognize gradient, Hessian, and Newton-type methods;
+    \item understand constrained optimization conceptually;
+    \item understand Monte Carlo integration;
+    \item understand Monte Carlo error and convergence rates;
+    \item generate random variables using inverse transforms;
+    \item understand acceptance--rejection sampling;
+    \item understand importance sampling;
+    \item recognize weight degeneracy;
+    \item understand variance reduction conceptually;
+    \item understand bootstrap resampling;
+    \item distinguish parametric and nonparametric bootstrap methods;
+    \item estimate bootstrap standard errors;
+    \item understand percentile and basic bootstrap intervals;
+    \item recognize bias-corrected bootstrap methods;
+    \item understand jackknife resampling;
+    \item understand permutation and randomization tests;
+    \item distinguish exact and Monte Carlo permutation procedures;
+    \item understand the plus-one correction for sampled permutations;
+    \item understand Markov chain Monte Carlo;
+    \item recognize Metropolis--Hastings;
+    \item recognize Gibbs sampling;
+    \item understand autocorrelation in MCMC;
+    \item understand effective sample size;
+    \item understand Monte Carlo standard errors;
+    \item recognize importance sampling and sequential Monte Carlo;
+    \item understand expectation--maximization;
+    \item recognize latent-variable estimation;
+    \item understand numerical differentiation;
+    \item understand automatic differentiation conceptually;
+    \item understand simulation studies;
+    \item design computational experiments for estimator comparison;
+    \item understand reproducibility and random seeds;
+    \item understand parallel computation conceptually;
+    \item recognize computational limitations in high-dimensional
+          statistics;
+    \item understand matrix decompositions used in statistical
+          computation;
+    \item understand iterative algorithms for regression and
+          regularization;
+    \item recognize coordinate descent;
+    \item understand stochastic-gradient methods conceptually;
+    \item understand computational diagnostics;
+    \item connect computational statistics with numerical analysis,
+          Bayesian statistics, statistical learning, and scientific
+          computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Computational Statistics?}
+\label{subsec:what-is-computational-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computational statistics studies numerical algorithms for statistical
+estimation, inference, simulation, prediction, and uncertainty
+quantification.
+
+Many statistical problems cannot be solved using closed-form formulas.
+
+Instead, one must compute approximations to quantities such as
+
+\[
+\boxed{
+\widehat{\theta}
+=
+\arg\max_\theta
+L(\theta),
+}
+\]
+
+\[
+\boxed{
+\mathbb{E}
+[
+g(\theta)
+\mid x
+],
+}
+\]
+
+or
+
+\[
+\boxed{
+P
+(
+T^*\geq T_{obs}
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Statistical Computation Is Necessary}
+\label{subsec:why-statistical-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computation becomes necessary when:
+
+\[
+\boxed{
+\text{likelihood equations have no closed form},
+}
+\]
+
+\[
+\boxed{
+\text{posterior integrals are intractable},
+}
+\]
+
+\[
+\boxed{
+\text{sampling distributions are unknown},
+}
+\]
+
+\[
+\boxed{
+\text{datasets are high dimensional},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{models require iterative estimation}.
+}
+\]
+
+Modern statistics therefore combines theory with numerical algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Analytical Versus Computational Solutions}
+\label{subsec:analytical-versus-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An analytical solution produces an exact symbolic formula.
+
+For example,
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\overline{X}.
+}
+\]
+
+A computational solution may instead produce a sequence
+
+\[
+\boxed{
+\theta^{(0)},
+\theta^{(1)},
+\ldots
+}
+\]
+
+that converges toward the desired estimate.
+
+The output is then an approximation whose accuracy depends on the
+algorithm and numerical precision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Error}
+\label{subsec:numerical-error-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computational error can arise from several sources:
+
+\[
+\boxed{
+\text{roundoff error},
+}
+\]
+
+\[
+\boxed{
+\text{truncation error},
+}
+\]
+
+\[
+\boxed{
+\text{optimization error},
+}
+\]
+
+\[
+\boxed{
+\text{Monte Carlo error},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{approximation error}.
+}
+\]
+
+These are distinct from sampling error in the statistical model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sampling Error Versus Computational Error}
+\label{subsec:sampling-versus-computational-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sampling error arises because only a finite random sample is observed.
+
+Computational error arises because the statistical procedure is
+implemented approximately.
+
+Thus a reported estimate may contain both:
+
+\[
+\boxed{
+\text{statistical uncertainty}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{numerical uncertainty}.
+}
+\]
+
+A reliable analysis controls both.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Floating-Point Arithmetic}
+\label{subsec:floating-point-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computers store most real numbers using finite binary representations.
+
+Therefore many real numbers cannot be represented exactly.
+
+For example,
+
+\[
+\boxed{
+0.1
+}
+\]
+
+does not generally have an exact finite binary representation.
+
+Repeated calculations can accumulate small numerical errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Catastrophic Cancellation}
+\label{subsec:catastrophic-cancellation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Catastrophic cancellation can occur when subtracting nearly equal
+floating-point numbers.
+
+For example,
+
+\[
+\boxed{
+a-b
+}
+\]
+
+may lose significant digits when \(a\) and \(b\) are very close.
+
+Statistically equivalent formulas may therefore have very different
+numerical stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stable Variance Computation}
+\label{subsec:stable-variance-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The identity
+
+\[
+\operatorname{Var}(X)
+=
+\mathbb{E}[X^2]
+-
+\mathbb{E}[X]^2
+\]
+
+is mathematically correct.
+
+But computing sample variance as
+
+\[
+\frac1n\sum x_i^2
+-
+\overline{x}^2
+\]
+
+can suffer cancellation when the observations are large but tightly
+clustered.
+
+A centered calculation is generally more stable:
+
+\[
+\boxed{
+\sum
+(
+x_i-\overline{x}
+)^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logarithmic Computation}
+\label{subsec:logarithmic-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Likelihoods often involve products of many small probabilities:
+
+\[
+\boxed{
+L(\theta)
+=
+\prod_{i=1}^{n}
+f_\theta(x_i).
+}
+\]
+
+This product may underflow numerically.
+
+Instead compute
+
+\[
+\boxed{
+\ell(\theta)
+=
+\sum_{i=1}^{n}
+\log
+f_\theta(x_i).
+}
+\]
+
+Log-likelihoods are both numerically more stable and easier to optimize.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Sum-Exp Trick}
+\label{subsec:log-sum-exp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one must compute
+
+\[
+\log
+\left(
+\sum_{i=1}^{n}
+e^{a_i}
+\right).
+\]
+
+Direct exponentiation may overflow.
+
+Let
+
+\[
+m
+=
+\max_i a_i.
+\]
+
+Then
+
+\[
+\boxed{
+\log
+\left(
+\sum_i e^{a_i}
+\right)
+=
+m
++
+\log
+\left(
+\sum_i
+e^{a_i-m}
+\right).
+}
+\]
+
+This is known as the log-sum-exp stabilization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Optimization in Statistics}
+\label{subsec:numerical-optimization-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many estimators solve
+
+\[
+\boxed{
+\widehat{\theta}
+=
+\arg\min_\theta
+Q(\theta)
+}
+\]
+
+or
+
+\[
+\boxed{
+\widehat{\theta}
+=
+\arg\max_\theta
+\ell(\theta).
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{maximum likelihood},
+}
+\]
+
+\[
+\boxed{
+\text{penalized regression},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{MAP estimation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient}
+\label{subsec:statistical-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+Q:
+\mathbb{R}^p
+\to
+\mathbb{R},
+\]
+
+the gradient is
+
+\[
+\boxed{
+\nabla Q(\boldsymbol{\theta})
+=
+\begin{pmatrix}
+\partial Q/\partial\theta_1\\
+\vdots\\
+\partial Q/\partial\theta_p
+\end{pmatrix}.
+}
+\]
+
+At an interior differentiable optimum,
+
+\[
+\boxed{
+\nabla Q(\widehat{\boldsymbol{\theta}})
+=
+\mathbf{0}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hessian Matrix}
+\label{subsec:statistical-hessian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Hessian is
+
+\[
+\boxed{
+H(\boldsymbol{\theta})
+=
+\nabla^2
+Q(\boldsymbol{\theta}).
+}
+\]
+
+It contains second derivatives.
+
+At a local minimum, a positive definite Hessian indicates positive local
+curvature.
+
+For log-likelihood maximization, the negative Hessian is closely related
+to observed Fisher information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient Descent}
+\label{subsec:gradient-descent-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gradient descent iterates
+
+\[
+\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
+-
+\eta_k
+\nabla
+Q
+(
+\boldsymbol{\theta}^{(k)}
+),
+}
+\]
+
+where
+
+\[
+\eta_k>0
+\]
+
+is the step size or learning rate.
+
+The update moves in the direction of steepest local decrease.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Step Size}
+\label{subsec:optimization-step-size}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the step size is too large, the algorithm may:
+
+\[
+\boxed{
+\text{overshoot},
+}
+\]
+
+\[
+\boxed{
+\text{oscillate},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{diverge}.
+}
+\]
+
+If it is too small, convergence may be extremely slow.
+
+Step-size selection is therefore an important computational issue.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton's Method}
+\label{subsec:newtons-method-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Newton's method uses both gradient and curvature:
+
+\[
+\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
+-
+H
+(
+\boldsymbol{\theta}^{(k)}
+)^{-1}
+\nabla
+Q
+(
+\boldsymbol{\theta}^{(k)}
+).
+}
+\]
+
+Near a well-behaved optimum, Newton's method can converge rapidly.
+
+However, computing and inverting the Hessian may be expensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton--Raphson for Likelihood}
+\label{subsec:newton-raphson-likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For log-likelihood
+
+\[
+\ell(\theta),
+\]
+
+Newton--Raphson uses
+
+\[
+\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\frac{
+\ell'(\theta^{(k)})
+}{
+\ell''(\theta^{(k)})
+}.
+}
+\]
+
+For vector parameters,
+
+\[
+\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
+-
+[
+\nabla^2\ell
+(
+\boldsymbol{\theta}^{(k)}
+)
+]^{-1}
+\nabla\ell
+(
+\boldsymbol{\theta}^{(k)}
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fisher Scoring}
+\label{subsec:fisher-scoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fisher scoring replaces the observed negative Hessian by expected Fisher
+information.
+
+The update is
+
+\[
+\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
++
+I
+(
+\boldsymbol{\theta}^{(k)}
+)^{-1}
+U
+(
+\boldsymbol{\theta}^{(k)}
+).
+}
+\]
+
+This method is important in generalized linear models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Iteratively Reweighted Least Squares}
+\label{subsec:irls}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many generalized linear models can be fitted using iteratively reweighted
+least squares, abbreviated IRLS.
+
+At each iteration, the algorithm solves a weighted least-squares problem
+
+\[
+\boxed{
+\min_{\boldsymbol{\beta}}
+(
+\mathbf{z}
+-
+X\boldsymbol{\beta}
+)^T
+W
+(
+\mathbf{z}
+-
+X\boldsymbol{\beta}
+).
+}
+\]
+
+The working response \(\mathbf{z}\) and weights \(W\) are updated
+iteratively.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convergence Criteria}
+\label{subsec:optimization-convergence-criteria}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An iterative algorithm may stop when:
+
+\[
+\boxed{
+\|
+\boldsymbol{\theta}^{(k+1)}
+-
+\boldsymbol{\theta}^{(k)}
+\|
+<
+\varepsilon,
+}
+\]
+
+or
+
+\[
+\boxed{
+|
+Q^{(k+1)}
+-
+Q^{(k)}
+|
+<
+\varepsilon,
+}
+\]
+
+or
+
+\[
+\boxed{
+\|
+\nabla Q
+(
+\boldsymbol{\theta}^{(k)}
+)
+\|
+<
+\varepsilon.
+}
+\]
+
+Multiple criteria are often checked together.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Versus Global Optima}
+\label{subsec:local-global-optima-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A local optimum is best only in a neighborhood.
+
+A global optimum is best over the full parameter space.
+
+Nonconvex statistical models may contain several local optima.
+
+Therefore initialization can materially affect the final estimate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Starting Values}
+\label{subsec:multiple-starting-values}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonconvex problems, one can run an optimizer from several initial
+points.
+
+If many runs converge to the same optimum, confidence in the numerical
+solution increases.
+
+Different solutions may indicate:
+
+\[
+\boxed{
+\text{multiple local optima},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{identifiability problems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constrained Optimization}
+\label{subsec:constrained-optimization-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Statistical parameters often satisfy constraints such as
+
+\[
+\boxed{
+\sigma^2>0,
+}
+\]
+
+\[
+\boxed{
+0<p<1,
+}
+\]
+
+or
+
+\[
+\boxed{
+\sum_jp_j=1.
+}
+\]
+
+Optimization algorithms must respect these constraints.
+
+One strategy is reparameterization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reparameterization}
+\label{subsec:optimization-reparameterization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of optimizing directly over
+
+\[
+\sigma>0,
+\]
+
+let
+
+\[
+\boxed{
+\eta
+=
+\log\sigma.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\sigma
+=
+e^\eta
+}
+\]
+
+automatically satisfies positivity.
+
+Similarly, probabilities can be represented using logistic or softmax
+transformations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coordinate Descent}
+\label{subsec:coordinate-descent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Coordinate descent updates one parameter at a time while holding the
+others fixed.
+
+For parameters
+
+\[
+\beta_1,\ldots,\beta_p,
+\]
+
+one cycles through
+
+\[
+\boxed{
+\beta_1
+\rightarrow
+\beta_2
+\rightarrow
+\cdots
+\rightarrow
+\beta_p.
+}
+\]
+
+Coordinate descent is especially useful for lasso and elastic-net
+regression.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Soft Thresholding}
+\label{subsec:soft-thresholding}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The soft-thresholding operator is
+
+\[
+\boxed{
+S(z,\lambda)
+=
+\operatorname{sign}(z)
+\max
+(
+|z|-\lambda,
+0
+).
+}
+\]
+
+It appears naturally in coordinate-descent updates for the lasso.
+
+Values sufficiently close to zero are set exactly to zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Gradient Descent}
+\label{subsec:stochastic-gradient-descent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+Q(\theta)
+=
+\frac1n
+\sum_{i=1}^{n}
+Q_i(\theta),
+\]
+
+ordinary gradient descent computes the full gradient.
+
+Stochastic gradient descent, abbreviated SGD, uses one observation or a
+small batch:
+
+\[
+\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\eta_k
+\nabla
+Q_{i_k}
+(
+\theta^{(k)}
+).
+}
+\]
+
+This can dramatically reduce the cost per iteration for large datasets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mini-Batch Optimization}
+\label{subsec:minibatch-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A mini-batch method uses a subset
+
+\[
+B_k
+\]
+
+of observations at iteration \(k\):
+
+\[
+\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\eta_k
+\frac1{|B_k|}
+\sum_{i\in B_k}
+\nabla Q_i
+(
+\theta^{(k)}
+).
+}
+\]
+
+This balances computational efficiency and gradient stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Differentiation}
+\label{subsec:numerical-differentiation-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If an analytic derivative is unavailable, a numerical approximation may
+be used.
+
+A forward difference is
+
+\[
+\boxed{
+f'(x)
+\approx
+\frac{
+f(x+h)-f(x)
+}{
+h
+}.
+}
+\]
+
+A centered difference is
+
+\[
+\boxed{
+f'(x)
+\approx
+\frac{
+f(x+h)-f(x-h)
+}{
+2h
+}.
+}
+\]
+
+The choice of \(h\) balances truncation and roundoff error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Automatic Differentiation Preview}
+\label{subsec:automatic-differentiation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Automatic differentiation computes derivatives by systematically applying
+the chain rule through a sequence of elementary operations.
+
+It is neither symbolic differentiation nor finite differencing.
+
+It can produce derivatives accurate to machine precision and is widely
+used in modern optimization and Bayesian computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix Computation in Statistics}
+\label{subsec:matrix-computation-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many statistical procedures require solving linear systems
+
+\[
+\boxed{
+A\mathbf{x}
+=
+\mathbf{b}.
+}
+\]
+
+Explicitly calculating
+
+\[
+A^{-1}
+\]
+
+is often less stable and less efficient than solving the system directly.
+
+Thus numerical linear algebra is central to statistical computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QR Decomposition}
+\label{subsec:qr-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a design matrix
+
+\[
+X,
+\]
+
+a QR decomposition writes
+
+\[
+\boxed{
+X
+=
+QR,
+}
+\]
+
+where \(Q\) has orthonormal columns and \(R\) is upper triangular.
+
+Least squares can then be solved from
+
+\[
+\boxed{
+R\widehat{\boldsymbol{\beta}}
+=
+Q^T\mathbf{y}.
+}
+\]
+
+This is often more numerically stable than forming
+
+\[
+X^TX.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Singular Value Decomposition}
+\label{subsec:svd-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The singular value decomposition is
+
+\[
+\boxed{
+X
+=
+U
+D
+V^T.
+}
+\]
+
+Here,
+
+\[
+U
+\]
+
+and
+
+\[
+V
+\]
+
+contain orthonormal singular vectors, and
+
+\[
+D
+\]
+
+contains nonnegative singular values.
+
+SVD is fundamental for:
+
+\[
+\boxed{
+\text{least squares},
+}
+\]
+
+\[
+\boxed{
+\text{PCA},
+}
+\]
+
+\[
+\boxed{
+\text{rank determination},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{regularization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Condition Number}
+\label{subsec:condition-number-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a nonsingular matrix \(A\), the condition number in the Euclidean norm
+is
+
+\[
+\boxed{
+\kappa(A)
+=
+\frac{
+\sigma_{\max}(A)
+}{
+\sigma_{\min}(A)
+}.
+}
+\]
+
+A large condition number indicates that small perturbations can cause
+large changes in the solution.
+
+This is a major issue under multicollinearity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Methods}
+\label{subsec:monte-carlo-methods-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Monte Carlo methods approximate mathematical quantities through random
+simulation.
+
+Suppose
+
+\[
+X_1,\ldots,X_M
+\overset{\text{i.i.d.}}{\sim}
+p(x).
+\]
+
+To estimate
+
+\[
+\mu
+=
+\mathbb{E}
+[
+g(X)
+],
+\]
+
+use
+
+\[
+\boxed{
+\widehat{\mu}_M
+=
+\frac1M
+\sum_{m=1}^{M}
+g(X_m).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Consistency}
+\label{subsec:monte-carlo-consistency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By the law of large numbers,
+
+\[
+\boxed{
+\widehat{\mu}_M
+\xrightarrow{P}
+\mu.
+}
+\]
+
+If
+
+\[
+\operatorname{Var}
+[
+g(X)
+]
+=
+\sigma_g^2
+<
+\infty,
+\]
+
+then
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{\mu}_M
+)
+=
+\frac{
+\sigma_g^2
+}{
+M
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Standard Error}
+\label{subsec:monte-carlo-se-independent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Monte Carlo standard error is approximately
+
+\[
+\boxed{
+MCSE
+=
+\frac{
+s_g
+}{
+\sqrt{M}
+},
+}
+\]
+
+where \(s_g\) is the sample standard deviation of
+
+\[
+g(X_1),
+\ldots,
+g(X_M).
+\]
+
+Thus computational accuracy improves at rate
+
+\[
+\boxed{
+M^{-1/2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Cost of Precision}
+\label{subsec:monte-carlo-cost-precision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because
+
+\[
+MCSE
+\propto
+M^{-1/2},
+\]
+
+reducing Monte Carlo error by a factor of \(2\) requires approximately
+
+\[
+\boxed{
+4
+}
+\]
+
+times as many simulations.
+
+Reducing it by a factor of \(10\) requires approximately
+
+\[
+\boxed{
+100
+}
+\]
+
+times as many simulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Monte Carlo Integration}
+\label{subsec:worked-monte-carlo-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Estimating an Integral}
+
+Suppose
+
+\[
+U
+\sim
+\operatorname{Uniform}(0,1).
+\]
+
+Then
+
+\[
+\int_0^1
+x^2\,dx
+=
+\mathbb{E}
+[
+U^2
+].
+\]
+
+Generate
+
+\[
+U_1,\ldots,U_M
+\]
+
+and calculate
+
+\[
+\widehat{I}
+=
+\frac1M
+\sum_{m=1}^{M}
+U_m^2.
+\]
+
+Since
+
+\[
+\int_0^1x^2\,dx
+=
+\frac13,
+\]
+
+the Monte Carlo estimate should approach
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+\frac13.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pseudo-Random Numbers}
+\label{subsec:pseudorandom-numbers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computer-generated random numbers are generally produced by deterministic
+algorithms designed to imitate randomness.
+
+These are called pseudo-random number generators.
+
+A generator begins from an internal state, often initialized by a seed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Seeds}
+\label{subsec:random-seeds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Setting a random seed can reproduce the same pseudo-random sequence.
+
+This is useful for:
+
+\[
+\boxed{
+\text{debugging},
+}
+\]
+
+\[
+\boxed{
+\text{verification},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{reproducible research}.
+}
+\]
+
+A fixed seed does not make the statistical procedure itself deterministic
+in a conceptual sense; it fixes one reproducible simulation realization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uniform Random Variables}
+\label{subsec:uniform-random-generation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many random-generation algorithms begin with
+
+\[
+\boxed{
+U
+\sim
+\operatorname{Uniform}(0,1).
+}
+\]
+
+Other distributions are generated by transforming or accepting/rejecting
+uniform random variables.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse Transform Sampling}
+\label{subsec:inverse-transform-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(F\) is a continuous strictly increasing CDF.
+
+If
+
+\[
+U
+\sim
+\operatorname{Uniform}(0,1),
+\]
+
+then
+
+\[
+\boxed{
+X
+=
+F^{-1}(U)
+}
+\]
+
+has CDF \(F\).
+
+This is inverse transform sampling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Exponential Simulation}
+\label{subsec:worked-exponential-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Inverse Transform Method}
+
+For
+
+\[
+X
+\sim
+\operatorname{Exponential}(\lambda),
+\]
+
+the CDF is
+
+\[
+F(x)
+=
+1-e^{-\lambda x}.
+\]
+
+Set
+
+\[
+U
+=
+1-e^{-\lambda X}.
+\]
+
+Then
+
+\[
+e^{-\lambda X}
+=
+1-U.
+\]
+
+Thus
+
+\[
+X
+=
+-\frac1\lambda
+\log(1-U).
+\]
+
+Since \(1-U\) is also uniform,
+
+\begin{answerbox}
+\[
+\boxed{
+X
+=
+-\frac1\lambda
+\log U
+}
+\]
+
+generates an exponential random variable.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acceptance--Rejection Sampling}
+\label{subsec:acceptance-rejection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose target density \(f\) is difficult to sample from.
+
+Choose proposal density \(g\) and constant \(M\) such that
+
+\[
+\boxed{
+f(x)
+\leq
+Mg(x)
+}
+\]
+
+for all \(x\).
+
+Generate
+
+\[
+Y\sim g
+\]
+
+and
+
+\[
+U\sim
+\operatorname{Uniform}(0,1).
+\]
+
+Accept \(Y\) if
+
+\[
+\boxed{
+U
+\leq
+\frac{
+f(Y)
+}{
+Mg(Y)
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acceptance Rate}
+\label{subsec:acceptance-rejection-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f\) and \(g\) are normalized densities, the average acceptance
+probability is
+
+\[
+\boxed{
+\frac1M.
+}
+\]
+
+Thus efficiency depends on choosing a proposal \(g\) that closely covers
+the target.
+
+A very large \(M\) produces many rejected proposals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Importance Sampling}
+\label{subsec:importance-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\mu
+=
+\int
+g(x)
+p(x)\,dx
+\]
+
+but sampling from \(p\) is difficult.
+
+Choose proposal density \(q\) with support covering the important regions
+of \(p\).
+
+Then
+
+\[
+\mu
+=
+\int
+g(x)
+\frac{
+p(x)
+}{
+q(x)
+}
+q(x)\,dx.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mu
+=
+\mathbb{E}_q
+[
+g(X)w(X)
+],
+}
+\]
+
+where
+
+\[
+\boxed{
+w(x)
+=
+\frac{
+p(x)
+}{
+q(x)
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Importance Sampling Estimator}
+\label{subsec:importance-sampling-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+X_1,\ldots,X_M
+\sim
+q,
+\]
+
+then
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\frac1M
+\sum_{m=1}^{M}
+g(X_m)
+w(X_m).
+}
+\]
+
+This estimator works well only if \(q\) provides sufficient coverage of
+important target regions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Self-Normalized Importance Sampling}
+\label{subsec:self-normalized-importance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the target density is known only up to a constant,
+
+\[
+p(x)
+\propto
+\widetilde{p}(x),
+\]
+
+define unnormalized weights
+
+\[
+\widetilde{w}_m
+=
+\frac{
+\widetilde{p}(X_m)
+}{
+q(X_m)
+}.
+\]
+
+Normalize them:
+
+\[
+\boxed{
+w_m
+=
+\frac{
+\widetilde{w}_m
+}{
+\sum_{r=1}^{M}
+\widetilde{w}_r
+}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\sum_{m=1}^{M}
+w_m
+g(X_m).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Importance Weight Degeneracy}
+\label{subsec:importance-weight-degeneracy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a few observations receive nearly all the importance weight, the
+estimate becomes unstable.
+
+This is called weight degeneracy.
+
+It occurs when proposal \(q\) poorly matches the target.
+
+Diagnostics should examine the distribution of weights.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Effective Sample Size for Importance Sampling}
+\label{subsec:importance-sampling-ess}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For normalized weights
+
+\[
+w_1,\ldots,w_M,
+\]
+
+a common heuristic effective sample size is
+
+\[
+\boxed{
+ESS
+=
+\frac1{
+\sum_{m=1}^{M}
+w_m^2
+}.
+}
+\]
+
+If all weights are equal,
+
+\[
+ESS=M.
+\]
+
+If one weight dominates,
+
+\[
+ESS
+\]
+
+approaches \(1\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance Reduction}
+\label{subsec:monte-carlo-variance-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Monte Carlo accuracy can be improved without simply increasing \(M\).
+
+Variance-reduction methods include:
+
+\[
+\boxed{
+\text{antithetic variables},
+}
+\]
+
+\[
+\boxed{
+\text{control variates},
+}
+\]
+
+\[
+\boxed{
+\text{importance sampling},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stratified simulation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Variates}
+\label{subsec:control-variates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one wants
+
+\[
+\mu
+=
+\mathbb{E}[Y]
+\]
+
+and has another variable \(X\) with known mean
+
+\[
+\mu_X.
+\]
+
+Consider
+
+\[
+\boxed{
+Y^*
+=
+Y
+-
+c
+(
+X-\mu_X
+).
+}
+\]
+
+Its expectation remains \(\mu\).
+
+Choosing \(c\) appropriately can reduce variance when \(X\) and \(Y\) are
+correlated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control-Variate Coefficient}
+\label{subsec:optimal-control-variate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The variance-minimizing coefficient is
+
+\[
+\boxed{
+c^*
+=
+\frac{
+\operatorname{Cov}(Y,X)
+}{
+\operatorname{Var}(X)
+}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\operatorname{Var}(Y^*)
+=
+\operatorname{Var}(Y)
+(
+1-\rho_{XY}^2
+).
+}
+\]
+
+Strong correlation can therefore yield substantial variance reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Antithetic Variables}
+\label{subsec:antithetic-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+U
+\sim
+\operatorname{Uniform}(0,1).
+\]
+
+Then
+
+\[
+1-U
+\]
+
+has the same distribution.
+
+A simulation may pair
+
+\[
+g(U)
+\]
+
+with
+
+\[
+g(1-U).
+\]
+
+If these outputs are negatively correlated, their average can have
+smaller variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap}
+\label{subsec:bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The bootstrap approximates a sampling distribution by repeatedly
+resampling from an estimated population distribution.
+
+For a statistic
+
+\[
+\widehat{\theta}
+=
+T(X_1,\ldots,X_n),
+\]
+
+generate bootstrap datasets
+
+\[
+\boxed{
+X_1^{*(b)},
+\ldots,
+X_n^{*(b)},
+}
+\]
+
+and calculate
+
+\[
+\boxed{
+\widehat{\theta}^{*(b)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonparametric Bootstrap}
+\label{subsec:nonparametric-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The nonparametric bootstrap samples with replacement from the observed
+dataset.
+
+Each bootstrap observation is drawn from the empirical distribution
+
+\[
+\boxed{
+F_n.
+}
+\]
+
+Thus every original observation receives probability
+
+\[
+\boxed{
+\frac1n
+}
+\]
+
+on each bootstrap draw.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Algorithm}
+\label{subsec:bootstrap-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic nonparametric bootstrap procedure is:
+
+\begin{enumerate}
+    \item observe data \(X_1,\ldots,X_n\);
+    \item calculate \(\widehat{\theta}\);
+    \item sample \(n\) observations with replacement from the data;
+    \item calculate \(\widehat{\theta}^*\);
+    \item repeat steps 3--4 for \(B\) bootstrap samples;
+    \item use the empirical distribution of
+          \(\widehat{\theta}^{*(1)},\ldots,\widehat{\theta}^{*(B)}\).
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Standard Error}
+\label{subsec:bootstrap-standard-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The bootstrap standard error is
+
+\[
+\boxed{
+\widehat{SE}_{boot}
+=
+\sqrt{
+\frac1{B-1}
+\sum_{b=1}^{B}
+\left(
+\widehat{\theta}^{*(b)}
+-
+\overline{\widehat{\theta}^*}
+\right)^2
+}.
+}
+\]
+
+Here,
+
+\[
+\boxed{
+\overline{\widehat{\theta}^*}
+=
+\frac1B
+\sum_{b=1}^{B}
+\widehat{\theta}^{*(b)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bootstrap Concept}
+\label{subsec:worked-bootstrap-concept}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Resampling a Small Dataset}
+
+Suppose the observed sample is
+
+\[
+\{2,4,7\}.
+\]
+
+One bootstrap sample might be
+
+\[
+\{4,4,2\}.
+\]
+
+Another might be
+
+\[
+\{7,2,7\}.
+\]
+
+Each sample has size \(3\) and is drawn with replacement from the original
+observations.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{Bootstrap samples may contain repeated observations and omit
+others.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Bias Estimate}
+\label{subsec:bootstrap-bias-estimate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A bootstrap estimate of estimator bias is
+
+\[
+\boxed{
+\widehat{\operatorname{Bias}}_{boot}
+=
+\overline{\widehat{\theta}^*}
+-
+\widehat{\theta}.
+}
+\]
+
+A simple bias-corrected point estimate is
+
+\[
+\boxed{
+\widehat{\theta}_{BC}
+=
+\widehat{\theta}
+-
+\widehat{\operatorname{Bias}}_{boot}.
+}
+\]
+
+Bias correction is not always beneficial because it can increase
+variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Percentile Bootstrap Interval}
+\label{subsec:percentile-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\widehat{\theta}^{*}_{(\alpha/2)}
+\]
+
+and
+
+\[
+\widehat{\theta}^{*}_{(1-\alpha/2)}
+\]
+
+be empirical bootstrap quantiles.
+
+The percentile interval is
+
+\[
+\boxed{
+\left[
+\widehat{\theta}^{*}_{(\alpha/2)},
+\widehat{\theta}^{*}_{(1-\alpha/2)}
+\right].
+}
+\]
+
+This is simple but can have poor coverage in biased or highly skewed
+settings.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Bootstrap Interval}
+\label{subsec:basic-bootstrap-interval}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The basic bootstrap interval reflects the bootstrap distribution around
+the observed estimate:
+
+\[
+\boxed{
+\left[
+2\widehat{\theta}
+-
+\widehat{\theta}^{*}_{(1-\alpha/2)},
+\,
+2\widehat{\theta}
+-
+\widehat{\theta}^{*}_{(\alpha/2)}
+\right].
+}
+\]
+
+It is sometimes called the reverse-percentile interval.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Normal Interval}
+\label{subsec:bootstrap-normal-interval}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using bootstrap standard error,
+
+\[
+\boxed{
+\widehat{\theta}
+\pm
+z_{1-\alpha/2}
+\widehat{SE}_{boot}
+}
+\]
+
+gives a normal-approximation bootstrap interval.
+
+This assumes the estimator distribution is sufficiently symmetric and
+approximately normal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{BCa Bootstrap Preview}
+\label{subsec:bca-bootstrap-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The bias-corrected and accelerated, or BCa, interval adjusts bootstrap
+quantiles for:
+
+\[
+\boxed{
+\text{median bias}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{skewness-related acceleration}.
+}
+\]
+
+It often improves coverage but requires additional computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric Bootstrap}
+\label{subsec:parametric-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The parametric bootstrap assumes a fitted parametric model
+
+\[
+F_{\widehat{\theta}}.
+\]
+
+Bootstrap samples are generated from
+
+\[
+\boxed{
+F_{\widehat{\theta}}
+}
+\]
+
+rather than directly from the empirical distribution.
+
+This can be more efficient when the parametric model is correct.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric Versus Nonparametric Bootstrap}
+\label{subsec:parametric-versus-nonparametric-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The nonparametric bootstrap relies less on parametric distributional
+assumptions.
+
+The parametric bootstrap can model features not well represented by a
+small empirical sample, but its validity depends strongly on model
+specification.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap for Regression}
+\label{subsec:bootstrap-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Regression bootstrapping may resample:
+
+\[
+\boxed{
+\text{observation pairs},
+}
+\]
+
+or under suitable assumptions,
+
+\[
+\boxed{
+\text{residuals}.
+}
+\]
+
+The appropriate scheme depends on the regression design and error
+structure.
+
+Resampling must preserve the data-generating assumptions relevant to the
+inferential target.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap and Dependence}
+\label{subsec:bootstrap-dependence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary observation-level bootstrap assumes independent sampling.
+
+For time series, spatial data, clustered data, or repeated measurements,
+independent resampling destroys dependence.
+
+Specialized schemes include:
+
+\[
+\boxed{
+\text{block bootstrap},
+}
+\]
+
+\[
+\boxed{
+\text{cluster bootstrap},
+}
+\]
+
+or model-based resampling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Block Bootstrap Preview}
+\label{subsec:block-bootstrap-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For dependent sequential data, blocks of consecutive observations are
+resampled rather than individual observations.
+
+This preserves short-range dependence within blocks.
+
+The block length creates a bias--variance and dependence-preservation
+tradeoff.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jackknife}
+\label{subsec:jackknife}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The jackknife systematically removes one observation at a time.
+
+Let
+
+\[
+\widehat{\theta}_{(-i)}
+\]
+
+be the estimate computed without observation \(i\).
+
+There are
+
+\[
+\boxed{
+n
+}
+\]
+
+leave-one-out estimates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jackknife Mean}
+\label{subsec:jackknife-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+\overline{\theta}_{(\cdot)}
+=
+\frac1n
+\sum_{i=1}^{n}
+\widehat{\theta}_{(-i)}.
+}
+\]
+
+A jackknife bias estimate is
+
+\[
+\boxed{
+\widehat{\operatorname{Bias}}_{jack}
+=
+(n-1)
+\left(
+\overline{\theta}_{(\cdot)}
+-
+\widehat{\theta}
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jackknife Standard Error}
+\label{subsec:jackknife-standard-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A jackknife standard-error estimate is
+
+\[
+\boxed{
+\widehat{SE}_{jack}
+=
+\sqrt{
+\frac{
+n-1
+}{
+n
+}
+\sum_{i=1}^{n}
+\left(
+\widehat{\theta}_{(-i)}
+-
+\overline{\theta}_{(\cdot)}
+\right)^2
+}.
+}
+\]
+
+Jackknife methods work especially well for sufficiently smooth
+statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Tests}
+\label{subsec:permutation-tests-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Permutation tests construct a null distribution by rearranging labels or
+assignments in a manner justified by the null hypothesis.
+
+Suppose a statistic is
+
+\[
+\boxed{
+T_{obs}.
+}
+\]
+
+For each valid permutation \(\pi\), compute
+
+\[
+\boxed{
+T_\pi.
+}
+\]
+
+The permutation distribution provides the null reference distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Permutation Test}
+\label{subsec:exact-permutation-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If all valid permutations can be enumerated, the exact permutation
+\(p\)-value for a right-tailed test is
+
+\[
+\boxed{
+p
+=
+\frac{
+\#\{
+T_\pi\geq T_{obs}
+\}
+}{
+\#\{
+\text{valid permutations}
+\}
+}.
+}
+\]
+
+The permutation scheme must reflect the null exchangeability structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Permutation Test}
+\label{subsec:monte-carlo-permutation-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When the number of permutations is too large, sample
+
+\[
+B
+\]
+
+random valid permutations.
+
+If
+
+\[
+B_{extreme}
+\]
+
+sampled statistics are at least as extreme as the observed statistic, a
+common finite-simulation correction is
+
+\[
+\boxed{
+p
+=
+\frac{
+B_{extreme}+1
+}{
+B+1
+}.
+}
+\]
+
+The plus-one correction avoids reporting an impossible Monte Carlo
+\(p\)-value of exactly zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomization Tests}
+\label{subsec:randomization-tests-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In randomized experiments, the treatment-assignment mechanism defines a
+natural reference distribution.
+
+Under a sharp null hypothesis, outcomes are fixed and treatment labels
+are reassigned according to the original randomization scheme.
+
+This produces a design-based randomization distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Versus Bootstrap}
+\label{subsec:permutation-versus-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bootstrap methods approximate sampling distributions by resampling data
+from an estimated population.
+
+Permutation methods approximate null distributions by rearranging labels
+or assignments under a null invariance principle.
+
+Thus:
+
+\[
+\boxed{
+\text{bootstrap}
+\rightarrow
+\text{sampling uncertainty},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{permutation}
+\rightarrow
+\text{null reference distribution}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Markov Chain Monte Carlo}
+\label{subsec:mcmc-computational-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Markov chain Monte Carlo constructs a dependent sequence
+
+\[
+\boxed{
+\theta^{(1)},
+\theta^{(2)},
+\ldots
+}
+\]
+
+whose stationary distribution is a target distribution
+
+\[
+\pi(\theta).
+\]
+
+In Bayesian statistics,
+
+\[
+\pi(\theta)
+\]
+
+is usually the posterior distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why MCMC Is Useful}
+\label{subsec:why-mcmc-useful}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the posterior is
+
+\[
+\pi(\theta\mid x)
+=
+\frac{
+h(\theta)
+}{
+C
+},
+\]
+
+where the normalizing constant \(C\) is unknown.
+
+Many MCMC methods require only ratios of posterior densities.
+
+Then \(C\) cancels.
+
+This makes MCMC useful for high-dimensional intractable posteriors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metropolis--Hastings Algorithm}
+\label{subsec:metropolis-hastings-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At current state
+
+\[
+\theta^{(m)},
+\]
+
+propose
+
+\[
+\theta'
+\sim
+q
+(
+\theta'\mid\theta^{(m)}
+).
+\]
+
+Accept \(\theta'\) with probability
+
+\[
+\boxed{
+\alpha
+=
+\min
+\left\{
+1,
+\frac{
+\pi(\theta')
+q
+(
+\theta^{(m)}\mid\theta'
+)
+}{
+\pi
+(
+\theta^{(m)}
+)
+q
+(
+\theta'\mid\theta^{(m)}
+)
+}
+\right\}.
+}
+\]
+
+If rejected,
+
+\[
+\boxed{
+\theta^{(m+1)}
+=
+\theta^{(m)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetric Proposal}
+\label{subsec:symmetric-mh-proposal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+q
+(
+\theta'\mid\theta
+)
+=
+q
+(
+\theta\mid\theta'
+),
+\]
+
+the proposal terms cancel.
+
+Then
+
+\[
+\boxed{
+\alpha
+=
+\min
+\left\{
+1,
+\frac{
+\pi(\theta')
+}{
+\pi(\theta)
+}
+\right\}.
+}
+\]
+
+Random-walk proposals are common examples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Detailed Balance}
+\label{subsec:detailed-balance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A transition kernel satisfies detailed balance with respect to \(\pi\) if
+
+\[
+\boxed{
+\pi(x)
+P(x,dy)
+=
+\pi(y)
+P(y,dx).
+}
+\]
+
+Detailed balance implies that \(\pi\) is stationary.
+
+Metropolis--Hastings is constructed to satisfy this relationship under
+appropriate conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gibbs Sampling}
+\label{subsec:gibbs-sampling-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boldsymbol{\theta}
+=
+(
+\theta_1,\ldots,\theta_p
+).
+\]
+
+Gibbs sampling repeatedly draws each component from its full conditional:
+
+\[
+\boxed{
+\theta_j
+\sim
+\pi
+(
+\theta_j
+\mid
+\boldsymbol{\theta}_{-j},
+x
+).
+}
+\]
+
+If all full conditionals are easy to sample from, Gibbs sampling can be
+simple to implement.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MCMC Burn-In and Warmup}
+\label{subsec:mcmc-burnin-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Early iterations may depend strongly on initialization or be used for
+algorithm adaptation.
+
+These are often treated as warmup iterations.
+
+Discarding warmup does not guarantee convergence.
+
+The post-warmup chain must still mix adequately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MCMC Autocorrelation}
+\label{subsec:mcmc-autocorrelation-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MCMC draws are dependent.
+
+Let
+
+\[
+\rho_k
+\]
+
+denote autocorrelation at lag \(k\) in the simulated chain.
+
+Strong positive autocorrelation means the chain explores the target
+slowly.
+
+This reduces effective information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integrated Autocorrelation Time}
+\label{subsec:integrated-autocorrelation-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A conceptual integrated autocorrelation time is
+
+\[
+\boxed{
+\tau
+=
+1
++
+2
+\sum_{k=1}^{\infty}
+\rho_k,
+}
+\]
+
+when the series is well-defined.
+
+Then approximately
+
+\[
+\boxed{
+ESS
+\approx
+\frac{
+M
+}{
+\tau
+}.
+}
+\]
+
+Thus highly correlated chains have smaller effective sample sizes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MCMC Monte Carlo Standard Error}
+\label{subsec:mcmc-mcse}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If posterior quantity \(g(\theta)\) has variance
+
+\[
+\sigma_g^2,
+\]
+
+a rough MCMC standard error is
+
+\[
+\boxed{
+MCSE
+\approx
+\sqrt{
+\frac{
+\sigma_g^2
+}{
+ESS
+}
+}.
+}
+\]
+
+Thus increasing raw iterations is useful only if the chain produces
+additional effective information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MCMC Diagnostics}
+\label{subsec:mcmc-diagnostics-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Useful diagnostics include:
+
+\[
+\boxed{
+\text{trace plots},
+}
+\]
+
+\[
+\boxed{
+\text{autocorrelation plots},
+}
+\]
+
+\[
+\boxed{
+\text{effective sample sizes},
+}
+\]
+
+\[
+\boxed{
+\widehat{R},
+}
+\]
+
+and comparisons across multiple chains.
+
+No single diagnostic proves convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequential Monte Carlo Preview}
+\label{subsec:sequential-monte-carlo-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sequential Monte Carlo represents a sequence of target distributions
+using weighted particles.
+
+At each stage, particles may undergo:
+
+\[
+\boxed{
+\text{weighting},
+}
+\]
+
+\[
+\boxed{
+\text{resampling},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{propagation}.
+}
+\]
+
+These methods are widely used in state-space and dynamic models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Particle Filtering Preview}
+\label{subsec:particle-filtering-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A particle filter approximates the filtering distribution
+
+\[
+\boxed{
+p
+(
+x_t
+\mid
+y_1,\ldots,y_t
+)
+}
+\]
+
+using a weighted collection of simulated states.
+
+Unlike the Kalman filter, particle methods can handle nonlinear and
+non-Gaussian state-space models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expectation--Maximization Algorithm}
+\label{subsec:em-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The expectation--maximization, or EM, algorithm is used when a model
+contains latent or missing data.
+
+Let
+
+\[
+Z
+\]
+
+denote latent variables and
+
+\[
+X
+\]
+
+the observed data.
+
+The complete-data log-likelihood is
+
+\[
+\boxed{
+\ell_c
+(
+\theta;X,Z
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{E-Step}
+\label{subsec:em-e-step}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given current parameter estimate
+
+\[
+\theta^{(k)},
+\]
+
+the E-step calculates
+
+\[
+\boxed{
+Q
+(
+\theta\mid\theta^{(k)}
+)
+=
+\mathbb{E}
+\left[
+\ell_c
+(
+\theta;X,Z
+)
+\mid
+X,\theta^{(k)}
+\right].
+}
+\]
+
+This replaces missing or latent information by its conditional expected
+log-likelihood contribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{M-Step}
+\label{subsec:em-m-step}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The M-step sets
+
+\[
+\boxed{
+\theta^{(k+1)}
+=
+\arg\max_\theta
+Q
+(
+\theta\mid\theta^{(k)}
+).
+}
+\]
+
+Thus EM alternates:
+
+\[
+\boxed{
+\text{Expectation}
+\rightarrow
+\text{Maximization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EM Monotonicity}
+\label{subsec:em-monotonicity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under standard conditions, each EM iteration does not decrease the
+observed-data likelihood:
+
+\[
+\boxed{
+L
+(
+\theta^{(k+1)}
+)
+\geq
+L
+(
+\theta^{(k)}
+).
+}
+\]
+
+However, EM can converge slowly and may converge to a local optimum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mixture-Model Example}
+\label{subsec:em-mixture-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+X_i
+\]
+
+arises from one of \(K\) latent mixture components.
+
+Introduce latent indicator
+
+\[
+\boxed{
+Z_i
+\in
+\{1,\ldots,K\}.
+}
+\]
+
+The E-step estimates posterior probabilities of component membership.
+
+The M-step updates component parameters using those probabilities as
+weights.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Studies}
+\label{subsec:simulation-studies}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simulation study evaluates statistical procedures under controlled
+data-generating conditions.
+
+Typical goals include estimating:
+
+\[
+\boxed{
+\text{bias},
+}
+\]
+
+\[
+\boxed{
+\text{variance},
+}
+\]
+
+\[
+\boxed{
+\text{MSE},
+}
+\]
+
+\[
+\boxed{
+\text{coverage},
+}
+\]
+
+\[
+\boxed{
+\text{Type I error},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{power}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Simulation Study Design}
+\label{subsec:simulation-study-design}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simulation study may proceed as follows:
+
+\begin{enumerate}
+    \item choose known population parameters;
+    \item generate a synthetic dataset;
+    \item apply the statistical procedure;
+    \item save the estimate or test result;
+    \item repeat many times;
+    \item summarize the repeated results.
+\end{enumerate}
+
+Because the true parameter is known, estimator properties can be measured
+directly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Bias Estimate}
+\label{subsec:simulation-bias}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose simulation replication \(r\) produces estimator
+
+\[
+\widehat{\theta}^{(r)}.
+\]
+
+Across \(R\) simulations,
+
+\[
+\boxed{
+\widehat{\operatorname{Bias}}
+=
+\frac1R
+\sum_{r=1}^{R}
+\widehat{\theta}^{(r)}
+-
+\theta.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo MSE Estimate}
+\label{subsec:simulation-mse}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simulation estimate of MSE is
+
+\[
+\boxed{
+\widehat{MSE}
+=
+\frac1R
+\sum_{r=1}^{R}
+\left(
+\widehat{\theta}^{(r)}
+-
+\theta
+\right)^2.
+}
+\]
+
+This approximates the true repeated-sampling mean squared error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coverage Simulation}
+\label{subsec:coverage-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose interval
+
+\[
+C_r
+\]
+
+is constructed in simulation \(r\).
+
+The empirical coverage is
+
+\[
+\boxed{
+\widehat{Coverage}
+=
+\frac1R
+\sum_{r=1}^{R}
+\mathbf{1}
+\{
+\theta\in C_r
+\}.
+}
+\]
+
+A nominal \(95\%\) interval should ideally yield coverage near
+
+\[
+\boxed{
+0.95.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulating Type I Error}
+\label{subsec:simulation-type-i}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Generate data under the null hypothesis.
+
+Apply the test and record whether it rejects.
+
+Then
+
+\[
+\boxed{
+\widehat{\alpha}
+=
+\frac{
+\text{number of rejections}
+}{
+R
+}.
+}
+\]
+
+This evaluates whether the procedure maintains its nominal significance
+level.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulating Power}
+\label{subsec:simulation-power}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Generate data under a specified alternative.
+
+Then
+
+\[
+\boxed{
+\widehat{Power}
+=
+\frac{
+\text{number of rejections}
+}{
+R
+}.
+}
+\]
+
+Repeating this for several effect sizes produces an empirical power curve.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Error in Simulation Studies}
+\label{subsec:simulation-monte-carlo-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Simulation summaries themselves contain Monte Carlo error.
+
+For a simulated rejection proportion
+
+\[
+\widehat{p},
+\]
+
+the approximate Monte Carlo standard error is
+
+\[
+\boxed{
+\sqrt{
+\frac{
+\widehat{p}
+(
+1-\widehat{p}
+)
+}{
+R
+}
+}.
+}
+\]
+
+Thus reported simulation results should use enough replications for the
+desired precision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reproducible Simulation}
+\label{subsec:reproducible-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A reproducible simulation should document:
+
+\[
+\boxed{
+\text{data-generating mechanism},
+}
+\]
+
+\[
+\boxed{
+\text{parameter values},
+}
+\]
+
+\[
+\boxed{
+\text{sample sizes},
+}
+\]
+
+\[
+\boxed{
+\text{number of replications},
+}
+\]
+
+\[
+\boxed{
+\text{random-number settings},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{analysis procedure}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Computation}
+\label{subsec:parallel-computation-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many simulation and resampling tasks contain independent repetitions.
+
+For example:
+
+\[
+\boxed{
+\text{bootstrap replications},
+}
+\]
+
+\[
+\boxed{
+\text{permutation samples},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{simulation-study replications}.
+}
+\]
+
+These can often be distributed across multiple processors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Random Number Generation}
+\label{subsec:parallel-random-number-generation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel simulation requires care with pseudo-random streams.
+
+Simply reusing the same seed on every worker can generate identical
+sequences.
+
+Reliable parallel random-number methods use independent or appropriately
+separated streams.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vectorization}
+\label{subsec:vectorization-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Vectorized computation performs operations on entire arrays or matrices
+rather than using explicit scalar loops.
+
+For example,
+
+\[
+\boxed{
+X^T\mathbf{y}
+}
+\]
+
+is a matrix operation.
+
+Vectorization can improve both clarity and speed when supported by
+optimized numerical libraries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Matrices}
+\label{subsec:sparse-matrices-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sparse matrix contains mostly zero entries.
+
+Large models involving:
+
+\[
+\boxed{
+\text{networks},
+}
+\]
+
+\[
+\boxed{
+\text{spatial adjacency},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{high-dimensional design matrices}
+}
+\]
+
+may benefit greatly from sparse storage and algorithms.
+
+Storing every zero explicitly can waste enormous memory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Complexity}
+\label{subsec:computational-complexity-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Algorithms can be compared by how computational cost grows with problem
+size.
+
+For example, dense matrix inversion is often roughly
+
+\[
+\boxed{
+O(p^3).
+}
+\]
+
+Thus doubling \(p\) can increase computational cost by approximately a
+factor of
+
+\[
+\boxed{
+8.
+}
+\]
+
+Complexity becomes critical in high-dimensional problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memory Complexity}
+\label{subsec:memory-complexity-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dense \(p\times p\) matrix requires storage proportional to
+
+\[
+\boxed{
+p^2.
+}
+\]
+
+For very large \(p\), covariance and kernel matrices can become
+impractical even before arithmetic becomes too slow.
+
+Algorithms may therefore rely on:
+
+\[
+\boxed{
+\text{sparsity},
+}
+\]
+
+\[
+\boxed{
+\text{low-rank approximations},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{iterative matrix methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Stability in Least Squares}
+\label{subsec:numerical-stability-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The normal-equation estimator is
+
+\[
+\widehat{\boldsymbol{\beta}}
+=
+(
+X^TX
+)^{-1}
+X^T\mathbf{y}.
+\]
+
+But forming
+
+\[
+X^TX
+\]
+
+can worsen conditioning.
+
+QR or SVD-based least-squares solutions are usually more stable.
+
+Thus mathematically equivalent formulas need not be computationally
+equivalent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Iterative Solvers}
+\label{subsec:iterative-linear-solvers-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For extremely large systems, direct matrix decompositions may be too
+expensive.
+
+Iterative solvers approximate the solution to
+
+\[
+\boxed{
+A\mathbf{x}
+=
+\mathbf{b}
+}
+\]
+
+through successive updates.
+
+Such methods can exploit matrix sparsity and avoid storing dense
+factorizations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Integration}
+\label{subsec:numerical-integration-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Statistical expectations often have the form
+
+\[
+\boxed{
+\int
+g(\theta)
+p(\theta)
+\,d\theta.
+}
+\]
+
+Low-dimensional integrals may be approximated using deterministic
+quadrature.
+
+High-dimensional integrals often require Monte Carlo or other specialized
+methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadrature Preview}
+\label{subsec:quadrature-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical quadrature rule approximates
+
+\[
+\int_a^b
+f(x)\,dx
+\]
+
+using weighted evaluations:
+
+\[
+\boxed{
+\int_a^b
+f(x)\,dx
+\approx
+\sum_{j=1}^{m}
+w_j
+f(x_j).
+}
+\]
+
+Examples include trapezoidal, Simpson-type, and Gaussian quadrature
+methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Curse of Dimensionality in Integration}
+\label{subsec:integration-curse-dimensionality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A deterministic grid using \(m\) points per dimension requires
+
+\[
+\boxed{
+m^d
+}
+\]
+
+evaluations in \(d\) dimensions.
+
+Thus quadrature becomes rapidly infeasible as dimension grows.
+
+Monte Carlo methods are attractive because their basic convergence rate
+does not directly deteriorate exponentially with dimension in this way.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimization in Statistical Learning}
+\label{subsec:optimization-statistical-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modern predictive models frequently solve penalized objectives such as
+
+\[
+\boxed{
+\min_{\boldsymbol{\beta}}
+\left[
+L
+(
+\boldsymbol{\beta}
+)
++
+\lambda
+P
+(
+\boldsymbol{\beta}
+)
+\right].
+}
+\]
+
+Different penalties require different numerical algorithms.
+
+Examples include:
+
+\[
+\boxed{
+\text{gradient methods},
+}
+\]
+
+\[
+\boxed{
+\text{coordinate descent},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{proximal algorithms}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proximal Methods Preview}
+\label{subsec:proximal-methods-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an objective is
+
+\[
+f(\theta)+g(\theta),
+\]
+
+where \(f\) is smooth and \(g\) may be nonsmooth.
+
+A proximal-gradient update has form
+
+\[
+\boxed{
+\theta^{(k+1)}
+=
+\operatorname{prox}_{\eta g}
+\left[
+\theta^{(k)}
+-
+\eta
+\nabla f
+(
+\theta^{(k)}
+)
+\right].
+}
+\]
+
+This framework is useful for \(\ell_1\)-penalized problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reproducible Statistical Computation}
+\label{subsec:reproducible-statistical-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A reproducible analysis should record:
+
+\[
+\boxed{
+\text{data version},
+}
+\]
+
+\[
+\boxed{
+\text{code},
+}
+\]
+
+\[
+\boxed{
+\text{software versions},
+}
+\]
+
+\[
+\boxed{
+\text{random seeds},
+}
+\]
+
+\[
+\boxed{
+\text{model settings},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{preprocessing decisions}.
+}
+\]
+
+Reproducibility is part of statistical validity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Diagnostics}
+\label{subsec:computational-diagnostics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A statistical result should not be trusted solely because software
+returned a number.
+
+Check for:
+
+\[
+\boxed{
+\text{optimizer convergence},
+}
+\]
+
+\[
+\boxed{
+\text{gradient size},
+}
+\]
+
+\[
+\boxed{
+\text{boundary estimates},
+}
+\]
+
+\[
+\boxed{
+\text{singular matrices},
+}
+\]
+
+\[
+\boxed{
+\text{MCMC mixing},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{simulation error}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algorithm Verification}
+\label{subsec:algorithm-verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When possible, verify a computational method using a problem with a known
+analytical answer.
+
+For example, an MCMC algorithm can be tested on a simple normal target
+whose moments are known.
+
+Agreement does not prove correctness for all problems, but disagreement
+reveals implementation errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity to Initialization}
+\label{subsec:sensitivity-initialization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some algorithms depend strongly on starting values.
+
+Examples include:
+
+\[
+\boxed{
+\text{mixture-model EM},
+}
+\]
+
+\[
+\boxed{
+k\text{-means},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{nonconvex likelihood optimization}.
+}
+\]
+
+Multiple initializations can expose instability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity to Tolerance}
+\label{subsec:sensitivity-tolerance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A convergence tolerance that is too loose may stop an algorithm before
+adequate accuracy is reached.
+
+An excessively strict tolerance can waste computation or fail because of
+floating-point limitations.
+
+Important analyses should be checked for stability across reasonable
+tolerances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{High-Dimensional Statistical Computation}
+\label{subsec:high-dimensional-statistical-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When
+
+\[
+p
+\]
+
+is extremely large, standard dense computations may become infeasible.
+
+Possible strategies include:
+
+\[
+\boxed{
+\text{regularization},
+}
+\]
+
+\[
+\boxed{
+\text{sparse matrices},
+}
+\]
+
+\[
+\boxed{
+\text{iterative solvers},
+}
+\]
+
+\[
+\boxed{
+\text{low-rank approximations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{distributed computation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Low-Rank Approximation}
+\label{subsec:low-rank-approximation-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a matrix is approximately low rank, one can retain only its largest
+singular components.
+
+For
+
+\[
+X
+=
+UDV^T,
+\]
+
+a rank-\(r\) approximation is
+
+\[
+\boxed{
+X_r
+=
+U_r
+D_r
+V_r^T.
+}
+\]
+
+This reduces storage and computation while retaining dominant structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Statistical Workflow}
+\label{subsec:computational-statistics-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical computational workflow is:
+
+\begin{enumerate}
+    \item formulate the statistical target;
+    \item determine whether an analytical solution exists;
+    \item choose an appropriate numerical algorithm;
+    \item choose a numerically stable parameterization;
+    \item initialize the algorithm carefully;
+    \item set convergence tolerances;
+    \item monitor objective values or diagnostic quantities;
+    \item verify convergence;
+    \item compare multiple initializations when appropriate;
+    \item quantify Monte Carlo error if simulation is used;
+    \item verify the method on known special cases;
+    \item assess sensitivity to algorithm settings;
+    \item use stable matrix factorizations;
+    \item preserve random seeds and software settings;
+    \item document computational limitations.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Computational Method}
+\label{subsec:choosing-computational-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For smooth likelihood optimization:
+
+\[
+\boxed{
+\text{Newton, quasi-Newton, or gradient methods}.
+}
+\]
+
+For lasso-type penalization:
+
+\[
+\boxed{
+\text{coordinate descent or proximal methods}.
+}
+\]
+
+For uncertainty from repeated sampling:
+
+\[
+\boxed{
+\text{bootstrap}.
+}
+\]
+
+For null distributions under exchangeability:
+
+\[
+\boxed{
+\text{permutation or randomization tests}.
+}
+\]
+
+For ordinary integrals under known simulation distributions:
+
+\[
+\boxed{
+\text{Monte Carlo}.
+}
+\]
+
+For difficult posterior distributions:
+
+\[
+\boxed{
+\text{MCMC}.
+}
+\]
+
+For latent-variable likelihoods:
+
+\[
+\boxed{
+\text{EM}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:computational-statistics-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Assuming Software Output Is Automatically Correct}
+
+A numerical optimizer may stop at:
+
+\[
+\boxed{
+\text{a local optimum},
+}
+\]
+
+\[
+\boxed{
+\text{a boundary},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a nonconverged point}.
+}
+\]
+
+Diagnostic messages must be inspected.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Numerical Precision}
+
+Very large or very small numbers can cause overflow or underflow.
+
+Likelihood calculations should often use logarithmic forms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Explicitly Inverting Matrices Unnecessarily}
+
+Solving
+
+\[
+A\mathbf{x}
+=
+\mathbf{b}
+\]
+
+directly is usually preferable to computing
+
+\[
+A^{-1}
+\]
+
+and multiplying.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Normal Equations in Ill-Conditioned Problems}
+
+Forming
+
+\[
+X^TX
+\]
+
+can worsen conditioning.
+
+QR or SVD methods are often more stable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Multiple Local Optima}
+
+Mixture models, clustering, and nonconvex objectives can have several
+local solutions.
+
+One starting point may not be enough.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Stopping Optimization Too Early}
+
+A small number of iterations does not guarantee convergence.
+
+The gradient, parameter changes, and objective changes should be checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reporting Monte Carlo Estimates Without Monte Carlo Error}
+
+A simulation result such as
+
+\[
+0.0317
+\]
+
+has finite-simulation uncertainty.
+
+Report or at least assess its Monte Carlo standard error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reporting a Monte Carlo \(p\)-Value of Zero}
+
+If only \(B\) random permutations are sampled, use a finite-simulation
+correction such as
+
+\[
+\boxed{
+\frac{
+B_{extreme}+1
+}{
+B+1
+}.
+}
+\]
+
+The true \(p\)-value has not been established as exactly zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Ordinary Bootstrap for Dependent Data}
+
+Independent resampling destroys serial, spatial, or cluster dependence.
+
+Use a resampling scheme appropriate to the sampling structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Bootstrap Always Works}
+
+The bootstrap can fail for irregular estimators, boundary problems,
+extreme-value statistics, or inappropriate resampling schemes.
+
+Its validity depends on the statistic and data-generating process.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Bootstrap Monte Carlo Error}
+
+The estimated bootstrap quantiles themselves depend on finite \(B\).
+
+Too few bootstrap samples can create unstable intervals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Permutation and Bootstrap Logic}
+
+Bootstrap resampling approximates sampling variation.
+
+Permutation resampling constructs a null reference distribution.
+
+They answer different inferential questions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming MCMC Draws Are Independent}
+
+MCMC samples are generally autocorrelated.
+
+Raw iteration count overstates effective information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Only One MCMC Chain}
+
+A single chain can remain trapped in one region without revealing the
+problem.
+
+Multiple dispersed chains provide stronger diagnostics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Warmup Fixes Poor Mixing}
+
+Discarding early iterations does not correct an algorithm that fails to
+explore the target distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Thinning Automatically}
+
+Thinning often discards useful draws.
+
+It should be used only for a justified computational reason.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Importance Weight Degeneracy}
+
+A small number of huge weights can make importance-sampling estimates
+effectively depend on only a few simulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Same Random Stream Improperly in Parallel Code}
+
+Duplicated random streams can make apparently independent simulation
+replications identical or correlated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Comparing Algorithms Without Equal Computational Budgets}
+
+One method may appear more accurate simply because it used much more
+computation.
+
+Runtime, memory, convergence quality, and statistical accuracy should be
+considered together.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Reproducibility}
+
+Without code, software settings, preprocessing details, and random-number
+information, a computational statistical result may be impossible to
+verify.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:computational-statistics-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Bayesian Inference.}
+MCMC, importance sampling, quadrature, and optimization make complex
+posterior distributions computationally accessible.
+
+\medskip
+
+\textbf{Statistical Learning.}
+Regularized regression, boosting, kernel methods, and high-dimensional
+models rely on numerical optimization.
+
+\medskip
+
+\textbf{Environmental Science.}
+Bootstrap, Monte Carlo simulation, spatial computation, and stochastic
+models quantify uncertainty in environmental data.
+
+\medskip
+
+\textbf{Engineering.}
+Simulation studies evaluate system reliability, estimator performance,
+and uncertainty under complicated failure processes.
+
+\medskip
+
+\textbf{Medicine.}
+Computational methods fit survival models, hierarchical models,
+longitudinal models, and high-dimensional predictive systems.
+
+\medskip
+
+\textbf{Finance.}
+Monte Carlo methods estimate risk, option values, portfolio uncertainty,
+and stochastic-model quantities.
+
+\medskip
+
+\textbf{Operations Research.}
+Simulation and optimization are central to queueing, scheduling,
+inventory, and stochastic decision problems.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Matrix decompositions, iterative methods, parallel simulation, and
+numerical integration support large-scale quantitative research.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:computational-statistics-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define computational statistics.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish sampling error and computational error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define numerical instability.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Monte Carlo integration.
+\end{exercise}
+
+\begin{exercise}[1]
+Define bootstrap resampling.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a permutation test.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Markov chain Monte Carlo.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the EM algorithm.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a random seed.
+\end{exercise}
+
+\begin{exercise}[1]
+Define effective sample size.
+\end{exercise}
+
+\begin{exercise}[1]
+Define importance sampling.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a condition number.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose an ordinary Monte Carlo estimator has standard deviation \(8\)
+per simulated draw and uses
+
+\[
+M=400.
+\]
+
+Compute its Monte Carlo standard error.
+\end{exercise}
+
+\begin{exercise}[2]
+How many simulations are required to reduce Monte Carlo standard error by
+one-half, approximately?
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+U=0.25
+\]
+
+and
+
+\[
+\lambda=2.
+\]
+
+Use inverse transform sampling to generate an exponential random variable
+using
+
+\[
+X=-\frac1\lambda\log U.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose normalized importance weights are
+
+\[
+0.5,\ 0.25,\ 0.25.
+\]
+
+Compute the heuristic ESS
+
+\[
+\frac1{\sum w_i^2}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose bootstrap estimates have standard deviation
+
+\[
+2.4.
+\]
+
+What quantity does this approximate?
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose \(1000\) random permutations are sampled and \(19\) produce
+statistics at least as extreme as the observed statistic.
+
+Compute the plus-one Monte Carlo permutation \(p\)-value.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose an MCMC run contains \(10000\) draws with estimated integrated
+autocorrelation time \(5\).
+
+Approximate its effective sample size.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a dense matrix has dimension
+
+\[
+p=1000.
+\]
+
+Approximately how many entries must be stored?
+\end{exercise}
+
+\begin{exercise}[2]
+If dense matrix inversion scales approximately as \(p^3\), by what factor
+does computational cost increase when \(p\) doubles?
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why log-likelihood computation is often more numerically stable
+than direct likelihood computation.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the log-sum-exp identity.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why subtracting nearly equal floating-point numbers can be
+unstable.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the gradient-descent update from the local direction of steepest
+descent.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive Newton's method using a second-order Taylor expansion.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare Newton--Raphson and Fisher scoring.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why reparameterizing \(\sigma=e^\eta\) removes a positivity
+constraint.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the soft-thresholding solution for a one-dimensional lasso
+problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why QR decomposition is numerically preferable to the normal
+equations in ill-conditioned least-squares problems.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how SVD identifies rank deficiency.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the statistical meaning of a large matrix condition number.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove consistency of the basic Monte Carlo estimator using the law of
+large numbers.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the variance of the basic Monte Carlo mean.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Monte Carlo error decreases at rate \(M^{-1/2}\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive inverse transform sampling.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that acceptance--rejection sampling produces draws from the target
+density.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the importance-sampling identity.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why poor proposal-tail coverage can cause infinite or enormous
+importance-sampling variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the optimal control-variate coefficient.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how antithetic variables can reduce variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the bootstrap standard-error formula.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare percentile, basic, and normal bootstrap confidence intervals.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between parametric and nonparametric bootstrap.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why an ordinary bootstrap is inappropriate for strongly
+autocorrelated time-series data.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the jackknife standard-error formula.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the null exchangeability condition underlying permutation tests.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the plus-one permutation correction is used in Monte Carlo
+permutation tests.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between exact and sampled permutation tests.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Metropolis--Hastings does not require the posterior
+normalizing constant.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain detailed balance.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why MCMC autocorrelation reduces effective sample size.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the E-step and M-step of the EM algorithm.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why EM likelihood values generally increase across iterations.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a simulation study to estimate the bias and MSE of two competing
+estimators.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how to estimate coverage probability through simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why random seeds matter for reproducibility.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why parallel simulation requires independent random-number
+streams.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why sparse matrices can dramatically reduce memory usage.
+\end{exercise}
+
+\begin{exercise}[4]
+Study convergence rates of gradient descent under strong convexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive quasi-Newton methods and the BFGS update.
+\end{exercise}
+
+\begin{exercise}[4]
+Study trust-region optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate constrained optimization using Lagrange multipliers and
+interior-point methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study automatic differentiation using computational graphs.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive coordinate-descent updates for elastic-net regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Study proximal-gradient methods for lasso estimation.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate stochastic-gradient convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study variance-reduced stochastic-gradient methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive acceptance--rejection efficiency.
+\end{exercise}
+
+\begin{exercise}[4]
+Study importance-sampling central limit theorems.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate adaptive importance sampling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sequential Monte Carlo algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive particle-filter recursions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study theoretical validity of the nonparametric bootstrap.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate bootstrap inconsistency for extreme-value statistics.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the block bootstrap for stationary time series.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the BCa bootstrap interval.
+\end{exercise}
+
+\begin{exercise}[4]
+Study permutation inference under restricted randomization schemes.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Metropolis--Hastings invariance using detailed balance.
+\end{exercise}
+
+\begin{exercise}[4]
+Study geometric ergodicity of Markov chains.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate MCMC central limit theorems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Hamiltonian Monte Carlo computationally.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive EM using Jensen's inequality.
+\end{exercise}
+
+\begin{exercise}[4]
+Study acceleration methods for slow EM algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate numerical linear algebra for very large least-squares
+problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study randomized low-rank matrix decompositions.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate distributed statistical computation.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:computational-statistics-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computational statistics provides algorithms for statistical problems
+that cannot be solved conveniently in closed form.
+
+Optimization solves problems such as
+
+\[
+\boxed{
+\widehat{\theta}
+=
+\arg\max_\theta
+\ell(\theta).
+}
+\]
+
+Gradient descent uses
+
+\[
+\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\eta_k
+\nabla Q
+(
+\theta^{(k)}
+).
+}
+\]
+
+Newton's method uses curvature:
+
+\[
+\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+H^{-1}
+\nabla Q.
+}
+\]
+
+Monte Carlo approximates expectations by
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\frac1M
+\sum_{m=1}^{M}
+g(X_m).
+}
+\]
+
+Its standard error decreases at rate
+
+\[
+\boxed{
+M^{-1/2}.
+}
+\]
+
+Bootstrap methods approximate sampling distributions by resampling.
+
+Permutation methods approximate null distributions through valid
+rearrangements.
+
+MCMC constructs dependent draws from difficult target distributions.
+
+EM alternates expected latent-data completion and maximization.
+
+Stable statistical computation relies on:
+
+\[
+\boxed{
+\text{numerical analysis}
++
+\text{optimization}
++
+\text{simulation}
++
+\text{resampling}
++
+\text{linear algebra}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:computational-statistics-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Computational Statistics completes Chapter~\ref{chap:statistics} by
+providing the numerical machinery needed to implement the methods
+developed throughout the chapter. Likelihood estimation requires
+optimization, bootstrap and permutation methods provide computational
+inference when analytic sampling distributions are unavailable, Bayesian
+statistics relies heavily on Monte Carlo and MCMC, and statistical
+learning requires scalable optimization and matrix algorithms. These
+ideas connect directly with Chapter 10 on optimization and Chapter 11 on
+numerical and computational mathematics, where the algorithms underlying
+large-scale scientific computation are developed in greater depth.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.19 Computational Statistics
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard computational statistics.
+%   - Standard numerical optimization for statistical estimation.
+%   - Standard Monte Carlo, bootstrap, permutation, and MCMC methods.
+%
+% Used for:
+%   - analytical versus computational inference;
+%   - numerical error;
+%   - floating-point arithmetic;
+%   - numerical stability;
+%   - log-likelihood computation;
+%   - log-sum-exp stabilization;
+%   - optimization;
+%   - gradients and Hessians;
+%   - gradient descent;
+%   - Newton--Raphson;
+%   - Fisher scoring;
+%   - IRLS;
+%   - convergence criteria;
+%   - local and global optimization;
+%   - constrained optimization;
+%   - reparameterization;
+%   - coordinate descent;
+%   - soft thresholding;
+%   - stochastic gradient descent;
+%   - numerical differentiation;
+%   - automatic differentiation preview;
+%   - QR decomposition;
+%   - singular value decomposition;
+%   - condition numbers;
+%   - Monte Carlo integration;
+%   - Monte Carlo standard errors;
+%   - pseudo-random number generation;
+%   - inverse transform sampling;
+%   - acceptance--rejection sampling;
+%   - importance sampling;
+%   - effective sample size;
+%   - variance reduction;
+%   - control variates;
+%   - antithetic variables;
+%   - nonparametric bootstrap;
+%   - parametric bootstrap;
+%   - bootstrap standard errors;
+%   - bootstrap confidence intervals;
+%   - BCa preview;
+%   - dependent-data bootstrap;
+%   - jackknife;
+%   - permutation tests;
+%   - randomization tests;
+%   - Monte Carlo permutation tests;
+%   - plus-one p-value correction;
+%   - MCMC;
+%   - Metropolis--Hastings;
+%   - Gibbs sampling;
+%   - MCMC diagnostics;
+%   - sequential Monte Carlo preview;
+%   - particle filtering preview;
+%   - expectation--maximization;
+%   - simulation studies;
+%   - bias, MSE, coverage, Type I error, and power simulation;
+%   - reproducibility;
+%   - parallel computation;
+%   - sparse matrices;
+%   - computational complexity;
+%   - low-rank approximation;
+%   - high-dimensional computation;
+%   - applications and exercises.
+%
+% Notes:
+%   - This completes Chapter 8 — Statistics.
+%   - Chapter 9 begins Differential Equations and Dynamical Systems.
+%   - Chapter 10 develops optimization methods in greater depth.
+%   - Chapter 11 develops numerical analysis and scientific computing in
+%     greater depth.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

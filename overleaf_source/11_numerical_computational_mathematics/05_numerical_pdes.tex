@@ -1,0 +1,4780 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.5 NUMERICAL PARTIAL DIFFERENTIAL EQUATIONS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Numerical Partial Differential Equations}
+\label{sec:numerical-pdes}
+
+\prerequisite{
+Partial differential equations, multivariable calculus, numerical analysis,
+numerical linear algebra, numerical ODEs, Taylor expansions, boundary-value
+problems, and basic programming concepts.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain why PDEs often require numerical approximation;
+    \item distinguish elliptic, parabolic, and hyperbolic PDEs;
+    \item construct spatial and temporal computational grids;
+    \item approximate first and second derivatives using finite differences;
+    \item derive standard centered finite-difference stencils;
+    \item discretize the Poisson equation;
+    \item apply Dirichlet, Neumann, and Robin boundary conditions;
+    \item understand the discrete Laplacian;
+    \item construct finite-difference matrix systems;
+    \item recognize sparse matrix structure arising from PDE discretization;
+    \item understand truncation error and consistency for PDE schemes;
+    \item understand convergence of spatial discretizations;
+    \item discretize the heat equation;
+    \item derive the Forward-Time Centered-Space scheme;
+    \item derive the Backward-Time Centered-Space scheme;
+    \item derive the Crank--Nicolson method;
+    \item analyze stability using Fourier or von Neumann analysis;
+    \item understand the CFL condition;
+    \item distinguish conditional and unconditional stability;
+    \item understand numerical diffusion and numerical dispersion;
+    \item discretize the advection equation;
+    \item recognize upwind schemes;
+    \item understand why centered advection schemes may be unstable;
+    \item recognize Lax--Friedrichs and Lax--Wendroff methods;
+    \item discretize the wave equation;
+    \item derive a standard second-order wave-equation scheme;
+    \item understand domain-of-dependence ideas;
+    \item understand finite-volume methods;
+    \item formulate conservation laws in integral form;
+    \item understand numerical fluxes;
+    \item recognize Godunov-type methods conceptually;
+    \item understand finite-element methods conceptually;
+    \item derive a weak formulation;
+    \item understand trial and test spaces;
+    \item recognize basis functions and assembly;
+    \item understand mass and stiffness matrices;
+    \item understand Galerkin approximation;
+    \item recognize spectral methods;
+    \item understand collocation and modal spectral approaches;
+    \item recognize pseudospectral differentiation matrices;
+    \item understand the method of lines;
+    \item recognize operator splitting;
+    \item understand adaptive mesh refinement conceptually;
+    \item distinguish structured and unstructured meshes;
+    \item recognize consistency, stability, and convergence issues in PDEs;
+    \item understand discrete maximum principles conceptually;
+    \item understand conservation and monotonicity properties;
+    \item recognize nonlinear PDE discretizations;
+    \item understand Newton linearization for nonlinear PDE systems;
+    \item recognize iterative solvers and preconditioners for PDE matrices;
+    \item connect numerical PDEs with fluid dynamics, heat transfer,
+          elasticity, electromagnetics, finance, wave propagation, and
+          scientific computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Numerical PDEs?}
+\label{subsec:why-numerical-pdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Partial differential equations describe systems whose unknowns depend on
+multiple independent variables.
+
+Examples include
+
+\[
+\boxed{
+u_t=\alpha u_{xx},
+}
+\]
+
+\[
+\boxed{
+u_{tt}=c^2u_{xx},
+}
+\]
+
+and
+
+\[
+\boxed{
+-\Delta u=f.
+}
+\]
+
+Closed-form solutions exist only for special geometries, coefficients,
+boundary conditions, and forcing terms.
+
+Numerical PDE methods replace the continuous problem by a finite set of
+algebraic equations that can be solved computationally.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classification of Second-Order PDEs}
+\label{subsec:pde-classification-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A second-order PDE in two variables may contain terms
+
+\[
+A u_{xx}
++
+B u_{xy}
++
+C u_{yy}.
+\]
+
+The discriminant
+
+\[
+\boxed{
+B^2-4AC
+}
+\]
+
+helps classify the equation.
+
+The classical categories are:
+
+\[
+\boxed{
+B^2-4AC<0
+\quad
+\text{elliptic},
+}
+\]
+
+\[
+\boxed{
+B^2-4AC=0
+\quad
+\text{parabolic},
+}
+\]
+
+and
+
+\[
+\boxed{
+B^2-4AC>0
+\quad
+\text{hyperbolic}.
+}
+\]
+
+Different PDE classes require different numerical techniques.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Canonical Examples}
+\label{subsec:pde-canonical-examples}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A standard elliptic PDE is Poisson's equation:
+
+\[
+\boxed{
+-\Delta u=f.
+}
+\]
+
+A standard parabolic PDE is the heat equation:
+
+\[
+\boxed{
+u_t=\alpha\Delta u.
+}
+\]
+
+A standard hyperbolic PDE is the wave equation:
+
+\[
+\boxed{
+u_{tt}=c^2\Delta u.
+}
+\]
+
+Another important hyperbolic equation is linear advection:
+
+\[
+\boxed{
+u_t+cu_x=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Grid}
+\label{subsec:pde-computational-grid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a one-dimensional spatial domain
+
+\[
+[a,b],
+\]
+
+define grid points
+
+\[
+\boxed{
+x_i=a+ih,
+\qquad
+i=0,\ldots,N,
+}
+\]
+
+where
+
+\[
+\boxed{
+h=\frac{b-a}{N}.
+}
+\]
+
+For time-dependent PDEs, define
+
+\[
+\boxed{
+t^n=n\Delta t.
+}
+\]
+
+The numerical approximation is written
+
+\[
+\boxed{
+u_i^n
+\approx
+u(x_i,t^n).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Differences}
+\label{subsec:pde-finite-differences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite-difference methods replace derivatives with combinations of nearby
+grid values.
+
+For example,
+
+\[
+\boxed{
+u_x(x_i)
+\approx
+\frac{
+u_{i+1}-u_{i-1}
+}{
+2h
+}.
+}
+\]
+
+Similarly,
+
+\[
+\boxed{
+u_{xx}(x_i)
+\approx
+\frac{
+u_{i+1}-2u_i+u_{i-1}
+}{
+h^2
+}.
+}
+\]
+
+These formulas are obtained from Taylor expansions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Centered First Derivative}
+\label{subsec:pde-centered-first-derivative}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Expand
+
+\[
+u(x_i+h)
+=
+u_i
++
+hu_i'
++
+\frac{h^2}{2}u_i''
++
+\frac{h^3}{6}u_i'''
++
+O(h^4),
+\]
+
+and
+
+\[
+u(x_i-h)
+=
+u_i
+-
+hu_i'
++
+\frac{h^2}{2}u_i''
+-
+\frac{h^3}{6}u_i'''
++
+O(h^4).
+\]
+
+Subtracting gives
+
+\[
+u_{i+1}-u_{i-1}
+=
+2hu_i'
++
+O(h^3).
+\]
+
+Therefore,
+
+\[
+\boxed{
+u_x(x_i)
+=
+\frac{
+u_{i+1}-u_{i-1}
+}{
+2h
+}
++
+O(h^2).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Centered Second Derivative}
+\label{subsec:pde-centered-second-derivative}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adding the two Taylor expansions gives
+
+\[
+u_{i+1}
+-
+2u_i
++
+u_{i-1}
+=
+h^2u_i''
++
+O(h^4).
+\]
+
+Thus,
+
+\[
+\boxed{
+u_{xx}(x_i)
+=
+\frac{
+u_{i+1}-2u_i+u_{i-1}
+}{
+h^2
+}
++
+O(h^2).
+}
+\]
+
+This is one of the most important finite-difference formulas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stencil Notation}
+\label{subsec:pde-stencils}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stencil describes the grid points used in a finite-difference formula.
+
+For the centered second derivative,
+
+\[
+\boxed{
+\frac{
+u_{i-1}-2u_i+u_{i+1}
+}{
+h^2
+},
+}
+\]
+
+the one-dimensional stencil coefficients are
+
+\[
+\boxed{
+\frac1{h^2}
+\begin{bmatrix}
+1 & -2 & 1
+\end{bmatrix}.
+}
+\]
+
+Stencil notation makes multidimensional schemes easier to visualize.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The One-Dimensional Poisson Equation}
+\label{subsec:one-dimensional-poisson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+-u''(x)=f(x),
+\qquad
+a<x<b,
+}
+\]
+
+with Dirichlet boundary conditions
+
+\[
+\boxed{
+u(a)=\alpha,
+\qquad
+u(b)=\beta.
+}
+\]
+
+At interior grid point \(x_i\),
+
+\[
+-u''(x_i)
+\approx
+-
+\frac{
+u_{i+1}-2u_i+u_{i-1}
+}{
+h^2
+}.
+\]
+
+Thus,
+
+\[
+\boxed{
+-u_{i-1}
++
+2u_i
+-
+u_{i+1}
+=
+h^2f_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Poisson Matrix System}
+\label{subsec:poisson-matrix-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For interior unknowns
+
+\[
+U
+=
+\begin{pmatrix}
+u_1\\
+u_2\\
+\vdots\\
+u_{N-1}
+\end{pmatrix},
+\]
+
+the discrete problem becomes
+
+\[
+\boxed{
+AU=b,
+}
+\]
+
+where
+
+\[
+\boxed{
+A
+=
+\frac1{h^2}
+\begin{pmatrix}
+2&-1&0&\cdots&0\\
+-1&2&-1&\ddots&\vdots\\
+0&-1&2&\ddots&0\\
+\vdots&\ddots&\ddots&\ddots&-1\\
+0&\cdots&0&-1&2
+\end{pmatrix}.
+}
+\]
+
+Boundary values contribute to the right-hand side.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: One-Dimensional Poisson Problem}
+\label{subsec:worked-poisson-1d}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Three Interior Grid Points}
+
+Consider
+
+\[
+-u''(x)=1,
+\qquad
+0<x<1,
+\]
+
+with
+
+\[
+u(0)=0,
+\qquad
+u(1)=0.
+\]
+
+Use
+
+\[
+h=\frac14.
+\]
+
+The interior points are
+
+\[
+x_1=\frac14,
+\qquad
+x_2=\frac12,
+\qquad
+x_3=\frac34.
+\]
+
+The finite-difference equations are
+
+\[
+-u_{i-1}+2u_i-u_{i+1}
+=
+h^2
+=
+\frac1{16}.
+\]
+
+Thus,
+
+\[
+\begin{pmatrix}
+2&-1&0\\
+-1&2&-1\\
+0&-1&2
+\end{pmatrix}
+\begin{pmatrix}
+u_1\\
+u_2\\
+u_3
+\end{pmatrix}
+=
+\frac1{16}
+\begin{pmatrix}
+1\\
+1\\
+1
+\end{pmatrix}.
+\]
+
+By symmetry,
+
+\[
+u_1=u_3.
+\]
+
+Solving gives
+
+\[
+u_1=\frac{3}{32},
+\qquad
+u_2=\frac18,
+\qquad
+u_3=\frac{3}{32}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+U
+=
+\begin{pmatrix}
+3/32\\
+1/8\\
+3/32
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dirichlet Boundary Conditions}
+\label{subsec:dirichlet-boundary-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Dirichlet condition specifies the solution value:
+
+\[
+\boxed{
+u=g
+\quad
+\text{on the boundary}.
+}
+\]
+
+These values are known directly and are inserted into the discrete
+equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neumann Boundary Conditions}
+\label{subsec:neumann-boundary-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Neumann condition specifies the normal derivative:
+
+\[
+\boxed{
+\frac{\partial u}{\partial n}
+=
+g.
+}
+\]
+
+In one dimension at the left endpoint, one may approximate
+
+\[
+u_x(a)
+\]
+
+using a one-sided difference:
+
+\[
+\boxed{
+\frac{
+u_1-u_0
+}{
+h
+}
+\approx
+g.
+}
+\]
+
+Higher-order boundary approximations are often preferable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robin Boundary Conditions}
+\label{subsec:robin-boundary-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Robin condition combines value and derivative:
+
+\[
+\boxed{
+\alpha u
++
+\beta
+\frac{\partial u}{\partial n}
+=
+g.
+}
+\]
+
+Finite differences or finite elements can incorporate this condition into
+the boundary equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Dimensional Laplacian}
+\label{subsec:two-dimensional-laplacian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In two dimensions,
+
+\[
+\boxed{
+\Delta u
+=
+u_{xx}+u_{yy}.
+}
+\]
+
+For equal grid spacing \(h\),
+
+\[
+u_{xx}
+\approx
+\frac{
+u_{i+1,j}
+-
+2u_{i,j}
++
+u_{i-1,j}
+}{
+h^2
+},
+\]
+
+and
+
+\[
+u_{yy}
+\approx
+\frac{
+u_{i,j+1}
+-
+2u_{i,j}
++
+u_{i,j-1}
+}{
+h^2
+}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\Delta u_{i,j}
+\approx
+\frac{
+u_{i+1,j}
++
+u_{i-1,j}
++
+u_{i,j+1}
++
+u_{i,j-1}
+-
+4u_{i,j}
+}{
+h^2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Five-Point Laplacian Stencil}
+\label{subsec:five-point-laplacian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The standard two-dimensional stencil is
+
+\[
+\boxed{
+\frac1{h^2}
+\begin{array}{ccc}
+&1&\\
+1&-4&1\\
+&1&
+\end{array}.
+}
+\]
+
+This is called the five-point stencil because it uses the center point and
+its four nearest axis-aligned neighbors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Poisson Equation in Two Dimensions}
+\label{subsec:discrete-poisson-2d}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+-\Delta u=f,
+\]
+
+the finite-difference equation is
+
+\[
+\boxed{
+4u_{i,j}
+-
+u_{i+1,j}
+-
+u_{i-1,j}
+-
+u_{i,j+1}
+-
+u_{i,j-1}
+=
+h^2f_{i,j}.
+}
+\]
+
+All interior nodes together form a large sparse linear system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Structure}
+\label{subsec:pde-sparse-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Each finite-difference equation involves only nearby grid points.
+
+Therefore each row of the matrix contains only a small number of nonzero
+entries.
+
+For a two-dimensional five-point stencil, each interior row has at most
+five important nonzeros.
+
+Thus PDE discretization naturally produces sparse matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kronecker Product Structure}
+\label{subsec:pde-kronecker-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+On a rectangular grid, the two-dimensional discrete Laplacian can often be
+written using Kronecker products.
+
+If \(T\) is the one-dimensional tridiagonal Laplacian matrix, then
+
+\[
+\boxed{
+A
+=
+I\otimes T
++
+T\otimes I.
+}
+\]
+
+This structure is valuable both analytically and computationally.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Maximum Principle Preview}
+\label{subsec:discrete-maximum-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Continuous elliptic equations often satisfy maximum principles.
+
+Well-designed discrete schemes may inherit analogous properties.
+
+For example, under appropriate assumptions the discrete solution may not
+develop artificial interior maxima or minima beyond those permitted by
+the forcing and boundary data.
+
+Such structure contributes to stability and physical reliability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Heat Equation}
+\label{subsec:numerical-heat-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+u_t
+=
+\alpha u_{xx},
+}
+\]
+
+where
+
+\[
+\alpha>0
+\]
+
+is the diffusivity.
+
+Define
+
+\[
+\boxed{
+u_i^n
+\approx
+u(x_i,t^n).
+}
+\]
+
+A numerical method must approximate both time and space derivatives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward-Time Centered-Space Method}
+\label{subsec:ftcs-heat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximate
+
+\[
+u_t
+\]
+
+with forward Euler:
+
+\[
+\frac{
+u_i^{n+1}-u_i^n
+}{
+\Delta t
+}.
+\]
+
+Approximate
+
+\[
+u_{xx}
+\]
+
+with the centered difference:
+
+\[
+\frac{
+u_{i+1}^n
+-
+2u_i^n
++
+u_{i-1}^n
+}{
+h^2
+}.
+\]
+
+Thus,
+
+\[
+\boxed{
+\frac{
+u_i^{n+1}-u_i^n
+}{
+\Delta t
+}
+=
+\alpha
+\frac{
+u_{i+1}^n
+-
+2u_i^n
++
+u_{i-1}^n
+}{
+h^2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diffusion Number}
+\label{subsec:diffusion-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+r
+=
+\frac{
+\alpha\Delta t
+}{
+h^2
+}.
+}
+\]
+
+Then FTCS becomes
+
+\[
+\boxed{
+u_i^{n+1}
+=
+r u_{i-1}^n
++
+(1-2r)u_i^n
++
+r u_{i+1}^n.
+}
+\]
+
+This makes the stability condition easy to express.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{FTCS Stability for Heat Equation}
+\label{subsec:ftcs-heat-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the one-dimensional heat equation, von Neumann analysis gives the
+condition
+
+\[
+\boxed{
+0\leq r\leq\frac12.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\Delta t
+\leq
+\frac{
+h^2
+}{
+2\alpha
+}.
+}
+\]
+
+The time step must shrink quadratically as the spatial grid is refined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Heat Equation Stability}
+\label{subsec:worked-heat-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Choosing a Stable FTCS Time Step}
+
+Suppose
+
+\[
+\alpha=0.5,
+\]
+
+and
+
+\[
+h=0.1.
+\]
+
+Stability requires
+
+\[
+\Delta t
+\leq
+\frac{
+(0.1)^2
+}{
+2(0.5)
+}.
+\]
+
+Therefore,
+
+\[
+\Delta t
+\leq
+0.01.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\Delta t\leq0.01.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward-Time Centered-Space Method}
+\label{subsec:btcs-heat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Backward Euler in time gives
+
+\[
+\boxed{
+\frac{
+u_i^{n+1}-u_i^n
+}{
+\Delta t
+}
+=
+\alpha
+\frac{
+u_{i+1}^{n+1}
+-
+2u_i^{n+1}
++
+u_{i-1}^{n+1}
+}{
+h^2
+}.
+}
+\]
+
+Rearranging,
+
+\[
+\boxed{
+-r u_{i-1}^{n+1}
++
+(1+2r)u_i^{n+1}
+-
+r u_{i+1}^{n+1}
+=
+u_i^n.
+}
+\]
+
+A linear system must be solved at every time step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Euler Stability for Diffusion}
+\label{subsec:backward-euler-diffusion-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Backward Euler is unconditionally stable for the linear diffusion problem
+in the standard von Neumann sense.
+
+Thus stability does not impose the same restriction
+
+\[
+\Delta t
+\leq
+C h^2.
+\]
+
+However, a very large time step can still produce poor accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Crank--Nicolson Method}
+\label{subsec:crank-nicolson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Crank--Nicolson averages the spatial operator between time levels \(n\)
+and \(n+1\):
+
+\[
+\boxed{
+\frac{
+u_i^{n+1}-u_i^n
+}{
+\Delta t
+}
+=
+\frac{\alpha}{2}
+\left[
+\delta_{xx}u_i^n
++
+\delta_{xx}u_i^{n+1}
+\right].
+}
+\]
+
+Here
+
+\[
+\boxed{
+\delta_{xx}u_i^n
+=
+\frac{
+u_{i+1}^n
+-
+2u_i^n
++
+u_{i-1}^n
+}{
+h^2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Crank--Nicolson Matrix Form}
+\label{subsec:crank-nicolson-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(L_h\) denote the discrete spatial Laplacian.
+
+Then Crank--Nicolson can be written
+
+\[
+\boxed{
+\left(
+I
+-
+\frac{
+\alpha\Delta t
+}{
+2
+}
+L_h
+\right)
+U^{n+1}
+=
+\left(
+I
++
+\frac{
+\alpha\Delta t
+}{
+2
+}
+L_h
+\right)
+U^n.
+}
+\]
+
+The left matrix can often be factorized once and reused if the grid and
+coefficients remain fixed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Accuracy of Heat-Equation Schemes}
+\label{subsec:heat-scheme-accuracy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sufficiently smooth solutions:
+
+\[
+\boxed{
+\text{FTCS}
+=
+O(\Delta t)
++
+O(h^2),
+}
+\]
+
+\[
+\boxed{
+\text{Backward Euler}
+=
+O(\Delta t)
++
+O(h^2),
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Crank--Nicolson}
+=
+O(\Delta t^2)
++
+O(h^2).
+}
+\]
+
+Thus Crank--Nicolson is second order in both time and space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Von Neumann Stability Analysis}
+\label{subsec:von-neumann-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Von Neumann analysis studies the evolution of Fourier error modes.
+
+Assume a discrete perturbation has form
+
+\[
+\boxed{
+e_i^n
+=
+G^n
+e^{\mathrm{i}i\theta},
+}
+\]
+
+where
+
+\[
+G
+\]
+
+is the amplification factor.
+
+Substitute this mode into the numerical scheme.
+
+Stability requires
+
+\[
+\boxed{
+|G(\theta)|\leq1
+}
+\]
+
+for all relevant wave numbers \(\theta\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{FTCS Amplification Factor}
+\label{subsec:ftcs-amplification-factor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the heat equation,
+
+\[
+u_i^{n+1}
+=
+r u_{i-1}^n
++
+(1-2r)u_i^n
++
+r u_{i+1}^n.
+\]
+
+Substituting
+
+\[
+e_i^n
+=
+G^n e^{\mathrm{i}i\theta}
+\]
+
+gives
+
+\[
+G
+=
+r e^{-\mathrm{i}\theta}
++
+1-2r
++
+r e^{\mathrm{i}\theta}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+G
+=
+1
+-
+4r
+\sin^2
+\left(
+\frac{\theta}{2}
+\right).
+}
+\]
+
+Requiring
+
+\[
+|G|\leq1
+\]
+
+for all \(\theta\) gives
+
+\[
+\boxed{
+r\leq\frac12.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advection Equation}
+\label{subsec:numerical-advection-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+u_t
++
+cu_x
+=
+0.
+}
+\]
+
+For constant \(c\), the exact solution is
+
+\[
+\boxed{
+u(x,t)
+=
+u_0(x-ct).
+}
+\]
+
+Thus the initial profile is transported at speed \(c\).
+
+A good numerical scheme should move the profile without excessive
+distortion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Centered FTCS for Advection}
+\label{subsec:centered-ftcs-advection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using forward time and centered space,
+
+\[
+\boxed{
+\frac{
+u_i^{n+1}-u_i^n
+}{
+\Delta t
+}
++
+c
+\frac{
+u_{i+1}^n-u_{i-1}^n
+}{
+2h
+}
+=
+0.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+u_i^{n+1}
+=
+u_i^n
+-
+\frac{\nu}{2}
+\left(
+u_{i+1}^n-u_{i-1}^n
+\right),
+}
+\]
+
+where
+
+\[
+\boxed{
+\nu
+=
+\frac{
+c\Delta t
+}{
+h
+}.
+}
+\]
+
+This standard centered FTCS scheme is unstable for pure linear advection.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Courant Number}
+\label{subsec:courant-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define the Courant number
+
+\[
+\boxed{
+\nu
+=
+\frac{
+c\Delta t
+}{
+h
+}.
+}
+\]
+
+It measures approximately how many grid cells information travels during
+one time step.
+
+This quantity appears in stability restrictions for hyperbolic equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Upwind Method}
+\label{subsec:upwind-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+c>0,
+\]
+
+information travels from left to right.
+
+Use the backward spatial difference:
+
+\[
+u_x
+\approx
+\frac{
+u_i^n-u_{i-1}^n
+}{
+h
+}.
+\]
+
+Then
+
+\[
+\boxed{
+u_i^{n+1}
+=
+u_i^n
+-
+\nu
+\left(
+u_i^n-u_{i-1}^n
+\right).
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+u_i^{n+1}
+=
+(1-\nu)u_i^n
++
+\nu u_{i-1}^n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Upwind Stability}
+\label{subsec:upwind-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+c>0,
+\]
+
+the first-order upwind method is stable under the CFL condition
+
+\[
+\boxed{
+0\leq\nu\leq1.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\Delta t
+\leq
+\frac{h}{c}.
+}
+\]
+
+For \(c<0\), the spatial difference must be reversed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Direction Matters in Upwinding}
+\label{subsec:upwind-direction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When
+
+\[
+c>0,
+\]
+
+use information from the left.
+
+When
+
+\[
+c<0,
+\]
+
+use information from the right.
+
+Thus upwind differentiation follows the direction from which
+characteristics bring information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Upwind Advection}
+\label{subsec:worked-upwind-advection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One Upwind Step}
+
+Suppose
+
+\[
+c=1,
+\qquad
+h=0.2,
+\qquad
+\Delta t=0.1.
+\]
+
+Then
+
+\[
+\nu
+=
+\frac{1(0.1)}{0.2}
+=
+0.5.
+\]
+
+For \(c>0\),
+
+\[
+u_i^{n+1}
+=
+0.5u_i^n
++
+0.5u_{i-1}^n.
+\]
+
+If
+
+\[
+u_i^n=4,
+\]
+
+and
+
+\[
+u_{i-1}^n=2,
+\]
+
+then
+
+\[
+u_i^{n+1}
+=
+0.5(4)+0.5(2)
+=
+3.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+u_i^{n+1}=3.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Diffusion}
+\label{subsec:numerical-diffusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+First-order upwind methods tend to smooth sharp solution features.
+
+This artificial smoothing is called numerical diffusion or numerical
+viscosity.
+
+A transported discontinuity may become increasingly spread over several
+grid cells.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modified Equation Idea}
+\label{subsec:modified-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical method can often be interpreted as solving a nearby PDE.
+
+For first-order upwind advection, the modified equation contains an
+artificial diffusion term of the form
+
+\[
+\boxed{
+u_t
++
+cu_x
+=
+\varepsilon_{\mathrm{num}}u_{xx}
++
+\cdots.
+}
+\]
+
+The coefficient depends on the grid and time step.
+
+Modified-equation analysis explains numerical diffusion and dispersion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Dispersion}
+\label{subsec:numerical-dispersion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical dispersion occurs when different numerical wave components travel
+at incorrect phase speeds.
+
+The result may include artificial oscillations or phase errors.
+
+This is especially important in wave propagation and high-order
+hyperbolic schemes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lax--Friedrichs Method}
+\label{subsec:lax-friedrichs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A classical scheme for linear advection is
+
+\[
+\boxed{
+u_i^{n+1}
+=
+\frac12
+\left(
+u_{i+1}^n
++
+u_{i-1}^n
+\right)
+-
+\frac{\nu}{2}
+\left(
+u_{i+1}^n
+-
+u_{i-1}^n
+\right).
+}
+\]
+
+The averaging term adds numerical diffusion and improves stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lax--Wendroff Method}
+\label{subsec:lax-wendroff}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For linear advection, Lax--Wendroff gives
+
+\[
+\boxed{
+u_i^{n+1}
+=
+u_i^n
+-
+\frac{\nu}{2}
+\left(
+u_{i+1}^n-u_{i-1}^n
+\right)
++
+\frac{\nu^2}{2}
+\left(
+u_{i+1}^n
+-
+2u_i^n
++
+u_{i-1}^n
+\right).
+}
+\]
+
+It is second-order accurate for smooth solutions.
+
+Near discontinuities, however, oscillations may appear.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{CFL Condition}
+\label{subsec:cfl-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For hyperbolic equations, numerical information should propagate at least
+as quickly as physical information.
+
+This motivates the Courant--Friedrichs--Lewy condition.
+
+Informally,
+
+\[
+\boxed{
+\text{physical domain of dependence}
+\subseteq
+\text{numerical domain of dependence}.
+}
+\]
+
+For simple explicit advection schemes, this commonly produces
+
+\[
+\boxed{
+|\nu|
+\leq1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wave Equation}
+\label{subsec:numerical-wave-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+u_{tt}
+=
+c^2u_{xx}.
+}
+\]
+
+Use centered differences in both time and space:
+
+\[
+\frac{
+u_i^{n+1}
+-
+2u_i^n
++
+u_i^{n-1}
+}{
+\Delta t^2
+}
+=
+c^2
+\frac{
+u_{i+1}^n
+-
+2u_i^n
++
+u_{i-1}^n
+}{
+h^2
+}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Explicit Wave Update}
+\label{subsec:explicit-wave-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+\nu
+=
+\frac{
+c\Delta t
+}{
+h
+}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+u_i^{n+1}
+=
+2u_i^n
+-
+u_i^{n-1}
++
+\nu^2
+\left(
+u_{i+1}^n
+-
+2u_i^n
++
+u_{i-1}^n
+\right).
+}
+\]
+
+The scheme is second-order accurate in both space and time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wave Stability Condition}
+\label{subsec:wave-stability-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the standard one-dimensional explicit centered scheme,
+
+\[
+\boxed{
+|\nu|
+\leq1
+}
+\]
+
+is required for stability.
+
+Thus,
+
+\[
+\boxed{
+\Delta t
+\leq
+\frac{h}{|c|}.
+}
+\]
+
+This is another CFL-type restriction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Starting the Wave Scheme}
+\label{subsec:starting-wave-scheme}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The second-order time recurrence requires both
+
+\[
+u_i^0
+\]
+
+and
+
+\[
+u_i^1.
+\]
+
+If initial displacement is
+
+\[
+u(x,0)=f(x)
+\]
+
+and initial velocity is
+
+\[
+u_t(x,0)=g(x),
+\]
+
+Taylor expansion can generate \(u_i^1\).
+
+A second-order start is
+
+\[
+\boxed{
+u_i^1
+=
+u_i^0
++
+\Delta t\,g_i
++
+\frac{\nu^2}{2}
+\left(
+u_{i+1}^0
+-
+2u_i^0
++
+u_{i-1}^0
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conservation Laws}
+\label{subsec:numerical-conservation-laws}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A one-dimensional conservation law has form
+
+\[
+\boxed{
+u_t
++
+f(u)_x
+=
+0.
+}
+\]
+
+Integrating over cell
+
+\[
+[x_{i-1/2},x_{i+1/2}]
+\]
+
+gives
+
+\[
+\boxed{
+\frac{d}{dt}
+\int_{x_{i-1/2}}^{x_{i+1/2}}
+u(x,t)\,dx
+=
+-
+f(u(x_{i+1/2},t))
++
+f(u(x_{i-1/2},t)).
+}
+\]
+
+This integral structure motivates finite-volume methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Volume Method}
+\label{subsec:finite-volume-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define the cell average
+
+\[
+\boxed{
+\overline{u}_i(t)
+=
+\frac1{\Delta x}
+\int_{x_{i-1/2}}^{x_{i+1/2}}
+u(x,t)\,dx.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\frac{d\overline{u}_i}{dt}
+=
+-
+\frac1{\Delta x}
+\left[
+F_{i+1/2}
+-
+F_{i-1/2}
+\right],
+}
+\]
+
+where \(F_{i\pm1/2}\) are numerical fluxes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conservation in Finite Volumes}
+\label{subsec:finite-volume-conservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The flux leaving one cell enters the neighboring cell.
+
+Thus internal fluxes cancel when equations are summed over cells.
+
+This gives a discrete conservation property.
+
+Finite-volume methods are therefore especially natural for conservation
+laws and fluid dynamics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Flux}
+\label{subsec:numerical-flux}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical flux approximates the physical flux at an interface:
+
+\[
+\boxed{
+F_{i+1/2}
+=
+\widehat{f}
+(
+u_i,
+u_{i+1}
+).
+}
+\]
+
+A consistent flux satisfies
+
+\[
+\boxed{
+\widehat{f}(u,u)=f(u).
+}
+\]
+
+Different numerical fluxes produce different stability and dissipation
+properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Godunov Method Preview}
+\label{subsec:godunov-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Godunov's method treats neighboring cell averages as piecewise constant
+states.
+
+At each cell interface, solve or approximate a local Riemann problem.
+
+The resulting interface solution determines the numerical flux.
+
+This framework forms the basis of many modern high-resolution methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shock Waves}
+\label{subsec:numerical-shock-waves}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nonlinear hyperbolic conservation laws can develop discontinuities even
+from smooth initial data.
+
+Classical derivatives then fail at the shock.
+
+The appropriate solution concept becomes a weak solution.
+
+Numerical methods must also select the physically relevant entropy
+solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monotone Schemes}
+\label{subsec:monotone-schemes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Monotone schemes prevent certain kinds of artificial oscillation by making
+the update monotonic in its input values.
+
+For scalar conservation laws, monotonicity provides strong stability and
+convergence properties.
+
+However, monotone methods are generally limited to first-order accuracy
+near smooth regions under standard linearity assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Variation}
+\label{subsec:total-variation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For grid values \(u_i\), define discrete total variation by
+
+\[
+\boxed{
+TV(u)
+=
+\sum_i
+|u_{i+1}-u_i|.
+}
+\]
+
+A total-variation-diminishing method satisfies
+
+\[
+\boxed{
+TV(u^{n+1})
+\leq
+TV(u^n).
+}
+\]
+
+This helps suppress spurious oscillations near discontinuities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flux Limiters Preview}
+\label{subsec:flux-limiters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+High-resolution schemes often blend:
+
+\[
+\boxed{
+\text{stable low-order fluxes}
+}
+\]
+
+with
+
+\[
+\boxed{
+\text{higher-order corrections}.
+}
+\]
+
+Flux limiters reduce the high-order correction near discontinuities while
+retaining higher accuracy in smooth regions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Element Method}
+\label{subsec:finite-element-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite-element methods begin from a weak or variational formulation rather
+than directly approximating derivatives pointwise.
+
+Consider Poisson's equation
+
+\[
+\boxed{
+-\Delta u=f
+}
+\]
+
+on domain \(\Omega\), with
+
+\[
+u=0
+\]
+
+on the boundary.
+
+Multiply by test function \(v\) and integrate:
+
+\[
+\boxed{
+\int_\Omega
+(-\Delta u)v\,dx
+=
+\int_\Omega
+fv\,dx.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Form of Poisson's Equation}
+\label{subsec:weak-form-poisson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using integration by parts,
+
+\[
+\int_\Omega
+\nabla u\cdot\nabla v\,dx
+-
+\int_{\partial\Omega}
+\frac{\partial u}{\partial n}v\,ds
+=
+\int_\Omega
+fv\,dx.
+\]
+
+For homogeneous Dirichlet test functions, the boundary term vanishes in
+the standard weak formulation.
+
+Thus seek \(u\) such that
+
+\[
+\boxed{
+\int_\Omega
+\nabla u\cdot\nabla v\,dx
+=
+\int_\Omega
+fv\,dx
+}
+\]
+
+for all admissible test functions \(v\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Weak Formulations Matter}
+\label{subsec:why-weak-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The strong Poisson equation requires second derivatives of \(u\).
+
+The weak formulation requires only first derivatives.
+
+Thus weak formulations permit less regular solution spaces and provide a
+natural foundation for finite elements.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trial and Test Spaces}
+\label{subsec:trial-test-spaces}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+V
+\]
+
+be an appropriate function space.
+
+The exact weak problem is:
+
+find
+
+\[
+\boxed{
+u\in V
+}
+\]
+
+such that
+
+\[
+\boxed{
+a(u,v)
+=
+\ell(v)
+}
+\]
+
+for every
+
+\[
+\boxed{
+v\in V.
+}
+\]
+
+Here,
+
+\[
+a(u,v)
+\]
+
+is a bilinear form and
+
+\[
+\ell(v)
+\]
+
+is a linear functional.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Dimensional Approximation Space}
+\label{subsec:finite-element-space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Choose a finite-dimensional subspace
+
+\[
+\boxed{
+V_h
+\subset V.
+}
+\]
+
+Let basis functions be
+
+\[
+\boxed{
+\phi_1,\ldots,\phi_N.
+}
+\]
+
+Approximate
+
+\[
+\boxed{
+u_h
+=
+\sum_{j=1}^{N}
+U_j\phi_j.
+}
+\]
+
+The unknowns are now the coefficients
+
+\[
+U_j.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Galerkin Method}
+\label{subsec:galerkin-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Galerkin method uses the same finite-dimensional space for trial and
+test functions.
+
+Require
+
+\[
+\boxed{
+a(u_h,v_h)
+=
+\ell(v_h)
+}
+\]
+
+for every
+
+\[
+v_h\in V_h.
+\]
+
+Choosing
+
+\[
+v_h=\phi_i
+\]
+
+gives
+
+\[
+\boxed{
+\sum_{j=1}^{N}
+U_j
+a(\phi_j,\phi_i)
+=
+\ell(\phi_i).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Element Matrix System}
+\label{subsec:finite-element-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+K_{ij}
+=
+a(\phi_j,\phi_i),
+}
+\]
+
+and
+
+\[
+\boxed{
+F_i
+=
+\ell(\phi_i).
+}
+\]
+
+Then
+
+\[
+\boxed{
+KU=F.
+}
+\]
+
+For Poisson's equation,
+
+\[
+\boxed{
+K_{ij}
+=
+\int_\Omega
+\nabla\phi_j
+\cdot
+\nabla\phi_i
+\,dx.
+}
+\]
+
+The matrix \(K\) is called the stiffness matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mass Matrix}
+\label{subsec:finite-element-mass-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For time-dependent problems, terms involving
+
+\[
+u_t
+\]
+
+often produce the mass matrix
+
+\[
+\boxed{
+M_{ij}
+=
+\int_\Omega
+\phi_j\phi_i
+\,dx.
+}
+\]
+
+After spatial discretization, a PDE may become
+
+\[
+\boxed{
+M\dot{U}
++
+KU
+=
+F.
+}
+\]
+
+This is a system of ODEs or differential-algebraic equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Piecewise Linear Finite Elements}
+\label{subsec:piecewise-linear-fem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In one dimension, a common basis uses piecewise linear hat functions.
+
+Each basis function satisfies
+
+\[
+\boxed{
+\phi_i(x_j)
+=
+\delta_{ij}.
+}
+\]
+
+It is nonzero only on intervals adjacent to node \(x_i\).
+
+This local support produces sparse finite-element matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Element Matrices}
+\label{subsec:local-element-matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite-element calculations are usually performed element by element.
+
+For each element \(e\), compute a local stiffness matrix
+
+\[
+\boxed{
+K^{(e)}.
+}
+\]
+
+Then insert its entries into the appropriate locations of the global
+matrix.
+
+This process is called assembly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Element Assembly}
+\label{subsec:finite-element-assembly}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because neighboring elements share nodes, their local contributions add.
+
+Symbolically,
+
+\[
+\boxed{
+K
+=
+\sum_e
+A_e^T
+K^{(e)}
+A_e,
+}
+\]
+
+where \(A_e\) represents the mapping between local and global degrees of
+freedom.
+
+Assembly is a central finite-element operation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantages of Finite Elements}
+\label{subsec:fem-advantages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite elements are especially useful for:
+
+\[
+\boxed{
+\text{irregular geometries},
+}
+\]
+
+\[
+\boxed{
+\text{variable coefficients},
+}
+\]
+
+\[
+\boxed{
+\text{unstructured meshes},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{complex boundary conditions}.
+}
+\]
+
+They also have a strong variational mathematical foundation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Structured and Unstructured Meshes}
+\label{subsec:structured-unstructured-meshes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A structured mesh has a regular indexing pattern.
+
+Examples include Cartesian grids.
+
+An unstructured mesh consists of irregularly connected elements such as:
+
+\[
+\boxed{
+\text{triangles},
+}
+\]
+
+\[
+\boxed{
+\text{tetrahedra},
+}
+\]
+
+or other polygons and polyhedra.
+
+Unstructured meshes fit complex geometry more naturally.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mesh Size}
+\label{subsec:pde-mesh-size}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The parameter
+
+\[
+\boxed{
+h
+}
+\]
+
+often denotes a characteristic element diameter or grid spacing.
+
+Smaller \(h\) generally improves spatial resolution.
+
+But reducing \(h\) increases:
+
+\[
+\boxed{
+\text{degrees of freedom},
+}
+\]
+
+\[
+\boxed{
+\text{memory},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{computational cost}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adaptive Mesh Refinement}
+\label{subsec:adaptive-mesh-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uniform refinement adds resolution everywhere.
+
+Adaptive mesh refinement, abbreviated AMR, places more resolution only
+where needed.
+
+A typical procedure is:
+
+\begin{enumerate}
+    \item solve on the current mesh;
+    \item estimate local error;
+    \item mark high-error regions;
+    \item refine those regions;
+    \item solve again.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(h\)- and \(p\)-Refinement}
+\label{subsec:h-p-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In finite-element terminology:
+
+\[
+\boxed{
+h\text{-refinement}
+=
+\text{smaller elements},
+}
+\]
+
+while
+
+\[
+\boxed{
+p\text{-refinement}
+=
+\text{higher polynomial degree}.
+}
+\]
+
+Combining both gives
+
+\[
+\boxed{
+hp\text{-methods}.
+}
+\]
+
+These can achieve very high accuracy for sufficiently smooth solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectral Methods}
+\label{subsec:spectral-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spectral methods approximate a solution using global basis functions:
+
+\[
+\boxed{
+u_N(x)
+=
+\sum_{k=0}^{N}
+a_k\phi_k(x).
+}
+\]
+
+Common bases include:
+
+\[
+\boxed{
+\text{Fourier functions},
+}
+\]
+
+\[
+\boxed{
+\text{Chebyshev polynomials},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Legendre polynomials}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectral Accuracy}
+\label{subsec:spectral-accuracy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For very smooth or analytic solutions, spectral methods can converge
+extremely rapidly.
+
+The error may decrease faster than any fixed algebraic power of
+
+\[
+1/N.
+\]
+
+This is sometimes called spectral or exponential convergence, depending on
+the precise regularity and setting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fourier Spectral Method}
+\label{subsec:fourier-spectral-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For periodic problems, approximate
+
+\[
+u(x)
+\]
+
+by a Fourier series:
+
+\[
+\boxed{
+u_N(x)
+=
+\sum_{k=-N/2}^{N/2}
+\widehat{u}_k
+e^{\mathrm{i}kx}.
+}
+\]
+
+Differentiation becomes multiplication in Fourier space:
+
+\[
+\boxed{
+\widehat{u_x}_k
+=
+\mathrm{i}k\widehat{u}_k.
+}
+\]
+
+This can make high-order spatial derivatives highly accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pseudospectral Methods}
+\label{subsec:pseudospectral-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pseudospectral methods represent the solution globally but evaluate
+nonlinear terms at selected collocation points.
+
+Derivatives may be computed using differentiation matrices:
+
+\[
+\boxed{
+U_x
+\approx
+DU.
+}
+\]
+
+This combines spectral approximation with nodal computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectral Limitations}
+\label{subsec:spectral-limitations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Global spectral methods can be less convenient for:
+
+\[
+\boxed{
+\text{complex geometry},
+}
+\]
+
+\[
+\boxed{
+\text{discontinuous solutions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{localized nonsmooth features}.
+}
+\]
+
+Discontinuities can produce Gibbs oscillations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Method of Lines}
+\label{subsec:pde-method-of-lines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The method of lines discretizes spatial derivatives but leaves time
+continuous.
+
+For a PDE
+
+\[
+u_t
+=
+\mathcal{L}u,
+\]
+
+spatial discretization gives
+
+\[
+\boxed{
+\frac{dU}{dt}
+=
+L_hU.
+}
+\]
+
+This large ODE system can then be integrated using the methods of
+Section~\ref{sec:numerical-odes}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Semi-Discrete Heat Equation}
+\label{subsec:semidiscrete-heat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+u_t
+=
+\alpha u_{xx},
+\]
+
+centered spatial differences give
+
+\[
+\boxed{
+\frac{dU}{dt}
+=
+\alpha L_hU,
+}
+\]
+
+where \(L_h\) is the discrete Laplacian.
+
+The resulting ODE system can be stiff because eigenvalues of \(L_h\) grow
+in magnitude as
+
+\[
+h\to0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why PDE Semi-Discretizations Become Stiff}
+\label{subsec:pde-semidiscrete-stiffness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For diffusion, the largest-magnitude eigenvalues of the discrete Laplacian
+scale approximately like
+
+\[
+\boxed{
+O(h^{-2}).
+}
+\]
+
+As the mesh is refined, fast-decaying numerical modes become increasingly
+rapid.
+
+This explains the explicit restriction
+
+\[
+\boxed{
+\Delta t=O(h^2)
+}
+\]
+
+for diffusion problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Operator Splitting}
+\label{subsec:operator-splitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+u_t
+=
+(A+B)u.
+}
+\]
+
+Instead of solving the full operator simultaneously, splitting methods
+alternate between subproblems involving \(A\) and \(B\).
+
+For one step, a first-order splitting is conceptually:
+
+\[
+\boxed{
+u^*
+=
+\text{evolve under }A,
+}
+\]
+
+then
+
+\[
+\boxed{
+u^{n+1}
+=
+\text{evolve under }B.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strang Splitting}
+\label{subsec:strang-splitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A symmetric second-order splitting is:
+
+\[
+\boxed{
+A
+\text{ for half a step},
+}
+\]
+
+then
+
+\[
+\boxed{
+B
+\text{ for a full step},
+}
+\]
+
+then
+
+\[
+\boxed{
+A
+\text{ for half a step}.
+}
+\]
+
+This is known as Strang splitting.
+
+It is widely used in reaction-diffusion and multiphysics problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear PDEs}
+\label{subsec:numerical-nonlinear-pdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonlinear PDE may produce a nonlinear algebraic system after
+discretization:
+
+\[
+\boxed{
+F(U)=0.
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{nonlinear diffusion},
+}
+\]
+
+\[
+\boxed{
+\text{Navier--Stokes equations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{nonlinear reaction-diffusion systems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton Linearization for PDE Systems}
+\label{subsec:newton-linearization-pde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given
+
+\[
+F(U)=0,
+\]
+
+Newton's method solves
+
+\[
+\boxed{
+J_F(U^{(k)})
+\Delta U
+=
+-
+F(U^{(k)}),
+}
+\]
+
+then updates
+
+\[
+\boxed{
+U^{(k+1)}
+=
+U^{(k)}
++
+\Delta U.
+}
+\]
+
+Each Newton iteration therefore requires a large linear solve.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Picard Iteration}
+\label{subsec:picard-pde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simpler nonlinear iteration may lag nonlinear coefficients.
+
+For example, if
+
+\[
+-\nabla\cdot
+(
+a(u)\nabla u
+)
+=
+f,
+\]
+
+one may solve
+
+\[
+\boxed{
+-\nabla\cdot
+(
+a(u^{(k)})\nabla u^{(k+1)}
+)
+=
+f.
+}
+\]
+
+This is a fixed-point or Picard-type iteration.
+
+It may converge more slowly than Newton but can be simpler and more
+robust.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Solvers for PDE Systems}
+\label{subsec:pde-linear-solvers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+PDE matrices can contain millions or billions of unknowns.
+
+Direct factorization may become too expensive.
+
+Large-scale solvers often use:
+
+\[
+\boxed{
+\text{conjugate gradient},
+}
+\]
+
+\[
+\boxed{
+\text{GMRES},
+}
+\]
+
+or related Krylov methods.
+
+Preconditioning is usually essential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multigrid Idea}
+\label{subsec:multigrid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Iterative methods often reduce oscillatory errors quickly but struggle with
+smooth long-wavelength errors.
+
+On a coarser grid, those smooth errors appear more oscillatory and can be
+removed efficiently.
+
+Multigrid combines:
+
+\[
+\boxed{
+\text{smoothing on fine grids}
+}
+\]
+
+with
+
+\[
+\boxed{
+\text{correction on coarse grids}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Grid Correction}
+\label{subsec:two-grid-correction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic two-grid cycle is:
+
+\begin{enumerate}
+    \item smooth the fine-grid approximation;
+    \item compute the residual;
+    \item restrict the residual to a coarser grid;
+    \item solve or approximate the coarse error equation;
+    \item interpolate the correction to the fine grid;
+    \item correct the fine-grid solution;
+    \item smooth again.
+\end{enumerate}
+
+This idea extends recursively to multigrid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Multigrid Is Powerful}
+\label{subsec:why-multigrid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For many elliptic problems, carefully designed multigrid methods can achieve
+computational work approximately proportional to the number of unknowns:
+
+\[
+\boxed{
+O(N).
+}
+\]
+
+This is close to optimal because simply reading the \(N\) unknowns already
+requires \(O(N)\) work.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preconditioning PDE Systems}
+\label{subsec:pde-preconditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Useful preconditioners include:
+
+\[
+\boxed{
+\text{Jacobi},
+}
+\]
+
+\[
+\boxed{
+\text{incomplete factorization},
+}
+\]
+
+\[
+\boxed{
+\text{domain decomposition},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{multigrid}.
+}
+\]
+
+The best choice depends strongly on the PDE and discretization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Domain Decomposition}
+\label{subsec:domain-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A large physical domain can be divided into subdomains.
+
+Each processor or solver handles a local problem.
+
+Information is exchanged across subdomain boundaries.
+
+This provides both:
+
+\[
+\boxed{
+\text{preconditioning}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{parallelism}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency of PDE Schemes}
+\label{subsec:pde-consistency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A finite-difference scheme is consistent if its discrete operator
+approaches the differential operator as
+
+\[
+h,\Delta t\to0.
+\]
+
+For example,
+
+\[
+\boxed{
+\frac{
+u_{i+1}-2u_i+u_{i-1}
+}{
+h^2
+}
+=
+u_{xx}(x_i)
++
+O(h^2).
+}
+\]
+
+Thus the centered second derivative is second-order consistent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PDE Stability}
+\label{subsec:pde-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+PDE stability describes whether perturbations remain controlled under the
+discrete evolution or algebraic solve.
+
+The appropriate stability notion depends on the PDE class and
+discretization.
+
+Common tools include:
+
+\[
+\boxed{
+\text{von Neumann analysis},
+}
+\]
+
+\[
+\boxed{
+\text{energy estimates},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{matrix norm estimates}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PDE Convergence}
+\label{subsec:pde-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical PDE approximation converges if
+
+\[
+\boxed{
+u_h
+\to
+u
+}
+\]
+
+in an appropriate norm as the grid is refined.
+
+For time-dependent schemes, both
+
+\[
+h
+\]
+
+and
+
+\[
+\Delta t
+\]
+
+may need to approach zero in a compatible way.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lax Equivalence Principle Preview}
+\label{subsec:lax-equivalence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a well-posed linear initial-value problem and a consistent finite-
+difference approximation, a classical principle states:
+
+\[
+\boxed{
+\text{stability}
+\Longleftrightarrow
+\text{convergence}.
+}
+\]
+
+This is the Lax equivalence theorem in its appropriate setting.
+
+It does not automatically apply to arbitrary nonlinear PDEs or arbitrary
+discretizations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Grid Refinement Study}
+\label{subsec:pde-grid-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To verify spatial convergence:
+
+\begin{enumerate}
+    \item solve on mesh size \(h\);
+    \item solve on \(h/2\);
+    \item solve on \(h/4\);
+    \item compare with an exact or highly resolved reference;
+    \item estimate observed convergence order.
+\end{enumerate}
+
+If
+
+\[
+E(h)\approx Ch^p,
+\]
+
+then
+
+\[
+\boxed{
+p
+\approx
+\log_2
+\left(
+\frac{
+E(h)
+}{
+E(h/2)
+}
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Space-Time Refinement}
+\label{subsec:space-time-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a scheme with error
+
+\[
+\boxed{
+O(\Delta t^q)
++
+O(h^p),
+}
+\]
+
+refining only one variable may eventually reveal error from the other.
+
+A balanced convergence study should vary both:
+
+\[
+\boxed{
+h
+}
+\]
+
+and
+
+\[
+\boxed{
+\Delta t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Manufactured Solutions}
+\label{subsec:manufactured-solutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When no exact benchmark solution is available, choose an artificial smooth
+function
+
+\[
+u_{\mathrm{exact}}.
+\]
+
+Substitute it into the PDE to determine the forcing term and boundary
+conditions that make it exact.
+
+Then test the numerical method against this known solution.
+
+This is called the method of manufactured solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Verification Versus Validation}
+\label{subsec:pde-verification-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Verification asks:
+
+\[
+\boxed{
+\text{Are the PDE equations being solved numerically correctly?}
+}
+\]
+
+Validation asks:
+
+\[
+\boxed{
+\text{Does the PDE model represent the physical system adequately?}
+}
+\]
+
+Grid convergence verifies the numerical method.
+
+Experimental comparison contributes to model validation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary Errors}
+\label{subsec:pde-boundary-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A high-order interior scheme can lose overall accuracy if low-order
+boundary approximations are used.
+
+Thus boundary discretization must be designed consistently with the desired
+global accuracy.
+
+Boundary conditions are not a minor implementation detail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ghost Points}
+\label{subsec:pde-ghost-points}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stencil near a boundary may require points outside the physical domain.
+
+Artificial external values are called ghost points.
+
+Boundary conditions are used to eliminate or determine the ghost values.
+
+Ghost-point methods can preserve centered interior stencils near
+boundaries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonuniform Grids}
+\label{subsec:pde-nonuniform-grids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uniform grids use constant spacing.
+
+Nonuniform grids allow
+
+\[
+\boxed{
+h_i
+=
+x_{i+1}-x_i
+}
+\]
+
+to vary.
+
+This permits higher resolution in selected regions.
+
+Finite-difference coefficients must then account for unequal spacing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Anisotropic Meshes}
+\label{subsec:anisotropic-meshes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some solutions vary rapidly in one direction but slowly in another.
+
+An anisotropic mesh uses different scales in different directions.
+
+This can efficiently resolve:
+
+\[
+\boxed{
+\text{boundary layers},
+}
+\]
+
+\[
+\boxed{
+\text{shocks},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{thin structures}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary Layers}
+\label{subsec:numerical-boundary-layers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Singularly perturbed PDEs may develop narrow regions with very large
+gradients.
+
+A uniform coarse grid can miss these layers entirely.
+
+Possible remedies include:
+
+\[
+\boxed{
+\text{mesh refinement},
+}
+\]
+
+\[
+\boxed{
+\text{fitted meshes},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{stabilized methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Peclet Number Preview}
+\label{subsec:peclet-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For advection-diffusion equations, the relative strength of transport and
+diffusion can be measured by a Peclet-type number:
+
+\[
+\boxed{
+Pe
+=
+\frac{
+\text{advection scale}
+}{
+\text{diffusion scale}
+}.
+}
+\]
+
+Large \(Pe\) indicates advection-dominated behavior.
+
+Standard centered schemes may oscillate unless the grid is sufficiently
+fine or stabilization is added.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advection-Diffusion Equation}
+\label{subsec:advection-diffusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common model is
+
+\[
+\boxed{
+u_t
++
+cu_x
+=
+\alpha u_{xx}.
+}
+\]
+
+The advection term transports the solution.
+
+The diffusion term smooths it.
+
+A numerical method must balance the different stability and accuracy
+requirements of both processes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reaction-Diffusion Equations}
+\label{subsec:reaction-diffusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A reaction-diffusion system has form
+
+\[
+\boxed{
+u_t
+=
+D\Delta u
++
+R(u).
+}
+\]
+
+The diffusion operator couples neighboring spatial points.
+
+The reaction term acts locally.
+
+Operator splitting is especially natural for such systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Elliptic, Parabolic, and Hyperbolic Numerical Behavior}
+\label{subsec:pde-class-behavior}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Elliptic problems usually require solving a global boundary-value system.
+
+Parabolic problems combine spatial coupling with one-way time evolution.
+
+Hyperbolic problems propagate waves and information along characteristic
+directions.
+
+Thus numerical methods should reflect the mathematical structure of the
+PDE class.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Difference Versus Finite Volume}
+\label{subsec:fd-vs-fv}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite differences approximate derivatives directly at grid points.
+
+Finite volumes approximate integral conservation laws over cells.
+
+Thus:
+
+\[
+\boxed{
+\text{finite difference}
+\rightarrow
+\text{derivative approximation},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{finite volume}
+\rightarrow
+\text{flux conservation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Difference Versus Finite Element}
+\label{subsec:fd-vs-fem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite differences are especially simple on regular grids.
+
+Finite elements are especially flexible for irregular geometry and
+variational problems.
+
+Finite differences begin from the strong differential form.
+
+Finite elements commonly begin from a weak form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Element Versus Spectral}
+\label{subsec:fem-vs-spectral}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite elements use local basis functions.
+
+Spectral methods often use global high-order basis functions.
+
+Local bases are flexible for geometry and adaptivity.
+
+Global spectral bases can provide extremely rapid convergence for smooth
+solutions on suitable domains.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical PDE Workflow}
+\label{subsec:numerical-pde-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the PDE and its mathematical type;
+    \item define the computational domain;
+    \item specify initial conditions when time dependent;
+    \item specify all boundary conditions;
+    \item identify conservation laws and invariants;
+    \item identify expected regularity and possible discontinuities;
+    \item choose finite difference, finite volume, finite element, spectral,
+          or another discretization;
+    \item construct the spatial mesh;
+    \item choose the spatial approximation order;
+    \item choose a time integrator if needed;
+    \item derive stability restrictions;
+    \item assemble the discrete algebraic system;
+    \item exploit sparsity and matrix structure;
+    \item select linear and nonlinear solvers;
+    \item choose preconditioners;
+    \item compute the numerical solution;
+    \item monitor solver residuals;
+    \item verify boundary conditions;
+    \item check conservation or physical constraints;
+    \item refine the mesh;
+    \item refine the time step;
+    \item estimate convergence rates;
+    \item compare with exact or manufactured solutions;
+    \item validate against physical data when applicable.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a PDE Discretization}
+\label{subsec:choosing-pde-discretization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For simple rectangular domains and smooth problems, consider:
+
+\[
+\boxed{
+\text{finite differences}.
+}
+\]
+
+For conservation laws and fluid transport, consider:
+
+\[
+\boxed{
+\text{finite volumes}.
+}
+\]
+
+For complex geometry and variational elliptic problems, consider:
+
+\[
+\boxed{
+\text{finite elements}.
+}
+\]
+
+For smooth periodic or simple-domain problems requiring very high
+accuracy, consider:
+
+\[
+\boxed{
+\text{spectral methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Time Integrator}
+\label{subsec:choosing-pde-time-integrator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonstiff hyperbolic systems, explicit methods are common.
+
+For diffusive systems, explicit stability restrictions may force
+
+\[
+\boxed{
+\Delta t=O(h^2).
+}
+\]
+
+Implicit methods may permit much larger stable steps.
+
+For method-of-lines systems, time-integration choices should follow the
+ODE stability properties of the semi-discrete system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:numerical-pde-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Using the Wrong PDE Classification}
+
+Elliptic, parabolic, and hyperbolic equations have fundamentally different
+mathematical behavior.
+
+A method appropriate for diffusion may be inappropriate for wave
+propagation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Boundary Conditions}
+
+A PDE without correct boundary data may be incomplete or solve a different
+physical problem.
+
+Boundary discretization must be incorporated into the numerical system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Centered Advection Without Stability Analysis}
+
+Forward-time centered-space discretization of pure advection is unstable.
+
+Higher formal symmetry does not imply stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Explicit Diffusion Step That Violates the Stability Limit}
+
+For one-dimensional FTCS heat flow,
+
+\[
+\boxed{
+\frac{
+\alpha\Delta t
+}{
+h^2
+}
+\leq
+\frac12
+}
+\]
+
+is required.
+
+Violating this condition can create oscillatory growth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Unconditional Stability With Unlimited Accuracy}
+
+Backward Euler can be stable with large time steps.
+
+That does not mean large time steps are accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the CFL Condition}
+
+For explicit hyperbolic schemes, numerical information must propagate
+quickly enough relative to the physical characteristics.
+
+A violated CFL restriction can destroy stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Wrong Upwind Direction}
+
+For
+
+\[
+c>0,
+\]
+
+use left-biased information.
+
+For
+
+\[
+c<0,
+\]
+
+use right-biased information.
+
+Using the opposite direction produces a downwind scheme with poor
+stability properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Numerical Diffusion as Physical Diffusion}
+
+A smeared numerical shock may be caused by the algorithm rather than the
+physical PDE.
+
+Grid refinement and method comparison can help separate the two.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Numerical Oscillations as Physical Waves}
+
+High-order dispersive schemes may generate oscillations near steep
+gradients or discontinuities.
+
+These may be numerical artifacts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Conservation}
+
+For conservation laws, a nonconservative discretization can produce
+incorrect shock speeds.
+
+Finite-volume or conservative-difference formulations are often essential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Matrix Sparsity}
+
+PDE discretization matrices are often sparse.
+
+Treating them as dense can make a tractable problem computationally
+impossible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Unpreconditioned Krylov Method on a Difficult PDE Matrix}
+
+A Krylov solver may technically converge but require an impractical number
+of iterations.
+
+Preconditioning is often essential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Refining Space Without Refining Time}
+
+A spatial convergence study can be contaminated by time-discretization
+error.
+
+Both sources of error must be controlled.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Refining Time Without Refining Space}
+
+Likewise, time error may become negligible while spatial error dominates.
+
+The observed convergence may then stop improving.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Boundary Accuracy}
+
+A second-order interior stencil combined with a first-order boundary
+formula may reduce the global convergence rate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Fine Mesh Automatically Gives a Correct Solution}
+
+A fine mesh does not repair:
+
+\[
+\boxed{
+\text{incorrect equations},
+}
+\]
+
+\[
+\boxed{
+\text{incorrect boundary conditions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{unstable discretization}.
+}
+\]
+
+Verification requires more than resolution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using High-Order Spectral Methods Across Discontinuities}
+
+Global smooth basis functions can produce Gibbs oscillations near jumps.
+
+Shock-capturing or local methods may be more appropriate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Nonlinear Solver Convergence}
+
+For nonlinear PDEs, discretization may be accurate while Newton iteration
+has not converged.
+
+Both discretization error and algebraic solver error must be monitored.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:numerical-pde-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Heat Transfer.}
+Diffusion and heat equations model temperature evolution in solids and
+fluids.
+
+\medskip
+
+\textbf{Fluid Dynamics.}
+Finite-volume and finite-element methods solve conservation laws and the
+Navier--Stokes equations.
+
+\medskip
+
+\textbf{Elasticity.}
+Finite elements are widely used for deformation, stress, and structural
+mechanics.
+
+\medskip
+
+\textbf{Electromagnetics.}
+Maxwell equations are solved numerically for antennas, waveguides, fields,
+and electromagnetic devices.
+
+\medskip
+
+\textbf{Wave Propagation.}
+Acoustic, seismic, and optical waves require stable low-dispersion
+numerical methods.
+
+\medskip
+
+\textbf{Finance.}
+Option-pricing equations such as Black--Scholes can be solved using
+finite-difference and finite-element methods.
+
+\medskip
+
+\textbf{Biology.}
+Reaction-diffusion equations model spatial population, chemical, and
+pattern-forming systems.
+
+\medskip
+
+\textbf{Environmental Modeling.}
+Transport-diffusion equations describe pollutants, heat, ocean processes,
+and atmospheric transport.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:numerical-pde-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a computational grid.
+\end{exercise}
+
+\begin{exercise}[1]
+State the centered first-difference formula.
+\end{exercise}
+
+\begin{exercise}[1]
+State the centered second-difference formula.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a finite-difference stencil.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a CFL condition conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a finite-volume cell average.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a weak formulation conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a finite-element basis function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a stiffness matrix.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a spectral method.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the centered second derivative using Taylor expansions.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct the three-point stencil for
+
+\[
+-u''=f.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Build the finite-difference matrix for a one-dimensional Poisson problem
+with four interior nodes.
+\end{exercise}
+
+\begin{exercise}[3]
+Incorporate nonzero Dirichlet boundary values into the right-hand side.
+\end{exercise}
+
+\begin{exercise}[3]
+Approximate a Neumann boundary condition using a one-sided difference.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the five-point Laplacian.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the two-dimensional Poisson equation at one interior node.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the resulting matrix is sparse.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the two-dimensional Laplacian using Kronecker products.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the FTCS heat equation scheme.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the diffusion number
+
+\[
+r
+=
+\frac{
+\alpha\Delta t
+}{
+h^2
+}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether a specified FTCS heat step is stable.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the maximum stable \(\Delta t\) for given \(h\) and \(\alpha\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive backward Euler for the heat equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the resulting matrix system.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive Crank--Nicolson for the heat equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the formal accuracy of FTCS, backward Euler, and
+Crank--Nicolson.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a von Neumann analysis of FTCS heat flow.
+\end{exercise}
+
+\begin{exercise}[2]
+Define the Courant number for linear advection.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the first-order upwind scheme for \(c>0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the corresponding upwind scheme for \(c<0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Check the CFL condition for a specified advection problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one upwind time step from given grid values.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain numerical diffusion in the upwind method.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why centered FTCS is unstable for pure linear advection.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply one Lax--Friedrichs step.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply one Lax--Wendroff step.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between numerical diffusion and numerical
+dispersion.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the centered wave-equation scheme.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine its CFL stability condition.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the first time level using initial displacement and velocity.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one wave-equation update.
+\end{exercise}
+
+\begin{exercise}[2]
+Integrate a conservation law over a finite-volume cell.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the semi-discrete finite-volume update.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why interface flux cancellation produces conservation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a consistent numerical flux for linear advection.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of a Riemann problem in Godunov's method.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute discrete total variation for a given grid function.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why TVD behavior is useful near shocks.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the weak form of one-dimensional Poisson's equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct piecewise linear hat functions on a three-element mesh.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a local finite-element stiffness matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Assemble two local stiffness matrices into a global matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a finite-element mass matrix for linear basis functions.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between trial and test functions.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the Galerkin condition.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare structured and unstructured meshes.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain \(h\)-refinement and \(p\)-refinement.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a Fourier spectral representation of a periodic function.
+\end{exercise}
+
+\begin{exercise}[3]
+Show how differentiation acts on Fourier coefficients.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain spectral convergence.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the Gibbs phenomenon.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a pseudospectral differentiation equation
+
+\[
+U_x\approx DU.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Apply the method of lines to the heat equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the resulting ODE system becomes stiff as \(h\to0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Write a first-order operator splitting for a reaction-diffusion equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a Strang splitting sequence.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Newton linearization for a nonlinear discrete PDE system.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Picard iteration.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Krylov methods are useful for PDE systems.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the basic idea of multigrid.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe one two-grid correction cycle.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of preconditioning in PDE linear solves.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a mesh-refinement convergence study from supplied errors.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate spatial convergence order.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why both \(h\) and \(\Delta t\) must be refined in a
+space-time convergence study.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a manufactured solution for a Poisson problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain verification versus validation for a PDE simulation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the five-point Laplacian truncation error.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove positive definiteness of the one-dimensional Dirichlet discrete
+Laplacian.
+\end{exercise}
+
+\begin{exercise}[4]
+Study discrete maximum principles for elliptic finite differences.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the eigenvalues of the one-dimensional discrete Laplacian.
+\end{exercise}
+
+\begin{exercise}[4]
+Use those eigenvalues to analyze diffusion stiffness.
+\end{exercise}
+
+\begin{exercise}[4]
+Perform a full von Neumann analysis of Crank--Nicolson.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the instability of centered FTCS advection.
+\end{exercise}
+
+\begin{exercise}[4]
+Perform modified-equation analysis for first-order upwind advection.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Lax--Wendroff dispersion.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the CFL condition from numerical and physical domains of dependence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study weak solutions of scalar conservation laws.
+\end{exercise}
+
+\begin{exercise}[4]
+Study entropy conditions and entropy-stable numerical methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Godunov fluxes for scalar convex conservation laws.
+\end{exercise}
+
+\begin{exercise}[4]
+Study MUSCL-type reconstruction.
+\end{exercise}
+
+\begin{exercise}[4]
+Study high-resolution flux limiters.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the weak finite-element formulation of Poisson's equation in two
+dimensions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Lax--Milgram theorem as the foundation of elliptic finite
+elements.
+\end{exercise}
+
+\begin{exercise}[4]
+Study C\'ea's lemma.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive finite-element interpolation error estimates.
+\end{exercise}
+
+\begin{exercise}[4]
+Study adaptive finite-element error estimation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Fourier spectral convergence for analytic functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Chebyshev collocation methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study multidimensional spectral methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study algebraic multigrid.
+\end{exercise}
+
+\begin{exercise}[4]
+Study domain-decomposition preconditioners.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stabilized finite elements for advection-dominated problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study discontinuous Galerkin methods.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:numerical-pde-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical PDE methods replace continuous derivatives and function spaces
+with finite-dimensional approximations.
+
+Finite differences use formulas such as
+
+\[
+\boxed{
+u_{xx}(x_i)
+\approx
+\frac{
+u_{i+1}-2u_i+u_{i-1}
+}{
+h^2
+}.
+}
+\]
+
+For two-dimensional diffusion,
+
+\[
+\boxed{
+\Delta u_{i,j}
+\approx
+\frac{
+u_{i+1,j}
++
+u_{i-1,j}
++
+u_{i,j+1}
++
+u_{i,j-1}
+-
+4u_{i,j}
+}{
+h^2
+}.
+}
+\]
+
+The FTCS heat scheme satisfies
+
+\[
+\boxed{
+u_i^{n+1}
+=
+r u_{i-1}^n
++
+(1-2r)u_i^n
++
+r u_{i+1}^n,
+}
+\]
+
+with
+
+\[
+\boxed{
+r
+=
+\frac{
+\alpha\Delta t
+}{
+h^2
+}.
+}
+\]
+
+For stability in one dimension,
+
+\[
+\boxed{
+r\leq\frac12.
+}
+\]
+
+For linear advection,
+
+\[
+\boxed{
+u_t+cu_x=0,
+}
+\]
+
+upwind schemes use information from the characteristic direction and obey
+CFL restrictions.
+
+Finite-volume methods emphasize
+
+\[
+\boxed{
+\text{conservation},
+}
+\]
+
+finite-element methods emphasize
+
+\[
+\boxed{
+\text{weak formulations and local basis functions},
+}
+\]
+
+and spectral methods emphasize
+
+\[
+\boxed{
+\text{high-order global approximation}.
+}
+\]
+
+Reliable PDE computation requires simultaneous attention to
+
+\[
+\boxed{
+\text{consistency}
++
+\text{stability}
++
+\text{convergence}
++
+\text{conservation}
++
+\text{linear algebra}
++
+\text{mesh resolution}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:numerical-pde-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Numerical PDEs extend the approximation and stability ideas of
+Section~\ref{sec:numerical-analysis} and the time-integration framework of
+Section~\ref{sec:numerical-odes} to spatially distributed systems.
+Finite-difference, finite-volume, finite-element, spectral, and
+method-of-lines approaches transform PDEs into large algebraic or ODE
+systems whose solution relies heavily on
+Section~\ref{sec:numerical-linear-algebra}. Nonlinear PDEs also require
+the iterative methods of Section~\ref{sec:numerical-optimization}. The
+next section, Monte Carlo Methods, develops an entirely different
+computational strategy based on random sampling for integration,
+probability estimation, uncertainty quantification, simulation, and
+high-dimensional computation.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.5 Numerical Partial Differential Equations
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard finite-difference PDE methods.
+%   - Standard finite-volume, finite-element, and spectral methods.
+%   - Standard PDE stability and convergence analysis.
+%
+% Used for:
+%   - PDE classification;
+%   - computational grids;
+%   - finite-difference formulas;
+%   - stencils;
+%   - one- and two-dimensional Poisson equations;
+%   - discrete Laplacians;
+%   - Dirichlet, Neumann, and Robin conditions;
+%   - sparse PDE matrices;
+%   - Kronecker-product structure;
+%   - discrete maximum-principle preview;
+%   - heat equation;
+%   - FTCS;
+%   - BTCS;
+%   - Crank--Nicolson;
+%   - diffusion-number stability restrictions;
+%   - von Neumann stability analysis;
+%   - advection equation;
+%   - Courant number;
+%   - upwind methods;
+%   - numerical diffusion;
+%   - numerical dispersion;
+%   - Lax--Friedrichs;
+%   - Lax--Wendroff;
+%   - CFL condition;
+%   - wave-equation discretization;
+%   - conservation laws;
+%   - finite-volume methods;
+%   - numerical fluxes;
+%   - Godunov methods preview;
+%   - shocks and weak solutions;
+%   - monotone and TVD schemes;
+%   - flux-limiters preview;
+%   - weak formulations;
+%   - finite-element methods;
+%   - Galerkin approximation;
+%   - stiffness and mass matrices;
+%   - finite-element assembly;
+%   - structured and unstructured meshes;
+%   - adaptive mesh refinement;
+%   - h-, p-, and hp-refinement;
+%   - spectral methods;
+%   - Fourier and pseudospectral methods;
+%   - method of lines;
+%   - semi-discrete stiffness;
+%   - operator splitting;
+%   - Strang splitting;
+%   - nonlinear PDEs;
+%   - Newton and Picard linearization;
+%   - Krylov solvers;
+%   - multigrid;
+%   - preconditioning;
+%   - domain decomposition;
+%   - consistency, stability, and convergence;
+%   - Lax equivalence preview;
+%   - refinement studies;
+%   - manufactured solutions;
+%   - boundary errors and ghost points;
+%   - nonuniform and anisotropic meshes;
+%   - boundary layers;
+%   - Peclet-number preview;
+%   - advection-diffusion;
+%   - reaction-diffusion;
+%   - applications and exercises.
+%
+% Notes:
+%   - Monte Carlo Methods are developed next in Section 11.6.
+%   - Scientific Computing follows in Section 11.7.
+%   - Numerical ODEs appear in Section 11.4.
+%   - PDE theory appears in Chapter 9.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

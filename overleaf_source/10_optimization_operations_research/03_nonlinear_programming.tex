@@ -1,0 +1,3749 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.3 NONLINEAR PROGRAMMING
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Nonlinear Programming}
+\label{sec:nonlinear-programming}
+
+\prerequisite{
+Optimization fundamentals, gradients, Hessian matrices, multivariable
+calculus, linear algebra, constrained optimization, Lagrange multipliers,
+Karush--Kuhn--Tucker conditions, and basic numerical optimization.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a nonlinear programming problem;
+    \item distinguish linear and nonlinear optimization models;
+    \item identify smooth and nonsmooth nonlinear programs;
+    \item formulate general constrained nonlinear optimization problems;
+    \item distinguish local and global nonlinear optimization;
+    \item understand feasible directions and tangent spaces;
+    \item recognize active constraints;
+    \item formulate the Lagrangian;
+    \item derive first-order equality-constrained optimality conditions;
+    \item understand constraint qualifications;
+    \item state the KKT conditions for nonlinear programs;
+    \item interpret complementary slackness;
+    \item identify LICQ conceptually;
+    \item identify MFCQ conceptually;
+    \item understand second-order necessary conditions;
+    \item understand second-order sufficient conditions;
+    \item recognize the Hessian of the Lagrangian;
+    \item understand reduced Hessian ideas conceptually;
+    \item recognize saddle-point structure in KKT systems;
+    \item solve simple nonlinear equality-constrained problems;
+    \item solve simple nonlinear inequality-constrained problems;
+    \item understand penalty methods;
+    \item distinguish quadratic and exact penalties conceptually;
+    \item understand barrier methods;
+    \item understand logarithmic barriers;
+    \item understand augmented Lagrangian methods;
+    \item understand sequential quadratic programming;
+    \item understand nonlinear interior-point methods conceptually;
+    \item recognize trust-region methods for constrained optimization;
+    \item understand line-search globalization;
+    \item understand merit functions;
+    \item recognize feasibility restoration;
+    \item understand Newton systems for KKT equations;
+    \item recognize sparse nonlinear programming structure;
+    \item understand scaling and conditioning;
+    \item distinguish local solvers from global nonlinear optimization;
+    \item recognize nonconvexity and multiple local optima;
+    \item understand multistart strategies conceptually;
+    \item connect nonlinear programming with engineering design,
+          estimation, economics, machine learning, and optimal control.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Nonlinear Programming?}
+\label{subsec:what-is-nonlinear-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonlinear programming problem, abbreviated NLP, is an optimization
+problem in which the objective function, one or more constraints, or both
+are nonlinear.
+
+A general form is
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}\in\mathbb{R}^n}
+\quad&
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+g_i(\mathbf{x})\leq0,
+\qquad
+i=1,\ldots,m,
+\\
+&
+h_j(\mathbf{x})=0,
+\qquad
+j=1,\ldots,p.
+\end{aligned}
+}
+\]
+
+The functions \(f\), \(g_i\), and \(h_j\) may be nonlinear.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Versus Nonlinear Programming}
+\label{subsec:linear-versus-nonlinear-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A linear program requires:
+
+\[
+\boxed{
+\text{linear objective}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{linear constraints}.
+}
+\]
+
+A nonlinear program may contain terms such as
+
+\[
+x_1^2,
+\]
+
+\[
+x_1x_2,
+\]
+
+\[
+e^{x_1},
+\]
+
+\[
+\log x_2,
+\]
+
+or
+
+\[
+\sin x_1.
+\]
+
+For example,
+
+\[
+\boxed{
+\min_{x,y}
+x^2+y^2
+}
+\]
+
+subject to
+
+\[
+\boxed{
+xy\geq1
+}
+\]
+
+is nonlinear because the constraint contains the product \(xy\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Smooth Nonlinear Programs}
+\label{subsec:smooth-nonlinear-programs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A smooth nonlinear program has sufficiently differentiable objective and
+constraint functions.
+
+Typical algorithms rely on:
+
+\[
+\boxed{
+\nabla f,
+}
+\]
+
+\[
+\boxed{
+\nabla g_i,
+}
+\]
+
+\[
+\boxed{
+\nabla h_j,
+}
+\]
+
+and sometimes
+
+\[
+\boxed{
+\nabla^2 f.
+}
+\]
+
+Smoothness enables Taylor expansion and local optimality analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonsmooth Nonlinear Programs}
+\label{subsec:nonsmooth-nonlinear-programs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonlinear optimization problem can also be nonsmooth.
+
+For example,
+
+\[
+\boxed{
+\min_x
+|x|
+}
+\]
+
+has no ordinary derivative at
+
+\[
+x=0.
+\]
+
+Similarly,
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+f(\mathbf{x})
++
+\lambda
+\|\mathbf{x}\|_1
+}
+\]
+
+is nonsmooth at points where components vanish.
+
+Nonsmooth optimization requires generalized derivative concepts and
+specialized methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local and Global Solutions}
+\label{subsec:nlp-local-global-solutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A feasible point \(\mathbf{x}^*\) is a local minimizer if there exists a
+neighborhood in which
+
+\[
+\boxed{
+f(\mathbf{x}^*)
+\leq
+f(\mathbf{x})
+}
+\]
+
+for all nearby feasible \(\mathbf{x}\).
+
+A global minimizer satisfies
+
+\[
+\boxed{
+f(\mathbf{x}^*)
+\leq
+f(\mathbf{x})
+}
+\]
+
+for every feasible point.
+
+For nonlinear and especially nonconvex problems,
+
+\[
+\boxed{
+\text{local minimum}
+\not\Rightarrow
+\text{global minimum}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonconvexity}
+\label{subsec:nlp-nonconvexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonlinear problem is nonconvex if the objective or feasible region fails
+to have the required convex structure.
+
+Nonconvexity can produce:
+
+\[
+\boxed{
+\text{multiple local minima},
+}
+\]
+
+\[
+\boxed{
+\text{local maxima},
+}
+\]
+
+\[
+\boxed{
+\text{saddle points},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{disconnected feasible regions}.
+}
+\]
+
+This makes global optimization difficult.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example of Multiple Local Minima}
+\label{subsec:nlp-multiple-local-minima}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+f(x)
+=
+(x^2-1)^2.
+}
+\]
+
+Then
+
+\[
+f'(x)
+=
+4x(x^2-1).
+\]
+
+Stationary points are
+
+\[
+x=-1,
+\qquad
+x=0,
+\qquad
+x=1.
+\]
+
+The points
+
+\[
+\boxed{
+x=\pm1
+}
+\]
+
+are global minima, while
+
+\[
+\boxed{
+x=0
+}
+\]
+
+is a local maximum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feasible Directions}
+\label{subsec:nlp-feasible-directions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(\mathbf{x}\) be feasible.
+
+A direction \(\mathbf{d}\) is a feasible direction if sufficiently small
+movement in that direction remains feasible:
+
+\[
+\boxed{
+\mathbf{x}
++
+\alpha\mathbf{d}
+\in
+\mathcal{F}
+}
+\]
+
+for sufficiently small positive \(\alpha\).
+
+At boundary points, not every direction is feasible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tangent Directions for Equality Constraints}
+\label{subsec:nlp-tangent-directions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+h_j(\mathbf{x})=0.
+\]
+
+A tangent direction \(\mathbf{d}\) at \(\mathbf{x}^*\) satisfies
+
+\[
+\boxed{
+\nabla h_j(\mathbf{x}^*)^T
+\mathbf{d}
+=
+0
+}
+\]
+
+for all equality constraints.
+
+Thus feasible first-order motion lies in the tangent space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Active Inequality Constraints}
+\label{subsec:nlp-active-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+g_i(\mathbf{x})\leq0,
+\]
+
+constraint \(i\) is active at \(\mathbf{x}^*\) if
+
+\[
+\boxed{
+g_i(\mathbf{x}^*)=0.
+}
+\]
+
+It is inactive if
+
+\[
+\boxed{
+g_i(\mathbf{x}^*)<0.
+}
+\]
+
+Only active inequalities contribute to the local boundary geometry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equality-Constrained Nonlinear Optimization}
+\label{subsec:nlp-equality-constrained}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+h_j(\mathbf{x})=0,
+\qquad
+j=1,\ldots,p.
+\end{aligned}
+}
+\]
+
+The Lagrangian is
+
+\[
+\boxed{
+\mathcal{L}
+(
+\mathbf{x},
+\boldsymbol{\lambda}
+)
+=
+f(\mathbf{x})
++
+\sum_{j=1}^{p}
+\lambda_j
+h_j(\mathbf{x}).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{First-Order Equality Conditions}
+\label{subsec:nlp-first-order-equality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under appropriate regularity conditions, a local constrained optimum
+satisfies
+
+\[
+\boxed{
+\nabla_{\mathbf{x}}
+\mathcal{L}
+(
+\mathbf{x}^*,
+\boldsymbol{\lambda}^*
+)
+=
+0,
+}
+\]
+
+together with
+
+\[
+\boxed{
+h_j(\mathbf{x}^*)=0.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\nabla f(\mathbf{x}^*)
++
+\sum_{j=1}^{p}
+\lambda_j^*
+\nabla h_j(\mathbf{x}^*)
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Nonlinear Equality Constraint}
+\label{subsec:worked-nlp-equality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Minimum on a Circle}
+
+Minimize
+
+\[
+f(x,y)=x+y
+\]
+
+subject to
+
+\[
+x^2+y^2=1.
+\]
+
+The Lagrangian is
+
+\[
+\mathcal{L}
+=
+x+y
++
+\lambda
+(
+x^2+y^2-1
+).
+\]
+
+Stationarity gives
+
+\[
+1+2\lambda x=0,
+\]
+
+\[
+1+2\lambda y=0.
+\]
+
+Therefore,
+
+\[
+x=y.
+\]
+
+Using the constraint,
+
+\[
+2x^2=1.
+\]
+
+Thus,
+
+\[
+x=y=\pm\frac1{\sqrt2}.
+\]
+
+Evaluate the objective:
+
+\[
+f
+\left(
+\frac1{\sqrt2},
+\frac1{\sqrt2}
+\right)
+=
+\sqrt2,
+\]
+
+while
+
+\[
+f
+\left(
+-\frac1{\sqrt2},
+-\frac1{\sqrt2}
+\right)
+=
+-\sqrt2.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+(x^*,y^*)
+=
+\left(
+-\frac1{\sqrt2},
+-\frac1{\sqrt2}
+\right),
+}
+\]
+
+with minimum value
+
+\[
+\boxed{
+f^*=-\sqrt2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constraint Qualifications}
+\label{subsec:nlp-constraint-qualifications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Constraint qualifications are regularity conditions ensuring that local
+constraint geometry is represented correctly by the gradients.
+
+They are needed because multiplier conditions can fail at degenerate
+points.
+
+Important examples include:
+
+\[
+\boxed{
+\text{LICQ},
+}
+\]
+
+\[
+\boxed{
+\text{MFCQ},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Slater's condition}
+}
+\]
+
+for convex problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Independence Constraint Qualification}
+\label{subsec:licq}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+LICQ stands for Linear Independence Constraint Qualification.
+
+At \(\mathbf{x}^*\), LICQ requires the gradients of:
+
+\[
+\boxed{
+\text{all equality constraints}
+}
+\]
+
+together with
+
+\[
+\boxed{
+\text{all active inequality constraints}
+}
+\]
+
+to be linearly independent.
+
+Under LICQ, KKT multipliers are locally well behaved and are unique under
+appropriate conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mangasarian--Fromovitz Constraint Qualification}
+\label{subsec:mfcq}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MFCQ is weaker than LICQ.
+
+Conceptually, it requires:
+
+\begin{itemize}
+    \item equality gradients to be linearly independent; and
+    \item existence of a direction tangent to the equality constraints
+          that strictly decreases all active inequality constraints.
+\end{itemize}
+
+MFCQ ensures the feasible set has an appropriate local direction structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Failure of Constraint Qualification}
+\label{subsec:nlp-cq-failure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+\min_x x
+}
+\]
+
+subject to
+
+\[
+\boxed{
+x^2=0.
+}
+\]
+
+The only feasible point is
+
+\[
+x=0,
+\]
+
+so it is trivially optimal.
+
+However,
+
+\[
+\nabla h(0)=0.
+\]
+
+The ordinary Lagrange condition would require
+
+\[
+1+\lambda(0)=0,
+\]
+
+which is impossible.
+
+The issue is failure of constraint regularity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General Nonlinear KKT Conditions}
+\label{subsec:nlp-kkt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+g_i(\mathbf{x})\leq0,
+\qquad i=1,\ldots,m,
+\\
+&
+h_j(\mathbf{x})=0,
+\qquad j=1,\ldots,p.
+\end{aligned}
+}
+\]
+
+Define
+
+\[
+\boxed{
+\mathcal{L}
+=
+f
++
+\sum_{i=1}^{m}
+\mu_i g_i
++
+\sum_{j=1}^{p}
+\lambda_j h_j.
+}
+\]
+
+At a regular local minimizer, the KKT conditions hold.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KKT Stationarity}
+\label{subsec:nlp-kkt-stationarity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Stationarity requires
+
+\[
+\boxed{
+\nabla f(\mathbf{x}^*)
++
+\sum_{i=1}^{m}
+\mu_i^*
+\nabla g_i(\mathbf{x}^*)
++
+\sum_{j=1}^{p}
+\lambda_j^*
+\nabla h_j(\mathbf{x}^*)
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KKT Primal Feasibility}
+\label{subsec:nlp-kkt-primal-feasibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The candidate must satisfy
+
+\[
+\boxed{
+g_i(\mathbf{x}^*)\leq0,
+}
+\]
+
+and
+
+\[
+\boxed{
+h_j(\mathbf{x}^*)=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KKT Dual Feasibility}
+\label{subsec:nlp-kkt-dual-feasibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the convention
+
+\[
+g_i(\mathbf{x})\leq0,
+\]
+
+the multipliers satisfy
+
+\[
+\boxed{
+\mu_i^*\geq0.
+}
+\]
+
+Equality multipliers remain unrestricted in sign.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KKT Complementary Slackness}
+\label{subsec:nlp-kkt-complementary-slackness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For every inequality,
+
+\[
+\boxed{
+\mu_i^*
+g_i(\mathbf{x}^*)
+=
+0.
+}
+\]
+
+Hence,
+
+\[
+g_i(\mathbf{x}^*)<0
+\Rightarrow
+\mu_i^*=0.
+\]
+
+Only active constraints can have positive multipliers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Nonlinear Inequality Constraint}
+\label{subsec:worked-nlp-inequality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{KKT with an Active Constraint}
+
+Minimize
+
+\[
+f(x,y)=x^2+y^2
+\]
+
+subject to
+
+\[
+x+y\geq2.
+\]
+
+Rewrite the inequality as
+
+\[
+g(x,y)
+=
+2-x-y
+\leq0.
+\]
+
+The Lagrangian is
+
+\[
+\mathcal{L}
+=
+x^2+y^2
++
+\mu(2-x-y).
+\]
+
+Stationarity gives
+
+\[
+2x-\mu=0,
+\]
+
+\[
+2y-\mu=0.
+\]
+
+Thus,
+
+\[
+x=y.
+\]
+
+The unconstrained minimizer \((0,0)\) is infeasible, so the constraint is
+active:
+
+\[
+x+y=2.
+\]
+
+Hence,
+
+\[
+x=y=1.
+\]
+
+Then
+
+\[
+\mu=2.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+(x^*,y^*)=(1,1),
+}
+\]
+
+with
+
+\[
+\boxed{
+\mu^*=2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Necessary Versus Sufficient KKT Conditions}
+\label{subsec:kkt-necessary-sufficient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For general nonlinear problems, KKT conditions are usually necessary
+under a suitable constraint qualification.
+
+They are not generally sufficient.
+
+A KKT point may correspond to:
+
+\[
+\boxed{
+\text{local minimum},
+}
+\]
+
+\[
+\boxed{
+\text{local maximum},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{saddle-type behavior}.
+}
+\]
+
+Convexity changes this situation substantially.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hessian of the Lagrangian}
+\label{subsec:hessian-of-lagrangian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Hessian with respect to the decision variables is
+
+\[
+\boxed{
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+=
+\nabla^2f
++
+\sum_i
+\mu_i
+\nabla^2g_i
++
+\sum_j
+\lambda_j
+\nabla^2h_j.
+}
+\]
+
+Second-order constrained optimality depends on this matrix restricted to
+appropriate feasible directions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Necessary Condition}
+\label{subsec:nlp-second-order-necessary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At a sufficiently regular local minimizer satisfying KKT conditions, the
+Hessian of the Lagrangian must be nonnegative along appropriate critical
+directions.
+
+In a pure equality-constrained problem, if \(\mathbf{d}\) satisfies
+
+\[
+\boxed{
+\nabla h_j(\mathbf{x}^*)^T\mathbf{d}=0
+}
+\]
+
+for every constraint, then a second-order necessary condition is
+
+\[
+\boxed{
+\mathbf{d}^T
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+(\mathbf{x}^*,\boldsymbol{\lambda}^*)
+\mathbf{d}
+\geq0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Sufficient Condition}
+\label{subsec:nlp-second-order-sufficient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the KKT conditions hold and
+
+\[
+\boxed{
+\mathbf{d}^T
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+\mathbf{d}
+>0
+}
+\]
+
+for every nonzero feasible critical direction \(\mathbf{d}\), then under
+appropriate regularity conditions the point is a strict local minimizer.
+
+Thus curvature is checked only along directions permitted by the
+constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduced Hessian}
+\label{subsec:reduced-hessian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the columns of \(Z\) form a basis for the tangent space:
+
+\[
+\boxed{
+\nabla h(\mathbf{x}^*)^TZ=0.
+}
+\]
+
+The reduced Hessian is
+
+\[
+\boxed{
+Z^T
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+Z.
+}
+\]
+
+Positive definiteness of the reduced Hessian gives a convenient
+second-order test for equality-constrained minima.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton System for Equality-Constrained Optimization}
+\label{subsec:equality-kkt-newton-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For equality constraints,
+
+\[
+h(\mathbf{x})=0,
+\]
+
+the KKT equations are
+
+\[
+\boxed{
+\nabla f(\mathbf{x})
++
+J_h(\mathbf{x})^T\boldsymbol{\lambda}
+=
+0,
+}
+\]
+
+and
+
+\[
+\boxed{
+h(\mathbf{x})=0.
+}
+\]
+
+Newton's method applied to these equations gives a linear system of the
+form
+
+\[
+\boxed{
+\begin{pmatrix}
+H & J_h^T\\
+J_h & 0
+\end{pmatrix}
+\begin{pmatrix}
+\mathbf{p}\\
+\Delta\boldsymbol{\lambda}
+\end{pmatrix}
+=
+-
+\begin{pmatrix}
+\nabla_{\mathbf{x}}\mathcal{L}\\
+h
+\end{pmatrix},
+}
+\]
+
+where
+
+\[
+\boxed{
+H
+=
+\nabla_{\mathbf{x}\mathbf{x}}^2\mathcal{L}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Saddle-Point Linear Systems}
+\label{subsec:nlp-saddle-point-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The KKT matrix
+
+\[
+\boxed{
+\begin{pmatrix}
+H&A^T\\
+A&0
+\end{pmatrix}
+}
+\]
+
+is called a saddle-point matrix.
+
+Such matrices arise throughout:
+
+\[
+\boxed{
+\text{constrained optimization},
+}
+\]
+
+\[
+\boxed{
+\text{fluid mechanics},
+}
+\]
+
+\[
+\boxed{
+\text{finite-element methods},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{optimal control}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Penalty Methods}
+\label{subsec:nlp-penalty-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Penalty methods transform constrained optimization into a sequence of
+unconstrained or simpler problems.
+
+For equality constraints
+
+\[
+h(\mathbf{x})=0,
+\]
+
+a quadratic penalty objective is
+
+\[
+\boxed{
+P_\rho(\mathbf{x})
+=
+f(\mathbf{x})
++
+\frac{\rho}{2}
+\|
+h(\mathbf{x})
+\|^2.
+}
+\]
+
+As \(\rho\) increases, constraint violation becomes increasingly
+expensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Penalty Method}
+\label{subsec:quadratic-penalty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sequence of problems is solved:
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+P_{\rho_k}(\mathbf{x}),
+}
+\]
+
+with
+
+\[
+\boxed{
+\rho_k\to\infty.
+}
+\]
+
+Under suitable conditions, minimizers approach feasible solutions of the
+original constrained problem.
+
+However, very large penalty parameters can create severe ill-conditioning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Quadratic Penalty}
+\label{subsec:worked-quadratic-penalty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Penalizing an Equality Constraint}
+
+Consider
+
+\[
+\min_x
+(x-2)^2
+\]
+
+subject to
+
+\[
+x=1.
+\]
+
+The constrained optimum is clearly
+
+\[
+x^*=1.
+\]
+
+The quadratic penalty objective is
+
+\[
+P_\rho(x)
+=
+(x-2)^2
++
+\frac{\rho}{2}
+(x-1)^2.
+\]
+
+Differentiate:
+
+\[
+P_\rho'(x)
+=
+2(x-2)
++
+\rho(x-1).
+\]
+
+Set equal to zero:
+
+\[
+(2+\rho)x
+=
+4+\rho.
+\]
+
+Thus,
+
+\[
+\boxed{
+x_\rho
+=
+\frac{
+\rho+4
+}{
+\rho+2
+}.
+}
+\]
+
+As
+
+\[
+\rho\to\infty,
+\]
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+x_\rho\to1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Penalty Functions}
+\label{subsec:exact-penalty-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An exact penalty can recover a constrained solution using a finite
+penalty parameter.
+
+A common form for equality constraints is
+
+\[
+\boxed{
+P_\rho(\mathbf{x})
+=
+f(\mathbf{x})
++
+\rho
+\sum_j
+|h_j(\mathbf{x})|.
+}
+\]
+
+Unlike quadratic penalties, exact penalties are generally nonsmooth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Barrier Methods}
+\label{subsec:nlp-barrier-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Barrier methods enforce inequality feasibility from the interior.
+
+For
+
+\[
+g_i(\mathbf{x})<0,
+\]
+
+a logarithmic barrier problem is
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+f(\mathbf{x})
+-
+\mu
+\sum_{i=1}^{m}
+\log
+[
+-g_i(\mathbf{x})
+].
+}
+\]
+
+The parameter
+
+\[
+\mu>0
+\]
+
+controls the barrier strength.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Barrier Behavior}
+\label{subsec:nlp-barrier-behavior}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As a feasible point approaches the boundary,
+
+\[
+g_i(\mathbf{x})\to0^-,
+\]
+
+we have
+
+\[
+-\log[-g_i(\mathbf{x})]
+\to\infty.
+\]
+
+Therefore the barrier prevents iterates from crossing the inequality
+boundary.
+
+As
+
+\[
+\mu\to0,
+\]
+
+the barrier problem approaches the original constrained problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Central Path in Nonlinear Optimization}
+\label{subsec:nlp-central-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The solutions of the barrier problems for varying \(\mu\) form a central
+path under appropriate conditions.
+
+This path satisfies perturbed KKT conditions.
+
+As
+
+\[
+\boxed{
+\mu\to0,
+}
+\]
+
+the solution approaches a constrained optimum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Augmented Lagrangian Method}
+\label{subsec:augmented-lagrangian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For equality constraints,
+
+\[
+h(\mathbf{x})=0,
+\]
+
+the augmented Lagrangian is
+
+\[
+\boxed{
+\mathcal{L}_\rho
+(
+\mathbf{x},
+\boldsymbol{\lambda}
+)
+=
+f(\mathbf{x})
++
+\boldsymbol{\lambda}^T
+h(\mathbf{x})
++
+\frac{\rho}{2}
+\|
+h(\mathbf{x})
+\|^2.
+}
+\]
+
+It combines multiplier information with a quadratic penalty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Augmented Lagrangians Help}
+\label{subsec:why-augmented-lagrangian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pure quadratic penalty methods often require
+
+\[
+\rho\to\infty.
+\]
+
+Augmented Lagrangian methods update both:
+
+\[
+\boxed{
+\boldsymbol{\lambda}
+}
+\]
+
+and
+
+\[
+\boxed{
+\rho.
+}
+\]
+
+This can achieve accurate feasibility without requiring extremely large
+penalty parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiplier Update}
+\label{subsec:augmented-lagrangian-multiplier-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic equality-constrained multiplier update has form
+
+\[
+\boxed{
+\boldsymbol{\lambda}_{k+1}
+=
+\boldsymbol{\lambda}_k
++
+\rho_k
+h(\mathbf{x}_{k+1}).
+}
+\]
+
+The multiplier accumulates information about persistent constraint
+violation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequential Quadratic Programming}
+\label{subsec:sequential-quadratic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sequential quadratic programming, abbreviated SQP, solves a sequence of
+quadratic approximations to the nonlinear problem.
+
+At iteration \(k\), the objective is approximated quadratically and the
+constraints are linearized.
+
+This produces a quadratic programming subproblem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SQP Subproblem}
+\label{subsec:sqp-subproblem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For equality constraints, a typical SQP step solves
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{p}}
+\quad&
+\nabla f(\mathbf{x}_k)^T\mathbf{p}
++
+\frac12
+\mathbf{p}^TB_k\mathbf{p}
+\\
+\text{subject to}
+\quad&
+h(\mathbf{x}_k)
++
+J_h(\mathbf{x}_k)\mathbf{p}
+=
+0.
+\end{aligned}
+}
+\]
+
+Here \(B_k\) approximates the Hessian of the Lagrangian.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SQP with Inequality Constraints}
+\label{subsec:sqp-inequality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonlinear inequalities,
+
+\[
+g_i(\mathbf{x})\leq0,
+\]
+
+the SQP subproblem uses linearized constraints:
+
+\[
+\boxed{
+g_i(\mathbf{x}_k)
++
+\nabla g_i(\mathbf{x}_k)^T\mathbf{p}
+\leq0.
+}
+\]
+
+Thus each nonlinear iteration solves a quadratic program with locally
+linearized constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why SQP Is Powerful}
+\label{subsec:why-sqp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Near a regular solution, SQP closely resembles Newton's method applied to
+the KKT equations.
+
+With accurate Hessian information and suitable assumptions, SQP can have
+very fast local convergence.
+
+It is one of the standard methods for smooth constrained nonlinear
+optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quasi-Newton SQP}
+\label{subsec:quasi-newton-sqp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computing
+
+\[
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+\]
+
+exactly can be expensive.
+
+Instead, \(B_k\) may be updated using quasi-Newton formulas such as BFGS.
+
+This reduces derivative cost while retaining curvature information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Line Search in Constrained Optimization}
+\label{subsec:nlp-line-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After computing a search direction \(\mathbf{p}_k\), a line-search method
+chooses
+
+\[
+\alpha_k>0
+\]
+
+and updates
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+\mathbf{x}_k
++
+\alpha_k\mathbf{p}_k.
+}
+\]
+
+The step should improve some measure of both objective quality and
+constraint satisfaction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Merit Functions}
+\label{subsec:nlp-merit-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A merit function combines objective and constraint violation into one
+scalar quantity.
+
+For example,
+
+\[
+\boxed{
+\Phi_\rho(\mathbf{x})
+=
+f(\mathbf{x})
++
+\rho
+\|
+h(\mathbf{x})
+\|_1.
+}
+\]
+
+Line search can then require sufficient decrease in \(\Phi_\rho\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Merit Functions Are Needed}
+\label{subsec:why-merit-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A step can reduce the objective while worsening feasibility.
+
+Another step can improve feasibility while increasing the objective.
+
+A merit function gives one scalar quantity for balancing these competing
+goals during globalization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Filter Methods Preview}
+\label{subsec:filter-methods-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Filter methods avoid combining objective and feasibility into one fixed
+merit function.
+
+Instead, a trial point can be accepted if it sufficiently improves either:
+
+\[
+\boxed{
+\text{objective value}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{constraint violation}.
+}
+\]
+
+This creates a two-criterion acceptance strategy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trust-Region Constrained Methods}
+\label{subsec:nlp-trust-region}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Trust-region methods solve a local constrained model subject to
+
+\[
+\boxed{
+\|\mathbf{p}\|
+\leq
+\Delta_k.
+}
+\]
+
+The step is restricted to a region where the local approximation is
+believed to be reliable.
+
+The radius is adjusted based on agreement between model prediction and
+actual improvement.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feasibility Restoration}
+\label{subsec:feasibility-restoration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some nonlinear algorithms temporarily focus primarily on reducing
+constraint violation.
+
+A restoration phase may approximately solve
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+\|
+h(\mathbf{x})
+\|
+}
+\]
+
+and suitable measures of violated inequalities.
+
+Once feasibility improves, objective optimization resumes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Interior-Point Methods}
+\label{subsec:nonlinear-interior-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interior-point methods for nonlinear programming solve barrier-modified
+KKT systems.
+
+Introduce slack variables
+
+\[
+s_i>0
+\]
+
+so that
+
+\[
+\boxed{
+g_i(\mathbf{x})+s_i=0.
+}
+\]
+
+Perturbed complementary slackness takes form
+
+\[
+\boxed{
+\mu_i s_i
+=
+\tau,
+}
+\]
+
+where
+
+\[
+\tau>0
+\]
+
+is driven toward zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal-Dual KKT System}
+\label{subsec:nlp-primal-dual-kkt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A primal-dual nonlinear interior-point method seeks approximate
+solutions of
+
+\[
+\boxed{
+\nabla f
++
+J_g^T\boldsymbol{\mu}
++
+J_h^T\boldsymbol{\lambda}
+=
+0,
+}
+\]
+
+\[
+\boxed{
+g(\mathbf{x})+\mathbf{s}=0,
+}
+\]
+
+\[
+\boxed{
+h(\mathbf{x})=0,
+}
+\]
+
+and
+
+\[
+\boxed{
+S\boldsymbol{\mu}
+=
+\tau\mathbf{1}.
+}
+\]
+
+Here
+
+\[
+S
+=
+\operatorname{diag}(s_1,\ldots,s_m).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton's Method for the Primal-Dual System}
+\label{subsec:nlp-primal-dual-newton}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The nonlinear primal-dual equations are linearized around the current
+iterate.
+
+A Newton system is solved for corrections to:
+
+\[
+\boxed{
+\mathbf{x},
+}
+\]
+
+\[
+\boxed{
+\boldsymbol{\lambda},
+}
+\]
+
+\[
+\boxed{
+\boldsymbol{\mu},
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbf{s}.
+}
+\]
+
+Large practical NLP solvers rely heavily on sparse linear algebra for this
+step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Active-Set Methods}
+\label{subsec:nlp-active-set-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An active-set method attempts to identify which inequalities will be
+binding at the solution.
+
+Once an active set is guessed, the problem is treated locally like an
+equality-constrained problem.
+
+The algorithm then adds or removes constraints from the active set as
+needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projected Gradient Methods Preview}
+\label{subsec:projected-gradient-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a simple feasible set \(C\), projected gradient descent uses
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+P_C
+\left[
+\mathbf{x}_k
+-
+\alpha_k
+\nabla f(\mathbf{x}_k)
+\right],
+}
+\]
+
+where
+
+\[
+P_C
+\]
+
+denotes projection onto \(C\).
+
+This is especially useful when projection is inexpensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bound-Constrained Optimization}
+\label{subsec:bound-constrained-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common nonlinear problem has simple bounds:
+
+\[
+\boxed{
+\ell_i
+\leq
+x_i
+\leq
+u_i.
+}
+\]
+
+These constraints arise naturally from:
+
+\[
+\boxed{
+\text{physical limits},
+}
+\]
+
+\[
+\boxed{
+\text{probabilities},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{design ranges}.
+}
+\]
+
+Specialized algorithms exploit this simple structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variable Transformations for Bounds}
+\label{subsec:nlp-variable-transformations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sometimes constraints are removed through reparameterization.
+
+For a positive variable,
+
+\[
+x>0,
+\]
+
+one may write
+
+\[
+\boxed{
+x=e^z.
+}
+\]
+
+For
+
+\[
+0<x<1,
+\]
+
+one may use the logistic transformation
+
+\[
+\boxed{
+x
+=
+\frac{
+1
+}{
+1+e^{-z}
+}.
+}
+\]
+
+Such transformations trade explicit constraints for nonlinear geometry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Least Squares}
+\label{subsec:nonlinear-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose residuals are
+
+\[
+r_i(\mathbf{x}),
+\qquad
+i=1,\ldots,m.
+\]
+
+Nonlinear least squares solves
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+\frac12
+\sum_{i=1}^{m}
+r_i(\mathbf{x})^2.
+}
+\]
+
+In vector form,
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+\frac12
+\|
+\mathbf{r}(\mathbf{x})
+\|_2^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient of Nonlinear Least Squares}
+\label{subsec:nonlinear-least-squares-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+J(\mathbf{x})
+\]
+
+be the Jacobian of the residual vector.
+
+Then
+
+\[
+\boxed{
+\nabla f(\mathbf{x})
+=
+J(\mathbf{x})^T
+\mathbf{r}(\mathbf{x}).
+}
+\]
+
+The Hessian is
+
+\[
+\boxed{
+\nabla^2f
+=
+J^TJ
++
+\sum_i
+r_i
+\nabla^2r_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gauss--Newton Method}
+\label{subsec:gauss-newton-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If residuals are small or nearly linear, the second Hessian term may be
+neglected.
+
+The Gauss--Newton step solves
+
+\[
+\boxed{
+J^TJ\mathbf{p}
+=
+-
+J^T\mathbf{r}.
+}
+\]
+
+This is often effective for parameter estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Levenberg--Marquardt Preview}
+\label{subsec:levenberg-marquardt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Levenberg--Marquardt modifies the Gauss--Newton system:
+
+\[
+\boxed{
+(
+J^TJ+\lambda I
+)
+\mathbf{p}
+=
+-
+J^T\mathbf{r}.
+}
+\]
+
+The parameter \(\lambda>0\) regularizes the step.
+
+Large \(\lambda\) makes the method more gradient-like, while small
+\(\lambda\) approaches Gauss--Newton behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Globalization}
+\label{subsec:nlp-globalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Newton and SQP methods can converge rapidly near a solution but may fail
+when started far away.
+
+Globalization strategies improve robustness.
+
+Common strategies include:
+
+\[
+\boxed{
+\text{line search},
+}
+\]
+
+\[
+\boxed{
+\text{trust regions},
+}
+\]
+
+\[
+\boxed{
+\text{merit functions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{filters}.
+}
+\]
+
+Here \emph{globalization} refers to convergence from a broader set of
+starting points, not proof of a global optimum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Solvers}
+\label{subsec:nlp-local-solvers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Most classical smooth NLP algorithms are local methods.
+
+They attempt to find a nearby KKT point.
+
+The solution can depend strongly on:
+
+\[
+\boxed{
+\text{initial guess},
+}
+\]
+
+\[
+\boxed{
+\text{scaling},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{algorithmic parameters}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multistart Methods}
+\label{subsec:nlp-multistart}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple strategy for nonconvex problems is to run a local solver from
+many initial points.
+
+If several runs converge to different local minima, compare their
+objective values.
+
+Multistart does not generally prove global optimality, but it can improve
+the chance of locating better solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Nonlinear Optimization Preview}
+\label{subsec:global-nonlinear-optimization-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Global optimization seeks a provably best solution over the entire
+feasible set.
+
+Methods can use:
+
+\[
+\boxed{
+\text{branch-and-bound},
+}
+\]
+
+\[
+\boxed{
+\text{convex relaxations},
+}
+\]
+
+\[
+\boxed{
+\text{interval methods},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{spatial decomposition}.
+}
+\]
+
+Global nonlinear optimization can be substantially harder than local
+optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaling}
+\label{subsec:nlp-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one variable naturally has magnitude
+
+\[
+10^{-6}
+\]
+
+and another has magnitude
+
+\[
+10^6.
+\]
+
+Then gradients and Hessians can be poorly balanced.
+
+Variable and constraint scaling can improve:
+
+\[
+\boxed{
+\text{conditioning},
+}
+\]
+
+\[
+\boxed{
+\text{Newton steps},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{termination tests}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constraint Scaling}
+\label{subsec:nlp-constraint-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two constraints are
+
+\[
+g_1(\mathbf{x})\approx10^8,
+\]
+
+and
+
+\[
+g_2(\mathbf{x})\approx10^{-5}.
+\]
+
+A solver may treat residuals unevenly.
+
+Rescaling constraints so their typical magnitudes are comparable often
+improves numerical behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Nonlinear Programs}
+\label{subsec:sparse-nonlinear-programs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large engineering NLPs often have sparse derivative matrices.
+
+That is, most entries of
+
+\[
+\boxed{
+J_g,
+}
+\]
+
+\[
+\boxed{
+J_h,
+}
+\]
+
+and
+
+\[
+\boxed{
+\nabla^2\mathcal{L}
+}
+\]
+
+are zero.
+
+Sparse linear algebra can dramatically reduce memory and computational
+cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Automatic Differentiation}
+\label{subsec:nlp-automatic-differentiation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Optimization methods often require accurate derivatives.
+
+Automatic differentiation evaluates derivatives through the computational
+graph of the objective and constraints.
+
+It can provide derivatives accurate to floating-point precision without
+symbolic expression growth or finite-difference truncation error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Difference Derivatives}
+\label{subsec:nlp-finite-difference-derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When analytical derivatives are unavailable, approximate
+
+\[
+\boxed{
+\frac{\partial f}{\partial x_i}
+\approx
+\frac{
+f(\mathbf{x}+h\mathbf{e}_i)
+-
+f(\mathbf{x})
+}{
+h
+}.
+}
+\]
+
+However, choosing \(h\) involves a tradeoff between:
+
+\[
+\boxed{
+\text{truncation error}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{floating-point cancellation}.
+}
+\]
+
+Poor derivative estimates can seriously degrade nonlinear solvers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stopping Criteria}
+\label{subsec:nlp-stopping-criteria}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For constrained nonlinear optimization, stopping criteria should examine
+several residuals.
+
+Important measures include:
+
+\[
+\boxed{
+\|\nabla_{\mathbf{x}}\mathcal{L}\|,
+}
+\]
+
+\[
+\boxed{
+\|h(\mathbf{x})\|,
+}
+\]
+
+\[
+\boxed{
+\max_i
+\{
+g_i(\mathbf{x}),0
+\},
+}
+\]
+
+and
+
+\[
+\boxed{
+|\mu_i g_i(\mathbf{x})|.
+}
+\]
+
+A small change in the objective alone is not enough.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KKT Residual}
+\label{subsec:nlp-kkt-residual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A solver may combine stationarity, feasibility, and complementarity into a
+KKT residual.
+
+Schematically,
+
+\[
+\boxed{
+R_{\mathrm{KKT}}
+=
+\begin{pmatrix}
+\nabla_{\mathbf{x}}\mathcal{L}
+\\
+h(\mathbf{x})
+\\
+\text{inequality residual}
+\\
+\text{complementarity residual}
+\end{pmatrix}.
+}
+\]
+
+A small norm
+
+\[
+\boxed{
+\|R_{\mathrm{KKT}}\|
+}
+\]
+
+indicates approximate first-order optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity Analysis}
+\label{subsec:nlp-sensitivity-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the optimization problem depends on a parameter \(p\).
+
+The optimal solution
+
+\[
+\mathbf{x}^*(p)
+\]
+
+and multipliers
+
+\[
+\boldsymbol{\lambda}^*(p),
+\qquad
+\boldsymbol{\mu}^*(p)
+\]
+
+may change as \(p\) changes.
+
+Under suitable regularity conditions, differentiating the KKT system can
+provide local sensitivity information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shadow Prices in Nonlinear Programming}
+\label{subsec:nlp-shadow-prices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Lagrange multipliers can still have marginal-value interpretations.
+
+If a constraint is parameterized by
+
+\[
+h(\mathbf{x})=b,
+\]
+
+then the associated multiplier may describe the local change in optimal
+value caused by changing \(b\).
+
+The exact sign depends on the formulation.
+
+Unlike linear programming, this sensitivity may vary continuously with
+the operating point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Engineering Design Example}
+\label{subsec:nlp-engineering-design}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a cylindrical container must hold volume \(V\).
+
+Let:
+
+\[
+r
+=
+\text{radius},
+\]
+
+and
+
+\[
+h
+=
+\text{height}.
+\]
+
+Volume imposes
+
+\[
+\boxed{
+\pi r^2h=V.
+}
+\]
+
+Surface area is
+
+\[
+\boxed{
+A(r,h)
+=
+2\pi r^2
++
+2\pi rh.
+}
+\]
+
+The design problem is
+
+\[
+\boxed{
+\begin{aligned}
+\min_{r,h}
+\quad&
+2\pi r^2+2\pi rh
+\\
+\text{subject to}
+\quad&
+\pi r^2h=V,
+\\
+&
+r,h>0.
+\end{aligned}
+}
+\]
+
+This is a nonlinear equality-constrained optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Optimal Cylinder Proportion}
+\label{subsec:worked-optimal-cylinder}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Closed Cylinder with Fixed Volume}
+
+From
+
+\[
+\pi r^2h=V,
+\]
+
+solve for
+
+\[
+h
+=
+\frac{
+V
+}{
+\pi r^2
+}.
+\]
+
+Substitute into surface area:
+
+\[
+A(r)
+=
+2\pi r^2
++
+2\pi r
+\left(
+\frac{
+V
+}{
+\pi r^2
+}
+\right).
+\]
+
+Thus,
+
+\[
+A(r)
+=
+2\pi r^2
++
+\frac{
+2V
+}{
+r
+}.
+\]
+
+Differentiate:
+
+\[
+A'(r)
+=
+4\pi r
+-
+\frac{
+2V
+}{
+r^2
+}.
+\]
+
+Set equal to zero:
+
+\[
+4\pi r^3
+=
+2V.
+\]
+
+Therefore,
+
+\[
+r^3
+=
+\frac{
+V
+}{
+2\pi
+}.
+\]
+
+Since
+
+\[
+h
+=
+\frac{
+V
+}{
+\pi r^2
+},
+\]
+
+using
+
+\[
+V=2\pi r^3
+\]
+
+gives
+
+\[
+h=2r.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+h=2r.
+}
+\]
+
+The optimal cylinder height equals its diameter.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameter Estimation}
+\label{subsec:nlp-parameter-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a nonlinear model predicts
+
+\[
+y_i
+\approx
+m(t_i,\boldsymbol{\theta}).
+\]
+
+Parameter estimation can be formulated as
+
+\[
+\boxed{
+\min_{\boldsymbol{\theta}}
+\sum_{i=1}^{n}
+\left[
+y_i
+-
+m(t_i,\boldsymbol{\theta})
+\right]^2.
+}
+\]
+
+This is nonlinear least squares when \(m\) depends nonlinearly on the
+parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Likelihood as Nonlinear Optimization}
+\label{subsec:nlp-maximum-likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For likelihood
+
+\[
+L(\boldsymbol{\theta}),
+\]
+
+maximum likelihood solves
+
+\[
+\boxed{
+\max_{\boldsymbol{\theta}}
+L(\boldsymbol{\theta}).
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+\min_{\boldsymbol{\theta}}
+-
+\log
+L(\boldsymbol{\theta}).
+}
+\]
+
+Constraints may arise from parameter domains such as:
+
+\[
+\boxed{
+\sigma>0,
+}
+\]
+
+or
+
+\[
+\boxed{
+p\in[0,1].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Economic Optimization}
+\label{subsec:nlp-economic-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consumer and producer models often involve nonlinear utility, production,
+or cost functions.
+
+For example,
+
+\[
+\boxed{
+\max_{x,y}
+x^\alpha y^{1-\alpha}
+}
+\]
+
+subject to
+
+\[
+\boxed{
+p_xx+p_yy\leq I.
+}
+\]
+
+This is a nonlinear optimization problem with a linear budget constraint.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Programming Workflow}
+\label{subsec:nlp-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item define the decision variables;
+    \item write the nonlinear objective;
+    \item state equality and inequality constraints;
+    \item specify bounds and domains;
+    \item determine whether the problem is smooth;
+    \item determine whether the problem is convex;
+    \item find or construct a feasible starting point;
+    \item identify active constraints near candidate solutions;
+    \item derive first-order KKT conditions;
+    \item check constraint qualifications;
+    \item examine second-order conditions when possible;
+    \item select an algorithm appropriate to the problem structure;
+    \item scale variables and constraints;
+    \item solve the numerical problem;
+    \item inspect KKT residuals;
+    \item test multiple initial points if nonconvexity is present;
+    \item perform sensitivity analysis;
+    \item interpret the result in the original application.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Nonlinear Programming Method}
+\label{subsec:choosing-nlp-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For smooth equality constraints, consider:
+
+\[
+\boxed{
+\text{Newton or SQP methods}.
+}
+\]
+
+For many smooth inequalities, consider:
+
+\[
+\boxed{
+\text{interior-point methods}.
+}
+\]
+
+For difficult feasibility structure, consider:
+
+\[
+\boxed{
+\text{augmented Lagrangian methods}.
+}
+\]
+
+For simple bounds, consider:
+
+\[
+\boxed{
+\text{projected or bound-constrained methods}.
+}
+\]
+
+For nonlinear least squares, consider:
+
+\[
+\boxed{
+\text{Gauss--Newton or Levenberg--Marquardt}.
+}
+\]
+
+For nonconvex global optimization, specialized global methods may be
+necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:nonlinear-programming-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Assuming KKT Conditions Guarantee a Minimum}
+
+For a nonconvex problem, a KKT point need not be a minimum.
+
+Second-order conditions or global reasoning may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Constraint Qualifications}
+
+KKT conditions may fail to be necessary when constraint gradients are
+degenerate.
+
+Always examine regularity assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Checking the Full Hessian Instead of Feasible Directions}
+
+For constrained optimization, curvature matters along feasible tangent or
+critical directions.
+
+The full Hessian need not be positive definite.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Hessian of \(f\) Instead of the Hessian of the Lagrangian}
+
+Second-order constrained conditions generally use
+
+\[
+\boxed{
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L},
+}
+\]
+
+not merely
+
+\[
+\nabla^2f.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting Complementary Slackness}
+
+For every inequality,
+
+\[
+\boxed{
+\mu_i g_i(x)=0.
+}
+\]
+
+An inactive constraint must have zero multiplier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Wrong Multiplier Sign}
+
+For
+
+\[
+g_i(x)\leq0,
+\]
+
+the standard minimization KKT convention requires
+
+\[
+\boxed{
+\mu_i\geq0.
+}
+\]
+
+Changing the inequality orientation changes the sign convention.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Penalty Methods Enforce Exact Feasibility at Finite \(\rho\)}
+
+Quadratic penalties generally require increasing \(\rho\) toward large
+values.
+
+At finite penalty, constraint violation is usually nonzero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Taking Penalty Parameters Too Large Too Quickly}
+
+Very large \(\rho\) can create ill-conditioning.
+
+Augmented Lagrangian methods help reduce this problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Log Barrier Outside the Strict Interior}
+
+The logarithmic barrier
+
+\[
+-\log[-g_i(x)]
+\]
+
+requires
+
+\[
+\boxed{
+g_i(x)<0.
+}
+\]
+
+It is undefined on or outside the boundary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Globalization with Global Optimization}
+
+Line search and trust regions improve convergence reliability.
+
+They do not generally guarantee the global optimum of a nonconvex
+problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Initial Guess Dependence}
+
+Local nonlinear solvers can converge to different KKT points from
+different starting values.
+
+This is especially important for nonconvex problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Scaling}
+
+Poorly scaled variables and constraints can cause bad Newton steps and
+misleading termination tests.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Noisy Finite Differences Without Checking Accuracy}
+
+Derivative errors can make an otherwise good optimization algorithm fail.
+
+Analytical or automatic derivatives are preferable when available.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Stopping Because the Objective Barely Changes}
+
+A flat objective sequence does not prove feasibility or stationarity.
+
+KKT residuals should also be checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:nonlinear-programming-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Engineering Design.}
+Structures, aircraft, mechanical components, and energy systems are often
+optimized subject to nonlinear physical constraints.
+
+\medskip
+
+\textbf{Parameter Estimation.}
+Nonlinear least-squares problems arise when model predictions depend
+nonlinearly on unknown parameters.
+
+\medskip
+
+\textbf{Statistics.}
+Maximum-likelihood and penalized estimation frequently require nonlinear
+optimization.
+
+\medskip
+
+\textbf{Machine Learning.}
+Training many models requires minimizing large nonlinear and often
+nonconvex loss functions.
+
+\medskip
+
+\textbf{Economics.}
+Utility, production, equilibrium, and resource-allocation models often
+contain nonlinear objectives and constraints.
+
+\medskip
+
+\textbf{Finance.}
+Risk measures, transaction costs, and nonlinear market constraints can
+produce nonlinear portfolio models.
+
+\medskip
+
+\textbf{Optimal Control.}
+Discretized trajectory optimization typically produces large sparse NLPs.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Inverse problems, model calibration, and experimental design frequently
+lead to constrained nonlinear optimization.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:nonlinear-programming-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a nonlinear programming problem.
+\end{exercise}
+
+\begin{exercise}[1]
+Give an example of a nonlinear objective with linear constraints.
+\end{exercise}
+
+\begin{exercise}[1]
+Give an example of a linear objective with nonlinear constraints.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an active inequality constraint.
+\end{exercise}
+
+\begin{exercise}[1]
+Define LICQ conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+State the KKT conditions.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the Hessian of the Lagrangian.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a quadratic penalty function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an augmented Lagrangian.
+\end{exercise}
+
+\begin{exercise}[1]
+Define sequential quadratic programming conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+\min_{x,y}
+x^2+y
+\]
+
+subject to
+
+\[
+x+y\leq3
+\]
+
+is a nonlinear program.
+\end{exercise}
+
+\begin{exercise}[2]
+Identify the active constraints at
+
+\[
+(x,y)=(1,1)
+\]
+
+for
+
+\[
+x^2+y^2\leq2,
+\]
+
+\[
+x+y\leq3.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the tangent direction condition for
+
+\[
+x^2+y^2=1.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Write the Lagrangian for
+
+\[
+\min_{x,y}
+x^2+3y^2
+\]
+
+subject to
+
+\[
+xy=1.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Write the KKT conditions for
+
+\[
+\min_x
+x^2
+\]
+
+subject to
+
+\[
+1-x\leq0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Minimize
+
+\[
+x^2+y^2
+\]
+
+subject to
+
+\[
+xy=1
+\]
+
+using Lagrange multipliers.
+\end{exercise}
+
+\begin{exercise}[3]
+Minimize
+
+\[
+x+y
+\]
+
+subject to
+
+\[
+x^2+y^2=4.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Find the KKT points of
+
+\[
+\min_{x,y}
+x^2+y^2
+\]
+
+subject to
+
+\[
+x+y\geq4.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Verify LICQ for the active constraint in the previous problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Give a constrained optimization problem where LICQ fails.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why
+
+\[
+\min_x x
+\]
+
+subject to
+
+\[
+x^2=0
+\]
+
+does not satisfy ordinary Lagrange multiplier stationarity.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Hessian of the Lagrangian for
+
+\[
+f(x,y)=x^2+y^2
+\]
+
+subject to
+
+\[
+xy=1.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Determine the tangent space to
+
+\[
+x+y+z=1.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use the reduced Hessian to analyze an equality-constrained quadratic
+problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Newton KKT system for equality-constrained optimization.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a quadratic penalty formulation for
+
+\[
+h(x)=0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that a quadratic penalty solution approaches feasibility as
+\(\rho\to\infty\) for a simple one-variable example.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a logarithmic barrier for
+
+\[
+x^2+y^2<1.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Write an augmented Lagrangian for two equality constraints.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive a multiplier update for an augmented Lagrangian method.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the SQP subproblem for
+
+\[
+\min f(x)
+\]
+
+subject to
+
+\[
+h(x)=0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Linearize the nonlinear inequality
+
+\[
+x^2+y^2-1\leq0
+\]
+
+around a given point.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a merit function is useful in constrained line search.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the gradient for nonlinear least squares.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the exact Hessian of a nonlinear least-squares objective.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Gauss--Newton approximation.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a nonlinear parameter-estimation problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a nonlinear engineering-design problem with one equality and
+one inequality constraint.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why multistart can help on a nonconvex NLP.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove first-order necessary conditions using tangent cones.
+\end{exercise}
+
+\begin{exercise}[4]
+Study LICQ, MFCQ, and their relationships.
+\end{exercise}
+
+\begin{exercise}[4]
+Study second-order necessary conditions for nonlinear programs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study second-order sufficient conditions using critical cones.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive reduced-Hessian conditions for equality-constrained problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study exact penalty theory.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze ill-conditioning in quadratic penalty methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study augmented Lagrangian convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive SQP from Newton's method on the KKT equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study superlinear convergence of SQP.
+\end{exercise}
+
+\begin{exercise}[4]
+Study line-search merit functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate filter globalization methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study trust-region SQP methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive primal-dual interior-point equations for NLP.
+\end{exercise}
+
+\begin{exercise}[4]
+Study central-path theory for nonlinear programs.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate sparse KKT-system factorization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study automatic differentiation for large NLPs.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze Gauss--Newton convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Levenberg--Marquardt methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate global optimization methods for nonconvex NLPs.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:nonlinear-programming-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonlinear program has form
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+g_i(\mathbf{x})\leq0,
+\\
+&
+h_j(\mathbf{x})=0.
+\end{aligned}
+}
+\]
+
+Its Lagrangian is
+
+\[
+\boxed{
+\mathcal{L}
+=
+f
++
+\sum_i
+\mu_i g_i
++
+\sum_j
+\lambda_jh_j.
+}
+\]
+
+Under suitable regularity, a local minimizer satisfies the KKT
+conditions:
+
+\[
+\boxed{
+\nabla_{\mathbf{x}}\mathcal{L}=0,
+}
+\]
+
+\[
+\boxed{
+g_i(\mathbf{x})\leq0,
+}
+\]
+
+\[
+\boxed{
+h_j(\mathbf{x})=0,
+}
+\]
+
+\[
+\boxed{
+\mu_i\geq0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\mu_i g_i(\mathbf{x})=0.
+}
+\]
+
+Second-order conditions use
+
+\[
+\boxed{
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+}
+\]
+
+restricted to feasible or critical directions.
+
+Important numerical methods include:
+
+\[
+\boxed{
+\text{penalty methods},
+}
+\]
+
+\[
+\boxed{
+\text{augmented Lagrangians},
+}
+\]
+
+\[
+\boxed{
+\text{SQP},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{interior-point methods}.
+}
+\]
+
+Nonlinear programming therefore combines
+
+\[
+\boxed{
+\text{calculus}
++
+\text{constraint geometry}
++
+\text{linear algebra}
++
+\text{numerical methods}
++
+\text{optimization theory}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:nonlinear-programming-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Nonlinear Programming extends the linear and general optimization
+framework of Sections~\ref{sec:optimization-fundamentals} and
+\ref{sec:linear-programming} to smooth and nonsmooth nonlinear models.
+KKT systems, second-order conditions, penalty methods, augmented
+Lagrangians, SQP, and nonlinear interior-point methods provide the central
+tools for constrained nonlinear problems. The next section, Convex
+Optimization, identifies an especially important subclass of nonlinear
+optimization in which convexity converts local optimality into global
+optimality and allows powerful duality and algorithmic guarantees.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.3 Nonlinear Programming
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard nonlinear programming theory.
+%   - Standard constrained optimization theory.
+%   - Standard numerical nonlinear optimization methods.
+%
+% Used for:
+%   - nonlinear programming definitions;
+%   - smooth and nonsmooth problems;
+%   - local and global optimization;
+%   - nonconvexity;
+%   - feasible and tangent directions;
+%   - active constraints;
+%   - equality-constrained optimization;
+%   - Lagrange multipliers;
+%   - constraint qualifications;
+%   - LICQ and MFCQ;
+%   - nonlinear KKT conditions;
+%   - complementary slackness;
+%   - necessary and sufficient conditions;
+%   - Hessian of the Lagrangian;
+%   - reduced Hessians;
+%   - Newton KKT systems;
+%   - saddle-point systems;
+%   - quadratic and exact penalty methods;
+%   - barrier methods;
+%   - central paths;
+%   - augmented Lagrangians;
+%   - SQP;
+%   - quasi-Newton SQP;
+%   - merit and filter methods;
+%   - trust regions;
+%   - feasibility restoration;
+%   - nonlinear interior-point methods;
+%   - active-set and projected methods;
+%   - nonlinear least squares;
+%   - Gauss--Newton;
+%   - Levenberg--Marquardt;
+%   - globalization;
+%   - multistart and global optimization preview;
+%   - scaling and sparse structure;
+%   - automatic and finite-difference derivatives;
+%   - KKT residuals;
+%   - sensitivity analysis;
+%   - engineering, statistical, economic, and scientific applications;
+%   - exercises.
+%
+% Notes:
+%   - Convex Optimization is developed next in Section 10.4.
+%   - Integer Programming follows in Section 10.5.
+%   - Numerical Optimization is developed more deeply in Chapter 11.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

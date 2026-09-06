@@ -1,0 +1,4220 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.17 SURVIVAL ANALYSIS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Survival Analysis}
+\label{sec:survival-analysis}
+
+\prerequisite{
+Probability, random variables, probability distributions, expectation,
+conditional probability, statistical estimation, confidence intervals,
+hypothesis testing, regression, generalized linear models, and basic
+calculus.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain why time-to-event data require specialized methods;
+    \item define survival time and event time;
+    \item distinguish complete, censored, and truncated observations;
+    \item distinguish right, left, and interval censoring;
+    \item define the survival function;
+    \item define the cumulative distribution function for event times;
+    \item define the density function for continuous survival times;
+    \item define the hazard function;
+    \item define the cumulative hazard function;
+    \item derive relationships among survival, hazard, density, and
+          cumulative hazard functions;
+    \item interpret hazard rates correctly;
+    \item understand common parametric survival distributions;
+    \item work with exponential survival models;
+    \item understand Weibull survival models;
+    \item estimate survival curves using the Kaplan--Meier estimator;
+    \item understand risk sets;
+    \item understand censored contributions to survival estimation;
+    \item estimate cumulative hazards using the Nelson--Aalen estimator;
+    \item compare survival curves using the log-rank test;
+    \item understand proportional hazards;
+    \item understand the Cox proportional-hazards model;
+    \item interpret Cox regression coefficients as hazard ratios;
+    \item understand the partial likelihood concept;
+    \item recognize time-dependent covariates;
+    \item recognize nonproportional hazards;
+    \item understand stratified Cox models conceptually;
+    \item recognize accelerated failure-time models;
+    \item distinguish hazard-ratio and time-ratio interpretations;
+    \item understand competing risks conceptually;
+    \item distinguish cause-specific hazards and cumulative incidence;
+    \item understand recurrent-event data conceptually;
+    \item recognize frailty models;
+    \item understand informative and noninformative censoring;
+    \item understand survival prediction and median survival;
+    \item recognize discrete-time survival analysis;
+    \item connect survival analysis with reliability, regression,
+          stochastic processes, and statistical learning.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Survival Analysis?}
+\label{subsec:what-is-survival-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Survival analysis studies the time until an event occurs.
+
+The event may be:
+
+\[
+\boxed{
+\text{death},
+}
+\]
+
+\[
+\boxed{
+\text{disease recurrence},
+}
+\]
+
+\[
+\boxed{
+\text{machine failure},
+}
+\]
+
+\[
+\boxed{
+\text{customer churn},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{completion of a process}.
+}
+\]
+
+The methods are designed to handle incomplete observation of event times.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Survival Time}
+\label{subsec:survival-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\boxed{
+T\geq0
+}
+\]
+
+denote the random time until the event of interest.
+
+The distribution of \(T\) may be described using:
+
+\[
+\boxed{
+F(t),
+}
+\]
+
+\[
+\boxed{
+S(t),
+}
+\]
+
+\[
+\boxed{
+f(t),
+}
+\]
+
+and
+
+\[
+\boxed{
+h(t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Event-Time Distribution Function}
+\label{subsec:event-time-cdf}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The cumulative distribution function of \(T\) is
+
+\[
+\boxed{
+F(t)
+=
+P(T\leq t).
+}
+\]
+
+It gives the probability that the event has occurred by time \(t\).
+
+Since
+
+\[
+T\geq0,
+\]
+
+typically
+
+\[
+F(0)
+\]
+
+is zero or small depending on the model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Survival Function}
+\label{subsec:survival-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Survival Function}
+The survival function is
+
+\[
+\boxed{
+S(t)
+=
+P(T>t).
+}
+\]
+\end{definitionbox}
+
+Since
+
+\[
+F(t)
+=
+P(T\leq t),
+\]
+
+we have
+
+\[
+\boxed{
+S(t)
+=
+1-F(t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Properties of the Survival Function}
+\label{subsec:survival-function-properties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The survival function satisfies
+
+\[
+\boxed{
+0\leq S(t)\leq1.
+}
+\]
+
+It is nonincreasing.
+
+For many continuous survival models,
+
+\[
+\boxed{
+S(0)=1,
+}
+\]
+
+and
+
+\[
+\boxed{
+\lim_{t\to\infty}
+S(t)
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Density of a Continuous Survival Time}
+\label{subsec:survival-density}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(T\) is continuous with density \(f\), then
+
+\[
+\boxed{
+f(t)
+=
+F'(t).
+}
+\]
+
+Since
+
+\[
+S(t)
+=
+1-F(t),
+\]
+
+we obtain
+
+\[
+\boxed{
+f(t)
+=
+-
+S'(t).
+}
+\]
+
+Thus the survival function completely determines the density.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hazard Function}
+\label{subsec:hazard-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Hazard Function}
+The hazard function is
+
+\[
+\boxed{
+h(t)
+=
+\lim_{\Delta t\to0^+}
+\frac{
+P
+(
+t\leq T<t+\Delta t
+\mid
+T\geq t
+)
+}{
+\Delta t
+}.
+}
+\]
+\end{definitionbox}
+
+For a continuous survival time,
+
+\[
+\boxed{
+h(t)
+=
+\frac{
+f(t)
+}{
+S(t)
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of the Hazard}
+\label{subsec:hazard-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The hazard describes the instantaneous event rate at time \(t\),
+conditional on survival up to that time.
+
+It is not generally a probability.
+
+A hazard may exceed \(1\) because it is a rate per unit time rather than a
+probability over a fixed interval.
+
+Thus:
+
+\[
+\boxed{
+h(t)
+\neq
+P(T=t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cumulative Hazard Function}
+\label{subsec:cumulative-hazard}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The cumulative hazard is
+
+\[
+\boxed{
+H(t)
+=
+\int_0^t
+h(u)\,du.
+}
+\]
+
+Because
+
+\[
+h(t)
+=
+-
+\frac{
+S'(t)
+}{
+S(t)
+},
+\]
+
+integration gives
+
+\[
+\boxed{
+H(t)
+=
+-
+\log S(t).
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+S(t)
+=
+e^{-H(t)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Density from Hazard}
+\label{subsec:density-from-hazard}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since
+
+\[
+f(t)
+=
+h(t)S(t),
+\]
+
+and
+
+\[
+S(t)
+=
+e^{-H(t)},
+\]
+
+we obtain
+
+\[
+\boxed{
+f(t)
+=
+h(t)
+e^{-H(t)}.
+}
+\]
+
+Thus the hazard function also determines the full survival distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Core Survival Relationships}
+\label{subsec:core-survival-relationships}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For continuous survival times,
+
+\[
+\boxed{
+S(t)=1-F(t),
+}
+\]
+
+\[
+\boxed{
+f(t)=-S'(t),
+}
+\]
+
+\[
+\boxed{
+h(t)=\frac{f(t)}{S(t)},
+}
+\]
+
+\[
+\boxed{
+H(t)=\int_0^t h(u)\,du,
+}
+\]
+
+and
+
+\[
+\boxed{
+S(t)=e^{-H(t)}.
+}
+\]
+
+These identities form the mathematical core of survival analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Survival from a Hazard}
+\label{subsec:worked-survival-from-hazard}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Constant Hazard}
+
+Suppose
+
+\[
+h(t)=0.2
+\]
+
+for all \(t\geq0\).
+
+Then
+
+\[
+H(t)
+=
+\int_0^t0.2\,du
+=
+0.2t.
+\]
+
+Therefore,
+
+\[
+S(t)
+=
+e^{-0.2t}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+S(t)
+=
+e^{-0.2t}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Survival Time}
+\label{subsec:expected-survival-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a nonnegative continuous random variable,
+
+\[
+\boxed{
+\mathbb{E}[T]
+=
+\int_0^\infty
+S(t)\,dt,
+}
+\]
+
+provided the integral is finite.
+
+This identity is often convenient because survival functions are central
+to event-time models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Median Survival Time}
+\label{subsec:median-survival-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The median survival time \(m\) satisfies
+
+\[
+\boxed{
+S(m)=0.5.
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+F(m)=0.5.
+}
+\]
+
+Median survival is often more robust and easier to estimate than mean
+survival when the upper tail is incompletely observed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Ordinary Methods Fail}
+\label{subsec:why-ordinary-survival-methods-fail}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a study ends before every subject experiences the event.
+
+For some individuals, the true event time is unknown.
+
+If these observations are discarded, information is wasted and estimates
+can be biased.
+
+If their last observed follow-up times are treated as actual event times,
+the event-time distribution is distorted.
+
+Survival methods explicitly incorporate this incomplete information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Censoring}
+\label{subsec:censoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Censoring occurs when the exact event time is not observed, but partial
+information about it is known.
+
+The most common form is right censoring.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Right Censoring}
+\label{subsec:right-censoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A survival time is right censored if one knows only that
+
+\[
+\boxed{
+T>C.
+}
+\]
+
+For example, a subject may still be event-free at the end of the study.
+
+Then the censoring time \(C\) provides a lower bound on the unknown event
+time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Left Censoring}
+\label{subsec:left-censoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A survival time is left censored if one knows only that
+
+\[
+\boxed{
+T<C.
+}
+\]
+
+For example, an event may already have occurred before the first
+observation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interval Censoring}
+\label{subsec:interval-censoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A survival time is interval censored if it is only known that
+
+\[
+\boxed{
+L<T\leq R.
+}
+\]
+
+This occurs when subjects are checked periodically and the event occurs
+between visits.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Observed Right-Censored Data}
+\label{subsec:observed-right-censored-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+T_i
+=
+\text{event time},
+\]
+
+and
+
+\[
+C_i
+=
+\text{censoring time}.
+\]
+
+The observed time is
+
+\[
+\boxed{
+Y_i
+=
+\min(T_i,C_i).
+}
+\]
+
+Define the event indicator
+
+\[
+\boxed{
+\delta_i
+=
+\mathbf{1}_{\{T_i\leq C_i\}}.
+}
+\]
+
+Then
+
+\[
+\delta_i=1
+\]
+
+means the event was observed, while
+
+\[
+\delta_i=0
+\]
+
+means the observation was right censored.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood Contribution Under Right Censoring}
+\label{subsec:right-censoring-likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an observed event at time \(y_i\), the likelihood contribution is
+
+\[
+f(y_i).
+\]
+
+For a censored observation at time \(y_i\), the contribution is
+
+\[
+S(y_i),
+\]
+
+because the only information is
+
+\[
+T_i>y_i.
+\]
+
+Thus the combined likelihood is
+
+\[
+\boxed{
+L
+=
+\prod_{i=1}^{n}
+[
+f(y_i)
+]^{\delta_i}
+[
+S(y_i)
+]^{1-\delta_i}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Censored Likelihood Contribution}
+\label{subsec:worked-censored-likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Observed Event Versus Censoring}
+
+Suppose two subjects are observed.
+
+Subject \(1\) experiences the event at time \(5\).
+
+Subject \(2\) is censored at time \(8\).
+
+Then their likelihood contribution is
+
+\[
+f(5)S(8).
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+L
+\propto
+f(5)S(8).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Noninformative Censoring}
+\label{subsec:noninformative-censoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many standard survival procedures assume censoring is noninformative.
+
+Informally, after accounting for modeled information, the censoring
+mechanism should not reveal additional information about the future event
+time.
+
+A common sufficient formulation is conditional independence between
+
+\[
+T
+\]
+
+and
+
+\[
+C
+\]
+
+given relevant covariates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Informative Censoring}
+\label{subsec:informative-censoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Censoring is informative when the censoring mechanism is related to event
+risk even after accounting for the analysis model.
+
+For example, subjects at high risk may systematically leave a study.
+
+Then ordinary Kaplan--Meier or Cox procedures may be biased.
+
+Special modeling, weighting, or sensitivity analysis may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Truncation}
+\label{subsec:survival-truncation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Truncation differs from censoring.
+
+With censoring, an individual is included in the dataset but the event
+time is only partly observed.
+
+With truncation, some individuals are not observed at all unless their
+event times satisfy a sampling condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Left Truncation}
+\label{subsec:left-truncation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under left truncation, a subject enters the risk set only after surviving
+to an entry time.
+
+If entry occurs at time \(L_i\), the subject is observed only if
+
+\[
+\boxed{
+T_i>L_i.
+}
+\]
+
+This is also called delayed entry.
+
+Risk sets must reflect this delayed eligibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Risk Set}
+\label{subsec:risk-set}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At event time \(t_j\), the risk set contains individuals who are still
+under observation and event-free immediately before \(t_j\).
+
+Let
+
+\[
+\boxed{
+n_j
+}
+\]
+
+denote the number at risk just before \(t_j\).
+
+Let
+
+\[
+\boxed{
+d_j
+}
+\]
+
+denote the number of observed events at \(t_j\).
+
+These quantities are central to nonparametric survival estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kaplan--Meier Estimator}
+\label{subsec:kaplan-meier}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Kaplan--Meier estimator of the survival function is
+
+\[
+\boxed{
+\widehat{S}(t)
+=
+\prod_{t_j\leq t}
+\left(
+1-
+\frac{
+d_j
+}{
+n_j
+}
+\right).
+}
+\]
+
+The product extends over distinct observed event times.
+
+Censoring changes future risk-set sizes but does not create a survival
+drop at the censoring time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Product-Limit Interpretation}
+\label{subsec:product-limit}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At event time \(t_j\),
+
+\[
+\boxed{
+1-
+\frac{
+d_j
+}{
+n_j
+}
+}
+\]
+
+estimates the conditional probability of surviving past \(t_j\), given
+survival immediately before \(t_j\).
+
+The overall survival probability is the product of these conditional
+survival probabilities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Kaplan--Meier}
+\label{subsec:worked-kaplan-meier}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Product-Limit Survival Estimate}
+
+Suppose observed event times produce the following risk-set information:
+
+\[
+\begin{array}{c|cc}
+t_j & n_j & d_j\\
+\hline
+2 & 5 & 1\\
+4 & 4 & 1\\
+7 & 2 & 1
+\end{array}
+\]
+
+At time \(4\),
+
+\[
+\widehat{S}(4)
+=
+\left(
+1-\frac15
+\right)
+\left(
+1-\frac14
+\right).
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{S}(4)
+=
+\frac45
+\cdot
+\frac34
+=
+0.60.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kaplan--Meier Curve}
+\label{subsec:kaplan-meier-curve}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Kaplan--Meier estimate is a decreasing step function.
+
+It changes only at observed event times.
+
+At censoring times, the curve does not drop, although the number at risk
+for later times decreases.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Median Survival from Kaplan--Meier}
+\label{subsec:km-median-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The estimated median survival is the earliest time \(t\) for which
+
+\[
+\boxed{
+\widehat{S}(t)
+\leq
+0.5.
+}
+\]
+
+If the estimated survival curve never falls to \(0.5\), the median
+survival is not estimable from the observed follow-up.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greenwood Variance Formula}
+\label{subsec:greenwood-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common estimated variance for the Kaplan--Meier estimator is
+
+\[
+\boxed{
+\widehat{\operatorname{Var}}
+[
+\widehat{S}(t)
+]
+=
+\widehat{S}(t)^2
+\sum_{t_j\leq t}
+\frac{
+d_j
+}{
+n_j(n_j-d_j)
+}.
+}
+\]
+
+This is known as Greenwood's formula.
+
+Transformations are often used when constructing survival confidence
+intervals so endpoints remain in \([0,1]\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cumulative Hazard Estimation}
+\label{subsec:cumulative-hazard-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of estimating survival directly, one may estimate
+
+\[
+H(t).
+\]
+
+Because
+
+\[
+S(t)
+=
+e^{-H(t)},
+\]
+
+the two approaches are closely connected.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nelson--Aalen Estimator}
+\label{subsec:nelson-aalen}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Nelson--Aalen estimator of the cumulative hazard is
+
+\[
+\boxed{
+\widehat{H}(t)
+=
+\sum_{t_j\leq t}
+\frac{
+d_j
+}{
+n_j
+}.
+}
+\]
+
+Each event time adds an estimated hazard increment
+
+\[
+\frac{d_j}{n_j}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Nelson--Aalen}
+\label{subsec:worked-nelson-aalen}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Cumulative Hazard}
+
+Suppose the risk-set information is
+
+\[
+(n_1,d_1)
+=
+(10,1),
+\]
+
+\[
+(n_2,d_2)
+=
+(8,2).
+\]
+
+Then after the second event time,
+
+\[
+\widehat{H}
+=
+\frac1{10}
++
+\frac2{8}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{H}
+=
+0.10+0.25
+=
+0.35.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kaplan--Meier and Nelson--Aalen Relationship}
+\label{subsec:km-na-relationship}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kaplan--Meier uses
+
+\[
+\prod
+\left(
+1-\frac{d_j}{n_j}
+\right),
+\]
+
+while Nelson--Aalen uses
+
+\[
+\sum
+\frac{d_j}{n_j}.
+\]
+
+For small hazard increments,
+
+\[
+\log(1-x)
+\approx
+-x.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\widehat{S}_{KM}(t)
+\approx
+e^{-\widehat{H}_{NA}(t)}.
+}
+\]
+
+They are closely related but not exactly identical in finite samples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comparing Survival Curves}
+\label{subsec:comparing-survival-curves}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two or more groups have Kaplan--Meier curves.
+
+Visual separation alone does not provide a formal statistical test.
+
+The log-rank test compares event experience across groups while
+accounting for changing risk sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Rank Test}
+\label{subsec:log-rank-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At event time \(t_j\), suppose:
+
+\[
+n_{1j}
+=
+\text{group 1 at risk},
+\]
+
+\[
+n_j
+=
+\text{total at risk},
+\]
+
+and
+
+\[
+d_j
+=
+\text{total events}.
+\]
+
+Under equal hazards, the expected number of group 1 events is
+
+\[
+\boxed{
+E_{1j}
+=
+d_j
+\frac{
+n_{1j}
+}{
+n_j
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Rank Observed Minus Expected}
+\label{subsec:log-rank-observed-expected}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Across event times,
+
+\[
+\boxed{
+O_1
+=
+\sum_jd_{1j},
+}
+\]
+
+and
+
+\[
+\boxed{
+E_1
+=
+\sum_jE_{1j}.
+}
+\]
+
+The log-rank test compares
+
+\[
+\boxed{
+O_1-E_1
+}
+\]
+
+with its null variance.
+
+For two groups, a statistic of the form
+
+\[
+\boxed{
+\frac{
+(O_1-E_1)^2
+}{
+V_1
+}
+}
+\]
+
+is asymptotically
+
+\[
+\chi^2_1
+\]
+
+under the null.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of the Log-Rank Test}
+\label{subsec:log-rank-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The log-rank test is particularly sensitive to persistent proportional
+differences in hazards.
+
+Its null hypothesis is broadly that the groups have the same survival
+experience under the test framework.
+
+When survival curves cross strongly, the log-rank test may have reduced
+power or a difficult interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Log-Rank Tests Preview}
+\label{subsec:weighted-log-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Weighted versions give different importance to early or late event times.
+
+A generic statistic uses weights
+
+\[
+w_j
+\]
+
+in sums such as
+
+\[
+\boxed{
+\sum_j
+w_j
+(
+d_{1j}-E_{1j}
+).
+}
+\]
+
+Different weights target different alternatives.
+
+Weights should ideally be chosen according to a prespecified scientific
+question.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric Survival Models}
+\label{subsec:parametric-survival-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A parametric survival model assumes a specific family for \(T\).
+
+Examples include:
+
+\[
+\boxed{
+\text{exponential},
+}
+\]
+
+\[
+\boxed{
+\text{Weibull},
+}
+\]
+
+\[
+\boxed{
+\text{log-normal},
+}
+\]
+
+\[
+\boxed{
+\text{log-logistic},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{gamma-type models}.
+}
+\]
+
+These models permit direct extrapolation when their assumptions are
+reasonable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential Survival Distribution}
+\label{subsec:exponential-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+T
+\sim
+\operatorname{Exponential}(\lambda).
+\]
+
+Then
+
+\[
+\boxed{
+f(t)
+=
+\lambda e^{-\lambda t},
+\qquad
+t\geq0.
+}
+\]
+
+The survival function is
+
+\[
+\boxed{
+S(t)
+=
+e^{-\lambda t}.
+}
+\]
+
+The hazard is
+
+\[
+\boxed{
+h(t)=\lambda.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memoryless Survival Property}
+\label{subsec:memoryless-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The exponential distribution satisfies
+
+\[
+\boxed{
+P
+(
+T>s+t
+\mid
+T>s
+)
+=
+P(T>t).
+}
+\]
+
+Thus surviving to time \(s\) does not change the distribution of the
+remaining lifetime.
+
+This memoryless property is equivalent to a constant hazard.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean and Median Exponential Survival}
+\label{subsec:exponential-mean-median}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+T
+\sim
+\operatorname{Exponential}(\lambda),
+\]
+
+the mean is
+
+\[
+\boxed{
+\mathbb{E}[T]
+=
+\frac1\lambda.
+}
+\]
+
+The median satisfies
+
+\[
+e^{-\lambda m}
+=
+\frac12,
+\]
+
+so
+
+\[
+\boxed{
+m
+=
+\frac{
+\log2
+}{
+\lambda
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Exponential Median Survival}
+\label{subsec:worked-exponential-median}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Constant-Hazard Median}
+
+Suppose
+
+\[
+\lambda=0.1.
+\]
+
+Then
+
+\[
+m
+=
+\frac{
+\log2
+}{
+0.1
+}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+m
+\approx
+6.93
+}
+\]
+
+time units.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential Likelihood with Censoring}
+\label{subsec:exponential-censored-likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For right-censored observations,
+
+\[
+f(y_i)
+=
+\lambda e^{-\lambda y_i}
+\]
+
+when \(\delta_i=1\), and
+
+\[
+S(y_i)
+=
+e^{-\lambda y_i}
+\]
+
+when \(\delta_i=0\).
+
+Therefore,
+
+\[
+L(\lambda)
+=
+\prod_i
+\lambda^{\delta_i}
+e^{-\lambda y_i}.
+\]
+
+Hence,
+
+\[
+\boxed{
+L(\lambda)
+=
+\lambda^D
+e^{-\lambda Y},
+}
+\]
+
+where
+
+\[
+D
+=
+\sum_i\delta_i
+\]
+
+and
+
+\[
+Y
+=
+\sum_iy_i.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential MLE with Censoring}
+\label{subsec:exponential-mle-censoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The log-likelihood is
+
+\[
+\ell(\lambda)
+=
+D\log\lambda
+-
+\lambda Y.
+\]
+
+Differentiating,
+
+\[
+\ell'(\lambda)
+=
+\frac{D}{\lambda}
+-
+Y.
+\]
+
+Thus,
+
+\[
+\boxed{
+\widehat{\lambda}
+=
+\frac{
+D
+}{
+Y
+}.
+}
+\]
+
+This is:
+
+\[
+\boxed{
+\frac{
+\text{number of observed events}
+}{
+\text{total observed time at risk}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weibull Distribution}
+\label{subsec:weibull-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Weibull model can be parameterized using shape \(k>0\) and scale
+\(\lambda>0\) with survival function
+
+\[
+\boxed{
+S(t)
+=
+\exp
+\left[
+-
+\left(
+\frac{t}{\lambda}
+\right)^k
+\right].
+}
+\]
+
+The cumulative hazard is
+
+\[
+\boxed{
+H(t)
+=
+\left(
+\frac{t}{\lambda}
+\right)^k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weibull Hazard}
+\label{subsec:weibull-hazard}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Weibull hazard is
+
+\[
+\boxed{
+h(t)
+=
+\frac{k}{\lambda}
+\left(
+\frac{t}{\lambda}
+\right)^{k-1}.
+}
+\]
+
+Therefore:
+
+\[
+\boxed{
+k=1
+\rightarrow
+\text{constant hazard},
+}
+\]
+
+\[
+\boxed{
+k>1
+\rightarrow
+\text{increasing hazard},
+}
+\]
+
+and
+
+\[
+\boxed{
+0<k<1
+\rightarrow
+\text{decreasing hazard}.
+}
+\]
+
+The exponential model is the special case
+
+\[
+\boxed{
+k=1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Normal Survival Model}
+\label{subsec:lognormal-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A log-normal survival model assumes
+
+\[
+\boxed{
+\log T
+\sim
+N(\mu,\sigma^2).
+}
+\]
+
+Thus \(T\) is positive but its hazard need not be monotone.
+
+The survival function is
+
+\[
+\boxed{
+S(t)
+=
+1
+-
+\Phi
+\left(
+\frac{
+\log t-\mu
+}{
+\sigma
+}
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Logistic Survival Model}
+\label{subsec:loglogistic-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A log-logistic model arises when
+
+\[
+\log T
+\]
+
+has a logistic distribution.
+
+Depending on parameters, its hazard may rise and then fall.
+
+This can model event processes with nonmonotone hazard behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression for Survival Data}
+\label{subsec:survival-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Survival regression relates event-time distributions to predictors such
+as:
+
+\[
+\boxed{
+\text{treatment},
+}
+\]
+
+\[
+\boxed{
+\text{age},
+}
+\]
+
+\[
+\boxed{
+\text{exposure},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{machine conditions}.
+}
+\]
+
+Two major frameworks are:
+
+\[
+\boxed{
+\text{proportional hazards},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{accelerated failure time}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proportional-Hazards Model}
+\label{subsec:proportional-hazards}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A proportional-hazards model assumes
+
+\[
+\boxed{
+h
+(
+t\mid\mathbf{x}
+)
+=
+h_0(t)
+\exp
+(
+\mathbf{x}^T
+\boldsymbol{\beta}
+).
+}
+\]
+
+Here,
+
+\[
+h_0(t)
+\]
+
+is the baseline hazard.
+
+The covariates multiply the baseline hazard by a constant factor.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cox Proportional-Hazards Model}
+\label{subsec:cox-proportional-hazards}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Cox model is
+
+\[
+\boxed{
+h
+(
+t\mid\mathbf{x}
+)
+=
+h_0(t)
+\exp
+(
+\beta_1x_1
++
+\cdots
++
+\beta_px_p
+).
+}
+\]
+
+The baseline hazard
+
+\[
+h_0(t)
+\]
+
+is left unspecified.
+
+This makes the model semiparametric.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hazard Ratio}
+\label{subsec:hazard-ratio}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider two covariate vectors
+
+\[
+\mathbf{x}_1
+\]
+
+and
+
+\[
+\mathbf{x}_0.
+\]
+
+Their hazard ratio is
+
+\[
+\boxed{
+HR
+=
+\frac{
+h(t\mid\mathbf{x}_1)
+}{
+h(t\mid\mathbf{x}_0)
+}
+=
+\exp
+\left[
+(
+\mathbf{x}_1-\mathbf{x}_0
+)^T
+\boldsymbol{\beta}
+\right].
+}
+\]
+
+The baseline hazard cancels.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of a Cox Coefficient}
+\label{subsec:cox-coefficient-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a one-unit increase in predictor \(x_j\), holding other modeled
+variables fixed,
+
+\[
+\boxed{
+HR
+=
+e^{\beta_j}.
+}
+\]
+
+If
+
+\[
+e^{\beta_j}=2,
+\]
+
+the modeled instantaneous event rate is twice as large at every time
+under the proportional-hazards assumption.
+
+This does not mean survival time is halved.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Cox Hazard Ratio}
+\label{subsec:worked-cox-hazard-ratio}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Interpreting a Cox Coefficient}
+
+Suppose
+
+\[
+\widehat{\beta}=0.4.
+\]
+
+Then
+
+\[
+\widehat{HR}
+=
+e^{0.4}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{HR}
+\approx
+1.49.
+}
+\]
+
+A one-unit increase in the predictor is associated with approximately a
+\(49\%\) higher modeled hazard, holding other modeled variables fixed.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Cox Is Semiparametric}
+\label{subsec:why-cox-semiparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The model specifies the finite-dimensional regression component
+
+\[
+\boldsymbol{\beta}
+\]
+
+but does not specify a finite-dimensional parametric family for
+
+\[
+h_0(t).
+\]
+
+Thus it contains both:
+
+\[
+\boxed{
+\text{parametric regression coefficients}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{nonparametric baseline hazard}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cox Partial Likelihood}
+\label{subsec:cox-partial-likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one event occurs at time \(t_j\) for subject \(i_j\).
+
+Conditional on one event occurring among subjects in risk set \(R_j\),
+the Cox model implies
+
+\[
+\boxed{
+P
+(
+i_j
+\text{ fails at }t_j
+\mid
+\text{one failure in }R_j
+)
+=
+\frac{
+\exp
+(
+\mathbf{x}_{i_j}^T
+\boldsymbol{\beta}
+)
+}{
+\sum_{k\in R_j}
+\exp
+(
+\mathbf{x}_k^T
+\boldsymbol{\beta}
+)
+}.
+}
+\]
+
+Multiplying these terms gives the partial likelihood.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partial Likelihood Formula}
+\label{subsec:cox-partial-likelihood-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ignoring tied event complications, the partial likelihood is
+
+\[
+\boxed{
+L_P
+(
+\boldsymbol{\beta}
+)
+=
+\prod_{j}
+\frac{
+\exp
+(
+\mathbf{x}_{i_j}^T
+\boldsymbol{\beta}
+)
+}{
+\displaystyle
+\sum_{k\in R_j}
+\exp
+(
+\mathbf{x}_k^T
+\boldsymbol{\beta}
+)
+}.
+}
+\]
+
+The baseline hazard cancels from each conditional probability.
+
+Therefore \(\boldsymbol{\beta}\) can be estimated without specifying
+\(h_0(t)\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tied Event Times}
+\label{subsec:cox-ties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When several subjects experience events at the same recorded time, the
+simple partial likelihood requires modification.
+
+Common approximations include:
+
+\[
+\boxed{
+\text{Breslow-type handling},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Efron-type handling}.
+}
+\]
+
+Exact approaches may also be used in certain settings.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Baseline Survival Under Cox Regression}
+\label{subsec:cox-baseline-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The baseline cumulative hazard is
+
+\[
+\boxed{
+H_0(t).
+}
+\]
+
+Since
+
+\[
+h(t\mid\mathbf{x})
+=
+h_0(t)
+e^{\mathbf{x}^T\boldsymbol{\beta}},
+\]
+
+the cumulative hazard is
+
+\[
+\boxed{
+H
+(
+t\mid\mathbf{x}
+)
+=
+H_0(t)
+e^{\mathbf{x}^T\boldsymbol{\beta}}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+S
+(
+t\mid\mathbf{x}
+)
+=
+[
+S_0(t)
+]^{
+e^{\mathbf{x}^T\boldsymbol{\beta}}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proportional-Hazards Assumption}
+\label{subsec:ph-assumption}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two covariate patterns,
+
+\[
+\mathbf{x}_1
+\]
+
+and
+
+\[
+\mathbf{x}_0,
+\]
+
+the Cox model assumes
+
+\[
+\boxed{
+\frac{
+h(t\mid\mathbf{x}_1)
+}{
+h(t\mid\mathbf{x}_0)
+}
+}
+\]
+
+does not depend on \(t\).
+
+Thus hazard ratios are constant over time.
+
+This is the proportional-hazards assumption.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonproportional Hazards}
+\label{subsec:nonproportional-hazards}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If treatment effects change over time, the hazard ratio may not be
+constant.
+
+For example:
+
+\[
+\boxed{
+HR(t)
+}
+\]
+
+may be less than \(1\) early and greater than \(1\) later.
+
+A standard Cox coefficient would then compress a time-varying effect into
+a single summary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-by-Covariate Interaction}
+\label{subsec:time-covariate-interaction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One way to model a changing effect is
+
+\[
+\boxed{
+h(t\mid x)
+=
+h_0(t)
+\exp
+[
+\beta_1x
++
+\beta_2xg(t)
+].
+}
+\]
+
+The hazard ratio for a one-unit change in \(x\) becomes
+
+\[
+\boxed{
+HR(t)
+=
+\exp
+[
+\beta_1+\beta_2g(t)
+].
+}
+\]
+
+Thus the covariate effect can vary with time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Schoenfeld Residuals Preview}
+\label{subsec:schoenfeld-residuals-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Schoenfeld residuals are commonly used to investigate proportional
+hazards for Cox-model covariates.
+
+Systematic residual patterns against time may suggest time-varying
+effects.
+
+No diagnostic alone proves that the model is correct.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stratified Cox Model}
+\label{subsec:stratified-cox}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stratified Cox model allows different baseline hazards for strata:
+
+\[
+\boxed{
+h_k
+(
+t\mid\mathbf{x}
+)
+=
+h_{0k}(t)
+\exp
+(
+\mathbf{x}^T
+\boldsymbol{\beta}
+).
+}
+\]
+
+The regression coefficients are shared, but the baseline hazard can
+differ across strata.
+
+This is useful for controlling a categorical variable whose
+proportional-hazards effect is not of direct interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Dependent Covariates}
+\label{subsec:time-dependent-covariates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some predictors change during follow-up.
+
+Write
+
+\[
+\boxed{
+\mathbf{x}(t).
+}
+\]
+
+Then a Cox model may take the form
+
+\[
+\boxed{
+h
+(
+t\mid\mathbf{x}(t)
+)
+=
+h_0(t)
+\exp
+[
+\mathbf{x}(t)^T
+\boldsymbol{\beta}
+].
+}
+\]
+
+Risk sets must use predictor values relevant at each event time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Internal and External Time-Dependent Covariates}
+\label{subsec:internal-external-time-covariates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An external time-dependent covariate evolves independently of the
+subject's event process in a suitable sense.
+
+Examples may include calendar-level environmental exposures.
+
+An internal covariate is generated by the subject's evolving health or
+state process and can require more careful interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Accelerated Failure-Time Models}
+\label{subsec:accelerated-failure-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Accelerated failure-time, or AFT, models act directly on survival time.
+
+A common form is
+
+\[
+\boxed{
+\log T
+=
+\mathbf{x}^T
+\boldsymbol{\beta}
++
+\varepsilon.
+}
+\]
+
+Exponentiating,
+
+\[
+\boxed{
+T
+=
+e^{\mathbf{x}^T\boldsymbol{\beta}}
+e^\varepsilon.
+}
+\]
+
+Covariates multiply the time scale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time Ratio}
+\label{subsec:time-ratio}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a one-unit increase in \(x_j\), an AFT model multiplies survival time
+by
+
+\[
+\boxed{
+e^{\beta_j}.
+}
+\]
+
+This is a time ratio.
+
+If
+
+\[
+e^{\beta_j}=1.5,
+\]
+
+the modeled event time is stretched by a factor of \(1.5\).
+
+This interpretation differs from a hazard ratio.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hazard Ratio Versus Time Ratio}
+\label{subsec:hazard-ratio-versus-time-ratio}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Cox model uses
+
+\[
+\boxed{
+\text{hazard ratios}.
+}
+\]
+
+AFT models use
+
+\[
+\boxed{
+\text{time ratios}.
+}
+\]
+
+These describe different features of the survival distribution and should
+not be interpreted interchangeably.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric AFT Models}
+\label{subsec:parametric-aft-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+AFT models arise naturally from distributions for
+
+\[
+\log T.
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{log-normal AFT},
+}
+\]
+
+\[
+\boxed{
+\text{log-logistic AFT},
+}
+\]
+
+and certain Weibull parameterizations.
+
+Parametric AFT models can support direct extrapolation beyond observed
+follow-up, but extrapolation relies strongly on the assumed distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Survival Regression Diagnostics}
+\label{subsec:survival-regression-diagnostics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Useful diagnostics include:
+
+\[
+\boxed{
+\text{proportional-hazards checks},
+}
+\]
+
+\[
+\boxed{
+\text{functional-form checks},
+}
+\]
+
+\[
+\boxed{
+\text{influential-observation checks},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{residual analysis}.
+}
+\]
+
+Model assumptions should be assessed rather than inferred solely from
+goodness-of-fit statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Martingale Residuals Preview}
+\label{subsec:martingale-residuals-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Martingale residuals compare observed event counts with estimated
+cumulative event intensity.
+
+They can help assess nonlinear covariate effects and unusual
+observations.
+
+Their distribution is generally skewed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deviance Residuals Preview}
+\label{subsec:survival-deviance-residuals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Deviance residuals transform martingale residuals to produce a more
+symmetric diagnostic scale.
+
+They are useful for identifying observations that fit the Cox model
+poorly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Competing Risks}
+\label{subsec:competing-risks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In some studies, several event types can occur and one event can prevent
+observation of another.
+
+Examples include different causes of failure or death.
+
+Let
+
+\[
+J
+\]
+
+denote the event type.
+
+Then the outcome includes both:
+
+\[
+\boxed{
+T
+}
+\]
+
+and
+
+\[
+\boxed{
+J.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cause-Specific Hazard}
+\label{subsec:cause-specific-hazard}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For cause \(k\), the cause-specific hazard is
+
+\[
+\boxed{
+h_k(t)
+=
+\lim_{\Delta t\to0^+}
+\frac{
+P
+(
+t\leq T<t+\Delta t,
+J=k
+\mid
+T\geq t
+)
+}{
+\Delta t
+}.
+}
+\]
+
+The overall hazard is
+
+\[
+\boxed{
+h(t)
+=
+\sum_k
+h_k(t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cumulative Incidence Function}
+\label{subsec:cumulative-incidence-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The cumulative incidence function for cause \(k\) is
+
+\[
+\boxed{
+F_k(t)
+=
+P
+(
+T\leq t,
+J=k
+).
+}
+\]
+
+It gives the probability of experiencing cause \(k\) by time \(t\) in
+the presence of competing events.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cause-Specific Hazard and Cumulative Incidence}
+\label{subsec:csh-versus-cif}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Cause-specific hazards describe instantaneous cause-specific rates among
+individuals still event-free.
+
+Cumulative incidence describes the actual probability of observing a
+specific event type over time.
+
+They answer different questions.
+
+A covariate can affect cause-specific hazards and cumulative incidence in
+different ways because competing events also influence probability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Kaplan--Meier Can Fail for Competing Risks}
+\label{subsec:km-competing-risks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Treating competing events as ordinary censoring and using
+
+\[
+1-\widehat{S}(t)
+\]
+
+can overestimate cause-specific cumulative incidence.
+
+A competing event changes whether the event of interest can still occur.
+
+Therefore cumulative incidence methods should be used when event type is
+important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subdistribution Hazard Preview}
+\label{subsec:subdistribution-hazard-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another competing-risks modeling approach uses a subdistribution hazard
+constructed to model cumulative incidence directly.
+
+This leads to regression methods distinct from cause-specific Cox
+regression.
+
+The interpretation should be stated carefully because the risk sets are
+defined differently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recurrent Events}
+\label{subsec:recurrent-events}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some subjects can experience the event multiple times.
+
+Examples include:
+
+\[
+\boxed{
+\text{hospital admissions},
+}
+\]
+
+\[
+\boxed{
+\text{equipment breakdowns},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{disease relapses}.
+}
+\]
+
+These recurrent event times within a subject are dependent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Counting-Process Representation}
+\label{subsec:counting-process-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+N_i(t)
+\]
+
+be the number of observed events for subject \(i\) by time \(t\).
+
+Then recurrent event data can be represented as counting processes.
+
+The at-risk indicator may be written
+
+\[
+\boxed{
+Y_i(t).
+}
+\]
+
+This notation forms the basis of advanced modern survival theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intensity Process Preview}
+\label{subsec:survival-intensity-process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A counting process may have an intensity
+
+\[
+\boxed{
+\lambda_i(t)
+=
+Y_i(t)
+h_i(t).
+}
+\]
+
+It represents the instantaneous expected event rate conditional on the
+past.
+
+This connects survival analysis directly with stochastic-process theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Frailty Models}
+\label{subsec:frailty-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A frailty model introduces an unobserved random effect representing
+subject- or cluster-level risk.
+
+A multiplicative frailty model may be
+
+\[
+\boxed{
+h_i(t)
+=
+Z_i
+h_0(t)
+\exp
+(
+\mathbf{x}_i^T
+\boldsymbol{\beta}
+),
+}
+\]
+
+where
+
+\[
+Z_i>0
+\]
+
+is an unobserved frailty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of Frailty}
+\label{subsec:frailty-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Individuals with larger frailty values have larger hazards.
+
+Frailty models can account for:
+
+\[
+\boxed{
+\text{unobserved heterogeneity},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{dependence within clusters}.
+}
+\]
+
+They are analogous to random-effects models in longitudinal and
+hierarchical data analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shared Frailty}
+\label{subsec:shared-frailty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Subjects within a common cluster may share the same frailty:
+
+\[
+\boxed{
+Z_g.
+}
+\]
+
+For example, members of the same family, hospital, or machine system may
+share unmeasured risk factors.
+
+This induces positive within-cluster event dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete-Time Survival}
+\label{subsec:discrete-time-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If events can occur only at discrete time points
+
+\[
+t=1,2,\ldots,
+\]
+
+define the discrete hazard
+
+\[
+\boxed{
+h_t
+=
+P
+(
+T=t
+\mid
+T\geq t
+).
+}
+\]
+
+Then
+
+\[
+\boxed{
+S(t)
+=
+\prod_{j=1}^{t}
+(
+1-h_j
+).
+}
+\]
+
+Discrete-time survival can be modeled using binary regression on
+person-period data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complementary Log-Log Link Preview}
+\label{subsec:cloglog-survival}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common link for discrete hazards is the complementary log-log link:
+
+\[
+\boxed{
+\log
+[
+-\log(1-h_t)
+]
+=
+\alpha_t
++
+\mathbf{x}^T
+\boldsymbol{\beta}.
+}
+\]
+
+This has a close connection with grouped proportional-hazards models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reliability Function}
+\label{subsec:reliability-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In engineering, the survival function is often called the reliability
+function:
+
+\[
+\boxed{
+R(t)
+=
+P(T>t).
+}
+\]
+
+Thus
+
+\[
+\boxed{
+R(t)=S(t).
+}
+\]
+
+The hazard may be called the failure rate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bathtub Hazard}
+\label{subsec:bathtub-hazard}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Engineering systems often display a bathtub-shaped hazard:
+
+\[
+\boxed{
+\text{high early failure rate}
+}
+\]
+
+followed by
+
+\[
+\boxed{
+\text{low stable failure rate}
+}
+\]
+
+and eventually
+
+\[
+\boxed{
+\text{increasing wear-out failure rate}.
+}
+\]
+
+Simple exponential models cannot represent this shape.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Restricted Mean Survival Time}
+\label{subsec:restricted-mean-survival-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a fixed horizon \(\tau\), the restricted mean survival time is
+
+\[
+\boxed{
+RMST(\tau)
+=
+\mathbb{E}
+[
+\min(T,\tau)
+].
+}
+\]
+
+It can be expressed as
+
+\[
+\boxed{
+RMST(\tau)
+=
+\int_0^\tau
+S(t)\,dt.
+}
+\]
+
+This summarizes expected event-free time up to a prespecified horizon.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Difference in Restricted Mean Survival}
+\label{subsec:rmst-difference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two groups,
+
+\[
+\boxed{
+\Delta_{RMST}
+=
+\int_0^\tau
+[
+S_1(t)-S_0(t)
+]
+\,dt.
+}
+\]
+
+This gives a time-scale treatment effect.
+
+It can be useful when proportional hazards is questionable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hazard Ratio Limitations}
+\label{subsec:hazard-ratio-limitations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A hazard ratio is not:
+
+\[
+\boxed{
+\text{a risk ratio},
+}
+\]
+
+\[
+\boxed{
+\text{a survival-probability ratio},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a ratio of median survival times}.
+}
+\]
+
+Its interpretation is conditional on remaining event-free and relies on
+the model being used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Survival Probability at a Fixed Time}
+\label{subsec:survival-fixed-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sometimes the most interpretable quantity is
+
+\[
+\boxed{
+S(t^*)
+}
+\]
+
+at a clinically or scientifically meaningful time \(t^*\).
+
+Two groups may be compared through
+
+\[
+\boxed{
+S_1(t^*)-S_0(t^*)
+}
+\]
+
+or
+
+\[
+\boxed{
+\frac{
+S_1(t^*)
+}{
+S_0(t^*)
+}.
+}
+\]
+
+These differ conceptually from hazard ratios.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Landmark Analysis Preview}
+\label{subsec:landmark-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A landmark analysis selects a prespecified time \(t_L\) and analyzes
+subsequent outcomes among subjects still at risk at \(t_L\).
+
+This can help address time-dependent predictors when the landmark
+definition is scientifically meaningful.
+
+Selection at the landmark changes the target population and must be
+interpreted accordingly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Immortal-Time Bias Preview}
+\label{subsec:immortal-time-bias}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Immortal-time bias occurs when exposure classification requires subjects
+to survive for some period before they can enter an exposed group.
+
+If that guaranteed survival time is incorrectly attributed to the
+exposure group, treatment or exposure effects can be severely biased.
+
+Time-dependent exposure modeling is often required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Left Truncation Risk Sets}
+\label{subsec:left-truncation-risk-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With delayed entry, subject \(i\) enters the risk set only when
+
+\[
+\boxed{
+L_i<t\leq Y_i.
+}
+\]
+
+Subjects who have not yet entered must not contribute to the risk set.
+
+This is essential for valid Kaplan--Meier and Cox analyses under left
+truncation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interval-Censored Survival Estimation Preview}
+\label{subsec:interval-censored-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary Kaplan--Meier methods assume exact event times or right
+censoring.
+
+For interval-censored data, the event time is known only to lie in
+
+\[
+(L_i,R_i].
+\]
+
+Special nonparametric or parametric likelihood methods are required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Survival Prediction}
+\label{subsec:survival-prediction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A survival model may predict an entire function
+
+\[
+\boxed{
+\widehat{S}(t\mid\mathbf{x}).
+}
+\]
+
+This differs from ordinary regression, where prediction often targets a
+single scalar mean.
+
+Useful predictions include:
+
+\[
+\boxed{
+\text{survival probability at }t,
+}
+\]
+
+\[
+\boxed{
+\text{median survival},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{cumulative event risk}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Censoring and Predictive Evaluation}
+\label{subsec:censoring-predictive-evaluation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Prediction accuracy cannot be evaluated naively when outcomes are
+censored.
+
+For example, at a fixed prediction horizon some subjects may have been
+censored before their event status is known.
+
+Evaluation methods may therefore use:
+
+\[
+\boxed{
+\text{risk-set methods},
+}
+\]
+
+\[
+\boxed{
+\text{inverse probability of censoring weights},
+}
+\]
+
+or specialized survival scoring rules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Concordance Index Preview}
+\label{subsec:concordance-index-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The concordance index, or C-index, measures how well predicted risk
+scores rank event times.
+
+Conceptually, it estimates the probability that, for an informative pair,
+the subject predicted to be at higher risk experiences the event earlier.
+
+Censoring complicates which pairs are comparable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Brier Score Preview}
+\label{subsec:survival-brier-score}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At prediction time \(t\), a survival Brier score compares predicted
+survival probability with observed event status.
+
+A simplified squared error is
+
+\[
+\boxed{
+[
+\mathbf{1}_{\{T>t\}}
+-
+\widehat{S}(t)
+]^2.
+}
+\]
+
+With censoring, weighting adjustments are required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Calibration in Survival Models}
+\label{subsec:survival-calibration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A survival prediction model is calibrated if predicted event
+probabilities agree with observed event frequencies over time.
+
+For example, among individuals with predicted
+
+\[
+80\%
+\]
+
+survival at time \(t\), approximately \(80\%\) should remain event-free
+to that horizon in a well-calibrated population.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Survival Analysis Workflow}
+\label{subsec:survival-analysis-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item define the event precisely;
+    \item define the time origin;
+    \item define the analysis time scale;
+    \item identify censoring and truncation mechanisms;
+    \item inspect follow-up distributions;
+    \item summarize numbers at risk;
+    \item estimate Kaplan--Meier curves;
+    \item report survival probabilities at meaningful times;
+    \item estimate median or restricted mean survival when appropriate;
+    \item compare groups descriptively;
+    \item use log-rank tests when their target is appropriate;
+    \item fit regression models when covariate adjustment is needed;
+    \item assess proportional hazards for Cox models;
+    \item investigate nonlinear covariate effects;
+    \item consider competing risks when multiple event types exist;
+    \item consider recurrent-event or frailty methods for repeated or
+          clustered outcomes;
+    \item evaluate predictive discrimination and calibration when
+          prediction is the goal;
+    \item report assumptions and censoring information clearly.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Survival Method}
+\label{subsec:choosing-survival-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To estimate survival without covariates:
+
+\[
+\boxed{
+\text{Kaplan--Meier}.
+}
+\]
+
+To estimate cumulative hazard:
+
+\[
+\boxed{
+\text{Nelson--Aalen}.
+}
+\]
+
+To compare several survival curves:
+
+\[
+\boxed{
+\text{log-rank test}.
+}
+\]
+
+To model covariate hazard ratios:
+
+\[
+\boxed{
+\text{Cox proportional hazards}.
+}
+\]
+
+To model effects directly on survival time:
+
+\[
+\boxed{
+\text{accelerated failure-time model}.
+}
+\]
+
+For competing event types:
+
+\[
+\boxed{
+\text{competing-risks methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:survival-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Treating Censored Times as Event Times}
+
+A censoring time only establishes that the event has not occurred before
+that time.
+
+It is not the actual event time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Deleting Censored Observations}
+
+Censored observations still contribute information about survival.
+
+Discarding them wastes information and can introduce bias.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Informative Censoring}
+
+Standard methods generally require censoring assumptions.
+
+If subjects leave because of changing event risk, ordinary estimators may
+be biased.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Censoring and Truncation}
+
+Censored individuals appear in the dataset.
+
+Truncated individuals may never enter the observed sample.
+
+These require different risk-set and likelihood constructions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating the Hazard as a Probability}
+
+The hazard is an instantaneous rate conditional on survival.
+
+It is not bounded above by \(1\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting a Hazard Ratio as a Risk Ratio}
+
+A hazard ratio compares instantaneous event rates among those still at
+risk.
+
+It does not equal a cumulative risk ratio in general.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Hazard Ratio as a Time Ratio}
+
+A Cox hazard ratio and an AFT time ratio refer to different model scales.
+
+They should not be interchanged.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Proportional Hazards Without Checking}
+
+The Cox model assumes covariate hazard ratios are constant over time.
+
+Crossing or changing effects can violate this assumption.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Log-Rank Automatically When Curves Cross}
+
+The ordinary log-rank test is optimized for certain persistent hazard
+differences.
+
+Strongly crossing hazards can produce low power or misleading summaries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reporting Only a \(p\)-Value}
+
+Survival analyses should also report effect estimates and uncertainty,
+such as:
+
+\[
+\boxed{
+\text{hazard ratios},
+}
+\]
+
+\[
+\boxed{
+\text{survival probabilities},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{RMST differences}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Number at Risk}
+
+Kaplan--Meier estimates near the end of follow-up may be based on very few
+remaining subjects.
+
+The number-at-risk table is essential for interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Extrapolating Kaplan--Meier Beyond Observed Follow-Up}
+
+Kaplan--Meier is nonparametric and does not support meaningful
+extrapolation beyond the available event information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Parametric Extrapolation Is Automatically Reliable}
+
+Parametric survival models can extrapolate, but the result depends
+strongly on the assumed tail behavior.
+
+Long-term predictions should be justified scientifically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Kaplan--Meier for Cause-Specific Incidence with Competing Risks}
+
+Treating competing events as ordinary censoring can overestimate
+cause-specific cumulative incidence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Delayed Entry}
+
+Subjects cannot contribute person-time before they become observable and
+eligible for the risk set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Creating Immortal-Time Bias}
+
+Exposure status must be aligned correctly with time.
+
+Future information cannot be used to classify earlier guaranteed
+survival time as exposed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Within-Subject Dependence for Recurrent Events}
+
+Multiple events from the same individual are correlated.
+
+Ordinary independent-event analysis can underestimate uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:survival-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Medicine.}
+Survival analysis models death, disease recurrence, treatment failure,
+hospital discharge, and time to clinical events.
+
+\medskip
+
+\textbf{Engineering Reliability.}
+Failure-time models estimate component lifetimes, hazard rates,
+reliability functions, and maintenance schedules.
+
+\medskip
+
+\textbf{Business.}
+Customer churn, employee retention, subscription duration, and time to
+purchase can be modeled as event-time outcomes.
+
+\medskip
+
+\textbf{Manufacturing.}
+Survival methods estimate time until machine breakdown, defect, or
+replacement.
+
+\medskip
+
+\textbf{Epidemiology.}
+Time from exposure to disease, recovery, hospitalization, or mortality
+requires censoring-aware methods.
+
+\medskip
+
+\textbf{Education.}
+Time to graduation, dropout, course completion, or program exit can be
+treated as survival outcomes.
+
+\medskip
+
+\textbf{Finance.}
+Time to default, bankruptcy, or contract termination can be analyzed
+using hazard models.
+
+\medskip
+
+\textbf{Ecology.}
+Survival of organisms, time to migration, and time to ecological events
+can be studied with censored event-time models.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:survival-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a survival time.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the survival function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the hazard function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the cumulative hazard function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define right censoring.
+\end{exercise}
+
+\begin{exercise}[1]
+Define interval censoring.
+\end{exercise}
+
+\begin{exercise}[1]
+Define left truncation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a risk set.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Kaplan--Meier estimator.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Nelson--Aalen estimator.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a hazard ratio.
+\end{exercise}
+
+\begin{exercise}[1]
+Define proportional hazards.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an accelerated failure-time model.
+\end{exercise}
+
+\begin{exercise}[1]
+Define cumulative incidence.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+S(t)=e^{-0.4t}.
+\]
+
+Find \(h(t)\).
+\end{exercise}
+
+\begin{exercise}[2]
+For the same survival function, find \(H(t)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+h(t)=3t^2.
+\]
+
+Find the cumulative hazard.
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous hazard, find the survival function.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+T\sim\operatorname{Exponential}(0.25),
+\]
+
+find the mean survival time.
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous distribution, find the median survival time.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose the distinct event times have
+
+\[
+(n_1,d_1)=(8,1),
+\]
+
+and
+
+\[
+(n_2,d_2)=(6,2).
+\]
+
+Compute the Kaplan--Meier estimate after the second event time.
+\end{exercise}
+
+\begin{exercise}[2]
+For the same data, compute the Nelson--Aalen cumulative hazard estimate.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+\widehat{\beta}=0.7
+\]
+
+in a Cox model. Compute the corresponding hazard ratio.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose an AFT coefficient is
+
+\[
+\widehat{\beta}=-0.2.
+\]
+
+Compute the corresponding time ratio.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a Weibull model has shape
+
+\[
+k=2.
+\]
+
+State whether its hazard increases, decreases, or remains constant.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a Weibull model has shape
+
+\[
+k=0.6.
+\]
+
+State the hazard behavior.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+h(t)
+=
+\frac{
+f(t)
+}{
+S(t)
+}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+H(t)
+=
+-\log S(t).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+f(t)
+=
+h(t)e^{-H(t)}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the tail-integral identity
+
+\[
+\mathbb{E}[T]
+=
+\int_0^\infty
+S(t)\,dt
+\]
+
+for nonnegative continuous \(T\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the right-censored likelihood
+
+\[
+\prod_i
+f(y_i)^{\delta_i}
+S(y_i)^{1-\delta_i}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the exponential MLE
+
+\[
+\widehat{\lambda}
+=
+\frac{
+D
+}{
+Y
+}
+\]
+
+under right censoring.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why censoring changes risk sets but does not cause a Kaplan--Meier
+drop.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Kaplan--Meier product-limit estimator from conditional
+survival probabilities.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the connection between Kaplan--Meier and Nelson--Aalen
+estimators.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Weibull hazard from its survival function.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the exponential distribution is a Weibull special case.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the memoryless property of the exponential distribution.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how the log-rank expected event count is constructed.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the Cox baseline hazard cancels from the partial likelihood.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Cox hazard ratio for two covariate vectors.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+S
+(
+t\mid\mathbf{x}
+)
+=
+[
+S_0(t)
+]^{
+e^{\mathbf{x}^T\boldsymbol{\beta}}
+}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the proportional-hazards assumption in words and mathematically.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how a time-by-covariate interaction allows nonproportional
+hazards.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare Cox and accelerated failure-time models.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a hazard ratio cannot generally be interpreted as a ratio of
+median survival times.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between a cause-specific hazard and cumulative
+incidence.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why competing events should not always be treated as ordinary
+censoring.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why recurrent events within one individual are dependent.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the purpose of a shared frailty model.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the discrete survival relation
+
+\[
+S(t)
+=
+\prod_{j=1}^{t}
+(
+1-h_j
+).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the meaning of restricted mean survival time.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how immortal-time bias can arise.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Greenwood's variance formula.
+\end{exercise}
+
+\begin{exercise}[4]
+Study asymptotic properties of the Kaplan--Meier estimator.
+\end{exercise}
+
+\begin{exercise}[4]
+Study martingale representations of Kaplan--Meier and Nelson--Aalen
+estimators.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the asymptotic null distribution of the log-rank statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Study weighted log-rank tests.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Cox partial likelihood using conditional event
+probabilities.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Cox score function and information matrix.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Breslow and Efron treatments of tied event times.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate estimation of the baseline cumulative hazard in a Cox model.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Schoenfeld residuals and proportional-hazards diagnostics.
+\end{exercise}
+
+\begin{exercise}[4]
+Study martingale and deviance residuals in Cox regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive likelihoods for parametric Weibull regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Study accelerated failure-time models under log-normal and log-logistic
+errors.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate competing-risks cumulative incidence estimation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study cause-specific Cox regression and subdistribution-hazard
+regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Study counting-process formulations of survival analysis.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate recurrent-event models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study shared frailty models.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate inverse probability of censoring weighting.
+\end{exercise}
+
+\begin{exercise}[4]
+Study interval-censored survival likelihoods.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate survival calibration and time-dependent prediction metrics.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:survival-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Survival analysis studies the event time
+
+\[
+\boxed{
+T\geq0.
+}
+\]
+
+The survival function is
+
+\[
+\boxed{
+S(t)
+=
+P(T>t).
+}
+\]
+
+The hazard is
+
+\[
+\boxed{
+h(t)
+=
+\frac{
+f(t)
+}{
+S(t)
+}.
+}
+\]
+
+The cumulative hazard is
+
+\[
+\boxed{
+H(t)
+=
+\int_0^t
+h(u)\,du
+=
+-\log S(t).
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+S(t)
+=
+e^{-H(t)}.
+}
+\]
+
+Right-censored observations are represented by
+
+\[
+\boxed{
+Y_i
+=
+\min(T_i,C_i),
+}
+\]
+
+with event indicator
+
+\[
+\boxed{
+\delta_i
+=
+\mathbf{1}_{\{T_i\leq C_i\}}.
+}
+\]
+
+The Kaplan--Meier estimator is
+
+\[
+\boxed{
+\widehat{S}(t)
+=
+\prod_{t_j\leq t}
+\left(
+1-
+\frac{
+d_j
+}{
+n_j
+}
+\right).
+}
+\]
+
+The Nelson--Aalen estimator is
+
+\[
+\boxed{
+\widehat{H}(t)
+=
+\sum_{t_j\leq t}
+\frac{
+d_j
+}{
+n_j
+}.
+}
+\]
+
+The Cox proportional-hazards model is
+
+\[
+\boxed{
+h
+(
+t\mid\mathbf{x}
+)
+=
+h_0(t)
+e^{\mathbf{x}^T\boldsymbol{\beta}}.
+}
+\]
+
+A one-unit predictor change corresponds to hazard ratio
+
+\[
+\boxed{
+e^{\beta_j}.
+}
+\]
+
+Accelerated failure-time models instead use
+
+\[
+\boxed{
+\log T
+=
+\mathbf{x}^T
+\boldsymbol{\beta}
++
+\varepsilon.
+}
+\]
+
+Survival analysis therefore combines
+
+\[
+\boxed{
+\text{probability}
++
+\text{censoring}
++
+\text{risk sets}
++
+\text{hazards}
++
+\text{regression}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:survival-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Survival Analysis extends the probability-distribution, estimation, and
+regression methods developed earlier in Chapter~\ref{chap:statistics} to
+time-to-event outcomes with censoring and truncation. The Kaplan--Meier
+and Nelson--Aalen estimators provide nonparametric estimates of survival
+and cumulative hazard, while the Cox proportional-hazards model provides
+a semiparametric regression framework. Counting-process formulations
+connect survival analysis with stochastic processes, and frailty models
+connect it with hierarchical and random-effects modeling. The next
+section, Statistical Learning, develops predictive modeling, model
+selection, regularization, classification, trees, ensembles, kernels,
+and modern high-dimensional statistical methods.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.17 Survival Analysis
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard survival-analysis theory.
+%   - Standard event-history and reliability methods.
+%   - Standard proportional-hazards and parametric survival models.
+%
+% Used for:
+%   - event-time distributions;
+%   - survival functions;
+%   - density functions;
+%   - hazard functions;
+%   - cumulative hazards;
+%   - survival-hazard relationships;
+%   - mean and median survival;
+%   - right, left, and interval censoring;
+%   - truncation and delayed entry;
+%   - censored likelihoods;
+%   - informative and noninformative censoring;
+%   - risk sets;
+%   - Kaplan--Meier estimation;
+%   - Greenwood variance;
+%   - Nelson--Aalen estimation;
+%   - log-rank tests;
+%   - exponential survival models;
+%   - Weibull survival models;
+%   - log-normal and log-logistic models;
+%   - proportional hazards;
+%   - Cox regression;
+%   - hazard-ratio interpretation;
+%   - partial likelihood;
+%   - tied events;
+%   - baseline survival estimation;
+%   - nonproportional hazards;
+%   - time-dependent covariates;
+%   - stratified Cox models;
+%   - accelerated failure-time models;
+%   - survival-model diagnostics;
+%   - competing risks;
+%   - cumulative incidence;
+%   - recurrent events;
+%   - counting processes;
+%   - frailty models;
+%   - discrete-time survival;
+%   - reliability;
+%   - restricted mean survival time;
+%   - landmark analysis;
+%   - immortal-time bias;
+%   - interval-censored data;
+%   - survival prediction;
+%   - concordance and Brier-score previews;
+%   - applications and exercises.
+%
+% Notes:
+%   - Statistical Learning is developed next in Section 8.18.
+%   - Stochastic-process theory from Chapter 7 provides a deeper
+%     foundation for counting-process survival theory.
+%   - Computational Statistics later develops numerical fitting,
+%     simulation, bootstrap, and predictive validation methods.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

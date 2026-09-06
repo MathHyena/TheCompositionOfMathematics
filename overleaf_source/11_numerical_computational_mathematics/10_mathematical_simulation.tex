@@ -1,0 +1,4647 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.10 MATHEMATICAL SIMULATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Mathematical Simulation}
+\label{sec:mathematical-simulation}
+
+\prerequisite{
+Mathematical modeling, probability, differential equations, numerical
+analysis, numerical ODEs, numerical PDEs, Monte Carlo methods, optimization,
+statistics, and scientific computing.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the role of mathematical simulation;
+    \item distinguish models from simulations;
+    \item distinguish deterministic and stochastic simulation;
+    \item distinguish static and dynamic simulation;
+    \item identify states, parameters, inputs, and outputs;
+    \item construct simulation state-update equations;
+    \item understand continuous-time and discrete-time models;
+    \item recognize event-driven simulation;
+    \item distinguish time-driven and event-driven simulation;
+    \item recognize agent-based simulation;
+    \item understand compartment models;
+    \item recognize network-based simulation;
+    \item formulate simulation experiments;
+    \item select initial conditions and parameter values;
+    \item understand transient and steady-state behavior;
+    \item recognize equilibration and warm-up periods;
+    \item understand simulation horizons;
+    \item understand time-step selection;
+    \item distinguish numerical instability from physical instability;
+    \item understand conservation diagnostics;
+    \item recognize invariant quantities;
+    \item construct Monte Carlo simulation studies;
+    \item estimate simulation uncertainty;
+    \item recognize stochastic trajectories;
+    \item understand replication and ensemble averaging;
+    \item distinguish aleatoric and parametric uncertainty;
+    \item understand sensitivity analysis;
+    \item recognize local and global sensitivity methods;
+    \item understand parameter sweeps;
+    \item recognize scenario analysis;
+    \item understand calibration;
+    \item distinguish calibration from validation;
+    \item understand parameter estimation from simulation outputs;
+    \item recognize inverse problems;
+    \item understand objective functions for calibration;
+    \item understand identifiability conceptually;
+    \item recognize structural and practical identifiability;
+    \item understand verification and validation;
+    \item recognize benchmark problems;
+    \item understand convergence studies;
+    \item construct manufactured or synthetic-data tests;
+    \item recognize uncertainty quantification;
+    \item understand output distributions;
+    \item estimate probabilities and quantiles from simulation;
+    \item recognize rare-event simulation;
+    \item understand surrogate models conceptually;
+    \item recognize reduced-order simulation;
+    \item understand response surfaces;
+    \item recognize simulation-based optimization;
+    \item understand digital experiments;
+    \item recognize reproducible simulation workflows;
+    \item understand checkpointing and restart;
+    \item recognize parallel ensemble simulation;
+    \item understand visualization of dynamic systems;
+    \item distinguish visual plausibility from mathematical verification;
+    \item connect simulation with biology, physics, engineering, finance,
+          operations research, epidemiology, environmental science, and
+          applied mathematics.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Mathematical Simulation?}
+\label{subsec:what-is-mathematical-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A mathematical simulation uses a mathematical model and a computational
+procedure to imitate the behavior of a system.
+
+A typical pipeline is
+
+\[
+\boxed{
+\text{real system}
+\longrightarrow
+\text{mathematical model}
+\longrightarrow
+\text{numerical algorithm}
+\longrightarrow
+\text{simulation output}.
+}
+\]
+
+The simulation is not the real system itself.
+
+It is the computed behavior of a mathematical representation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Versus Simulation}
+\label{subsec:model-versus-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A mathematical model specifies relationships among variables.
+
+For example,
+
+\[
+\boxed{
+\frac{dP}{dt}
+=
+rP
+\left(
+1-\frac{P}{K}
+\right)
+}
+\]
+
+is a logistic population model.
+
+A simulation chooses:
+
+\[
+\boxed{
+P(0),
+}
+\]
+
+\[
+\boxed{
+r,
+}
+\]
+
+\[
+\boxed{
+K,
+}
+\]
+
+a numerical method, and a time interval, then computes an approximate
+trajectory.
+
+Thus the same model can produce many different simulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Components of a Simulation Model}
+\label{subsec:simulation-model-components}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simulation typically includes:
+
+\[
+\boxed{
+\text{state variables},
+}
+\]
+
+\[
+\boxed{
+\text{parameters},
+}
+\]
+
+\[
+\boxed{
+\text{inputs},
+}
+\]
+
+\[
+\boxed{
+\text{initial conditions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{outputs}.
+}
+\]
+
+These categories should be defined explicitly before implementation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Variables}
+\label{subsec:simulation-state-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A state variable contains information required to determine future model
+behavior.
+
+If
+
+\[
+x(t)
+\]
+
+is the state, then a deterministic continuous-time model may have form
+
+\[
+\boxed{
+\frac{dx}{dt}
+=
+f(x,t;\theta),
+}
+\]
+
+where
+
+\[
+\theta
+\]
+
+denotes model parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameters}
+\label{subsec:simulation-parameters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parameters describe fixed or externally selected model properties.
+
+Examples include:
+
+\[
+\boxed{
+\text{growth rate},
+}
+\]
+
+\[
+\boxed{
+\text{diffusion coefficient},
+}
+\]
+
+\[
+\boxed{
+\text{service rate},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{transmission rate}.
+}
+\]
+
+A parameter may be treated as fixed in one simulation and uncertain in
+another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inputs and Forcing}
+\label{subsec:simulation-inputs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An input is an externally prescribed quantity that influences the state.
+
+A model may be written
+
+\[
+\boxed{
+\dot{x}
+=
+f(x,u,t;\theta),
+}
+\]
+
+where
+
+\[
+u(t)
+\]
+
+is the input or forcing.
+
+Examples include:
+
+\[
+\boxed{
+\text{external load},
+}
+\]
+
+\[
+\boxed{
+\text{control signal},
+}
+\]
+
+\[
+\boxed{
+\text{rainfall},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{arrival process}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Outputs}
+\label{subsec:simulation-outputs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The full state may not be the final quantity of interest.
+
+An output may be
+
+\[
+\boxed{
+y(t)
+=
+g(x(t),\theta).
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{maximum temperature},
+}
+\]
+
+\[
+\boxed{
+\text{total deaths},
+}
+\]
+
+\[
+\boxed{
+\text{waiting time},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{financial loss}.
+}
+\]
+
+Simulation design should begin by identifying the quantities of interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deterministic Simulation}
+\label{subsec:deterministic-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A deterministic simulation produces the same mathematical trajectory from
+the same:
+
+\[
+\boxed{
+\text{initial conditions},
+}
+\]
+
+\[
+\boxed{
+\text{parameters},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{inputs}.
+}
+\]
+
+For example,
+
+\[
+\dot{x}
+=
+f(x,t)
+\]
+
+with a fixed initial condition defines one deterministic trajectory when
+the solution is unique.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Simulation}
+\label{subsec:stochastic-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stochastic simulation includes random variables or stochastic processes.
+
+The output is therefore random.
+
+One run produces one realization:
+
+\[
+\boxed{
+X^{(1)}(t).
+}
+\]
+
+Repeated runs produce
+
+\[
+\boxed{
+X^{(1)}(t),
+X^{(2)}(t),
+\ldots,
+X^{(N)}(t).
+}
+\]
+
+Statistical summaries are then used to describe simulation behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Static Simulation}
+\label{subsec:static-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A static simulation does not explicitly model evolution through time.
+
+For example, if uncertain input
+
+\[
+X
+\]
+
+produces output
+
+\[
+Y=g(X),
+\]
+
+then repeated sampling of \(X\) creates a static Monte Carlo simulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Simulation}
+\label{subsec:dynamic-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dynamic simulation models evolution through time.
+
+Examples include:
+
+\[
+\boxed{
+\text{ODE trajectories},
+}
+\]
+
+\[
+\boxed{
+\text{PDE fields},
+}
+\]
+
+\[
+\boxed{
+\text{queues},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{agent populations}.
+}
+\]
+
+The state changes from one time to another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continuous-Time Simulation}
+\label{subsec:continuous-time-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A continuous-time model may have form
+
+\[
+\boxed{
+\dot{x}
+=
+f(x,t).
+}
+\]
+
+The mathematical state is defined continuously in time.
+
+The numerical simulation still evaluates the state only at finitely many
+times, using methods such as those of
+Section~\ref{sec:numerical-odes}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete-Time Simulation}
+\label{subsec:discrete-time-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrete-time model evolves through a recurrence:
+
+\[
+\boxed{
+x_{n+1}
+=
+F(x_n,n).
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{population maps},
+}
+\]
+
+\[
+\boxed{
+\text{difference equations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{discrete control systems}.
+}
+\]
+
+No numerical time-discretization is required if the original mathematical
+model is itself discrete.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Logistic Map}
+\label{subsec:worked-logistic-map-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Discrete Population Simulation}
+
+Consider
+
+\[
+x_{n+1}
+=
+rx_n(1-x_n),
+\]
+
+with
+
+\[
+r=2,
+\qquad
+x_0=0.2.
+\]
+
+Then
+
+\[
+x_1
+=
+2(0.2)(0.8)
+=
+0.32.
+\]
+
+Next,
+
+\[
+x_2
+=
+2(0.32)(0.68)
+=
+0.4352.
+\]
+
+Then,
+
+\[
+x_3
+=
+2(0.4352)(0.5648)
+\approx
+0.4916.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+x_1=0.32,
+\qquad
+x_2=0.4352,
+\qquad
+x_3\approx0.4916.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Driven Simulation}
+\label{subsec:time-driven-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A time-driven simulation advances using regularly or adaptively selected
+time steps:
+
+\[
+\boxed{
+t_0
+\rightarrow
+t_1
+\rightarrow
+t_2
+\rightarrow
+\cdots.
+}
+\]
+
+At each step, the state is updated.
+
+Numerical ODE and PDE solvers are standard examples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Event-Driven Simulation}
+\label{subsec:event-driven-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In an event-driven simulation, the clock jumps from one event time to the
+next.
+
+Suppose event times are
+
+\[
+\boxed{
+T_1<T_2<T_3<\cdots.
+}
+\]
+
+The state changes only when an event occurs.
+
+This approach is common in:
+
+\[
+\boxed{
+\text{queueing},
+}
+\]
+
+\[
+\boxed{
+\text{inventory},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{communication networks}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Event Calendar}
+\label{subsec:event-calendar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrete-event simulator maintains a future-event list.
+
+Each event record may contain:
+
+\[
+\boxed{
+\text{event time},
+}
+\]
+
+\[
+\boxed{
+\text{event type},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{associated data}.
+}
+\]
+
+The next event is removed from the calendar, processed, and any newly
+scheduled events are inserted.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Queue Simulation}
+\label{subsec:queue-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A queueing simulation may include two event types:
+
+\[
+\boxed{
+\text{arrival}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{departure}.
+}
+\]
+
+The state may include:
+
+\[
+\boxed{
+Q(t)
+=
+\text{number waiting},
+}
+\]
+
+and the server status.
+
+Events update the state and schedule future events.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Simple Queue Events}
+\label{subsec:worked-simple-queue-events}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Processing Arrivals and Departures}
+
+Suppose a single-server system is initially empty.
+
+The first arrival occurs at
+
+\[
+t=1.
+\]
+
+The customer begins service immediately.
+
+Suppose service takes
+
+\[
+2
+\]
+
+time units.
+
+Then the departure is scheduled at
+
+\[
+t=3.
+\]
+
+If another customer arrives at
+
+\[
+t=2,
+\]
+
+the second customer must wait.
+
+\begin{answerbox}
+At time \(t=2\),
+
+\[
+\boxed{
+\text{one customer is in service and one customer is waiting.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Agent-Based Simulation}
+\label{subsec:agent-based-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Agent-based models simulate individual interacting entities.
+
+An agent may have:
+
+\[
+\boxed{
+\text{state},
+}
+\]
+
+\[
+\boxed{
+\text{rules},
+}
+\]
+
+\[
+\boxed{
+\text{location},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{interactions}.
+}
+\]
+
+System-level behavior emerges from many local interactions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Examples of Agents}
+\label{subsec:simulation-agent-examples}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Agents may represent:
+
+\[
+\boxed{
+\text{people},
+}
+\]
+
+\[
+\boxed{
+\text{animals},
+}
+\]
+
+\[
+\boxed{
+\text{vehicles},
+}
+\]
+
+\[
+\boxed{
+\text{firms},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{cells}.
+}
+\]
+
+Agent-based modeling is useful when individual heterogeneity and local
+interaction are important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Synchronous and Asynchronous Agent Updates}
+\label{subsec:agent-update-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In synchronous updating, every agent computes its next state from the same
+current configuration.
+
+Then all states are updated simultaneously.
+
+In asynchronous updating, agents update one at a time or at random times.
+
+The update rule can materially change model behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Compartment Models}
+\label{subsec:simulation-compartment-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compartment models divide a population or quantity among aggregate states.
+
+For example,
+
+\[
+\boxed{
+S+I+R=N.
+}
+\]
+
+An epidemic model may use
+
+\[
+\boxed{
+\frac{dS}{dt}
+=
+-\beta
+\frac{SI}{N},
+}
+\]
+
+\[
+\boxed{
+\frac{dI}{dt}
+=
+\beta
+\frac{SI}{N}
+-
+\gamma I,
+}
+\]
+
+and
+
+\[
+\boxed{
+\frac{dR}{dt}
+=
+\gamma I.
+}
+\]
+
+The simulation tracks movement among compartments.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conservation in Compartment Models}
+\label{subsec:compartment-conservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the SIR equations,
+
+\[
+\frac{d}{dt}
+(S+I+R)
+=
+0.
+\]
+
+Therefore,
+
+\[
+\boxed{
+S(t)+I(t)+R(t)=N.
+}
+\]
+
+A numerical simulation should preserve this total exactly or to within
+small numerical error, depending on the numerical method.
+
+This provides a useful verification diagnostic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Simulation}
+\label{subsec:network-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many systems are naturally represented by a graph
+
+\[
+\boxed{
+G=(V,E).
+}
+\]
+
+Vertices represent entities and edges represent interactions.
+
+A network simulation may model:
+
+\[
+\boxed{
+\text{disease transmission},
+}
+\]
+
+\[
+\boxed{
+\text{traffic},
+}
+\]
+
+\[
+\boxed{
+\text{power flow},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{information spread}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State on a Network}
+\label{subsec:state-on-network}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose each node \(i\) has state
+
+\[
+x_i(t).
+\]
+
+A coupled system may have form
+
+\[
+\boxed{
+\dot{x}_i
+=
+f_i(x_i)
++
+\sum_{j}
+A_{ij}
+g_{ij}(x_i,x_j),
+}
+\]
+
+where
+
+\[
+A
+\]
+
+is an adjacency matrix.
+
+The network structure controls which states interact.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cellular Automata}
+\label{subsec:cellular-automata-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A cellular automaton consists of:
+
+\[
+\boxed{
+\text{a lattice},
+}
+\]
+
+\[
+\boxed{
+\text{discrete states},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{local update rules}.
+}
+\]
+
+At each discrete time, the state of each cell is updated based on a
+neighborhood.
+
+Simple local rules can generate complex global patterns.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State-Transition Simulation}
+\label{subsec:state-transition-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A general discrete stochastic model may use transition probabilities
+
+\[
+\boxed{
+P_{ij}
+=
+P(X_{n+1}=j\mid X_n=i).
+}
+\]
+
+Simulation then draws the next state from the row of \(P\) corresponding
+to the current state.
+
+This is a Markov-chain simulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Horizon}
+\label{subsec:simulation-horizon}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simulation must define a stopping horizon.
+
+Examples include:
+
+\[
+\boxed{
+0\leq t\leq T,
+}
+\]
+
+\[
+\boxed{
+n=0,\ldots,N,
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{until a stopping event occurs}.
+}
+\]
+
+The horizon should be long enough to capture the behavior relevant to the
+scientific question.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transient Behavior}
+\label{subsec:simulation-transient-behavior}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Early simulation behavior can depend strongly on initial conditions.
+
+This initial period is called the transient.
+
+For example, a queue initialized empty may initially have artificially
+short waiting times.
+
+Steady-state analysis may therefore discard or separately analyze an
+initial warm-up period.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Steady-State Simulation}
+\label{subsec:steady-state-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stochastic system may approach a stationary distribution.
+
+If
+
+\[
+X(t)
+\]
+
+reaches statistical equilibrium, long-run quantities may be estimated from
+a sufficiently long simulation.
+
+Examples include:
+
+\[
+\boxed{
+\text{mean queue length},
+}
+\]
+
+\[
+\boxed{
+\text{server utilization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{long-run inventory level}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Warm-Up Period}
+\label{subsec:simulation-warmup-period}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose observations during
+
+\[
+0\leq t<T_w
+\]
+
+are strongly influenced by artificial initial conditions.
+
+One may discard this period and estimate steady-state quantities using
+
+\[
+\boxed{
+t\geq T_w.
+}
+\]
+
+The warm-up length should be justified rather than selected arbitrarily.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Horizon Simulation}
+\label{subsec:finite-horizon-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some systems are inherently finite-horizon.
+
+Examples include:
+
+\[
+\boxed{
+\text{one epidemic season},
+}
+\]
+
+\[
+\boxed{
+\text{one flight operation},
+}
+\]
+
+\[
+\boxed{
+\text{a manufacturing shift},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a financial option maturity period}.
+}
+\]
+
+In these cases, transient behavior may itself be the quantity of interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Step Selection}
+\label{subsec:simulation-time-step-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For time-driven numerical simulations, the time step must balance:
+
+\[
+\boxed{
+\text{accuracy},
+}
+\]
+
+\[
+\boxed{
+\text{stability},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{cost}.
+}
+\]
+
+A time step that is too large may miss important dynamics.
+
+A time step that is excessively small may create unnecessary computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Physical and Numerical Time Scales}
+\label{subsec:physical-numerical-time-scales}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the model contains characteristic time scales
+
+\[
+\boxed{
+\tau_1,
+\tau_2,\ldots.
+}
+\]
+
+The numerical method must resolve the time scales relevant to the desired
+output.
+
+Fast time scales may also create stiffness, requiring special integration
+methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Physical Instability Versus Numerical Instability}
+\label{subsec:physical-vs-numerical-instability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A physical model may genuinely exhibit exponential growth.
+
+A numerical method may also produce artificial growth even when the exact
+solution is stable.
+
+These phenomena must be distinguished.
+
+A convergence or stability study can help determine whether observed
+growth is physical or numerical.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Initial Conditions}
+\label{subsec:simulation-initial-conditions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Initial conditions can strongly influence simulation outcomes.
+
+A simulation study may consider:
+
+\[
+\boxed{
+x(0)=x_0,
+}
+\]
+
+or a distribution
+
+\[
+\boxed{
+X(0)\sim p_0.
+}
+\]
+
+When multiple plausible initial states exist, sensitivity to initial
+conditions should be investigated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chaotic Sensitivity}
+\label{subsec:chaotic-simulation-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In chaotic systems, nearby initial conditions can separate rapidly.
+
+If
+
+\[
+\|x_0-\widetilde{x}_0\|
+\]
+
+is small, it is possible that
+
+\[
+\boxed{
+\|x(t)-\widetilde{x}(t)\|
+}
+\]
+
+becomes large at later times.
+
+Long-term trajectory prediction may therefore be impossible even when the
+model is deterministic.
+
+Statistical or qualitative properties may remain meaningful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conservation Laws as Diagnostics}
+\label{subsec:simulation-conservation-diagnostics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the model conserves
+
+\[
+I(x).
+\]
+
+Then
+
+\[
+\boxed{
+I(x(t))
+=
+I(x(0)).
+}
+\]
+
+Monitor
+
+\[
+\boxed{
+\Delta I(t)
+=
+I(x(t))-I(x(0)).
+}
+\]
+
+Unexpected drift can reveal numerical error or implementation problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Positivity Diagnostics}
+\label{subsec:simulation-positivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many model quantities must remain nonnegative:
+
+\[
+\boxed{
+x_i(t)\geq0.
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{population},
+}
+\]
+
+\[
+\boxed{
+\text{mass},
+}
+\]
+
+\[
+\boxed{
+\text{concentration},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{probability}.
+}
+\]
+
+Negative computed values may indicate inappropriate numerical methods or
+step sizes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundedness Diagnostics}
+\label{subsec:simulation-boundedness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A model may guarantee
+
+\[
+\boxed{
+a\leq x(t)\leq b.
+}
+\]
+
+If a simulation violates these known bounds, possible causes include:
+
+\[
+\boxed{
+\text{numerical instability},
+}
+\]
+
+\[
+\boxed{
+\text{coding errors},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{incorrect parameterization}.
+}
+\]
+
+Known mathematical bounds are valuable computational checks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Replications}
+\label{subsec:stochastic-replications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A single stochastic trajectory cannot characterize the full behavior of a
+random system.
+
+Generate independent replications
+
+\[
+\boxed{
+Y_1,\ldots,Y_N.
+}
+\]
+
+Estimate the mean by
+
+\[
+\boxed{
+\overline{Y}
+=
+\frac1N
+\sum_{i=1}^{N}
+Y_i.
+}
+\]
+
+Estimate the variance by
+
+\[
+\boxed{
+s^2
+=
+\frac1{N-1}
+\sum_{i=1}^{N}
+(Y_i-\overline{Y})^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ensemble Mean}
+\label{subsec:simulation-ensemble-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose each replication produces a trajectory
+
+\[
+X^{(r)}(t).
+\]
+
+The ensemble mean is
+
+\[
+\boxed{
+\overline{X}(t)
+=
+\frac1R
+\sum_{r=1}^{R}
+X^{(r)}(t).
+}
+\]
+
+This estimates
+
+\[
+\boxed{
+\mathbb{E}[X(t)].
+}
+\]
+
+Pointwise quantiles can also be estimated across the ensemble.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Confidence Bands}
+\label{subsec:simulation-confidence-bands}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At each time \(t\), repeated simulations can estimate uncertainty in a
+summary such as the mean.
+
+For independent runs, an approximate pointwise interval is
+
+\[
+\boxed{
+\overline{X}(t)
+\pm
+z_{1-\alpha/2}
+\frac{
+s(t)
+}{
+\sqrt{R}
+}.
+}
+\]
+
+These are pointwise intervals, not automatically simultaneous confidence
+bands over the entire trajectory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aleatoric Uncertainty}
+\label{subsec:simulation-aleatoric-uncertainty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Aleatoric uncertainty represents intrinsic randomness in the modeled
+system.
+
+Examples include:
+
+\[
+\boxed{
+\text{random arrivals},
+}
+\]
+
+\[
+\boxed{
+\text{thermal fluctuations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{random failure times}.
+}
+\]
+
+Increasing the amount of data may characterize this randomness more
+precisely, but does not eliminate it from the system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Epistemic or Parametric Uncertainty}
+\label{subsec:simulation-parametric-uncertainty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parameter uncertainty arises because quantities such as
+
+\[
+\theta
+\]
+
+are not known exactly.
+
+One may represent
+
+\[
+\boxed{
+\Theta
+\sim p(\theta)
+}
+\]
+
+and propagate parameter uncertainty through the simulation.
+
+This is different from intrinsic randomness in the system dynamics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncertainty Propagation}
+\label{subsec:simulation-uncertainty-propagation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+Y
+=
+M(\Theta).
+\]
+
+Sample
+
+\[
+\Theta_1,\ldots,\Theta_N
+\]
+
+from the uncertainty model.
+
+Then compute
+
+\[
+\boxed{
+Y_i
+=
+M(\Theta_i).
+}
+\]
+
+The resulting outputs approximate the distribution of \(Y\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Output Distribution}
+\label{subsec:simulation-output-distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Simulation outputs can be summarized by:
+
+\[
+\boxed{
+\mathbb{E}[Y],
+}
+\]
+
+\[
+\boxed{
+\operatorname{Var}(Y),
+}
+\]
+
+\[
+\boxed{
+P(Y>c),
+}
+\]
+
+and quantiles
+
+\[
+\boxed{
+q_\alpha.
+}
+\]
+
+Reporting only the average may hide important tail behavior or
+multimodality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scenario Analysis}
+\label{subsec:simulation-scenario-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scenario analysis compares selected parameter or policy settings.
+
+For example:
+
+\[
+\boxed{
+\text{baseline},
+}
+\]
+
+\[
+\boxed{
+\text{moderate intervention},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{strong intervention}.
+}
+\]
+
+Each scenario should be defined explicitly and simulated using a consistent
+comparison framework.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controlled Scenario Comparison}
+\label{subsec:controlled-scenario-comparison}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When comparing scenarios, keep unrelated assumptions fixed.
+
+Then observed changes can be attributed more clearly to the changed
+scenario variable.
+
+In stochastic simulation, common random numbers may further reduce noise
+in pairwise comparisons.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameter Sweeps}
+\label{subsec:simulation-parameter-sweeps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the model depends on parameter pair
+
+\[
+(\theta_1,\theta_2).
+\]
+
+Evaluate the simulation over a grid:
+
+\[
+\boxed{
+(\theta_{1,i},\theta_{2,j}).
+}
+\]
+
+For each pair, compute quantity of interest
+
+\[
+\boxed{
+Q_{ij}.
+}
+\]
+
+The resulting table or surface reveals broad parameter dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{One-at-a-Time Sensitivity}
+\label{subsec:one-at-a-time-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple sensitivity approach changes one parameter while holding all
+others fixed.
+
+For parameter \(\theta_i\),
+
+\[
+\boxed{
+S_i
+\approx
+\frac{
+Q(\theta_i+h)-Q(\theta_i-h)
+}{
+2h
+}.
+}
+\]
+
+This estimates a local derivative.
+
+It does not capture interactions between several uncertain parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normalized Sensitivity}
+\label{subsec:normalized-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dimensionless local sensitivity may be written
+
+\[
+\boxed{
+S_i^{\mathrm{rel}}
+=
+\frac{
+\theta_i
+}{
+Q
+}
+\frac{
+\partial Q
+}{
+\partial\theta_i
+},
+}
+\]
+
+provided the quantities are nonzero.
+
+This measures approximate percentage output change per percentage parameter
+change.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Sensitivity}
+\label{subsec:simulation-global-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Global sensitivity analysis varies parameters over their entire plausible
+ranges.
+
+It can capture:
+
+\[
+\boxed{
+\text{nonlinearity},
+}
+\]
+
+\[
+\boxed{
+\text{interactions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{nonlocal effects}.
+}
+\]
+
+Monte Carlo sampling is commonly used for global sensitivity studies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance-Based Sensitivity Preview}
+\label{subsec:variance-based-sensitivity-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+Y=M(\Theta_1,\ldots,\Theta_d).
+\]
+
+A variance-based method decomposes
+
+\[
+\operatorname{Var}(Y)
+\]
+
+into contributions associated with individual parameters and interactions.
+
+A parameter with a large contribution strongly influences output
+uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Calibration}
+\label{subsec:simulation-calibration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Calibration chooses parameter values so simulation outputs agree with
+observations.
+
+Suppose observed data are
+
+\[
+y_1,\ldots,y_m,
+\]
+
+and simulated predictions are
+
+\[
+\widehat{y}_i(\theta).
+\]
+
+A least-squares calibration problem is
+
+\[
+\boxed{
+\min_\theta
+\sum_{i=1}^{m}
+\left[
+y_i-\widehat{y}_i(\theta)
+\right]^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Calibration}
+\label{subsec:weighted-calibration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If observations have different uncertainties, use weights:
+
+\[
+\boxed{
+J(\theta)
+=
+\sum_{i=1}^{m}
+w_i
+\left[
+y_i-\widehat{y}_i(\theta)
+\right]^2.
+}
+\]
+
+A common statistical choice is
+
+\[
+\boxed{
+w_i
+=
+\frac1{\sigma_i^2}
+}
+\]
+
+when observational error variances \(\sigma_i^2\) are known or estimated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Parameter Calibration}
+\label{subsec:worked-parameter-calibration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Estimating an Exponential Growth Rate}
+
+Suppose
+
+\[
+P(t)
+=
+P_0e^{rt},
+\]
+
+with known
+
+\[
+P_0=100.
+\]
+
+An observation at
+
+\[
+t=2
+\]
+
+gives
+
+\[
+P(2)=200.
+\]
+
+Then
+
+\[
+200
+=
+100e^{2r}.
+\]
+
+Thus,
+
+\[
+2=e^{2r}.
+\]
+
+Taking logarithms,
+
+\[
+\ln2=2r.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+r
+=
+\frac{\ln2}{2}.
+}
+\]
+\end{answerbox}
+
+For more complicated models, the same calibration idea may require a
+numerical optimizer.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation-Based Parameter Estimation}
+\label{subsec:simulation-based-parameter-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the model has no closed-form solution, computing
+
+\[
+J(\theta)
+\]
+
+may itself require running a simulation.
+
+Thus calibration becomes
+
+\[
+\boxed{
+\theta
+\rightarrow
+\text{simulation}
+\rightarrow
+\widehat{y}(\theta)
+\rightarrow
+J(\theta)
+\rightarrow
+\text{optimizer}.
+}
+\]
+
+This nested structure can be computationally expensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse Problems}
+\label{subsec:simulation-inverse-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A forward problem computes outputs from parameters:
+
+\[
+\boxed{
+\theta
+\longrightarrow
+y.
+}
+\]
+
+An inverse problem attempts to infer parameters from observations:
+
+\[
+\boxed{
+y
+\longrightarrow
+\theta.
+}
+\]
+
+Simulation-based calibration is therefore a form of inverse problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Identifiability}
+\label{subsec:simulation-identifiability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A parameter is identifiable if distinct parameter values produce
+distinguishable model outputs in principle.
+
+If
+
+\[
+\boxed{
+M(\theta_1)
+=
+M(\theta_2)
+}
+\]
+
+for
+
+\[
+\theta_1\neq\theta_2,
+\]
+
+then the observations may not uniquely determine the parameter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Structural Identifiability}
+\label{subsec:structural-identifiability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Structural identifiability concerns whether parameters can be uniquely
+determined from ideal noise-free observations with perfect experimental
+information.
+
+It is a mathematical property of the model structure.
+
+A model may fail structurally even before measurement noise is considered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Practical Identifiability}
+\label{subsec:practical-identifiability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A structurally identifiable parameter may still be difficult to estimate
+from finite noisy data.
+
+This is practical nonidentifiability.
+
+Signs include:
+
+\[
+\boxed{
+\text{large confidence intervals},
+}
+\]
+
+\[
+\boxed{
+\text{flat objective functions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{strong parameter correlation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Calibration Versus Validation}
+\label{subsec:calibration-versus-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Calibration chooses model parameters using data.
+
+Validation evaluates whether the calibrated model predicts independent
+observations adequately.
+
+Thus using the same data for both tasks can overstate model performance.
+
+Conceptually,
+
+\[
+\boxed{
+\text{calibration}
+=
+\text{fit},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{validation}
+=
+\text{independent test}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Verification Versus Validation}
+\label{subsec:simulation-verification-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Verification asks:
+
+\[
+\boxed{
+\text{Did we solve the mathematical model correctly?}
+}
+\]
+
+Validation asks:
+
+\[
+\boxed{
+\text{Is the mathematical model adequate for the real system?}
+}
+\]
+
+These are distinct questions.
+
+A perfectly verified simulation can still be based on a poor model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Code Verification}
+\label{subsec:simulation-code-verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Code verification checks whether the software implements the intended
+numerical method correctly.
+
+Methods include:
+
+\[
+\boxed{
+\text{unit tests},
+}
+\]
+
+\[
+\boxed{
+\text{benchmark problems},
+}
+\]
+
+\[
+\boxed{
+\text{manufactured solutions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{convergence studies}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Solution Verification}
+\label{subsec:simulation-solution-verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Solution verification estimates numerical uncertainty in one particular
+simulation result.
+
+It asks how errors such as
+
+\[
+\boxed{
+\text{time-step error},
+}
+\]
+
+\[
+\boxed{
+\text{mesh error},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{iterative solver error}
+}
+\]
+
+affect the reported solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Benchmark Problems}
+\label{subsec:simulation-benchmark-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A benchmark problem has a trusted analytical or reference solution.
+
+For example, test a numerical ODE solver on
+
+\[
+\boxed{
+y'=y,
+\qquad
+y(0)=1,
+}
+\]
+
+whose exact solution is
+
+\[
+\boxed{
+y=e^t.
+}
+\]
+
+Agreement with benchmark behavior provides evidence of implementation
+correctness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convergence Studies}
+\label{subsec:simulation-convergence-studies}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a method has expected order \(p\).
+
+Run simulations with
+
+\[
+h,
+\qquad
+\frac h2,
+\qquad
+\frac h4.
+\]
+
+If
+
+\[
+E(h)
+\approx
+Ch^p,
+\]
+
+then
+
+\[
+\boxed{
+\frac{
+E(h)
+}{
+E(h/2)
+}
+\approx
+2^p.
+}
+\]
+
+Observed convergence provides a strong implementation check.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Synthetic Data}
+\label{subsec:simulation-synthetic-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Synthetic data are generated from a known model with known parameters.
+
+For example,
+
+\[
+\boxed{
+y_i
+=
+M(t_i;\theta_{\mathrm{true}})
++
+\varepsilon_i.
+}
+\]
+
+A calibration method can then be tested to determine whether it recovers
+
+\[
+\theta_{\mathrm{true}}.
+\]
+
+This is useful for validating estimation procedures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Validation}
+\label{subsec:simulation-model-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Model validation compares predictions against empirical observations.
+
+Useful comparisons may include:
+
+\[
+\boxed{
+\text{time-series trajectories},
+}
+\]
+
+\[
+\boxed{
+\text{means},
+}
+\]
+
+\[
+\boxed{
+\text{variances},
+}
+\]
+
+\[
+\boxed{
+\text{distributions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{event frequencies}.
+}
+\]
+
+The validation metric should match the intended use of the model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Analysis}
+\label{subsec:simulation-residual-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For observations \(y_i\) and predictions \(\widehat{y}_i\), define residuals
+
+\[
+\boxed{
+r_i
+=
+y_i-\widehat{y}_i.
+}
+\]
+
+Residuals can reveal:
+
+\[
+\boxed{
+\text{bias},
+}
+\]
+
+\[
+\boxed{
+\text{time dependence},
+}
+\]
+
+\[
+\boxed{
+\text{heteroskedasticity},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{missing model structure}.
+}
+\]
+
+A small aggregate error can still hide systematic residual patterns.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Error Decomposition}
+\label{subsec:simulation-error-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrepancy between simulation and reality may arise from:
+
+\[
+\boxed{
+\text{measurement error},
+}
+\]
+
+\[
+\boxed{
+\text{parameter error},
+}
+\]
+
+\[
+\boxed{
+\text{model-form error},
+}
+\]
+
+\[
+\boxed{
+\text{discretization error},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{software error}.
+}
+\]
+
+These sources should not be conflated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model-Form Error}
+\label{subsec:model-form-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Model-form error occurs when the governing equations omit or simplify
+important physical or behavioral mechanisms.
+
+No amount of numerical refinement can remove this error.
+
+Thus
+
+\[
+\boxed{
+h\to0
+}
+\]
+
+does not imply that the simulation approaches reality.
+
+It only implies that the numerical solution approaches the chosen
+mathematical model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncertainty Quantification}
+\label{subsec:simulation-uq}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uncertainty quantification studies how uncertain inputs influence
+simulation outputs.
+
+Suppose
+
+\[
+\Theta
+\]
+
+is uncertain and
+
+\[
+Y=M(\Theta).
+\]
+
+The goal is to characterize the distribution of \(Y\).
+
+This may include:
+
+\[
+\boxed{
+\mathbb{E}[Y],
+}
+\]
+
+\[
+\boxed{
+\operatorname{Var}(Y),
+}
+\]
+
+\[
+\boxed{
+P(Y>c),
+}
+\]
+
+and quantiles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confidence and Prediction Intervals}
+\label{subsec:simulation-confidence-prediction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A confidence interval typically describes uncertainty in an estimated
+parameter or mean.
+
+A prediction interval describes uncertainty in a future observation or
+realization.
+
+These are not generally the same width.
+
+Prediction intervals usually include additional variability from the
+system itself.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rare-Event Simulation}
+\label{subsec:simulation-rare-events}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some applications care primarily about
+
+\[
+\boxed{
+P(Y>c),
+}
+\]
+
+where the event is extremely unlikely.
+
+Examples include:
+
+\[
+\boxed{
+\text{structural failure},
+}
+\]
+
+\[
+\boxed{
+\text{extreme financial loss},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{system overload}.
+}
+\]
+
+Naive simulation may require an enormous number of replications.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rare-Event Variance Reduction}
+\label{subsec:simulation-rare-event-variance-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Possible techniques include:
+
+\[
+\boxed{
+\text{importance sampling},
+}
+\]
+
+\[
+\boxed{
+\text{splitting methods},
+}
+\]
+
+and specialized rare-event algorithms.
+
+The goal is to observe the important region more frequently while
+correcting for altered sampling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation-Based Optimization}
+\label{subsec:simulation-based-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose decision variable \(x\) controls a simulation.
+
+The objective may be
+
+\[
+\boxed{
+J(x)
+=
+\mathbb{E}
+[
+C(x,\xi)
+].
+}
+\]
+
+If \(J(x)\) has no analytic form, it can be estimated by simulation:
+
+\[
+\boxed{
+\widehat{J}_N(x)
+=
+\frac1N
+\sum_{i=1}^{N}
+C(x,\xi_i).
+}
+\]
+
+An optimization algorithm then searches over \(x\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Noisy Objective Functions}
+\label{subsec:noisy-simulation-objectives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Simulation-based objectives may contain sampling noise.
+
+Thus two evaluations at the same \(x\) can differ:
+
+\[
+\boxed{
+\widehat{J}^{(1)}(x)
+\neq
+\widehat{J}^{(2)}(x).
+}
+\]
+
+Optimization methods must account for this variability.
+
+Possible approaches include:
+
+\[
+\boxed{
+\text{larger sample sizes},
+}
+\]
+
+\[
+\boxed{
+\text{common random numbers},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{stochastic optimization methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Random Numbers in Simulation Optimization}
+\label{subsec:simulation-common-random-numbers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose decisions \(x_A\) and \(x_B\) are compared.
+
+Use identical random inputs
+
+\[
+\xi_1,\ldots,\xi_N
+\]
+
+for both.
+
+Then compare
+
+\[
+\boxed{
+\widehat{J}(x_A)
+-
+\widehat{J}(x_B).
+}
+\]
+
+Correlation induced by common randomness can reduce variance in the
+difference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Surrogate Models}
+\label{subsec:simulation-surrogate-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a simulation
+
+\[
+M(\theta)
+\]
+
+is expensive, approximate it using a cheaper model
+
+\[
+\boxed{
+\widetilde{M}(\theta).
+}
+\]
+
+The surrogate may be built from simulation samples.
+
+Applications include:
+
+\[
+\boxed{
+\text{optimization},
+}
+\]
+
+\[
+\boxed{
+\text{uncertainty analysis},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{interactive exploration}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Response Surfaces}
+\label{subsec:response-surfaces}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A response surface approximates a quantity of interest as a function of
+parameters:
+
+\[
+\boxed{
+Q(\theta)
+\approx
+\widetilde{Q}(\theta).
+}
+\]
+
+A simple response surface may use a polynomial:
+
+\[
+\boxed{
+\widetilde{Q}(\theta)
+=
+\beta_0
++
+\sum_i
+\beta_i\theta_i
++
+\sum_{i,j}
+\beta_{ij}\theta_i\theta_j.
+}
+\]
+
+Higher-order or nonparametric surrogates are also possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Surrogate Validation}
+\label{subsec:surrogate-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A surrogate introduces approximation error.
+
+Therefore compare surrogate predictions with independent full simulations.
+
+A surrogate should not be trusted merely because it fits its training
+points well.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduced-Order Simulation}
+\label{subsec:reduced-order-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the original state satisfies
+
+\[
+x(t)
+\in
+\mathbb{R}^N.
+\]
+
+Approximate
+
+\[
+\boxed{
+x(t)
+\approx
+V_r a(t),
+}
+\]
+
+where
+
+\[
+r\ll N.
+\]
+
+Then simulate the reduced coordinates
+
+\[
+a(t)
+\]
+
+instead of all \(N\) original variables.
+
+This can greatly reduce computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Reduction Tradeoff}
+\label{subsec:model-reduction-tradeoff}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Reduced-order models exchange accuracy for speed.
+
+The central question is whether the reduced model preserves the quantities
+of interest.
+
+Validation must be performed over the parameter and state ranges where the
+reduced model will be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Digital Experiments}
+\label{subsec:digital-experiments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simulation study should be designed like an experiment.
+
+Specify:
+
+\[
+\boxed{
+\text{factors},
+}
+\]
+
+\[
+\boxed{
+\text{factor levels},
+}
+\]
+
+\[
+\boxed{
+\text{responses},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{replications}.
+}
+\]
+
+Statistical design-of-experiments principles can improve the efficiency of
+simulation studies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factorial Simulation Designs}
+\label{subsec:factorial-simulation-design}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two parameters each have two selected levels.
+
+A full factorial design contains
+
+\[
+\boxed{
+2^2=4
+}
+\]
+
+parameter combinations.
+
+For \(k\) two-level factors, the design contains
+
+\[
+\boxed{
+2^k
+}
+\]
+
+combinations.
+
+Factorial designs reveal interactions that one-at-a-time sweeps may miss.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Replication and Randomization}
+\label{subsec:simulation-replication-randomization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Replication estimates stochastic variability.
+
+Randomization prevents systematic ordering effects from contaminating
+comparisons.
+
+Although computer simulations are controlled experiments, random execution
+order can still help when computational environments or shared resources
+vary over time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Data Management}
+\label{subsec:simulation-data-management}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large simulation studies may produce:
+
+\[
+\boxed{
+\text{input configurations},
+}
+\]
+
+\[
+\boxed{
+\text{raw trajectories},
+}
+\]
+
+\[
+\boxed{
+\text{summary statistics},
+}
+\]
+
+\[
+\boxed{
+\text{checkpoints},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{plots}.
+}
+\]
+
+Data organization should preserve the relationship between each result and
+the simulation settings that generated it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Metadata}
+\label{subsec:simulation-metadata}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Each simulation result should ideally record:
+
+\[
+\boxed{
+\text{parameter values},
+}
+\]
+
+\[
+\boxed{
+\text{initial conditions},
+}
+\]
+
+\[
+\boxed{
+\text{numerical method},
+}
+\]
+
+\[
+\boxed{
+\text{step size or tolerances},
+}
+\]
+
+\[
+\boxed{
+\text{random seed},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{software version}.
+}
+\]
+
+Without metadata, large simulation studies become difficult to interpret
+or reproduce.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Checkpointing and Restart}
+\label{subsec:simulation-checkpointing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Long simulations should periodically save the current state.
+
+A checkpoint may contain:
+
+\[
+\boxed{
+x(t_k),
+}
+\]
+
+\[
+\boxed{
+t_k,
+}
+\]
+
+\[
+\boxed{
+\text{random generator state},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{solver state}.
+}
+\]
+
+The simulation can then resume without restarting from \(t=0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Simulation}
+\label{subsec:parallel-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many simulation tasks are embarrassingly parallel.
+
+Examples include:
+
+\[
+\boxed{
+\text{independent stochastic replications},
+}
+\]
+
+\[
+\boxed{
+\text{parameter combinations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{scenario runs}.
+}
+\]
+
+If each simulation is independent, the work can be distributed across many
+processors with little communication.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Ensemble Average}
+\label{subsec:parallel-ensemble-average}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose processor \(j\) computes local sum
+
+\[
+\boxed{
+S_j
+=
+\sum_{r\in I_j}
+Y_r.
+}
+\]
+
+After all workers finish, perform a reduction:
+
+\[
+\boxed{
+\overline{Y}
+=
+\frac{
+\sum_jS_j
+}{
+N
+}.
+}
+\]
+
+Only the final summary requires communication.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Streams in Parallel Simulation}
+\label{subsec:parallel-simulation-random-streams}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel stochastic simulations should use carefully managed random-number
+streams.
+
+Different workers should not accidentally generate overlapping sequences.
+
+Reproducible stream assignment also makes parallel experiments easier to
+verify.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Visualization of Simulation Results}
+\label{subsec:simulation-visualization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Useful visualizations include:
+
+\[
+\boxed{
+\text{trajectories},
+}
+\]
+
+\[
+\boxed{
+\text{phase portraits},
+}
+\]
+
+\[
+\boxed{
+\text{heat maps},
+}
+\]
+
+\[
+\boxed{
+\text{histograms},
+}
+\]
+
+\[
+\boxed{
+\text{quantile bands},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{animations}.
+}
+\]
+
+The visualization should correspond to the scientific quantity of
+interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Phase Portraits}
+\label{subsec:simulation-phase-portraits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a two-dimensional state
+
+\[
+(x(t),y(t)),
+\]
+
+plot
+
+\[
+\boxed{
+y
+\text{ versus }
+x
+}
+\]
+
+rather than plotting both only against time.
+
+Phase portraits reveal:
+
+\[
+\boxed{
+\text{equilibria},
+}
+\]
+
+\[
+\boxed{
+\text{cycles},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{qualitative trajectory structure}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ensemble Visualization}
+\label{subsec:ensemble-visualization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Plotting hundreds of stochastic trajectories simultaneously can become
+unreadable.
+
+Instead, summarize with:
+
+\[
+\boxed{
+\text{median trajectory},
+}
+\]
+
+and quantile envelopes such as
+
+\[
+\boxed{
+5\%,
+25\%,
+75\%,
+95\%.
+}
+\]
+
+This displays uncertainty without overwhelming the figure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Visual Plausibility Is Not Validation}
+\label{subsec:simulation-visual-plausibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An animation may appear realistic while the model is mathematically or
+physically wrong.
+
+Simulation quality must be assessed using:
+
+\[
+\boxed{
+\text{convergence},
+}
+\]
+
+\[
+\boxed{
+\text{conservation},
+}
+\]
+
+\[
+\boxed{
+\text{data comparison},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{uncertainty analysis}.
+}
+\]
+
+A visually appealing result is not sufficient evidence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example: Projectile Simulation}
+\label{subsec:projectile-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ignoring air resistance, projectile motion satisfies
+
+\[
+\boxed{
+x''=0,
+}
+\]
+
+\[
+\boxed{
+y''=-g.
+}
+\]
+
+Introduce velocities
+
+\[
+v_x=x',
+\qquad
+v_y=y'.
+\]
+
+Then
+
+\[
+\boxed{
+x'=v_x,
+}
+\]
+
+\[
+\boxed{
+y'=v_y,
+}
+\]
+
+\[
+\boxed{
+v_x'=0,
+}
+\]
+
+and
+
+\[
+\boxed{
+v_y'=-g.
+}
+\]
+
+A numerical ODE solver can simulate the trajectory until
+
+\[
+y(t)=0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projectile Event Detection}
+\label{subsec:projectile-event-detection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define event function
+
+\[
+\boxed{
+g_{\mathrm{event}}(t,x,y,v_x,v_y)
+=
+y.
+}
+\]
+
+The impact occurs when
+
+\[
+\boxed{
+y=0
+}
+\]
+
+while the projectile is moving downward.
+
+Accurate event location avoids relying on whichever discrete step first
+produces a negative height.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example: Predator--Prey Simulation}
+\label{subsec:predator-prey-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Lotka--Volterra equations are
+
+\[
+\boxed{
+\frac{dx}{dt}
+=
+\alpha x-\beta xy,
+}
+\]
+
+\[
+\boxed{
+\frac{dy}{dt}
+=
+\delta xy-\gamma y.
+}
+\]
+
+Here:
+
+\[
+x(t)
+=
+\text{prey population},
+\]
+
+and
+
+\[
+y(t)
+=
+\text{predator population}.
+\]
+
+Simulation can reveal oscillatory population dynamics and dependence on
+parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example: Epidemic Simulation}
+\label{subsec:epidemic-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An SEIR-type model may use
+
+\[
+\boxed{
+S+E+I+R=N.
+}
+\]
+
+A possible deterministic system is
+
+\[
+\boxed{
+\frac{dS}{dt}
+=
+-\beta
+\frac{SI}{N},
+}
+\]
+
+\[
+\boxed{
+\frac{dE}{dt}
+=
+\beta
+\frac{SI}{N}
+-
+\sigma E,
+}
+\]
+
+\[
+\boxed{
+\frac{dI}{dt}
+=
+\sigma E
+-
+\gamma I,
+}
+\]
+
+\[
+\boxed{
+\frac{dR}{dt}
+=
+\gamma I.
+}
+\]
+
+Simulation can compare interventions by modifying parameters or movement
+rules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example: Inventory Simulation}
+\label{subsec:inventory-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+I_t
+\]
+
+denote inventory.
+
+A simple discrete update is
+
+\[
+\boxed{
+I_{t+1}
+=
+I_t
++
+Q_t
+-
+D_t,
+}
+\]
+
+where
+
+\[
+Q_t
+\]
+
+is replenishment and
+
+\[
+D_t
+\]
+
+is demand.
+
+If demand is random, repeated simulation estimates:
+
+\[
+\boxed{
+\text{stockout probability},
+}
+\]
+
+\[
+\boxed{
+\text{holding cost},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{service level}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example: Reliability Simulation}
+\label{subsec:reliability-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose component lifetimes are random:
+
+\[
+\boxed{
+T_i.
+}
+\]
+
+System failure time
+
+\[
+T_{\mathrm{sys}}
+\]
+
+depends on how components are connected.
+
+Monte Carlo simulation samples the component lifetimes, evaluates the
+system failure rule, and estimates quantities such as
+
+\[
+\boxed{
+P(T_{\mathrm{sys}}\leq t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example: Financial Path Simulation}
+\label{subsec:financial-path-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stochastic asset model may satisfy
+
+\[
+\boxed{
+dS_t
+=
+\mu S_t\,dt
++
+\sigma S_t\,dW_t.
+}
+\]
+
+Simulated paths
+
+\[
+S_t^{(1)},
+\ldots,
+S_t^{(N)}
+\]
+
+can estimate distributions of future asset values or path-dependent
+payoffs.
+
+The simulation must account for both stochastic sampling error and
+time-discretization error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Credibility}
+\label{subsec:simulation-credibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A credible simulation should provide evidence concerning:
+
+\[
+\boxed{
+\text{model assumptions},
+}
+\]
+
+\[
+\boxed{
+\text{implementation correctness},
+}
+\]
+
+\[
+\boxed{
+\text{numerical accuracy},
+}
+\]
+
+\[
+\boxed{
+\text{parameter uncertainty},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{validation against observations}.
+}
+\]
+
+Credibility is built through multiple independent checks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulation Workflow}
+\label{subsec:mathematical-simulation-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A complete simulation workflow is:
+
+\begin{enumerate}
+    \item define the scientific or operational question;
+    \item identify quantities of interest;
+    \item formulate the mathematical model;
+    \item identify states, parameters, inputs, and outputs;
+    \item state assumptions explicitly;
+    \item determine whether the model is deterministic or stochastic;
+    \item determine whether it is continuous-time, discrete-time, or
+          event-driven;
+    \item specify initial and boundary conditions;
+    \item select parameter values or parameter distributions;
+    \item choose numerical methods;
+    \item select time step, mesh, or solver tolerances;
+    \item implement the simulation;
+    \item verify the implementation on simple cases;
+    \item monitor invariants and constraints;
+    \item perform numerical convergence studies;
+    \item determine the appropriate simulation horizon;
+    \item identify and handle transient behavior;
+    \item perform stochastic replications when required;
+    \item estimate simulation uncertainty;
+    \item perform sensitivity analysis;
+    \item calibrate uncertain parameters when data are available;
+    \item validate against independent observations;
+    \item compare alternative scenarios;
+    \item document metadata and random seeds;
+    \item visualize important outputs;
+    \item report uncertainty and limitations;
+    \item preserve enough information for reproducibility.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Simulation Approach}
+\label{subsec:choosing-simulation-approach}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For smooth deterministic dynamics, consider:
+
+\[
+\boxed{
+\text{ODE or PDE simulation}.
+}
+\]
+
+For systems driven by discrete events, consider:
+
+\[
+\boxed{
+\text{discrete-event simulation}.
+}
+\]
+
+For heterogeneous interacting individuals, consider:
+
+\[
+\boxed{
+\text{agent-based simulation}.
+}
+\]
+
+For random systems with known transition structure, consider:
+
+\[
+\boxed{
+\text{stochastic-process simulation}.
+}
+\]
+
+For uncertainty propagation, consider:
+
+\[
+\boxed{
+\text{Monte Carlo ensembles}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:mathematical-simulation-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing the Model With Reality}
+
+A simulation approximates a mathematical model.
+
+Even a perfectly computed solution may fail to represent the real system
+adequately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing the Model With the Numerical Method}
+
+For example,
+
+\[
+\dot{x}=f(x)
+\]
+
+is the model.
+
+Euler's method is only one possible numerical algorithm for simulating it.
+
+Changing the numerical solver should not change the mathematical model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using One Stochastic Run as the Expected Outcome}
+
+One realization may be highly atypical.
+
+Use independent replications and statistical summaries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reporting Only the Mean}
+
+A mean can hide:
+
+\[
+\boxed{
+\text{large variance},
+}
+\]
+
+\[
+\boxed{
+\text{skewness},
+}
+\]
+
+\[
+\boxed{
+\text{multimodality},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{extreme tails}.
+}
+\]
+
+Report distributional information when it matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Warm-Up Bias}
+
+A queue initialized empty may not represent long-run behavior.
+
+Steady-state estimation must account for transient initialization effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Discarding Warm-Up in a Finite-Horizon Problem}
+
+If the actual system begins empty, the transient may be physically
+meaningful.
+
+Do not remove it merely because steady-state simulation often uses
+warm-up deletion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Arbitrary Simulation Horizon}
+
+A horizon that is too short can miss important long-term behavior.
+
+A horizon that is unnecessarily long wastes computation.
+
+Choose it according to the scientific objective and system time scales.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Numerical Stability}
+
+An exploding simulation may result from an unstable discretization rather
+than an unstable physical model.
+
+Repeat with a smaller time step or a more appropriate method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Conservation Laws}
+
+If the exact model conserves mass or population, major numerical drift is
+a warning sign.
+
+Track known invariants.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Tiny Negative Values as Automatically Physical}
+
+A concentration of
+
+\[
+-10^{-8}
+\]
+
+may simply be numerical error.
+
+The model's admissible state space should guide interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Changing Many Parameters at Once Without Experimental Design}
+
+The resulting output change may be difficult to attribute.
+
+Use structured scenario analysis or experimental design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using One-at-a-Time Sensitivity to Infer Interactions}
+
+One-at-a-time methods do not reveal parameter interactions.
+
+Use global or factorial approaches when interactions matter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Calibrating and Validating on the Same Data}
+
+A model can appear artificially accurate when tested on the data used to
+fit it.
+
+Independent validation data provide stronger evidence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Good Fit Proves the Model Mechanism Is Correct}
+
+Different parameter sets or even different models may fit the same data.
+
+Predictive agreement does not automatically identify the true mechanism.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Identifiability}
+
+An optimizer may return one parameter vector even when many nearly
+equivalent vectors fit the data.
+
+Investigate identifiability and parameter uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Simulation Runs Fix Model Bias}
+
+Increasing replication reduces Monte Carlo error.
+
+It does not eliminate:
+
+\[
+\boxed{
+\text{model-form error}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{systematic parameter bias}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Surrogate Outside Its Training Region}
+
+A surrogate may interpolate well but extrapolate poorly.
+
+Validate over the region where it will actually be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Saving Results Without Configuration Metadata}
+
+A trajectory without parameter values, solver tolerances, and seed
+information may be impossible to reproduce.
+
+Store simulation metadata with outputs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming an Animation Is Evidence of Correctness}
+
+A realistic-looking animation can still arise from incorrect equations or
+unstable numerics.
+
+Use quantitative verification and validation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:mathematical-simulation-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Epidemiology.}
+Compartment and agent-based models simulate infection spread, intervention
+strategies, mobility, vaccination, and healthcare demand.
+
+\medskip
+
+\textbf{Ecology.}
+Population, predator--prey, competition, dispersal, and spatial models can
+be explored computationally.
+
+\medskip
+
+\textbf{Engineering.}
+Simulation predicts stress, temperature, fluid flow, control-system
+response, reliability, and manufacturing performance.
+
+\medskip
+
+\textbf{Physics.}
+Particle motion, waves, fields, statistical systems, and dynamical systems
+are commonly studied through numerical simulation.
+
+\medskip
+
+\textbf{Operations Research.}
+Queues, inventories, transportation systems, staffing policies, and
+service operations are evaluated through discrete-event and stochastic
+simulation.
+
+\medskip
+
+\textbf{Finance.}
+Stochastic path simulation is used for pricing, risk analysis, portfolio
+evaluation, and scenario generation.
+
+\medskip
+
+\textbf{Environmental Science.}
+Climate, hydrology, pollution transport, ecosystems, and ocean-atmosphere
+systems require large-scale mathematical simulations.
+
+\medskip
+
+\textbf{Mathematical Research.}
+Simulation provides numerical experiments that can reveal patterns,
+suggest conjectures, test asymptotic regimes, and explore models before
+formal analysis is available.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:mathematical-simulation-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define mathematical simulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish a model from a simulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a state variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a simulation parameter.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish deterministic and stochastic simulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish static and dynamic simulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define event-driven simulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define agent-based simulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a simulation replication.
+\end{exercise}
+
+\begin{exercise}[1]
+Define model validation.
+\end{exercise}
+
+\begin{exercise}[2]
+Identify the states and parameters in a logistic population model.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform three updates of a discrete logistic model.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the update rule for a simple inventory model.
+\end{exercise}
+
+\begin{exercise}[2]
+Describe the state variables of a single-server queue.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a future-event list containing three arrivals and two
+departures.
+\end{exercise}
+
+\begin{exercise}[3]
+Process one event and update the event calendar.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare time-driven and event-driven simulation for a queue.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a simple synchronous agent update rule.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how asynchronous updating could change the outcome.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the SIR model and verify that
+
+\[
+S+I+R
+\]
+
+is conserved.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a numerical diagnostic for population conservation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a network-state model using an adjacency matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a two-state Markov-chain simulation algorithm.
+\end{exercise}
+
+\begin{exercise}[2]
+Choose a reasonable simulation horizon for a specified finite-duration
+system and explain the choice.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why an empty initial queue may bias steady-state estimates.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain when a warm-up period should not be discarded.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a time-step refinement study for a dynamic simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how to distinguish physical instability from numerical
+instability.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a positivity check for a compartment model.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the ensemble mean from five stochastic replications.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the sample variance across replications.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an approximate confidence interval for a simulation mean.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a pointwise confidence interval is not automatically a
+simultaneous trajectory band.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish aleatoric and parametric uncertainty.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a Monte Carlo uncertainty-propagation experiment.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate an exceedance probability
+
+\[
+P(Y>c)
+\]
+
+from simulation output.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate a simulation quantile from sorted outputs.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct three explicit scenarios for a population model.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a controlled comparison between two policy scenarios.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a two-parameter simulation sweep.
+\end{exercise}
+
+\begin{exercise}[3]
+Approximate a local parameter sensitivity using centered differences.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a normalized sensitivity coefficient.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why one-at-a-time sensitivity misses interactions.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe global sensitivity analysis.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct a least-squares calibration objective.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a weighted least-squares calibration objective.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain simulation-based parameter estimation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the relationship between calibration and inverse problems.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of a structurally unidentifiable model parameterization.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe signs of practical nonidentifiability.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish calibration, verification, and validation.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a benchmark test for a numerical simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a synthetic-data parameter-recovery experiment.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a convergence-order calculation from supplied simulation errors.
+\end{exercise}
+
+\begin{exercise}[3]
+Identify possible sources of discrepancy between simulation and
+experiment.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain model-form error.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why numerical refinement cannot eliminate model-form error.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a residual analysis for calibrated time-series data.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between confidence and prediction intervals.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why naive simulation can be inefficient for rare-event
+probabilities.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe an importance-sampling approach to rare-event simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a simulation-based optimization objective.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the objective may be noisy.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how common random numbers can improve comparison of two decisions.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a quadratic response-surface model for two parameters.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe how to validate a surrogate model.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain reduced-order simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the tradeoff between reduced-model speed and accuracy.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a \(2^3\) factorial simulation design.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why factorial designs reveal interactions.
+\end{exercise}
+
+\begin{exercise}[3]
+List the metadata that should accompany a simulation result.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a checkpoint strategy for a long stochastic simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why random generator state may need to be checkpointed.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a parallel ensemble simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how to prevent overlapping random streams across workers.
+\end{exercise}
+
+\begin{exercise}[3]
+Design an uncertainty visualization for a stochastic trajectory.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why visualization alone is insufficient for validation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study discrete-event simulation theory for queueing systems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stochastic simulation algorithms for continuous-time Markov chains.
+\end{exercise}
+
+\begin{exercise}[4]
+Study exact stochastic chemical-reaction simulation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study agent-based epidemic models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study network epidemic simulation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study chaotic sensitivity and Lyapunov exponents in simulation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study structural identifiability of nonlinear ODE models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study profile likelihood for practical identifiability.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Bayesian calibration of simulation models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study model discrepancy in calibration.
+\end{exercise}
+
+\begin{exercise}[4]
+Study global variance-based sensitivity indices.
+\end{exercise}
+
+\begin{exercise}[4]
+Study uncertainty propagation using polynomial chaos.
+\end{exercise}
+
+\begin{exercise}[4]
+Study rare-event splitting algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study simulation optimization with noisy objectives.
+\end{exercise}
+
+\begin{exercise}[4]
+Study surrogate-based optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Gaussian-process surrogate modeling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study reduced-order modeling for dynamical systems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study verification and validation frameworks for computational models.
+\end{exercise}
+
+\begin{exercise}[4]
+Design a complete reproducible simulation study from model formulation to
+validation.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:mathematical-simulation-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mathematical simulation combines
+
+\[
+\boxed{
+\text{model}
++
+\text{numerical method}
++
+\text{computational experiment}.
+}
+\]
+
+Simulations may be
+
+\[
+\boxed{
+\text{deterministic or stochastic},
+}
+\]
+
+\[
+\boxed{
+\text{static or dynamic},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{time-driven or event-driven}.
+}
+\]
+
+A simulation state may evolve through
+
+\[
+\boxed{
+\dot{x}
+=
+f(x,t;\theta)
+}
+\]
+
+or
+
+\[
+\boxed{
+x_{n+1}
+=
+F(x_n,n;\theta).
+}
+\]
+
+Reliable simulation requires
+
+\[
+\boxed{
+\text{verification}
++
+\text{validation}
++
+\text{uncertainty quantification}
++
+\text{sensitivity analysis}.
+}
+\]
+
+Calibration may be written as
+
+\[
+\boxed{
+\min_\theta
+J(\theta),
+}
+\]
+
+where evaluating \(J\) may itself require a full simulation.
+
+Stochastic studies require repeated runs and statistical summaries.
+
+Simulation is therefore not merely running code. It is a controlled
+mathematical experiment requiring careful modeling, numerical analysis,
+statistical reasoning, and computational documentation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:mathematical-simulation-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Mathematical Simulation combines many of the computational tools developed
+throughout Chapter~11. Numerical ODE and PDE methods generate deterministic
+trajectories and fields, Monte Carlo methods produce stochastic ensembles,
+Numerical Optimization supports calibration and simulation-based
+optimization, and Scientific Computing provides the software,
+parallelization, verification, and reproducibility infrastructure needed
+for large computational studies. Simulation also forms a central bridge to
+the applied modeling topics of Chapter~13, where biological, physical,
+financial, economic, network, and control systems are formulated in
+application-specific detail. The next section, High-Performance
+Mathematical Computing, develops the algorithms and computational
+architectures required to scale mathematical calculations to large
+problems, distributed systems, accelerators, and modern high-performance
+hardware.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.10 Mathematical Simulation
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard mathematical modeling and simulation methodology.
+%   - Standard deterministic and stochastic simulation concepts.
+%   - Standard verification, validation, calibration, sensitivity, and
+%     uncertainty-quantification principles.
+%
+% Used for:
+%   - mathematical simulation definition;
+%   - model versus simulation distinction;
+%   - states, parameters, inputs, and outputs;
+%   - deterministic and stochastic simulation;
+%   - static and dynamic simulation;
+%   - continuous- and discrete-time simulation;
+%   - time-driven simulation;
+%   - event-driven simulation;
+%   - event calendars;
+%   - queue simulation;
+%   - agent-based simulation;
+%   - synchronous and asynchronous updates;
+%   - compartment models;
+%   - conservation diagnostics;
+%   - network simulation;
+%   - cellular automata;
+%   - Markov state transitions;
+%   - simulation horizons;
+%   - transient and steady-state behavior;
+%   - warm-up periods;
+%   - finite-horizon simulation;
+%   - time-step selection;
+%   - physical and numerical time scales;
+%   - physical versus numerical instability;
+%   - initial-condition sensitivity;
+%   - chaotic behavior;
+%   - conservation, positivity, and boundedness diagnostics;
+%   - stochastic replications;
+%   - ensemble means;
+%   - simulation confidence intervals;
+%   - aleatoric and parametric uncertainty;
+%   - uncertainty propagation;
+%   - output distributions;
+%   - scenario analysis;
+%   - parameter sweeps;
+%   - local and global sensitivity;
+%   - normalized sensitivity;
+%   - variance-based sensitivity preview;
+%   - calibration;
+%   - weighted least squares;
+%   - simulation-based parameter estimation;
+%   - inverse problems;
+%   - structural and practical identifiability;
+%   - calibration versus validation;
+%   - code and solution verification;
+%   - benchmark problems;
+%   - convergence studies;
+%   - synthetic data;
+%   - residual analysis;
+%   - simulation error decomposition;
+%   - model-form error;
+%   - uncertainty quantification;
+%   - confidence and prediction intervals;
+%   - rare-event simulation;
+%   - simulation-based optimization;
+%   - noisy objectives;
+%   - common random numbers;
+%   - surrogate models;
+%   - response surfaces;
+%   - reduced-order simulation;
+%   - digital experiments;
+%   - factorial simulation designs;
+%   - replication and randomization;
+%   - simulation metadata and data management;
+%   - checkpointing and restart;
+%   - parallel simulation;
+%   - parallel random streams;
+%   - simulation visualization;
+%   - phase portraits;
+%   - ensemble visualization;
+%   - projectile, predator--prey, epidemic, inventory, reliability, and
+%     financial simulation examples;
+%   - applications and exercises.
+%
+% Notes:
+%   - High-Performance Mathematical Computing is developed next in
+%     Section 11.11.
+%   - Mathematical Modeling is developed in Chapter 13.
+%   - Numerical ODEs appear in Section 11.4.
+%   - Numerical PDEs appear in Section 11.5.
+%   - Monte Carlo Methods appear in Section 11.6.
+%   - Scientific Computing appears in Section 11.7.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

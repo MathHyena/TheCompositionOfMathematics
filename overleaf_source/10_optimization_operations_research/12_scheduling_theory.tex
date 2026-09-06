@@ -1,0 +1,4372 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.12 SCHEDULING THEORY
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Scheduling Theory}
+\label{sec:scheduling-theory}
+
+\prerequisite{
+Optimization fundamentals, combinatorial optimization, integer
+programming, dynamic programming, graph theory, queueing concepts,
+probability, and basic algorithmic complexity.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a scheduling problem;
+    \item identify jobs, machines, processing times, release dates, and
+          due dates;
+    \item define completion time, flow time, lateness, tardiness,
+          earliness, and makespan;
+    \item distinguish single-machine, parallel-machine, flow-shop,
+          job-shop, and open-shop environments;
+    \item interpret standard three-field scheduling notation;
+    \item distinguish preemptive and nonpreemptive scheduling;
+    \item model precedence constraints;
+    \item construct precedence graphs;
+    \item understand critical paths;
+    \item formulate common scheduling objectives;
+    \item use shortest-processing-time sequencing;
+    \item use earliest-due-date sequencing;
+    \item understand Smith's weighted shortest-processing-time rule;
+    \item recognize Moore--Hodgson scheduling for minimizing the number
+          of tardy jobs;
+    \item understand list scheduling;
+    \item use longest-processing-time scheduling for parallel machines;
+    \item understand approximation guarantees for list scheduling;
+    \item apply Johnson's rule to a two-machine flow shop;
+    \item formulate disjunctive machine constraints;
+    \item formulate scheduling problems as mixed-integer programs;
+    \item recognize time-indexed formulations;
+    \item understand sequence-dependent setup times;
+    \item distinguish regular and nonregular scheduling objectives;
+    \item understand release-date scheduling;
+    \item understand preemptive scheduling conceptually;
+    \item recognize shortest-remaining-processing-time scheduling;
+    \item understand weighted completion-time objectives;
+    \item understand maximum lateness and total tardiness;
+    \item recognize scheduling problems that are computationally hard;
+    \item derive lower bounds for makespan;
+    \item understand branch-and-bound for scheduling;
+    \item understand dynamic-programming approaches conceptually;
+    \item recognize local-search and neighborhood methods;
+    \item understand critical-path scheduling in project networks;
+    \item distinguish CPM and PERT conceptually;
+    \item compute basic PERT expected activity times;
+    \item understand resource-constrained project scheduling conceptually;
+    \item recognize workforce and shift scheduling;
+    \item connect scheduling theory with manufacturing, transportation,
+          computing, logistics, healthcare, and project management.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Scheduling?}
+\label{subsec:what-is-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scheduling determines:
+
+\[
+\boxed{
+\text{when}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{where}
+}
+\]
+
+jobs should be processed using limited resources.
+
+A typical scheduling problem contains:
+
+\[
+\boxed{
+\text{jobs}
++
+\text{machines}
++
+\text{processing requirements}
++
+\text{timing constraints}.
+}
+\]
+
+The objective is usually to improve some measure of:
+
+\[
+\boxed{
+\text{time},
+}
+\]
+
+\[
+\boxed{
+\text{delay},
+}
+\]
+
+\[
+\boxed{
+\text{throughput},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{resource utilization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jobs}
+\label{subsec:scheduling-jobs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+J
+=
+\{1,2,\ldots,n\}
+\]
+
+be the set of jobs.
+
+A job may represent:
+
+\[
+\boxed{
+\text{a manufactured part},
+}
+\]
+
+\[
+\boxed{
+\text{a computer task},
+}
+\]
+
+\[
+\boxed{
+\text{an aircraft operation},
+}
+\]
+
+\[
+\boxed{
+\text{a maintenance request},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a project activity}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Machines and Resources}
+\label{subsec:scheduling-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+M
+=
+\{1,2,\ldots,m\}
+\]
+
+be the set of machines or resources.
+
+A machine may represent:
+
+\[
+\boxed{
+\text{physical equipment},
+}
+\]
+
+\[
+\boxed{
+\text{a worker},
+}
+\]
+
+\[
+\boxed{
+\text{a runway},
+}
+\]
+
+\[
+\boxed{
+\text{a processor},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a service station}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Processing Time}
+\label{subsec:scheduling-processing-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The processing time of job \(j\) is commonly denoted
+
+\[
+\boxed{
+p_j.
+}
+\]
+
+If processing time depends on the machine, write
+
+\[
+\boxed{
+p_{ij}
+}
+\]
+
+for the time required to process job \(j\) on machine \(i\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Start and Completion Times}
+\label{subsec:start-completion-times}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+S_j
+=
+\text{start time of job }j,
+\]
+
+and
+
+\[
+C_j
+=
+\text{completion time of job }j.
+\]
+
+For a nonpreemptive job with processing time \(p_j\),
+
+\[
+\boxed{
+C_j
+=
+S_j+p_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Release Dates}
+\label{subsec:scheduling-release-dates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A release date
+
+\[
+\boxed{
+r_j
+}
+\]
+
+is the earliest time at which job \(j\) may begin.
+
+Thus,
+
+\[
+\boxed{
+S_j
+\geq
+r_j.
+}
+\]
+
+A job cannot be processed before the required material, information, or
+resource becomes available.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Due Dates}
+\label{subsec:scheduling-due-dates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A due date
+
+\[
+\boxed{
+d_j
+}
+\]
+
+is the desired completion time of job \(j\).
+
+A job completing after \(d_j\) is late in the ordinary scheduling sense.
+
+Due dates create several important performance measures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Completion Time}
+\label{subsec:scheduling-completion-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The completion time of job \(j\) is simply
+
+\[
+\boxed{
+C_j.
+}
+\]
+
+The sum of completion times,
+
+\[
+\boxed{
+\sum_{j=1}^{n}
+C_j,
+}
+\]
+
+is a common measure of total system congestion when all jobs are available
+at time zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow Time}
+\label{subsec:scheduling-flow-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The flow time of job \(j\) is
+
+\[
+\boxed{
+F_j
+=
+C_j-r_j.
+}
+\]
+
+It measures how long the job remains in the system after becoming
+available.
+
+If every job has
+
+\[
+r_j=0,
+\]
+
+then
+
+\[
+\boxed{
+F_j=C_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lateness}
+\label{subsec:scheduling-lateness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The lateness of job \(j\) is
+
+\[
+\boxed{
+L_j
+=
+C_j-d_j.
+}
+\]
+
+If
+
+\[
+L_j>0,
+\]
+
+the job finishes late.
+
+If
+
+\[
+L_j<0,
+\]
+
+the job finishes early.
+
+Thus lateness can be negative.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tardiness}
+\label{subsec:scheduling-tardiness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The tardiness of job \(j\) is
+
+\[
+\boxed{
+T_j
+=
+\max
+\{
+C_j-d_j,
+0
+\}.
+}
+\]
+
+Unlike lateness,
+
+\[
+\boxed{
+T_j\geq0.
+}
+\]
+
+Early completion does not produce negative tardiness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Earliness}
+\label{subsec:scheduling-earliness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The earliness of job \(j\) is
+
+\[
+\boxed{
+E_j
+=
+\max
+\{
+d_j-C_j,
+0
+\}.
+}
+\]
+
+A job cannot simultaneously be both early and tardy:
+
+\[
+\boxed{
+E_jT_j=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tardy-Job Indicator}
+\label{subsec:tardy-job-indicator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+U_j
+=
+\begin{cases}
+1,
+&
+C_j>d_j,
+\\
+0,
+&
+C_j\leq d_j.
+\end{cases}
+}
+\]
+
+Then
+
+\[
+\boxed{
+\sum_jU_j
+}
+\]
+
+is the number of tardy jobs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Makespan}
+\label{subsec:scheduling-makespan}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The makespan is the completion time of the final job:
+
+\[
+\boxed{
+C_{\max}
+=
+\max_j
+C_j.
+}
+\]
+
+Minimizing makespan seeks to finish all work as early as possible.
+
+This objective is especially important for parallel-machine and shop
+scheduling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Lateness}
+\label{subsec:maximum-lateness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Maximum lateness is
+
+\[
+\boxed{
+L_{\max}
+=
+\max_j
+L_j.
+}
+\]
+
+Minimizing \(L_{\max}\) protects against the worst due-date deviation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Tardiness}
+\label{subsec:total-tardiness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Total tardiness is
+
+\[
+\boxed{
+\sum_{j=1}^{n}
+T_j.
+}
+\]
+
+A weighted version is
+
+\[
+\boxed{
+\sum_{j=1}^{n}
+w_jT_j,
+}
+\]
+
+where \(w_j\) represents the importance of job \(j\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Completion Time}
+\label{subsec:weighted-completion-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If jobs have weights
+
+\[
+w_j>0,
+\]
+
+the total weighted completion time is
+
+\[
+\boxed{
+\sum_{j=1}^{n}
+w_jC_j.
+}
+\]
+
+This penalizes delay of high-priority jobs more strongly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regular Objectives}
+\label{subsec:regular-scheduling-objectives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scheduling objective is regular if delaying any job cannot improve the
+objective while all other completion times remain fixed.
+
+Examples include:
+
+\[
+\boxed{
+C_{\max},
+}
+\]
+
+\[
+\boxed{
+\sum C_j,
+}
+\]
+
+\[
+\boxed{
+L_{\max},
+}
+\]
+
+and
+
+\[
+\boxed{
+\sum T_j.
+}
+\]
+
+Regular objectives generally provide no incentive to insert unnecessary
+idle time when a job is available and feasible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonregular Objectives}
+\label{subsec:nonregular-scheduling-objectives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Objectives involving earliness can be nonregular.
+
+For example,
+
+\[
+\boxed{
+\sum_j
+(
+\alpha_jE_j+\beta_jT_j
+)
+}
+\]
+
+may penalize completing jobs too early as well as too late.
+
+In such problems, intentional idle time may be optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preemption}
+\label{subsec:scheduling-preemption}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A preemptive schedule allows a job to be interrupted and resumed later.
+
+A nonpreemptive schedule requires a started operation to continue until
+completion.
+
+Preemption is possible in some computer systems but impossible or costly
+in many manufacturing processes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Machine Environments}
+\label{subsec:scheduling-machine-environments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Important scheduling environments include:
+
+\[
+\boxed{
+\text{single machine},
+}
+\]
+
+\[
+\boxed{
+\text{parallel machines},
+}
+\]
+
+\[
+\boxed{
+\text{flow shop},
+}
+\]
+
+\[
+\boxed{
+\text{job shop},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{open shop}.
+}
+\]
+
+Each environment imposes different technological restrictions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Single-Machine Scheduling}
+\label{subsec:single-machine-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In single-machine scheduling,
+
+\[
+\boxed{
+m=1.
+}
+\]
+
+At most one job can be processed at a time.
+
+The main decision is often the sequence in which jobs should be processed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Identical Parallel Machines}
+\label{subsec:identical-parallel-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For identical parallel machines, each job has the same processing time on
+every machine.
+
+This environment is commonly denoted
+
+\[
+\boxed{
+P_m.
+}
+\]
+
+The scheduling decision determines both:
+
+\[
+\boxed{
+\text{machine assignment}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{job sequence}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uniform Parallel Machines}
+\label{subsec:uniform-parallel-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uniform machines have different speeds.
+
+If machine \(i\) has speed
+
+\[
+s_i,
+\]
+
+then a job with workload \(p_j\) may require
+
+\[
+\boxed{
+\frac{p_j}{s_i}
+}
+\]
+
+time on machine \(i\).
+
+This environment is commonly denoted
+
+\[
+\boxed{
+Q_m.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unrelated Parallel Machines}
+\label{subsec:unrelated-parallel-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For unrelated machines, processing time may depend arbitrarily on both the
+job and the machine:
+
+\[
+\boxed{
+p_{ij}.
+}
+\]
+
+This environment is commonly denoted
+
+\[
+\boxed{
+R_m.
+}
+\]
+
+It is substantially more general than identical-machine scheduling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow-Shop Scheduling}
+\label{subsec:flow-shop-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a flow shop, every job visits machines in the same order.
+
+For example,
+
+\[
+\boxed{
+M_1
+\to
+M_2
+\to
+M_3.
+}
+\]
+
+A job cannot begin its operation on \(M_2\) until it completes its
+operation on \(M_1\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Job-Shop Scheduling}
+\label{subsec:job-shop-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a job shop, different jobs may require different machine routes.
+
+For example,
+
+\[
+J_1:
+M_1
+\to
+M_3
+\to
+M_2,
+\]
+
+while
+
+\[
+J_2:
+M_2
+\to
+M_1.
+\]
+
+This flexibility makes job-shop scheduling computationally difficult.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Open-Shop Scheduling}
+\label{subsec:open-shop-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In an open shop, each job may require processing on several machines, but
+the order of those operations is not fixed in advance.
+
+The schedule determines both:
+
+\[
+\boxed{
+\text{operation ordering}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{resource timing}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Three-Field Scheduling Notation}
+\label{subsec:three-field-scheduling-notation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scheduling problem is often represented using
+
+\[
+\boxed{
+\alpha
+\mid
+\beta
+\mid
+\gamma.
+}
+\]
+
+Here:
+
+\[
+\alpha
+=
+\text{machine environment},
+\]
+
+\[
+\beta
+=
+\text{processing restrictions},
+\]
+
+and
+
+\[
+\gamma
+=
+\text{objective}.
+\]
+
+This is commonly called Graham's three-field notation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Examples of Scheduling Notation}
+\label{subsec:scheduling-notation-examples}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For example,
+
+\[
+\boxed{
+1
+\mid
+\mid
+\sum C_j
+}
+\]
+
+means:
+
+\[
+\boxed{
+\text{one machine, no additional restrictions, minimize total completion
+time}.
+}
+\]
+
+Similarly,
+
+\[
+\boxed{
+P_m
+\mid
+\mid
+C_{\max}
+}
+\]
+
+means:
+
+\[
+\boxed{
+\text{identical parallel machines, minimize makespan}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Restriction Symbols}
+\label{subsec:scheduling-restriction-symbols}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Examples appearing in the middle field include:
+
+\[
+\boxed{
+r_j
+}
+\]
+
+for release dates,
+
+\[
+\boxed{
+\mathrm{prec}
+}
+\]
+
+for precedence constraints,
+
+\[
+\boxed{
+\mathrm{pmtn}
+}
+\]
+
+for preemption,
+
+and
+
+\[
+\boxed{
+s_{ij}
+}
+\]
+
+for sequence-dependent setup times.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest Processing Time Rule}
+\label{subsec:spt-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The shortest processing time rule, abbreviated SPT, orders jobs by
+nondecreasing processing time:
+
+\[
+\boxed{
+p_1
+\leq
+p_2
+\leq
+\cdots
+\leq
+p_n.
+}
+\]
+
+For
+
+\[
+\boxed{
+1\mid\mid\sum C_j,
+}
+\]
+
+SPT is optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why SPT Minimizes Total Completion Time}
+\label{subsec:spt-proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two consecutive jobs \(i\) and \(j\) satisfy
+
+\[
+p_i>p_j,
+\]
+
+but \(i\) is scheduled before \(j\).
+
+Ignoring the completion time accumulated before them, their contribution
+to total completion time is
+
+\[
+p_i
++
+(p_i+p_j)
+=
+2p_i+p_j.
+\]
+
+If their order is reversed, the contribution is
+
+\[
+p_j
++
+(p_j+p_i)
+=
+p_i+2p_j.
+\]
+
+The difference is
+
+\[
+(2p_i+p_j)
+-
+(p_i+2p_j)
+=
+p_i-p_j
+>
+0.
+\]
+
+Therefore placing the shorter job first improves the objective.
+
+Repeated pairwise exchanges yield SPT order.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: SPT}
+\label{subsec:worked-spt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Minimizing Total Completion Time}
+
+Suppose four jobs have processing times
+
+\[
+p_A=6,
+\qquad
+p_B=2,
+\qquad
+p_C=5,
+\qquad
+p_D=1.
+\]
+
+SPT order is
+
+\[
+D,B,C,A.
+\]
+
+Completion times are
+
+\[
+C_D=1,
+\]
+
+\[
+C_B=3,
+\]
+
+\[
+C_C=8,
+\]
+
+and
+
+\[
+C_A=14.
+\]
+
+Therefore,
+
+\[
+\sum C_j
+=
+1+3+8+14
+=
+26.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+D\to B\to C\to A
+}
+\]
+
+minimizes total completion time.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Shortest Processing Time}
+\label{subsec:wspt-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\boxed{
+1\mid\mid\sum_jw_jC_j,
+}
+\]
+
+the optimal sequence is obtained by ordering jobs according to
+
+\[
+\boxed{
+\frac{p_j}{w_j}
+}
+\]
+
+in nondecreasing order.
+
+Equivalently, order by
+
+\[
+\boxed{
+\frac{w_j}{p_j}
+}
+\]
+
+in nonincreasing order.
+
+This is often called Smith's rule or the weighted shortest processing time
+rule.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pairwise Interchange for Smith's Rule}
+\label{subsec:smith-rule-proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose jobs \(i\) and \(j\) are adjacent.
+
+Scheduling \(i\) before \(j\) contributes, apart from prior completion
+time,
+
+\[
+w_i p_i
++
+w_j(p_i+p_j).
+\]
+
+Scheduling \(j\) before \(i\) contributes
+
+\[
+w_j p_j
++
+w_i(p_j+p_i).
+\]
+
+Placing \(i\) before \(j\) is no worse when
+
+\[
+w_jp_i
+\leq
+w_ip_j.
+\]
+
+Equivalently,
+
+\[
+\boxed{
+\frac{p_i}{w_i}
+\leq
+\frac{p_j}{w_j}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Earliest Due Date Rule}
+\label{subsec:edd-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The earliest due date rule, abbreviated EDD, orders jobs by nondecreasing
+due date:
+
+\[
+\boxed{
+d_1
+\leq
+d_2
+\leq
+\cdots
+\leq
+d_n.
+}
+\]
+
+For
+
+\[
+\boxed{
+1\mid\mid L_{\max},
+}
+\]
+
+EDD minimizes maximum lateness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: EDD}
+\label{subsec:worked-edd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Minimizing Maximum Lateness}
+
+Suppose jobs have
+
+\[
+(p_A,d_A)=(4,10),
+\]
+
+\[
+(p_B,d_B)=(3,5),
+\]
+
+\[
+(p_C,d_C)=(2,8).
+\]
+
+EDD order is
+
+\[
+B,C,A.
+\]
+
+Completion times are
+
+\[
+C_B=3,
+\]
+
+\[
+C_C=5,
+\]
+
+\[
+C_A=9.
+\]
+
+Lateness values are
+
+\[
+L_B=3-5=-2,
+\]
+
+\[
+L_C=5-8=-3,
+\]
+
+\[
+L_A=9-10=-1.
+\]
+
+Therefore,
+
+\[
+\boxed{
+L_{\max}=-1.
+}
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+B\to C\to A
+}
+\]
+
+is an EDD schedule.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Moore--Hodgson Algorithm}
+\label{subsec:moore-hodgson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\boxed{
+1\mid\mid\sum U_j,
+}
+\]
+
+the Moore--Hodgson algorithm minimizes the number of tardy jobs.
+
+The algorithm:
+
+\begin{enumerate}
+    \item orders jobs by EDD;
+    \item processes jobs in that order;
+    \item whenever the current sequence becomes tardy, removes the job
+          with the largest processing time among jobs currently scheduled;
+    \item places removed jobs after the on-time jobs.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of Moore--Hodgson}
+\label{subsec:moore-hodgson-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When an EDD prefix cannot meet all due dates, removing the longest job
+frees the largest amount of processing time.
+
+This maximizes the opportunity for the remaining jobs to finish on time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Tardiness Is Harder}
+\label{subsec:total-tardiness-hardness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Although EDD optimizes
+
+\[
+L_{\max},
+\]
+
+it does not generally minimize
+
+\[
+\sum_jT_j.
+\]
+
+Similarly, Moore--Hodgson minimizes the number of tardy jobs but not their
+total tardiness.
+
+The single-machine total-tardiness problem is substantially more
+difficult.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Critical Ratio Dispatching Rule}
+\label{subsec:critical-ratio-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common real-time dispatching priority index is
+
+\[
+\boxed{
+CR_j
+=
+\frac{
+d_j-t
+}{
+p_j^{\mathrm{remaining}}
+},
+}
+\]
+
+where \(t\) is the current time.
+
+A small critical ratio indicates greater urgency.
+
+This is a heuristic dispatching rule, not a general optimality theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Other Dispatching Rules}
+\label{subsec:other-dispatching-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Common shop-floor rules include:
+
+\[
+\boxed{
+\text{FIFO},
+}
+\]
+
+\[
+\boxed{
+\text{SPT},
+}
+\]
+
+\[
+\boxed{
+\text{EDD},
+}
+\]
+
+\[
+\boxed{
+\text{least slack},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{critical ratio}.
+}
+\]
+
+Different rules optimize different operational priorities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slack}
+\label{subsec:scheduling-slack}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At time \(t\), the slack of job \(j\) is
+
+\[
+\boxed{
+SL_j
+=
+d_j
+-
+t
+-
+p_j^{\mathrm{remaining}}.
+}
+\]
+
+A negative slack means the job cannot meet its due date even if processed
+continuously from the current time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Precedence Constraints}
+\label{subsec:scheduling-precedence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose job \(i\) must finish before job \(j\) begins.
+
+Write
+
+\[
+\boxed{
+i\prec j.
+}
+\]
+
+Then
+
+\[
+\boxed{
+S_j
+\geq
+C_i.
+}
+\]
+
+For nonpreemptive processing,
+
+\[
+\boxed{
+S_j
+\geq
+S_i+p_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Precedence Graph}
+\label{subsec:precedence-graph}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Precedence constraints can be represented by a directed acyclic graph.
+
+A directed edge
+
+\[
+i\to j
+\]
+
+means
+
+\[
+\boxed{
+i
+\text{ must precede }
+j.
+}
+\]
+
+A feasible schedule must respect a topological ordering of the graph.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Critical Path}
+\label{subsec:scheduling-critical-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a project network, a path from project start to project completion has
+length equal to the sum of activity durations along that path.
+
+The critical path is a longest-duration path.
+
+Its length gives a lower bound on project completion time:
+
+\[
+\boxed{
+C_{\max}
+\geq
+\text{critical-path length}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Earliest Start Times}
+\label{subsec:earliest-start-times}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a precedence-constrained project without resource conflicts, the
+earliest start time of an activity is determined by the completion of all
+its predecessors.
+
+If \(\operatorname{Pred}(j)\) is the predecessor set,
+
+\[
+\boxed{
+ES_j
+=
+\max_{i\in\operatorname{Pred}(j)}
+EF_i,
+}
+\]
+
+where
+
+\[
+\boxed{
+EF_i
+=
+ES_i+p_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Latest Start Times}
+\label{subsec:latest-start-times}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Working backward from the project completion time gives latest finish and
+latest start times.
+
+For activity \(j\),
+
+\[
+\boxed{
+LS_j
+=
+LF_j-p_j.
+}
+\]
+
+The total slack is
+
+\[
+\boxed{
+LS_j-ES_j.
+}
+\]
+
+Critical activities have zero slack.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Critical Path Method}
+\label{subsec:critical-path-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Critical Path Method, abbreviated CPM, assumes deterministic activity
+durations.
+
+The basic procedure is:
+
+\begin{enumerate}
+    \item construct the precedence network;
+    \item perform a forward pass;
+    \item determine project completion time;
+    \item perform a backward pass;
+    \item compute activity slack;
+    \item identify the critical path.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PERT}
+\label{subsec:pert}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Program Evaluation and Review Technique, abbreviated PERT, introduces
+uncertain activity durations.
+
+A classical PERT model uses:
+
+\[
+a
+=
+\text{optimistic duration},
+\]
+
+\[
+m
+=
+\text{most likely duration},
+\]
+
+and
+
+\[
+b
+=
+\text{pessimistic duration}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PERT Expected Duration}
+\label{subsec:pert-expected-duration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The classical PERT approximation uses
+
+\[
+\boxed{
+\mathbb{E}[T]
+\approx
+\frac{
+a+4m+b
+}{
+6
+}.
+}
+\]
+
+The approximate variance is
+
+\[
+\boxed{
+\operatorname{Var}(T)
+\approx
+\left(
+\frac{
+b-a
+}{
+6
+}
+\right)^2.
+}
+\]
+
+These formulas arise from the traditional beta-distribution approximation
+used in PERT.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: PERT Duration}
+\label{subsec:worked-pert-duration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Expected Activity Duration}
+
+Suppose an activity has:
+
+\[
+a=4,
+\qquad
+m=7,
+\qquad
+b=10.
+\]
+
+Then
+
+\[
+\mathbb{E}[T]
+\approx
+\frac{
+4+4(7)+10
+}{
+6
+}.
+\]
+
+Thus,
+
+\[
+\mathbb{E}[T]
+=
+\frac{42}{6}
+=
+7.
+\]
+
+The approximate variance is
+
+\[
+\left(
+\frac{10-4}{6}
+\right)^2
+=
+1.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\mathbb{E}[T]\approx7,
+\qquad
+\operatorname{Var}(T)\approx1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resource Constraints in Projects}
+\label{subsec:resource-constrained-projects}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Critical-path calculations assume that precedence is the main restriction.
+
+In practice, multiple activities may compete for limited resources.
+
+A resource capacity constraint may be written
+
+\[
+\boxed{
+\sum_j
+a_{rj}
+y_{jt}
+\leq
+R_r,
+}
+\]
+
+where:
+
+\[
+a_{rj}
+=
+\text{units of resource }r\text{ used by job }j,
+\]
+
+\[
+y_{jt}
+=
+\text{whether job }j\text{ is active at time }t,
+\]
+
+and
+
+\[
+R_r
+=
+\text{available capacity}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resource-Constrained Project Scheduling}
+\label{subsec:rcpsp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Resource-Constrained Project Scheduling Problem, abbreviated RCPSP,
+combines:
+
+\[
+\boxed{
+\text{precedence constraints}
+}
+\]
+
+with
+
+\[
+\boxed{
+\text{limited renewable resources}.
+}
+\]
+
+A common objective is
+
+\[
+\boxed{
+\min C_{\max}.
+}
+\]
+
+The RCPSP is computationally difficult in general.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel-Machine Makespan Scheduling}
+\label{subsec:parallel-machine-makespan}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For identical parallel machines,
+
+\[
+\boxed{
+P_m
+\mid
+\mid
+C_{\max},
+}
+\]
+
+jobs must be distributed among \(m\) machines.
+
+The load on machine \(i\) is
+
+\[
+\boxed{
+L_i
+=
+\sum_{j\text{ assigned to }i}
+p_j.
+}
+\]
+
+Then
+
+\[
+\boxed{
+C_{\max}
+=
+\max_i
+L_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lower Bounds for Parallel-Machine Makespan}
+\label{subsec:parallel-machine-lower-bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Any schedule must satisfy
+
+\[
+\boxed{
+C_{\max}
+\geq
+\frac{
+\sum_jp_j
+}{
+m
+}.
+}
+\]
+
+Also,
+
+\[
+\boxed{
+C_{\max}
+\geq
+\max_jp_j.
+}
+\]
+
+Therefore a basic lower bound is
+
+\[
+\boxed{
+LB
+=
+\max
+\left\{
+\frac{\sum_jp_j}{m},
+\;
+\max_jp_j
+\right\}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{List Scheduling}
+\label{subsec:list-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+List scheduling processes jobs in a specified list order.
+
+Whenever a machine becomes available, assign the next unscheduled job to
+that machine.
+
+For identical parallel machines and makespan minimization, any list order
+produces a schedule satisfying the classical bound
+
+\[
+\boxed{
+C_{\max}^{LS}
+\leq
+\left(
+2-\frac1m
+\right)
+C_{\max}^*.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Longest Processing Time Rule}
+\label{subsec:lpt-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Longest Processing Time, abbreviated LPT, first sorts jobs so that
+
+\[
+\boxed{
+p_1
+\geq
+p_2
+\geq
+\cdots
+\geq
+p_n.
+}
+\]
+
+Then list scheduling is applied.
+
+Large jobs are distributed early, reducing the risk that a large job
+creates a poor final imbalance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LPT Approximation Bound}
+\label{subsec:lpt-approximation-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+m\geq2,
+\]
+
+LPT satisfies the classical bound
+
+\[
+\boxed{
+C_{\max}^{LPT}
+\leq
+\left(
+\frac43
+-
+\frac{1}{3m}
+\right)
+C_{\max}^*.
+}
+\]
+
+Thus LPT has a stronger worst-case guarantee than arbitrary list
+scheduling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: LPT}
+\label{subsec:worked-lpt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Three Identical Machines}
+
+Suppose processing times are
+
+\[
+8,\ 7,\ 6,\ 5,\ 4,\ 3.
+\]
+
+There are
+
+\[
+m=3
+\]
+
+machines.
+
+LPT assigns:
+
+\[
+M_1:
+8+3=11,
+\]
+
+\[
+M_2:
+7+4=11,
+\]
+
+\[
+M_3:
+6+5=11.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+C_{\max}=11.
+}
+\]
+\end{answerbox}
+
+Since
+
+\[
+\frac{
+8+7+6+5+4+3
+}{
+3
+}
+=
+11,
+\]
+
+the lower bound is also \(11\).
+
+Hence the LPT schedule is optimal.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Load Balancing}
+\label{subsec:scheduling-load-balancing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel-machine makespan scheduling is a load-balancing problem.
+
+Each job contributes workload \(p_j\).
+
+The goal is to partition jobs among machines so that the largest total
+load is minimized.
+
+This connects scheduling with partitioning and combinatorial optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow-Shop Scheduling}
+\label{subsec:flow-shop-details}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose each job requires processing on two machines in order:
+
+\[
+M_1
+\to
+M_2.
+\]
+
+Let
+
+\[
+p_{1j}
+\]
+
+be processing time of job \(j\) on machine \(1\),
+
+and
+
+\[
+p_{2j}
+\]
+
+its processing time on machine \(2\).
+
+The problem
+
+\[
+\boxed{
+F_2
+\mid
+\mid
+C_{\max}
+}
+\]
+
+has an elegant optimal sequencing rule.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Johnson's Rule}
+\label{subsec:johnsons-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the two-machine flow-shop makespan problem, Johnson's rule is:
+
+\begin{enumerate}
+    \item find the smallest unscheduled processing time among all remaining
+          operations;
+    \item if it occurs on machine \(1\), place that job in the earliest
+          available position;
+    \item if it occurs on machine \(2\), place that job in the latest
+          available position;
+    \item remove the job and repeat.
+\end{enumerate}
+
+The resulting sequence minimizes makespan.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Alternative Statement of Johnson's Rule}
+\label{subsec:johnsons-rule-partition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Partition jobs into:
+
+\[
+\boxed{
+A
+=
+\{
+j:
+p_{1j}\leq p_{2j}
+\},
+}
+\]
+
+and
+
+\[
+\boxed{
+B
+=
+\{
+j:
+p_{1j}>p_{2j}
+\}.
+}
+\]
+
+Schedule jobs in \(A\) first in nondecreasing order of \(p_{1j}\).
+
+Then schedule jobs in \(B\) in nonincreasing order of \(p_{2j}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Johnson's Rule}
+\label{subsec:worked-johnson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Two-Machine Flow Shop}
+
+Suppose:
+
+\[
+\begin{array}{c|cccc}
+\text{Job}
+&
+A
+&
+B
+&
+C
+&
+D
+\\
+\hline
+p_{1j}
+&
+3
+&
+8
+&
+4
+&
+7
+\\
+p_{2j}
+&
+6
+&
+2
+&
+5
+&
+9
+\end{array}
+\]
+
+Jobs with
+
+\[
+p_{1j}\leq p_{2j}
+\]
+
+are
+
+\[
+A,C,D.
+\]
+
+Order these by increasing \(p_{1j}\):
+
+\[
+A,C,D.
+\]
+
+Job \(B\) belongs to the second group.
+
+Therefore Johnson's sequence is
+
+\begin{answerbox}
+\[
+\boxed{
+A\to C\to D\to B.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Flow Shops}
+\label{subsec:permutation-flow-shops}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a permutation flow shop, all machines process jobs in the same job
+order.
+
+If the sequence is
+
+\[
+J_3,J_1,J_2,
+\]
+
+then every machine processes jobs in that order.
+
+For more than two machines, makespan minimization is generally much more
+difficult than the Johnson-rule case.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Job-Shop Disjunctive Constraints}
+\label{subsec:job-shop-disjunctive}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two operations \(i\) and \(j\) require the same machine.
+
+They cannot overlap.
+
+Therefore either
+
+\[
+\boxed{
+S_i+p_i
+\leq
+S_j,
+}
+\]
+
+or
+
+\[
+\boxed{
+S_j+p_j
+\leq
+S_i.
+}
+\]
+
+This is a disjunctive constraint.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Sequencing Variable}
+\label{subsec:binary-sequencing-variable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+y_{ij}
+=
+\begin{cases}
+1,
+&
+i\text{ is scheduled before }j,
+\\
+0,
+&
+j\text{ is scheduled before }i.
+\end{cases}
+\]
+
+A Big-\(M\) formulation is
+
+\[
+\boxed{
+S_i+p_i
+\leq
+S_j
++
+M(1-y_{ij}),
+}
+\]
+
+and
+
+\[
+\boxed{
+S_j+p_j
+\leq
+S_i
++
+My_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing Big-\(M\) in Scheduling}
+\label{subsec:scheduling-big-m}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The value \(M\) must be large enough to deactivate the appropriate
+sequencing inequality.
+
+However, an excessively large value can create:
+
+\[
+\boxed{
+\text{weak LP relaxations}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{poor numerical conditioning}.
+}
+\]
+
+A valid scheduling horizon often provides a useful upper bound for \(M\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Makespan Variable in MILP}
+\label{subsec:makespan-variable-milp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Introduce variable
+
+\[
+C_{\max}.
+\]
+
+For every job,
+
+\[
+\boxed{
+C_j
+\leq
+C_{\max}.
+}
+\]
+
+Then minimize
+
+\[
+\boxed{
+C_{\max}.
+}
+\]
+
+This converts the maximum completion time into a linear objective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tardiness Linearization}
+\label{subsec:tardiness-linearization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Introduce variable
+
+\[
+T_j\geq0.
+\]
+
+Impose
+
+\[
+\boxed{
+T_j
+\geq
+C_j-d_j.
+}
+\]
+
+Then minimizing
+
+\[
+\boxed{
+\sum_jT_j
+}
+\]
+
+forces
+
+\[
+T_j
+=
+\max
+\{
+C_j-d_j,
+0
+\}
+\]
+
+at optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Indexed Scheduling Formulation}
+\label{subsec:time-indexed-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose time is discretized.
+
+Define
+
+\[
+x_{jt}
+=
+\begin{cases}
+1,
+&
+\text{job }j\text{ starts at time }t,
+\\
+0,
+&
+\text{otherwise}.
+\end{cases}
+\]
+
+Each job starts exactly once:
+
+\[
+\boxed{
+\sum_t
+x_{jt}
+=
+1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Indexed Capacity Constraints}
+\label{subsec:time-indexed-capacity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For one machine, at most one job may be active at time \(\tau\).
+
+Thus,
+
+\[
+\boxed{
+\sum_j
+\sum_{
+t:
+t\leq\tau<t+p_j
+}
+x_{jt}
+\leq
+1.
+}
+\]
+
+Time-indexed formulations can be strong but may require many binary
+variables.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Release Dates in Time-Indexed Models}
+\label{subsec:time-indexed-release-dates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If job \(j\) cannot start before \(r_j\), then simply omit variables with
+
+\[
+t<r_j,
+\]
+
+or impose
+
+\[
+\boxed{
+x_{jt}=0,
+\qquad
+t<r_j.
+}
+\]
+
+Similarly, a deadline can restrict allowable completion periods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequence-Dependent Setup Times}
+\label{subsec:sequence-dependent-setup-times}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose processing job \(j\) immediately after job \(i\) requires setup
+time
+
+\[
+\boxed{
+s_{ij}.
+}
+\]
+
+Then if \(i\) precedes \(j\),
+
+\[
+\boxed{
+S_j
+\geq
+C_i+s_{ij}.
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{machine cleaning},
+}
+\]
+
+\[
+\boxed{
+\text{tool changes},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{product changeovers}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequence-Independent Setup Times}
+\label{subsec:sequence-independent-setup-times}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If setup time depends only on the next job,
+
+\[
+s_j,
+\]
+
+then it may often be combined with processing time:
+
+\[
+\boxed{
+p_j'
+=
+s_j+p_j.
+}
+\]
+
+Sequence-dependent setup times cannot generally be absorbed this way.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Release Dates and Idle Time}
+\label{subsec:release-dates-idle-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Without release dates and with a regular objective, intentional idle time
+on a single machine is usually unnecessary.
+
+With release dates, idle time can be unavoidable.
+
+In some problems, waiting for a future high-priority job can even be
+strategically useful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest Remaining Processing Time}
+\label{subsec:srpt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With preemption and release dates, the shortest remaining processing time
+rule, abbreviated SRPT, always processes an available job with minimum
+remaining processing time.
+
+For the classical problem
+
+\[
+\boxed{
+1
+\mid
+r_j,\mathrm{pmtn}
+\mid
+\sum C_j,
+}
+\]
+
+SRPT is optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of SRPT}
+\label{subsec:srpt-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When a shorter job arrives, it may interrupt a longer job.
+
+Completing short jobs quickly reduces the number of unfinished jobs in
+the system.
+
+This is the preemptive analogue of SPT.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scheduling With Deadlines}
+\label{subsec:scheduling-deadlines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A deadline
+
+\[
+\bar d_j
+\]
+
+is a hard requirement:
+
+\[
+\boxed{
+C_j
+\leq
+\bar d_j.
+}
+\]
+
+A due date is usually a soft target that may be violated with a penalty.
+
+Thus:
+
+\[
+\boxed{
+\text{deadline}
+\neq
+\text{due date}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feasibility Versus Optimization}
+\label{subsec:scheduling-feasibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some scheduling problems ask only whether all timing requirements can be
+satisfied.
+
+Others seek the best feasible schedule.
+
+Thus scheduling includes both:
+
+\[
+\boxed{
+\text{feasibility problems}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{optimization problems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lower Bounds}
+\label{subsec:scheduling-lower-bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Lower bounds are important in exact algorithms.
+
+For makespan, useful bounds can arise from:
+
+\[
+\boxed{
+\text{total workload},
+}
+\]
+
+\[
+\boxed{
+\text{largest job},
+}
+\]
+
+\[
+\boxed{
+\text{critical paths},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{machine workloads}.
+}
+\]
+
+A lower bound helps determine how close a candidate schedule is to optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Machine-Workload Bound}
+\label{subsec:machine-workload-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose every job shop operation assigned to machine \(i\) has processing
+time \(p_{ij}\).
+
+Any schedule must satisfy
+
+\[
+\boxed{
+C_{\max}
+\geq
+\sum_j
+p_{ij}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+C_{\max}
+\geq
+\max_i
+\sum_jp_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Critical-Path Bound in Job Shops}
+\label{subsec:job-shop-critical-path-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For each job, its operations must follow a specified route.
+
+Therefore,
+
+\[
+\boxed{
+C_{\max}
+\geq
+\sum_{k\in J_j}
+p_{jk}
+}
+\]
+
+for every job \(j\).
+
+A lower bound is therefore
+
+\[
+\boxed{
+\max_j
+\{
+\text{total processing requirement of job }j
+\}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branch-and-Bound for Scheduling}
+\label{subsec:scheduling-branch-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Branch-and-bound can search over sequencing or assignment decisions.
+
+A node may represent a partially fixed schedule.
+
+At each node:
+
+\begin{enumerate}
+    \item compute a lower bound;
+    \item construct or maintain a feasible incumbent;
+    \item prune if the lower bound cannot improve the incumbent;
+    \item otherwise branch on another scheduling decision.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming for Scheduling}
+\label{subsec:scheduling-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming can be effective when the state is manageable.
+
+A subset state may represent:
+
+\[
+\boxed{
+S
+=
+\text{set of jobs already completed}.
+}
+\]
+
+The remaining schedule depends only on \(S\) and any additional timing
+information required.
+
+This can reduce repeated enumeration, although the state space may still
+contain
+
+\[
+\boxed{
+2^n
+}
+\]
+
+subsets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Search for Scheduling}
+\label{subsec:scheduling-local-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scheduling neighborhood may use:
+
+\[
+\boxed{
+\text{adjacent swaps},
+}
+\]
+
+\[
+\boxed{
+\text{pairwise exchanges},
+}
+\]
+
+\[
+\boxed{
+\text{job insertion},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{machine reassignment}.
+}
+\]
+
+Local search repeatedly replaces the current schedule with a better nearby
+schedule.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adjacent Swap Neighborhood}
+\label{subsec:adjacent-swap-neighborhood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a sequence
+
+\[
+J_1,J_2,\ldots,J_n,
+\]
+
+an adjacent-swap move exchanges
+
+\[
+J_k
+\]
+
+and
+
+\[
+J_{k+1}.
+\]
+
+There are only
+
+\[
+\boxed{
+n-1
+}
+\]
+
+adjacent swaps, making this a small neighborhood.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Insertion Neighborhood}
+\label{subsec:insertion-neighborhood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An insertion move removes one job from its current position and inserts it
+elsewhere.
+
+This neighborhood is larger than adjacent swaps and can escape some local
+optima that adjacent swaps cannot.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dispatching Versus Offline Scheduling}
+\label{subsec:dispatching-versus-offline}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Offline scheduling assumes the relevant jobs and information are known
+before scheduling begins.
+
+Online scheduling receives jobs over time.
+
+A dispatching rule makes repeated local decisions as information becomes
+available.
+
+Examples include:
+
+\[
+\boxed{
+\text{SPT},
+}
+\]
+
+\[
+\boxed{
+\text{EDD},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{critical-ratio dispatching}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Online Scheduling}
+\label{subsec:online-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In online scheduling, future jobs may be unknown.
+
+An online algorithm must make decisions without full future information.
+
+Performance can be evaluated using competitive analysis, which compares
+the online schedule against an optimal schedule that knows the entire
+input in advance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Batch Scheduling}
+\label{subsec:batch-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some machines can process several compatible jobs simultaneously as one
+batch.
+
+A batch has:
+
+\[
+\boxed{
+\text{capacity restrictions}
+}
+\]
+
+and may have a processing time determined by the jobs assigned to it.
+
+Batch scheduling occurs in ovens, furnaces, chemical processing, and data
+processing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{No-Wait Scheduling}
+\label{subsec:no-wait-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a no-wait flow shop, once a job starts, it must continue through its
+sequence of machines without waiting between operations.
+
+This occurs when intermediate storage is impossible or product quality
+would deteriorate.
+
+No-wait constraints tightly couple operation start times.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Blocking Scheduling}
+\label{subsec:blocking-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If there is no buffer between machines, a completed job may remain on its
+current machine until the next machine becomes available.
+
+This is called blocking.
+
+The upstream machine then cannot begin another job.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Workforce Scheduling}
+\label{subsec:workforce-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Workforce scheduling assigns employees to shifts or tasks while satisfying
+coverage requirements.
+
+Let
+
+\[
+x_s
+=
+\text{number of workers assigned to shift }s.
+\]
+
+If period \(t\) requires at least \(d_t\) workers,
+
+\[
+\boxed{
+\sum_s
+a_{ts}x_s
+\geq
+d_t,
+}
+\]
+
+where \(a_{ts}=1\) if shift \(s\) covers period \(t\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shift Scheduling}
+\label{subsec:shift-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic shift-scheduling model is
+
+\[
+\boxed{
+\begin{aligned}
+\min
+\quad&
+\sum_s
+c_sx_s
+\\
+\text{subject to}
+\quad&
+\sum_s
+a_{ts}x_s
+\geq
+d_t,
+\qquad
+t=1,\ldots,T,
+\\
+&
+x_s\in\mathbb{Z}_{\geq0}.
+\end{aligned}
+}
+\]
+
+More detailed workforce models include:
+
+\[
+\boxed{
+\text{skills},
+}
+\]
+
+\[
+\boxed{
+\text{breaks},
+}
+\]
+
+\[
+\boxed{
+\text{overtime},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{fairness}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Crew Scheduling}
+\label{subsec:crew-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Crew scheduling selects feasible sequences of work activities.
+
+Each complete feasible duty can be treated as a column.
+
+This often leads to large set-covering or set-partitioning models.
+
+Column generation is therefore central in airline, rail, and transit crew
+scheduling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transportation Scheduling}
+\label{subsec:transportation-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Transportation scheduling may involve:
+
+\[
+\boxed{
+\text{vehicles},
+}
+\]
+
+\[
+\boxed{
+\text{drivers},
+}
+\]
+
+\[
+\boxed{
+\text{gates},
+}
+\]
+
+\[
+\boxed{
+\text{runways},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{loading resources}.
+}
+\]
+
+Many such problems combine:
+
+\[
+\boxed{
+\text{network optimization}
++
+\text{integer programming}
++
+\text{scheduling}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Machine Availability}
+\label{subsec:machine-availability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A machine may be unavailable during maintenance or other downtime.
+
+If machine \(i\) is unavailable on interval
+
+\[
+[a,b],
+\]
+
+then no nonpreemptive operation assigned to that machine may overlap the
+interval.
+
+Calendar constraints can therefore become part of scheduling feasibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maintenance Scheduling}
+\label{subsec:maintenance-scheduling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Maintenance scheduling balances:
+
+\[
+\boxed{
+\text{equipment availability},
+}
+\]
+
+\[
+\boxed{
+\text{maintenance requirements},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{production demand}.
+}
+\]
+
+Preventive maintenance can reduce failure risk but temporarily removes
+capacity.
+
+This creates a natural optimization tradeoff.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Scheduling Preview}
+\label{subsec:stochastic-scheduling-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Real processing times may be random.
+
+Machines may fail.
+
+Jobs may arrive unexpectedly.
+
+Then the schedule must respond to uncertainty.
+
+Approaches include:
+
+\[
+\boxed{
+\text{stochastic optimization},
+}
+\]
+
+\[
+\boxed{
+\text{robust scheduling},
+}
+\]
+
+\[
+\boxed{
+\text{dynamic rescheduling},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{dispatching policies}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robust Scheduling Preview}
+\label{subsec:robust-scheduling-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A robust schedule attempts to remain effective under uncertain processing
+times or disruptions.
+
+One may include:
+
+\[
+\boxed{
+\text{time buffers},
+}
+\]
+
+\[
+\boxed{
+\text{slack},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{uncertainty sets}.
+}
+\]
+
+The goal is often to trade nominal efficiency for resilience.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Schedule Stability}
+\label{subsec:schedule-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When disruptions occur, repeatedly replacing the original schedule may be
+operationally expensive.
+
+A rescheduling objective may therefore penalize deviation from the original
+plan:
+
+\[
+\boxed{
+\text{new performance cost}
++
+\lambda
+(
+\text{schedule-change cost}
+).
+}
+\]
+
+This distinguishes optimization quality from schedule stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scheduling Complexity}
+\label{subsec:scheduling-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scheduling problems range from very easy to computationally difficult.
+
+Examples with simple optimal rules include:
+
+\[
+\boxed{
+1\mid\mid\sum C_j
+}
+\]
+
+using SPT,
+
+and
+
+\[
+\boxed{
+1\mid\mid L_{\max}
+}
+\]
+
+using EDD.
+
+Other problems, such as general job-shop makespan scheduling, are NP-hard.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Small Model Changes Matter}
+\label{subsec:scheduling-small-model-changes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adding only one feature can dramatically change complexity.
+
+For example:
+
+\[
+\boxed{
+\text{one machine}
+}
+\]
+
+may be easy under one objective,
+
+while adding:
+
+\[
+\boxed{
+\text{release dates},
+}
+\]
+
+\[
+\boxed{
+\text{sequence-dependent setups},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{multiple machines}
+}
+\]
+
+can create a much harder problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scheduling Optimization Workflow}
+\label{subsec:scheduling-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify jobs and operations;
+    \item identify machines and resources;
+    \item record processing times;
+    \item record release dates and due dates;
+    \item identify precedence requirements;
+    \item determine whether preemption is allowed;
+    \item identify setup times;
+    \item identify machine availability restrictions;
+    \item define the objective;
+    \item write the problem using three-field notation when possible;
+    \item check for a known optimal sequencing rule;
+    \item derive lower bounds;
+    \item construct a feasible schedule;
+    \item choose exact optimization, approximation, or heuristic methods;
+    \item compute completion-time performance measures;
+    \item compare against lower bounds or optimality gaps;
+    \item perform sensitivity analysis;
+    \item consider robustness and rescheduling needs.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Scheduling Method}
+\label{subsec:choosing-scheduling-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+1\mid\mid\sum C_j,
+\]
+
+use:
+
+\[
+\boxed{
+\text{SPT}.
+}
+\]
+
+For
+
+\[
+1\mid\mid\sum w_jC_j,
+\]
+
+use:
+
+\[
+\boxed{
+\text{Smith's rule}.
+}
+\]
+
+For
+
+\[
+1\mid\mid L_{\max},
+\]
+
+use:
+
+\[
+\boxed{
+\text{EDD}.
+}
+\]
+
+For
+
+\[
+1\mid\mid\sum U_j,
+\]
+
+use:
+
+\[
+\boxed{
+\text{Moore--Hodgson}.
+}
+\]
+
+For
+
+\[
+F_2\mid\mid C_{\max},
+\]
+
+use:
+
+\[
+\boxed{
+\text{Johnson's rule}.
+}
+\]
+
+For difficult general scheduling problems, consider:
+
+\[
+\boxed{
+\text{MILP},
+}
+\]
+
+\[
+\boxed{
+\text{branch-and-bound},
+}
+\]
+
+\[
+\boxed{
+\text{constraint programming},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{metaheuristics}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:scheduling-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing Lateness and Tardiness}
+
+Lateness can be negative:
+
+\[
+\boxed{
+L_j=C_j-d_j.
+}
+\]
+
+Tardiness cannot:
+
+\[
+\boxed{
+T_j=\max\{L_j,0\}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Due Dates and Deadlines}
+
+A due date is generally a target.
+
+A deadline is generally a hard feasibility requirement.
+
+They should not be modeled identically unless the application requires it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using SPT for Every Objective}
+
+SPT minimizes total completion time in the classical single-machine
+problem.
+
+It does not generally minimize:
+
+\[
+\boxed{
+L_{\max},
+}
+\]
+
+\[
+\boxed{
+\sum T_j,
+}
+\]
+
+or
+
+\[
+\boxed{
+C_{\max}
+}
+\]
+
+in unrelated scheduling environments.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using EDD to Minimize Total Tardiness}
+
+EDD minimizes maximum lateness for the classical single-machine problem.
+
+It does not generally minimize total tardiness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Release Dates}
+
+A schedule beginning job \(j\) before
+
+\[
+r_j
+\]
+
+is infeasible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Setup Times}
+
+If changing from job \(i\) to job \(j\) requires setup time
+
+\[
+s_{ij},
+\]
+
+then omitting it can underestimate completion times substantially.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Allowing Machine Overlap}
+
+Two nonpreemptive operations requiring the same single-capacity machine
+cannot overlap.
+
+This must be enforced explicitly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Allowing a Job to Use Two Machines Simultaneously}
+
+In ordinary shop scheduling, a job normally processes one operation at a
+time unless the technological model explicitly allows simultaneous
+operations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Precedence Constraints}
+
+A schedule can satisfy all machine capacities and still be infeasible if
+job routing or project precedence is violated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Excessively Large Big-\(M\)}
+
+Very large \(M\) values weaken mixed-integer formulations and can damage
+numerical performance.
+
+Use the tightest justified scheduling horizon.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Lower Bound Is a Feasible Schedule}
+
+A lower bound estimates what no schedule can beat.
+
+It need not itself be attainable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Heuristic Solution Is Optimal}
+
+Dispatching rules, local search, and metaheuristics can produce good
+schedules without proving optimality.
+
+A valid lower bound or exact algorithm is required for a certificate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Critical Path Alone Solves Resource-Constrained Projects}
+
+CPM handles precedence timing.
+
+If several activities compete for scarce resources, additional scheduling
+decisions are required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting PERT Estimates as Exact Distributions}
+
+Classical PERT expected-time and variance formulas are approximations based
+on modeling assumptions.
+
+Real project durations may not follow those assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Rescheduling Cost}
+
+A mathematically improved schedule may be operationally undesirable if it
+requires large last-minute changes.
+
+Real systems may require schedule-stability objectives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:scheduling-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Manufacturing.}
+Jobs must be sequenced across machines while respecting processing routes,
+setups, due dates, and capacity.
+
+\medskip
+
+\textbf{Air Transportation.}
+Aircraft, gates, crews, loading equipment, maintenance resources, and
+runways all require coordinated schedules.
+
+\medskip
+
+\textbf{Computing.}
+Processors schedule tasks to reduce completion time, response time,
+lateness, or energy use.
+
+\medskip
+
+\textbf{Healthcare.}
+Operating rooms, physicians, nurses, diagnostic equipment, and patient
+appointments require scheduling under limited capacity.
+
+\medskip
+
+\textbf{Project Management.}
+CPM, PERT, and resource-constrained scheduling coordinate activities with
+precedence relationships.
+
+\medskip
+
+\textbf{Workforce Planning.}
+Employees are assigned to shifts while satisfying coverage, qualification,
+labor, and fairness requirements.
+
+\medskip
+
+\textbf{Logistics.}
+Vehicles, docks, loading bays, warehouse resources, and delivery windows
+create complex scheduling problems.
+
+\medskip
+
+\textbf{Maintenance.}
+Preventive and corrective maintenance must be scheduled while preserving
+operational availability.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:scheduling-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define processing time.
+\end{exercise}
+
+\begin{exercise}[1]
+Define release date.
+\end{exercise}
+
+\begin{exercise}[1]
+Define due date.
+\end{exercise}
+
+\begin{exercise}[1]
+Define completion time.
+\end{exercise}
+
+\begin{exercise}[1]
+Define flow time.
+\end{exercise}
+
+\begin{exercise}[1]
+Define lateness.
+\end{exercise}
+
+\begin{exercise}[1]
+Define tardiness.
+\end{exercise}
+
+\begin{exercise}[1]
+Define makespan.
+\end{exercise}
+
+\begin{exercise}[1]
+Define preemption.
+\end{exercise}
+
+\begin{exercise}[1]
+Interpret
+
+\[
+1\mid\mid\sum C_j.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+C_j=14,
+\qquad
+d_j=10,
+\]
+
+compute lateness and tardiness.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+C_j=8,
+\qquad
+d_j=12,
+\]
+
+compute lateness, tardiness, and earliness.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+r_j=3,
+\qquad
+C_j=11,
+\]
+
+compute flow time.
+\end{exercise}
+
+\begin{exercise}[2]
+Order processing times
+
+\[
+7,2,9,4
+\]
+
+according to SPT.
+\end{exercise}
+
+\begin{exercise}[2]
+Order due dates
+
+\[
+12,5,9,18
+\]
+
+according to EDD.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute
+
+\[
+\rho_j
+=
+\frac{p_j}{w_j}
+\]
+
+for several jobs and determine Smith's-rule order.
+\end{exercise}
+
+\begin{exercise}[3]
+Use SPT to minimize total completion time for five jobs.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute every \(C_j\) and verify the resulting value of
+
+\[
+\sum C_j.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use Smith's rule to minimize
+
+\[
+\sum w_jC_j
+\]
+
+for a small job set.
+\end{exercise}
+
+\begin{exercise}[3]
+Use EDD to minimize maximum lateness.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute \(L_j\), \(T_j\), and \(L_{\max}\) for the resulting schedule.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply the Moore--Hodgson algorithm to a small set of jobs.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine the minimum number of tardy jobs in the previous problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a precedence graph from a list of precedence relations.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a forward pass through a project network.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a backward pass and compute activity slack.
+\end{exercise}
+
+\begin{exercise}[3]
+Identify the critical path.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a PERT expected duration from optimistic, most-likely, and
+pessimistic values.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the corresponding PERT activity variance.
+\end{exercise}
+
+\begin{exercise}[3]
+For three identical parallel machines, compute the workload lower bound
+for makespan.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply arbitrary list scheduling to a set of jobs.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply LPT scheduling to the same job set.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the two makespans.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether the lower bound proves the LPT schedule optimal.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply Johnson's rule to a four-job, two-machine flow shop.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the machine completion-time table for the Johnson schedule.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the resulting flow-shop makespan.
+\end{exercise}
+
+\begin{exercise}[3]
+Write disjunctive constraints for two jobs requiring the same machine.
+\end{exercise}
+
+\begin{exercise}[3]
+Convert the previous disjunction to a Big-\(M\) formulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Introduce a makespan variable into a scheduling MILP.
+\end{exercise}
+
+\begin{exercise}[3]
+Linearize
+
+\[
+T_j
+=
+\max
+\{
+C_j-d_j,0
+\}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a time-indexed formulation for three jobs.
+\end{exercise}
+
+\begin{exercise}[3]
+Write one-machine capacity constraints in time-indexed form.
+\end{exercise}
+
+\begin{exercise}[3]
+Add release dates to the previous formulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Model sequence-dependent setup times.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute slack and critical ratio for a job at a specified current time.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain when intentional idle time may be useful.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between offline and online scheduling.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a basic workforce shift-scheduling model.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a resource-capacity constraint for a project schedule.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why RCPSP cannot generally be solved by CPM alone.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct lower bounds for a small job-shop makespan problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how branch-and-bound can use these lower bounds.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the SPT optimality theorem using adjacent interchange.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove Smith's rule using pairwise interchange.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove EDD optimality for
+
+\[
+1\mid\mid L_{\max}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Prove correctness of the Moore--Hodgson algorithm.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the list-scheduling bound
+
+\[
+C_{\max}^{LS}
+\leq
+\left(
+2-\frac1m
+\right)
+C_{\max}^*.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Study the LPT approximation bound.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove Johnson's rule for
+
+\[
+F_2\mid\mid C_{\max}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Study single-machine total-tardiness dynamic programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Study
+
+\[
+1\mid r_j,\mathrm{pmtn}\mid\sum C_j
+\]
+
+and prove optimality of SRPT.
+\end{exercise}
+
+\begin{exercise}[4]
+Study scheduling with precedence constraints.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Lawler's algorithm for precedence-constrained maximum lateness.
+\end{exercise}
+
+\begin{exercise}[4]
+Study exact branch-and-bound methods for job-shop scheduling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study disjunctive-graph formulations of job shops.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate time-indexed formulations and LP relaxation strength.
+\end{exercise}
+
+\begin{exercise}[4]
+Study constraint programming for scheduling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study interval variables and global no-overlap constraints.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate local-search neighborhoods for job-shop scheduling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study tabu search for scheduling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study simulated annealing for scheduling.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate crew scheduling using set partitioning and column generation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Resource-Constrained Project Scheduling Problem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study robust project scheduling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stochastic scheduling with random processing times.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate competitive analysis for online scheduling.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:scheduling-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scheduling determines how jobs use limited resources over time.
+
+Important job parameters include:
+
+\[
+\boxed{
+p_j,
+\quad
+r_j,
+\quad
+d_j.
+}
+\]
+
+Important performance measures include:
+
+\[
+\boxed{
+C_j,
+}
+\]
+
+\[
+\boxed{
+F_j=C_j-r_j,
+}
+\]
+
+\[
+\boxed{
+L_j=C_j-d_j,
+}
+\]
+
+\[
+\boxed{
+T_j=\max\{C_j-d_j,0\},
+}
+\]
+
+and
+
+\[
+\boxed{
+C_{\max}=\max_jC_j.
+}
+\]
+
+For classical single-machine problems:
+
+\[
+\boxed{
+1\mid\mid\sum C_j
+\rightarrow
+\text{SPT},
+}
+\]
+
+\[
+\boxed{
+1\mid\mid\sum w_jC_j
+\rightarrow
+\text{Smith's rule},
+}
+\]
+
+\[
+\boxed{
+1\mid\mid L_{\max}
+\rightarrow
+\text{EDD},
+}
+\]
+
+and
+
+\[
+\boxed{
+1\mid\mid\sum U_j
+\rightarrow
+\text{Moore--Hodgson}.
+}
+\]
+
+For two-machine flow-shop makespan:
+
+\[
+\boxed{
+F_2\mid\mid C_{\max}
+\rightarrow
+\text{Johnson's rule}.
+}
+\]
+
+For parallel machines, basic makespan bounds include
+
+\[
+\boxed{
+C_{\max}
+\geq
+\max
+\left\{
+\frac{\sum_jp_j}{m},
+\max_jp_j
+\right\}.
+}
+\]
+
+Scheduling theory therefore combines
+
+\[
+\boxed{
+\text{optimization}
++
+\text{combinatorics}
++
+\text{algorithms}
++
+\text{resource allocation}
++
+\text{time}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:scheduling-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Scheduling Theory combines the discrete decision structures of
+Section~\ref{sec:combinatorial-optimization}, the integer formulations of
+Section~\ref{sec:integer-programming}, and the congestion perspective of
+Section~\ref{sec:queueing-theory}. Classical rules such as SPT, EDD,
+Smith's rule, Moore--Hodgson, LPT, and Johnson's rule exploit special
+problem structure, while general shop and project scheduling often require
+mixed-integer optimization, dynamic programming, branch-and-bound,
+constraint programming, or heuristics. The next section, Inventory Theory,
+studies another major operations-research problem: how much and when to
+order when demand, holding cost, shortage cost, and replenishment interact
+over time.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.12 Scheduling Theory
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard deterministic scheduling theory.
+%   - Standard project-scheduling and operations-research methods.
+%   - Standard machine-scheduling algorithms and formulations.
+%
+% Used for:
+%   - jobs, machines, and processing times;
+%   - release dates and due dates;
+%   - start and completion times;
+%   - flow time;
+%   - lateness, tardiness, and earliness;
+%   - tardy-job indicators;
+%   - makespan;
+%   - weighted completion time;
+%   - regular and nonregular objectives;
+%   - preemption;
+%   - single, parallel, flow-shop, job-shop, and open-shop environments;
+%   - Graham three-field notation;
+%   - SPT;
+%   - Smith's rule / WSPT;
+%   - EDD;
+%   - Moore--Hodgson;
+%   - dispatching rules;
+%   - slack and critical ratio;
+%   - precedence constraints;
+%   - precedence graphs;
+%   - critical paths;
+%   - CPM;
+%   - PERT;
+%   - RCPSP;
+%   - parallel-machine makespan bounds;
+%   - list scheduling;
+%   - LPT;
+%   - Johnson's rule;
+%   - permutation flow shops;
+%   - disjunctive constraints;
+%   - Big-M sequencing models;
+%   - makespan and tardiness linearizations;
+%   - time-indexed formulations;
+%   - sequence-dependent setups;
+%   - SRPT;
+%   - deadlines;
+%   - branch-and-bound;
+%   - dynamic programming;
+%   - local search;
+%   - online scheduling;
+%   - batch, blocking, and no-wait scheduling;
+%   - workforce and crew scheduling;
+%   - transportation scheduling;
+%   - maintenance scheduling;
+%   - stochastic and robust scheduling previews;
+%   - schedule stability;
+%   - applications and exercises.
+%
+% Notes:
+%   - Inventory Theory is developed next in Section 10.13.
+%   - Decision Theory follows in Section 10.14.
+%   - Detailed stochastic optimization appears in Section 10.8.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,4326 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.7 SCIENTIFIC COMPUTING
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Scientific Computing}
+\label{sec:scientific-computing}
+
+\prerequisite{
+Numerical analysis, numerical linear algebra, numerical optimization,
+numerical differential equations, Monte Carlo methods, basic algorithms,
+programming concepts, and elementary computer architecture.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the role of scientific computing in applied mathematics;
+    \item distinguish mathematical models, numerical algorithms, and
+          software implementations;
+    \item understand the scientific-computing workflow;
+    \item recognize sources of computational error;
+    \item distinguish algorithmic complexity from practical runtime;
+    \item understand arithmetic intensity conceptually;
+    \item recognize memory and data-movement costs;
+    \item understand cache locality conceptually;
+    \item distinguish scalar and vectorized computation;
+    \item understand matrix-oriented computation;
+    \item recognize sparse data structures;
+    \item understand the importance of numerical libraries;
+    \item distinguish interpreted and compiled execution conceptually;
+    \item recognize profiling and benchmarking;
+    \item understand reproducible computational experiments;
+    \item understand deterministic and nondeterministic computation;
+    \item recognize parallel computing;
+    \item distinguish shared-memory and distributed-memory parallelism;
+    \item understand task and data parallelism;
+    \item recognize multicore computing;
+    \item recognize vector processors and GPUs;
+    \item understand distributed-memory communication conceptually;
+    \item recognize message passing;
+    \item understand speedup and parallel efficiency;
+    \item apply Amdahl's law;
+    \item understand weak and strong scaling;
+    \item recognize load balancing;
+    \item understand communication overhead;
+    \item recognize synchronization costs;
+    \item understand domain decomposition;
+    \item recognize iterative methods suited to parallel computation;
+    \item understand precision choices;
+    \item distinguish single, double, and mixed precision;
+    \item recognize arbitrary-precision arithmetic;
+    \item understand reproducibility limitations in floating-point parallel
+          reductions;
+    \item understand software verification and numerical validation;
+    \item recognize unit testing for mathematical software;
+    \item understand convergence testing;
+    \item understand dimensional and unit checks;
+    \item recognize data provenance;
+    \item understand checkpointing;
+    \item recognize restartable computations;
+    \item understand parameter sweeps;
+    \item recognize ensemble simulation;
+    \item understand computational pipelines;
+    \item recognize workflow automation;
+    \item understand scientific visualization conceptually;
+    \item distinguish visualization from quantitative validation;
+    \item recognize high-performance computing;
+    \item understand computational scalability;
+    \item recognize accelerator computing;
+    \item understand performance portability conceptually;
+    \item connect scientific computing with simulation, optimization,
+          statistics, data analysis, differential equations, and applied
+          mathematical modeling.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Scientific Computing?}
+\label{subsec:what-is-scientific-computing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific computing uses mathematical models, numerical algorithms, and
+computer systems to study problems through computation.
+
+A typical scientific-computing pipeline is
+
+\[
+\boxed{
+\text{mathematical model}
+\longrightarrow
+\text{numerical method}
+\longrightarrow
+\text{implementation}
+\longrightarrow
+\text{computed result}.
+}
+\]
+
+Each stage can introduce its own assumptions and errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scientific Computing as Applied Mathematics}
+\label{subsec:scientific-computing-applied-mathematics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific computing is not merely programming.
+
+It combines:
+
+\[
+\boxed{
+\text{mathematical modeling},
+}
+\]
+
+\[
+\boxed{
+\text{numerical analysis},
+}
+\]
+
+\[
+\boxed{
+\text{algorithm design},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{computer implementation}.
+}
+\]
+
+The mathematical quality of the result depends on all four.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model, Method, and Implementation}
+\label{subsec:model-method-implementation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Three layers should be distinguished carefully.
+
+The \textbf{model} specifies the mathematical problem:
+
+\[
+\boxed{
+F(u,\theta)=0.
+}
+\]
+
+The \textbf{numerical method} approximates the solution:
+
+\[
+\boxed{
+F_h(u_h,\theta)=0.
+}
+\]
+
+The \textbf{implementation} realizes the numerical method as software.
+
+A result can fail because of an error at any of these layers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sources of Computational Error}
+\label{subsec:scientific-computing-error-sources}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Important error sources include:
+
+\[
+\boxed{
+\text{modeling error},
+}
+\]
+
+\[
+\boxed{
+\text{data uncertainty},
+}
+\]
+
+\[
+\boxed{
+\text{discretization error},
+}
+\]
+
+\[
+\boxed{
+\text{iteration error},
+}
+\]
+
+\[
+\boxed{
+\text{floating-point error},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{software error}.
+}
+\]
+
+These should be analyzed separately whenever possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Workflow}
+\label{subsec:scientific-computing-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item define the scientific question;
+    \item construct the mathematical model;
+    \item identify inputs, parameters, and outputs;
+    \item determine the numerical problem class;
+    \item choose appropriate numerical methods;
+    \item estimate expected computational cost;
+    \item implement or select trusted software;
+    \item verify individual components;
+    \item run benchmark problems;
+    \item perform convergence studies;
+    \item perform sensitivity studies;
+    \item evaluate computational performance;
+    \item document configuration and software versions;
+    \item store sufficient information for reproducibility;
+    \item interpret numerical results within model limitations.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algorithmic Complexity}
+\label{subsec:scientific-computing-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Algorithmic complexity estimates computational work as problem size grows.
+
+Examples include:
+
+\[
+\boxed{
+O(n),
+}
+\]
+
+\[
+\boxed{
+O(n\log n),
+}
+\]
+
+\[
+\boxed{
+O(n^2),
+}
+\]
+
+and
+
+\[
+\boxed{
+O(n^3).
+}
+\]
+
+Complexity describes asymptotic growth rather than exact execution time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Operation Count}
+\label{subsec:operation-count}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical algorithms are often analyzed by counting arithmetic operations.
+
+For dense Gaussian elimination, the leading arithmetic work is
+
+\[
+\boxed{
+\frac{2}{3}n^3.
+}
+\]
+
+For a dense matrix-vector product,
+
+\[
+\boxed{
+A x,
+}
+\]
+
+the work is approximately
+
+\[
+\boxed{
+O(n^2).
+}
+\]
+
+Operation counts are useful but do not completely predict modern hardware
+performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Runtime Is More Than Arithmetic}
+\label{subsec:runtime-more-than-arithmetic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Actual runtime depends on:
+
+\[
+\boxed{
+\text{arithmetic operations},
+}
+\]
+
+\[
+\boxed{
+\text{memory access},
+}
+\]
+
+\[
+\boxed{
+\text{communication},
+}
+\]
+
+\[
+\boxed{
+\text{synchronization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{hardware utilization}.
+}
+\]
+
+A method with fewer arithmetic operations can still be slower if it moves
+data inefficiently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memory Hierarchy}
+\label{subsec:memory-hierarchy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modern computers contain multiple levels of memory.
+
+Conceptually,
+
+\[
+\boxed{
+\text{registers}
+\rightarrow
+\text{cache}
+\rightarrow
+\text{main memory}
+\rightarrow
+\text{storage}.
+}
+\]
+
+Memory closer to the processor is typically faster but smaller.
+
+Efficient scientific software attempts to reuse data before it is moved
+again from slower memory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Data Locality}
+\label{subsec:data-locality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Temporal locality means recently accessed data are likely to be used
+again.
+
+Spatial locality means nearby memory locations are likely to be used
+together.
+
+Algorithms that exploit locality can significantly outperform
+mathematically equivalent implementations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arithmetic Intensity}
+\label{subsec:arithmetic-intensity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Arithmetic intensity is approximately
+
+\[
+\boxed{
+\frac{
+\text{floating-point operations}
+}{
+\text{bytes moved}
+}.
+}
+\]
+
+High arithmetic intensity means substantial computation is performed for
+each unit of data movement.
+
+Low arithmetic intensity indicates that memory bandwidth may dominate
+performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memory-Bound and Compute-Bound Algorithms}
+\label{subsec:memory-compute-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A memory-bound algorithm spends much of its time moving data.
+
+A compute-bound algorithm spends much of its time performing arithmetic.
+
+For example, sparse matrix-vector multiplication is often memory-bound
+because relatively little arithmetic is performed per stored matrix
+entry.
+
+Dense matrix multiplication has much higher arithmetic intensity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vectorization}
+\label{subsec:scientific-vectorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Vectorized computation applies operations to collections of values rather
+than processing one scalar element at a time at the high-level programming
+layer.
+
+For example,
+
+\[
+\boxed{
+y
+=
+Ax+b
+}
+\]
+
+expresses a complete matrix-vector operation.
+
+Well-designed numerical libraries can execute such operations efficiently
+using optimized low-level routines.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix-Oriented Computation}
+\label{subsec:matrix-oriented-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many scientific problems can be expressed using:
+
+\[
+\boxed{
+\text{vectors},
+}
+\]
+
+\[
+\boxed{
+\text{matrices},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{tensor operations}.
+}
+\]
+
+This provides both mathematical clarity and access to highly optimized
+numerical kernels.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Libraries}
+\label{subsec:numerical-libraries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific software frequently relies on established numerical libraries
+for operations such as:
+
+\[
+\boxed{
+\text{matrix multiplication},
+}
+\]
+
+\[
+\boxed{
+\text{factorization},
+}
+\]
+
+\[
+\boxed{
+\text{eigenvalue computation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Fourier transforms}.
+}
+\]
+
+Using a tested optimized library is often preferable to reimplementing
+fundamental numerical kernels.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Layered Numerical Software}
+\label{subsec:layered-numerical-software}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A high-level solver may call lower-level routines.
+
+For example,
+
+\[
+\boxed{
+\text{optimization algorithm}
+}
+\]
+
+may call
+
+\[
+\boxed{
+\text{sparse linear solver},
+}
+\]
+
+which calls
+
+\[
+\boxed{
+\text{matrix-vector kernels}.
+}
+\]
+
+Understanding these layers helps locate both performance bottlenecks and
+numerical failures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Compiled and Interpreted Execution}
+\label{subsec:compiled-interpreted}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compiled languages translate programs into machine-level instructions
+before execution.
+
+Interpreted or dynamically executed environments may evaluate higher-level
+operations during runtime.
+
+For scientific computing, the distinction is often less important than
+whether expensive numerical operations are delegated to optimized compiled
+libraries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Profiling}
+\label{subsec:scientific-profiling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Profiling measures where a program spends computational resources.
+
+A profiler may reveal:
+
+\[
+\boxed{
+\text{runtime by function},
+}
+\]
+
+\[
+\boxed{
+\text{memory allocation},
+}
+\]
+
+\[
+\boxed{
+\text{communication time},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{hardware utilization}.
+}
+\]
+
+Optimization should target measured bottlenecks rather than guessed ones.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Benchmarking}
+\label{subsec:scientific-benchmarking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Benchmarking compares performance under controlled conditions.
+
+Useful quantities include:
+
+\[
+\boxed{
+\text{execution time},
+}
+\]
+
+\[
+\boxed{
+\text{throughput},
+}
+\]
+
+\[
+\boxed{
+\text{memory use},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{iterations to convergence}.
+}
+\]
+
+A benchmark should specify the problem size, hardware, algorithm,
+precision, tolerances, and implementation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Warm-Up Effects}
+\label{subsec:benchmark-warmup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The first execution of a computation may include additional costs such as:
+
+\[
+\boxed{
+\text{memory initialization},
+}
+\]
+
+\[
+\boxed{
+\text{cache population},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{runtime compilation}.
+}
+\]
+
+Repeated measurements are often preferable to relying on one timing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Computing}
+\label{subsec:parallel-computing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel computing performs multiple computations simultaneously.
+
+The goal is to reduce runtime or solve larger problems by using several
+processing units.
+
+Parallelism may occur across:
+
+\[
+\boxed{
+\text{cores},
+}
+\]
+
+\[
+\boxed{
+\text{processors},
+}
+\]
+
+\[
+\boxed{
+\text{GPUs},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{networked computers}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Task Parallelism}
+\label{subsec:task-parallelism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Task parallelism performs different computations simultaneously.
+
+For example:
+
+\[
+\boxed{
+\text{simulation A}
+\parallel
+\text{simulation B}
+\parallel
+\text{simulation C}.
+}
+\]
+
+Monte Carlo replications and parameter sweeps are naturally task
+parallel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Data Parallelism}
+\label{subsec:data-parallelism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Data parallelism applies the same operation to different portions of a
+data set simultaneously.
+
+Examples include:
+
+\[
+\boxed{
+\text{vector addition},
+}
+\]
+
+\[
+\boxed{
+\text{matrix operations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{grid updates in PDE solvers}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shared-Memory Computing}
+\label{subsec:shared-memory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In shared-memory systems, several processing units access a common memory
+space.
+
+Threads may operate on different portions of the same arrays.
+
+Advantages include relatively simple data sharing.
+
+Challenges include:
+
+\[
+\boxed{
+\text{race conditions},
+}
+\]
+
+\[
+\boxed{
+\text{synchronization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{memory contention}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Race Conditions}
+\label{subsec:race-conditions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A race condition occurs when the result depends on the timing of
+simultaneous operations.
+
+For example, two threads may attempt to update the same memory location.
+
+Without synchronization, the final result may be unpredictable.
+
+Parallel numerical algorithms should avoid or correctly manage shared
+writes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Synchronization}
+\label{subsec:parallel-synchronization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Synchronization coordinates parallel tasks.
+
+Examples include:
+
+\[
+\boxed{
+\text{barriers},
+}
+\]
+
+\[
+\boxed{
+\text{locks},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{collective operations}.
+}
+\]
+
+Synchronization can ensure correctness but may reduce parallel efficiency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distributed-Memory Computing}
+\label{subsec:distributed-memory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In distributed-memory systems, each process has its own memory.
+
+Processes exchange information explicitly.
+
+Conceptually,
+
+\[
+\boxed{
+\text{local computation}
++
+\text{message passing}.
+}
+\]
+
+Large clusters and supercomputers commonly use this model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Message Passing}
+\label{subsec:message-passing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Processes may send and receive data:
+
+\[
+\boxed{
+P_i
+\longrightarrow
+P_j.
+}
+\]
+
+Communication may involve:
+
+\[
+\boxed{
+\text{point-to-point messages}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{collective communication}.
+}
+\]
+
+Collective operations include reductions, broadcasts, and global
+synchronization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Domain Decomposition}
+\label{subsec:scientific-domain-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A computational domain can be divided among processors.
+
+For example,
+
+\[
+\boxed{
+\Omega
+=
+\Omega_1
+\cup
+\Omega_2
+\cup
+\cdots
+\cup
+\Omega_p.
+}
+\]
+
+Each processor updates its local subdomain.
+
+Boundary information is exchanged with neighboring subdomains.
+
+This is common in numerical PDEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Halo and Ghost Data}
+\label{subsec:halo-ghost-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A processor may require neighboring values owned by another processor.
+
+Copies of these values are stored in halo or ghost regions.
+
+At each communication step, neighboring processes exchange updated
+boundary data.
+
+This permits local stencil computations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Speedup}
+\label{subsec:parallel-speedup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If one processor requires time
+
+\[
+T_1
+\]
+
+and \(p\) processors require time
+
+\[
+T_p,
+\]
+
+the parallel speedup is
+
+\[
+\boxed{
+S_p
+=
+\frac{
+T_1
+}{
+T_p
+}.
+}
+\]
+
+Ideal linear speedup is
+
+\[
+\boxed{
+S_p=p.
+}
+\]
+
+Real applications rarely achieve perfect linear scaling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Efficiency}
+\label{subsec:parallel-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel efficiency is
+
+\[
+\boxed{
+E_p
+=
+\frac{
+S_p
+}{
+p
+}
+=
+\frac{
+T_1
+}{
+pT_p
+}.
+}
+\]
+
+Ideal efficiency is
+
+\[
+\boxed{
+E_p=1.
+}
+\]
+
+Lower efficiency indicates that additional processors are producing
+diminishing benefit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Speedup and Efficiency}
+\label{subsec:worked-speedup-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Parallel Performance}
+
+Suppose a simulation takes
+
+\[
+T_1=120
+\]
+
+seconds on one processor and
+
+\[
+T_8=20
+\]
+
+seconds on eight processors.
+
+The speedup is
+
+\[
+S_8
+=
+\frac{120}{20}
+=
+6.
+\]
+
+The parallel efficiency is
+
+\[
+E_8
+=
+\frac68
+=
+0.75.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+S_8=6,
+\qquad
+E_8=75\%.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Amdahl's Law}
+\label{subsec:amdahls-law}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose fraction \(s\) of a computation is inherently serial.
+
+The remaining fraction
+
+\[
+1-s
+\]
+
+can be perfectly parallelized.
+
+Then the ideal speedup on \(p\) processors is
+
+\[
+\boxed{
+S_p
+=
+\frac{
+1
+}{
+s+\frac{1-s}{p}
+}.
+}
+\]
+
+As
+
+\[
+p\to\infty,
+\]
+
+\[
+\boxed{
+S_{\max}
+=
+\frac1s.
+}
+\]
+
+Thus even a small serial fraction can limit total speedup.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Amdahl's Law}
+\label{subsec:worked-amdahl}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Maximum Parallel Speedup}
+
+Suppose
+
+\[
+s=0.10.
+\]
+
+Then with infinitely many processors,
+
+\[
+S_{\max}
+=
+\frac1{0.10}
+=
+10.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+S_{\max}=10.
+}
+\]
+\end{answerbox}
+
+No amount of additional parallel hardware can exceed this idealized limit
+unless the serial portion is reduced.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Scaling}
+\label{subsec:strong-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Strong scaling keeps total problem size fixed while increasing processor
+count.
+
+The question is:
+
+\[
+\boxed{
+\text{How much faster can the same problem be solved?}
+}
+\]
+
+Eventually, communication and synchronization dominate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Scaling}
+\label{subsec:weak-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Weak scaling increases problem size proportionally with processor count.
+
+The amount of work per processor remains approximately constant.
+
+The question is:
+
+\[
+\boxed{
+\text{Can a larger problem be solved in approximately the same time?}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Load Balancing}
+\label{subsec:load-balancing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel efficiency decreases if some processors perform much more work
+than others.
+
+Ideally,
+
+\[
+\boxed{
+W_1
+\approx
+W_2
+\approx
+\cdots
+\approx
+W_p.
+}
+\]
+
+Poor load balancing causes processors to wait for the slowest worker.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Communication Overhead}
+\label{subsec:communication-overhead}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel computation often requires communication.
+
+Total runtime may be modeled schematically as
+
+\[
+\boxed{
+T
+=
+T_{\mathrm{compute}}
++
+T_{\mathrm{communication}}
++
+T_{\mathrm{synchronization}}.
+}
+\]
+
+Increasing processor count may reduce computational work per processor
+while increasing communication cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Latency and Bandwidth}
+\label{subsec:latency-bandwidth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Communication cost is often described by:
+
+\[
+\boxed{
+\text{latency}
+=
+\text{startup cost per message},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{bandwidth}
+=
+\text{data transfer rate}.
+}
+\]
+
+Many small messages can be inefficient because latency is paid repeatedly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Granularity}
+\label{subsec:parallel-granularity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Granularity describes the amount of computation performed between
+communication or synchronization events.
+
+Fine-grained parallelism uses many small tasks.
+
+Coarse-grained parallelism uses larger tasks.
+
+Too-fine granularity may cause overhead to dominate useful computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Embarrassingly Parallel Problems}
+\label{subsec:embarrassingly-parallel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A problem is called embarrassingly parallel when tasks require little or no
+communication.
+
+Examples include:
+
+\[
+\boxed{
+\text{independent Monte Carlo paths},
+}
+\]
+
+\[
+\boxed{
+\text{parameter sweeps},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{independent optimization starts}.
+}
+\]
+
+Such problems can achieve excellent parallel scaling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graphics Processing Units}
+\label{subsec:gpu-computing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Graphics Processing Units, abbreviated GPUs, contain many computational
+units designed for highly parallel workloads.
+
+They are effective when many similar operations can be performed
+simultaneously.
+
+Examples include:
+
+\[
+\boxed{
+\text{dense matrix operations},
+}
+\]
+
+\[
+\boxed{
+\text{large vector operations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{independent simulation kernels}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{CPU Versus GPU}
+\label{subsec:cpu-versus-gpu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A CPU typically contains fewer powerful general-purpose cores.
+
+A GPU contains many simpler processing units optimized for throughput.
+
+Thus:
+
+\[
+\boxed{
+\text{CPU}
+\rightarrow
+\text{complex control and general tasks},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{GPU}
+\rightarrow
+\text{massively data-parallel work}.
+}
+\]
+
+The distinction is architectural rather than absolute.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Accelerator Data Transfer}
+\label{subsec:accelerator-data-transfer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Moving data between processor memory spaces can be expensive.
+
+A computation may lose the advantage of an accelerator if arrays are
+repeatedly transferred.
+
+Efficient accelerator algorithms attempt to:
+
+\[
+\boxed{
+\text{move data infrequently}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{perform substantial work while data remain resident}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Precision}
+\label{subsec:scientific-computing-precision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific computations may use several numerical precisions.
+
+Common choices include approximately:
+
+\[
+\boxed{
+\text{single precision},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{double precision}.
+}
+\]
+
+Higher or arbitrary precision can be used when ordinary floating-point
+precision is insufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Single and Double Precision}
+\label{subsec:single-double-precision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Single precision uses fewer bits and therefore:
+
+\[
+\boxed{
+\text{less memory}
+}
+\]
+
+and often
+
+\[
+\boxed{
+\text{greater computational throughput}.
+}
+\]
+
+Double precision provides substantially greater numerical accuracy and
+dynamic range.
+
+The appropriate choice depends on conditioning and required accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mixed Precision}
+\label{subsec:scientific-mixed-precision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mixed-precision algorithms use different precisions for different parts of
+a computation.
+
+For example:
+
+\[
+\boxed{
+\text{low-precision factorization}
+}
+\]
+
+may be combined with
+
+\[
+\boxed{
+\text{high-precision residual correction}.
+}
+\]
+
+Iterative refinement is an important example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Lower Precision Can Be Faster}
+\label{subsec:why-lower-precision-faster}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Lower-precision values require fewer bits.
+
+This may reduce:
+
+\[
+\boxed{
+\text{memory use},
+}
+\]
+
+\[
+\boxed{
+\text{memory bandwidth},
+}
+\]
+
+and sometimes
+
+\[
+\boxed{
+\text{arithmetic cost}.
+}
+\]
+
+The benefit is useful only if the resulting numerical accuracy remains
+acceptable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arbitrary Precision}
+\label{subsec:arbitrary-precision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Arbitrary-precision arithmetic allows the number of stored digits to be
+increased beyond standard hardware precision.
+
+It is useful for:
+
+\[
+\boxed{
+\text{ill-conditioned problems},
+}
+\]
+
+\[
+\boxed{
+\text{high-accuracy constants},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{verification of numerical conjectures}.
+}
+\]
+
+The computational cost increases significantly with precision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Floating-Point Reduction Order}
+\label{subsec:floating-point-reduction-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Floating-point addition is not exactly associative:
+
+\[
+\boxed{
+(a+b)+c
+\neq
+a+(b+c)
+}
+\]
+
+in general.
+
+Parallel reductions may sum values in different orders.
+
+Thus two parallel runs can produce slightly different final digits even
+when the mathematical computation is equivalent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pairwise Summation}
+\label{subsec:pairwise-summation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of summing sequentially,
+
+\[
+x_1+x_2+\cdots+x_n,
+\]
+
+pairwise summation recursively sums groups of similar size.
+
+This can reduce accumulated floating-point error and also maps naturally
+onto parallel reduction trees.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Compensated Summation}
+\label{subsec:compensated-summation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compensated summation attempts to track rounding error lost during repeated
+addition.
+
+Conceptually, one maintains both:
+
+\[
+\boxed{
+\text{running sum}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{small correction}.
+}
+\]
+
+This can greatly improve accuracy when summing many floating-point values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deterministic and Nondeterministic Computation}
+\label{subsec:deterministic-nondeterministic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A deterministic program produces the same mathematical execution path from
+the same inputs.
+
+Parallel scheduling, randomized algorithms, asynchronous updates, and
+hardware-dependent reduction orders may introduce nondeterministic
+execution.
+
+This does not automatically imply mathematical invalidity.
+
+But reproducibility must be interpreted carefully.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bitwise Reproducibility}
+\label{subsec:bitwise-reproducibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bitwise reproducibility means repeated runs produce exactly identical
+binary outputs.
+
+This is stronger than numerical reproducibility.
+
+Two correct calculations may differ in low-order floating-point digits
+while agreeing to all scientifically meaningful precision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Reproducibility}
+\label{subsec:numerical-reproducibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical reproducibility means independently repeated computations agree
+within stated numerical tolerances.
+
+This often provides a more meaningful scientific standard than exact
+bitwise equality.
+
+The acceptable tolerance should be connected to:
+
+\[
+\boxed{
+\text{conditioning},
+}
+\]
+
+\[
+\boxed{
+\text{discretization error},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{scientific precision requirements}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reproducible Computational Experiments}
+\label{subsec:reproducible-computational-experiments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A computational experiment should record:
+
+\[
+\boxed{
+\text{model equations},
+}
+\]
+
+\[
+\boxed{
+\text{input data},
+}
+\]
+
+\[
+\boxed{
+\text{parameter values},
+}
+\]
+
+\[
+\boxed{
+\text{software versions},
+}
+\]
+
+\[
+\boxed{
+\text{numerical tolerances},
+}
+\]
+
+\[
+\boxed{
+\text{random seeds},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{hardware information when relevant}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Data Provenance}
+\label{subsec:data-provenance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Data provenance records where data came from and how they were processed.
+
+A derived data set should ideally be traceable through
+
+\[
+\boxed{
+\text{raw input}
+\rightarrow
+\text{transformations}
+\rightarrow
+\text{analysis}
+\rightarrow
+\text{final result}.
+}
+\]
+
+This is especially important in long computational pipelines.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Configuration Files}
+\label{subsec:scientific-configuration-files}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large simulations often separate parameters from source code.
+
+A configuration may contain:
+
+\[
+\boxed{
+\text{mesh size},
+}
+\]
+
+\[
+\boxed{
+\text{time step},
+}
+\]
+
+\[
+\boxed{
+\text{solver tolerance},
+}
+\]
+
+\[
+\boxed{
+\text{physical parameters},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{output options}.
+}
+\]
+
+This improves experiment management and reproducibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logging}
+\label{subsec:scientific-logging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simulation log may record:
+
+\[
+\boxed{
+\text{start and end times},
+}
+\]
+
+\[
+\boxed{
+\text{iteration counts},
+}
+\]
+
+\[
+\boxed{
+\text{residual histories},
+}
+\]
+
+\[
+\boxed{
+\text{warnings},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{parameter settings}.
+}
+\]
+
+Logs help diagnose both numerical and software failures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Checkpointing}
+\label{subsec:checkpointing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Long computations should periodically save enough state to restart.
+
+A checkpoint may contain:
+
+\[
+\boxed{
+\text{current solution},
+}
+\]
+
+\[
+\boxed{
+\text{simulation time},
+}
+\]
+
+\[
+\boxed{
+\text{solver state},
+}
+\]
+
+and possibly
+
+\[
+\boxed{
+\text{random generator state}.
+}
+\]
+
+If the program stops unexpectedly, computation can resume from the latest
+checkpoint.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Checkpoint Interval}
+\label{subsec:checkpoint-interval}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Saving checkpoints too frequently creates excessive I/O cost.
+
+Saving them too rarely risks losing substantial computation after a
+failure.
+
+Thus checkpoint frequency balances:
+
+\[
+\boxed{
+\text{storage overhead}
+}
+\]
+
+against
+
+\[
+\boxed{
+\text{recomputation risk}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameter Sweeps}
+\label{subsec:parameter-sweeps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a model depends on parameter
+
+\[
+\theta.
+\]
+
+A parameter sweep evaluates
+
+\[
+\boxed{
+M(\theta_1),
+M(\theta_2),
+\ldots,
+M(\theta_N).
+}
+\]
+
+Parameter sweeps are useful for:
+
+\[
+\boxed{
+\text{sensitivity analysis},
+}
+\]
+
+\[
+\boxed{
+\text{phase diagrams},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{scenario comparison}.
+}
+\]
+
+Independent parameter combinations are naturally parallel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ensemble Simulation}
+\label{subsec:ensemble-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ensemble consists of many simulations with different:
+
+\[
+\boxed{
+\text{initial conditions},
+}
+\]
+
+\[
+\boxed{
+\text{parameters},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{random inputs}.
+}
+\]
+
+Ensemble results provide information about variability and uncertainty.
+
+Monte Carlo simulation is an important form of ensemble computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Batch Processing}
+\label{subsec:batch-processing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large computational experiments may submit many independent jobs to a
+shared computing system.
+
+Each job processes a particular:
+
+\[
+\boxed{
+\text{parameter case},
+}
+\]
+
+\[
+\boxed{
+\text{sample},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{simulation segment}.
+}
+\]
+
+Batch systems schedule these jobs based on available resources.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Pipelines}
+\label{subsec:computational-pipelines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scientific workflow often contains several stages:
+
+\[
+\boxed{
+\text{input}
+\rightarrow
+\text{preprocessing}
+\rightarrow
+\text{simulation}
+\rightarrow
+\text{analysis}
+\rightarrow
+\text{visualization}.
+}
+\]
+
+Automating these stages reduces manual inconsistency and improves
+reproducibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Workflow Dependencies}
+\label{subsec:workflow-dependencies}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some computational tasks cannot begin until others finish.
+
+This forms a dependency graph.
+
+For example,
+
+\[
+\boxed{
+\text{mesh generation}
+\rightarrow
+\text{PDE solve}
+\rightarrow
+\text{postprocessing}.
+}
+\]
+
+Independent branches of the graph can execute in parallel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Verification of Scientific Software}
+\label{subsec:scientific-software-verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Software verification asks whether the implemented code correctly performs
+the intended numerical method.
+
+Verification techniques include:
+
+\[
+\boxed{
+\text{unit tests},
+}
+\]
+
+\[
+\boxed{
+\text{analytic test cases},
+}
+\]
+
+\[
+\boxed{
+\text{manufactured solutions},
+}
+\]
+
+\[
+\boxed{
+\text{convergence studies},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{cross-code comparisons}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unit Testing}
+\label{subsec:scientific-unit-testing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A unit test checks one small component of a program.
+
+Examples include testing:
+
+\[
+\boxed{
+\text{a derivative routine},
+}
+\]
+
+\[
+\boxed{
+\text{a matrix assembly function},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a coordinate transformation}.
+}
+\]
+
+Small tests make software failures easier to isolate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression Testing}
+\label{subsec:regression-testing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A regression test compares current software output with previously
+validated output.
+
+Its purpose is to detect unintended changes after modifying the code.
+
+Because floating-point outputs may vary slightly, numerical regression
+tests should often use tolerances rather than exact string equality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convergence Testing}
+\label{subsec:scientific-convergence-testing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a numerical method is theoretically order \(p\).
+
+A convergence test checks whether
+
+\[
+\boxed{
+E(h)
+\approx
+Ch^p.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\frac{
+E(h)
+}{
+E(h/2)
+}
+\approx
+2^p.
+}
+\]
+
+Failure to observe the expected rate can reveal implementation or modeling
+errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Testing}
+\label{subsec:scientific-residual-testing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a computed solution \(u_h\), evaluate the discrete residual
+
+\[
+\boxed{
+r_h
+=
+F_h(u_h).
+}
+\]
+
+A large residual indicates the algebraic equations have not been solved
+accurately.
+
+A small residual does not by itself guarantee small physical or
+discretization error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conservation Checks}
+\label{subsec:scientific-conservation-checks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the mathematical model conserves a quantity
+
+\[
+I(u),
+\]
+
+monitor
+
+\[
+\boxed{
+I(u^n)-I(u^0).
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{mass},
+}
+\]
+
+\[
+\boxed{
+\text{charge},
+}
+\]
+
+\[
+\boxed{
+\text{energy},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{population}.
+}
+\]
+
+Unexpected drift can reveal numerical or software errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dimensional Analysis as a Software Check}
+\label{subsec:dimensional-analysis-software-check}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Physical equations must be dimensionally consistent.
+
+For example, if
+
+\[
+x
+=
+x_0
++
+vt,
+\]
+
+then
+
+\[
+[v][t]
+=
+[x].
+\]
+
+Unit inconsistencies can reveal input and implementation mistakes before
+expensive simulations are run.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nondimensionalization}
+\label{subsec:scientific-nondimensionalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Introduce characteristic scales such as
+
+\[
+x=L\widehat{x},
+\qquad
+t=T\widehat{t},
+\qquad
+u=U\widehat{u}.
+\]
+
+The resulting equations may depend on dimensionless parameters.
+
+Nondimensionalization can improve:
+
+\[
+\boxed{
+\text{physical interpretation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{numerical scaling}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example: Dimensionless ODE}
+\label{subsec:worked-dimensionless-ode}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Scaling Exponential Decay}
+
+Suppose
+
+\[
+\frac{dy}{dt}
+=
+-ky.
+\]
+
+Introduce
+
+\[
+\tau=kt.
+\]
+
+Then
+
+\[
+\frac{dy}{dt}
+=
+k
+\frac{dy}{d\tau}.
+\]
+
+Therefore,
+
+\[
+k
+\frac{dy}{d\tau}
+=
+-ky.
+\]
+
+Canceling \(k\),
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+\frac{dy}{d\tau}
+=
+-y.
+}
+\]
+\end{answerbox}
+
+The physical parameter has been absorbed into the time scale.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity Studies}
+\label{subsec:scientific-sensitivity-studies}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sensitivity study varies inputs and observes the resulting output.
+
+For parameter \(\theta\),
+
+\[
+\boxed{
+S
+=
+\frac{
+\partial Q
+}{
+\partial\theta
+}
+}
+\]
+
+measures local sensitivity of output \(Q\).
+
+Finite differences may approximate:
+
+\[
+\boxed{
+\frac{
+Q(\theta+h)-Q(\theta-h)
+}{
+2h
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncertainty Versus Sensitivity}
+\label{subsec:uncertainty-versus-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sensitivity asks how strongly an output responds to a parameter.
+
+Uncertainty quantification asks how uncertain inputs produce uncertain
+outputs.
+
+A parameter can have high sensitivity but little uncertainty, or low
+sensitivity but large uncertainty.
+
+These concepts should not be confused.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scientific Visualization}
+\label{subsec:scientific-visualization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Visualization helps interpret large numerical data sets.
+
+Common visualizations include:
+
+\[
+\boxed{
+\text{line plots},
+}
+\]
+
+\[
+\boxed{
+\text{contours},
+}
+\]
+
+\[
+\boxed{
+\text{vector fields},
+}
+\]
+
+\[
+\boxed{
+\text{surface plots},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{animations}.
+}
+\]
+
+Visualization can reveal patterns that are difficult to detect in raw
+arrays.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Visualization Is Not Validation}
+\label{subsec:visualization-not-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A visually smooth solution may still be:
+
+\[
+\boxed{
+\text{inaccurate},
+}
+\]
+
+\[
+\boxed{
+\text{unstable},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{physically incorrect}.
+}
+\]
+
+Plots should be combined with quantitative diagnostics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derived Quantities}
+\label{subsec:derived-quantities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific interest often lies not in the full solution field but in
+derived quantities.
+
+Examples include:
+
+\[
+\boxed{
+\text{maximum temperature},
+}
+\]
+
+\[
+\boxed{
+\text{total flux},
+}
+\]
+
+\[
+\boxed{
+\text{mean displacement},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{peak infection}.
+}
+\]
+
+Error analysis should consider these quantities of interest directly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduction Operations}
+\label{subsec:scientific-reductions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A reduction combines many values into one.
+
+Examples include:
+
+\[
+\boxed{
+\sum_i x_i,
+}
+\]
+
+\[
+\boxed{
+\max_i x_i,
+}
+\]
+
+and
+
+\[
+\boxed{
+\|x\|_2.
+}
+\]
+
+Parallel reductions require communication and may be synchronization
+points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Input and Output Costs}
+\label{subsec:scientific-io}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large simulations can generate enormous amounts of data.
+
+Writing every state to storage may dominate runtime.
+
+Output strategies may instead save:
+
+\[
+\boxed{
+\text{selected time steps},
+}
+\]
+
+\[
+\boxed{
+\text{compressed fields},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{derived quantities}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{In Situ Analysis}
+\label{subsec:in-situ-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In situ analysis processes simulation data while the simulation is still
+running.
+
+Instead of writing every full data set to disk, the program computes
+summaries, statistics, or visualization information immediately.
+
+This can reduce storage and I/O requirements.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Storage}
+\label{subsec:computational-storage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific data may include:
+
+\[
+\boxed{
+\text{raw inputs},
+}
+\]
+
+\[
+\boxed{
+\text{checkpoints},
+}
+\]
+
+\[
+\boxed{
+\text{solution fields},
+}
+\]
+
+\[
+\boxed{
+\text{logs},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{derived outputs}.
+}
+\]
+
+A storage strategy should preserve enough information to reproduce key
+scientific conclusions without retaining unnecessary data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{High-Performance Computing}
+\label{subsec:high-performance-computing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+High-Performance Computing, abbreviated HPC, uses advanced computational
+resources to solve problems requiring substantial:
+
+\[
+\boxed{
+\text{processing power},
+}
+\]
+
+\[
+\boxed{
+\text{memory},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{parallelism}.
+}
+\]
+
+HPC includes multicore processors, GPUs, clusters, and supercomputers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scalability}
+\label{subsec:scientific-scalability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scalable algorithm continues to use additional computational resources
+effectively as:
+
+\[
+\boxed{
+\text{problem size increases}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{processor count increases}.
+}
+\]
+
+Scalability depends on both the mathematical algorithm and its
+implementation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algorithmic Scalability}
+\label{subsec:algorithmic-scalability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one solver requires
+
+\[
+O(N^3)
+\]
+
+work while another requires
+
+\[
+O(N).
+\]
+
+For small \(N\), the difference may not matter.
+
+For very large \(N\), asymptotic complexity dominates.
+
+Thus better algorithms are often more important than faster hardware.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Scalability}
+\label{subsec:parallel-scalability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel scalability depends on:
+
+\[
+\boxed{
+\text{serial fraction},
+}
+\]
+
+\[
+\boxed{
+\text{communication volume},
+}
+\]
+
+\[
+\boxed{
+\text{synchronization frequency},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{load balance}.
+}
+\]
+
+Reducing these costs can be as important as increasing processor count.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Performance Portability}
+\label{subsec:performance-portability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Performance portability means software performs efficiently across
+different hardware platforms without requiring a complete redesign.
+
+This is challenging because CPUs, GPUs, and accelerators have different
+memory and execution characteristics.
+
+Portable abstractions attempt to separate mathematical algorithms from
+hardware-specific details.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Versus Dense Computation}
+\label{subsec:sparse-versus-dense-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dense algorithms assume most entries are nonzero.
+
+Sparse algorithms store and process only significant nonzero entries.
+
+If
+
+\[
+\operatorname{nnz}(A)
+\ll
+mn,
+\]
+
+then sparse storage can dramatically reduce memory.
+
+However, sparse computations often have lower arithmetic intensity and
+more irregular memory access.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix-Free Computation}
+\label{subsec:matrix-free-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matrix-free method avoids explicitly storing a large matrix.
+
+Instead, it provides an operation
+
+\[
+\boxed{
+v
+\mapsto
+Av.
+}
+\]
+
+Krylov methods often require only matrix-vector products.
+
+For PDEs and optimization, this can eliminate enormous matrix storage
+costs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix-Free Jacobians}
+\label{subsec:matrix-free-jacobians}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Jacobian-vector product can be approximated by
+
+\[
+\boxed{
+J(u)v
+\approx
+\frac{
+F(u+\varepsilon v)-F(u)
+}{
+\varepsilon
+}.
+}
+\]
+
+This permits Newton--Krylov methods without explicitly assembling \(J\).
+
+Automatic differentiation can also compute Jacobian-vector products more
+accurately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fast Fourier Transform}
+\label{subsec:fast-fourier-transform}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A direct discrete Fourier transform requires approximately
+
+\[
+\boxed{
+O(N^2)
+}
+\]
+
+operations.
+
+The Fast Fourier Transform, abbreviated FFT, reduces this to approximately
+
+\[
+\boxed{
+O(N\log N).
+}
+\]
+
+This dramatic complexity reduction makes large Fourier-based computations
+practical.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why the FFT Matters}
+\label{subsec:why-fft-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The FFT appears in:
+
+\[
+\boxed{
+\text{spectral PDE solvers},
+}
+\]
+
+\[
+\boxed{
+\text{signal processing},
+}
+\]
+
+\[
+\boxed{
+\text{convolution},
+}
+\]
+
+\[
+\boxed{
+\text{correlation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Poisson solvers}.
+}
+\]
+
+It is a classic example of algorithmic improvement outweighing raw
+hardware speed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convolution by FFT}
+\label{subsec:fft-convolution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The convolution theorem states that convolution in physical space becomes
+multiplication in Fourier space.
+
+Conceptually,
+
+\[
+\boxed{
+f*g
+=
+\mathcal{F}^{-1}
+\left[
+\mathcal{F}(f)
+\mathcal{F}(g)
+\right].
+}
+\]
+
+Thus large convolutions can be accelerated using FFT algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomized Algorithms}
+\label{subsec:scientific-randomized-algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some scientific algorithms use randomness to reduce computational cost.
+
+Examples include:
+
+\[
+\boxed{
+\text{Monte Carlo simulation},
+}
+\]
+
+\[
+\boxed{
+\text{randomized matrix approximation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{randomized optimization methods}.
+}
+\]
+
+Randomness becomes part of the numerical algorithm rather than merely a
+source of uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomized Linear Algebra Preview}
+\label{subsec:randomized-linear-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(A\) is a very large matrix.
+
+Instead of computing a complete factorization, one may multiply \(A\) by
+a random test matrix
+
+\[
+\boxed{
+\Omega
+}
+\]
+
+to form
+
+\[
+\boxed{
+Y=A\Omega.
+}
+\]
+
+The range of \(Y\) can approximate the dominant range of \(A\).
+
+This can accelerate low-rank approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameter Estimation Pipeline}
+\label{subsec:parameter-estimation-pipeline}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A parameter-estimation problem may contain several nested computational
+layers:
+
+\[
+\boxed{
+\theta
+\rightarrow
+\text{model simulation}
+\rightarrow
+\text{predicted data}
+\rightarrow
+\text{objective}
+\rightarrow
+\text{optimizer}.
+}
+\]
+
+Each optimization step may require another simulation.
+
+This can make parameter estimation computationally expensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Surrogate Models}
+\label{subsec:scientific-surrogate-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a simulation is extremely expensive, a surrogate model may approximate
+
+\[
+\boxed{
+\theta
+\mapsto
+Q(\theta).
+}
+\]
+
+The surrogate is cheaper to evaluate and can support:
+
+\[
+\boxed{
+\text{optimization},
+}
+\]
+
+\[
+\boxed{
+\text{uncertainty quantification},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{parameter exploration}.
+}
+\]
+
+The surrogate introduces an additional approximation error that must be
+validated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduced-Order Models}
+\label{subsec:reduced-order-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A large model with state
+
+\[
+u\in\mathbb{R}^N
+\]
+
+may be approximated using a lower-dimensional representation
+
+\[
+\boxed{
+u
+\approx
+V_r a,
+}
+\]
+
+where
+
+\[
+V_r
+\in
+\mathbb{R}^{N\times r},
+\qquad
+r\ll N.
+\]
+
+Reduced-order models can accelerate repeated simulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proper Orthogonal Decomposition Preview}
+\label{subsec:pod-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose simulation snapshots form matrix
+
+\[
+\boxed{
+X
+=
+\begin{pmatrix}
+|&|&&|\\
+u_1&u_2&\cdots&u_m\\
+|&|&&|
+\end{pmatrix}.
+}
+\]
+
+The singular value decomposition can identify dominant spatial modes.
+
+Keeping the leading modes produces a low-dimensional basis.
+
+This is closely connected with low-rank approximation from
+Section~\ref{sec:numerical-linear-algebra}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Complexity of Simulation}
+\label{subsec:simulation-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a time-dependent simulation has:
+
+\[
+N
+=
+\text{spatial unknowns},
+\]
+
+and
+
+\[
+M
+=
+\text{time steps}.
+\]
+
+If each time step costs
+
+\[
+O(N),
+\]
+
+then total work is approximately
+
+\[
+\boxed{
+O(MN).
+}
+\]
+
+If each step requires a dense solve costing
+
+\[
+O(N^3),
+\]
+
+the total becomes
+
+\[
+\boxed{
+O(MN^3).
+}
+\]
+
+Thus solver choice can completely determine tractability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memory Complexity}
+\label{subsec:memory-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Runtime complexity is not the only resource constraint.
+
+A dense \(N\times N\) matrix requires
+
+\[
+\boxed{
+O(N^2)
+}
+\]
+
+storage.
+
+A sparse stencil matrix may require only
+
+\[
+\boxed{
+O(N)
+}
+\]
+
+storage.
+
+For very large problems, memory requirements can determine whether a
+method is feasible at all.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Memory Tradeoffs}
+\label{subsec:time-memory-tradeoffs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some algorithms reduce runtime by storing intermediate quantities.
+
+Others recompute values to reduce memory.
+
+Thus scientific computing often balances:
+
+\[
+\boxed{
+\text{computation}
+}
+\]
+
+against
+
+\[
+\boxed{
+\text{storage}.
+}
+\]
+
+Checkpointing in adjoint and optimization computations is an important
+example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Monte Carlo}
+\label{subsec:parallel-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\widehat{\mu}
+=
+\frac1N
+\sum_{i=1}^{N}
+g(X_i).
+\]
+
+Divide the \(N\) samples across \(p\) workers.
+
+Each computes a partial sum
+
+\[
+\boxed{
+S_j
+=
+\sum_{i\in I_j}
+g(X_i).
+}
+\]
+
+Then perform a global reduction:
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\frac1N
+\sum_{j=1}^{p}
+S_j.
+}
+\]
+
+Only the final reduction requires communication.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel PDE Computation}
+\label{subsec:parallel-pde-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a stencil-based PDE method, divide the grid into subdomains.
+
+Each processor updates interior points independently.
+
+Only neighboring boundary values must be exchanged.
+
+Thus communication is localized to subdomain interfaces.
+
+The ratio between interior work and boundary communication strongly affects
+scaling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Surface-to-Volume Effect}
+\label{subsec:surface-volume-effect}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In domain decomposition, computation scales with subdomain volume while
+communication scales roughly with boundary surface area.
+
+As each processor receives a smaller subdomain, the surface-to-volume ratio
+increases.
+
+Thus communication becomes increasingly important in strong scaling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Linear Algebra}
+\label{subsec:parallel-linear-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dense matrix operations can be distributed across processors by dividing
+matrices into blocks.
+
+Sparse iterative methods distribute matrix rows or graph partitions.
+
+The key operations often include:
+
+\[
+\boxed{
+\text{matrix-vector products},
+}
+\]
+
+\[
+\boxed{
+\text{dot products},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{preconditioner applications}.
+}
+\]
+
+Global dot products can become synchronization bottlenecks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asynchronous Computation}
+\label{subsec:asynchronous-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Traditional parallel algorithms often require all processors to synchronize
+at specific points.
+
+Asynchronous methods allow workers to proceed using partially outdated
+information.
+
+This can reduce waiting but complicates convergence analysis.
+
+Some iterative optimization and linear-solver methods admit asynchronous
+variants.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fault Tolerance}
+\label{subsec:scientific-fault-tolerance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As computational systems grow, hardware or software failures become more
+likely during long simulations.
+
+Fault-tolerance strategies include:
+
+\[
+\boxed{
+\text{checkpoint/restart},
+}
+\]
+
+\[
+\boxed{
+\text{redundancy},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{algorithmic recovery}.
+}
+\]
+
+Scientific workflows should anticipate failure rather than assume every
+long run will finish uninterrupted.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scientific Computing and Cloud Systems}
+\label{subsec:scientific-cloud-computing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific workloads may run on local workstations, clusters,
+supercomputers, or cloud-based systems.
+
+The mathematical algorithms remain similar, but resource management and
+cost models differ.
+
+Cloud computation can provide flexible access to:
+
+\[
+\boxed{
+\text{CPUs},
+}
+\]
+
+\[
+\boxed{
+\text{GPUs},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{distributed storage}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reproducibility Across Hardware}
+\label{subsec:reproducibility-across-hardware}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Changing hardware can alter:
+
+\[
+\boxed{
+\text{floating-point reduction order},
+}
+\]
+
+\[
+\boxed{
+\text{compiler optimizations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{mathematical-library implementations}.
+}
+\]
+
+Therefore numerical agreement should often be assessed using scientifically
+meaningful tolerances rather than demanding exact identical digits.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scientific Computing Workflow for Large Problems}
+\label{subsec:large-scientific-computing-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a large computational project:
+
+\begin{enumerate}
+    \item begin with a small verified model;
+    \item compare against analytic or benchmark results;
+    \item perform a discretization study;
+    \item establish numerical tolerances;
+    \item profile the implementation;
+    \item identify dominant computational kernels;
+    \item exploit efficient libraries;
+    \item exploit sparsity;
+    \item reduce unnecessary data movement;
+    \item parallelize only meaningful bottlenecks;
+    \item measure strong and weak scaling;
+    \item implement checkpointing;
+    \item document all runtime parameters;
+    \item automate parameter sweeps and postprocessing;
+    \item verify that high-performance changes preserve numerical results;
+    \item perform final scientific validation.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing Computational Strategies}
+\label{subsec:choosing-computational-strategies}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For small dense linear algebra, use optimized dense factorizations.
+
+For large sparse systems, use:
+
+\[
+\boxed{
+\text{sparse direct methods}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{preconditioned iterative methods}.
+}
+\]
+
+For independent simulation ensembles, use:
+
+\[
+\boxed{
+\text{task parallelism}.
+}
+\]
+
+For stencil-based PDEs, use:
+
+\[
+\boxed{
+\text{domain decomposition}.
+}
+\]
+
+For large data-parallel kernels, consider:
+
+\[
+\boxed{
+\text{GPU acceleration}.
+}
+\]
+
+For memory-limited systems, consider:
+
+\[
+\boxed{
+\text{sparse or matrix-free algorithms}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:scientific-computing-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Optimizing Code Before Verifying Mathematics}
+
+A fast implementation of an incorrect method is still incorrect.
+
+Correctness should be established before performance optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Big-O Complexity Predicts Exact Runtime}
+
+Two algorithms with the same asymptotic complexity can have very different
+constants, memory behavior, and hardware utilization.
+
+Benchmark representative problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Memory Access}
+
+Modern computational performance may be limited more by data movement than
+by arithmetic.
+
+Reducing operation count alone may not improve runtime.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reimplementing Standard Numerical Kernels Unnecessarily}
+
+Fundamental matrix and transform operations are often already available in
+highly optimized and well-tested libraries.
+
+Use established kernels unless a specialized implementation is required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Parallelizing a Tiny Problem}
+
+Parallel overhead can exceed the useful computation.
+
+Parallelism becomes beneficial only when sufficient work exists to justify
+communication and scheduling costs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Twice as Many Processors Gives Twice the Speed}
+
+Serial work, communication, and synchronization prevent ideal scaling.
+
+Measure speedup directly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Load Imbalance}
+
+Parallel runtime is often determined by the slowest worker.
+
+Equal processor counts do not imply equal workloads.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Many Small Network Messages}
+
+Latency costs can dominate.
+
+Combining communication into fewer larger messages may improve
+performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Transferring Accelerator Data Repeatedly}
+
+GPU computation can become slower than CPU computation if data movement
+dominates kernel execution.
+
+Keep frequently used data close to the accelerator when possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Lower Precision Is Always Safe}
+
+Lower precision can increase rounding error or cause convergence failure
+for ill-conditioned problems.
+
+Precision should be selected using numerical analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Double Precision Is Always Necessary}
+
+Some well-conditioned calculations can be performed accurately in lower
+precision, potentially reducing cost.
+
+Mixed precision may provide a better tradeoff.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Expecting Parallel Floating-Point Reductions to Be Bitwise Identical}
+
+Different summation orders can change low-order digits.
+
+This is normal floating-point behavior and should be distinguished from
+meaningful numerical disagreement.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Random Simulation Without Recording Seeds}
+
+Exact reproduction of stochastic experiments becomes difficult.
+
+Record both generator configuration and seed information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Saving Too Little Information to Reproduce Results}
+
+A final graph alone is not a reproducible computational experiment.
+
+Preserve model parameters, code version, numerical settings, and input
+data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Saving Every Possible Output}
+
+Massive unnecessary output can dominate runtime and storage.
+
+Save quantities needed for scientific interpretation and reproducibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating a Plot as Verification}
+
+A smooth-looking solution can be quantitatively wrong.
+
+Use residuals, convergence studies, conservation checks, and benchmark
+solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Units}
+
+A unit mismatch can produce numerically plausible but physically
+meaningless results.
+
+Perform dimensional checks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Failing to Test Small Problems First}
+
+Large simulations are difficult to debug.
+
+Start with small cases where solutions can be inspected or compared with
+known results.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Changing Algorithm and Hardware Simultaneously}
+
+If performance or results change, it becomes difficult to identify the
+cause.
+
+Controlled computational experiments change one major factor at a time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Hardware Fixes a Poor Algorithm}
+
+An algorithm with poor asymptotic scaling may remain inefficient even on a
+large computer.
+
+Algorithmic improvements often provide much larger gains.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:scientific-computing-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Physics.}
+Scientific computing supports particle simulations, quantum models,
+electromagnetics, statistical mechanics, and astrophysics.
+
+\medskip
+
+\textbf{Engineering.}
+Large numerical simulations are used in structures, fluids, heat transfer,
+circuits, control, and mechanical design.
+
+\medskip
+
+\textbf{Biology.}
+Computational models study epidemics, ecological systems, molecular
+systems, and population dynamics.
+
+\medskip
+
+\textbf{Chemistry.}
+Reaction kinetics, molecular simulation, quantum chemistry, and transport
+models rely on high-performance numerical computation.
+
+\medskip
+
+\textbf{Climate and Environment.}
+Atmospheric, oceanic, and environmental models involve extremely large
+coupled PDE systems and ensemble simulations.
+
+\medskip
+
+\textbf{Statistics and Data Science.}
+Large-scale linear algebra, optimization, Bayesian computation, and
+simulation require efficient numerical software.
+
+\medskip
+
+\textbf{Finance.}
+Monte Carlo simulation, PDE methods, optimization, and stochastic models
+are used in pricing and risk analysis.
+
+\medskip
+
+\textbf{Operations Research.}
+Large optimization, simulation, and network models depend on efficient
+computational algorithms.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:scientific-computing-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define scientific computing.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish a mathematical model from a numerical method.
+\end{exercise}
+
+\begin{exercise}[1]
+Define algorithmic complexity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define arithmetic intensity conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define parallel speedup.
+\end{exercise}
+
+\begin{exercise}[1]
+Define parallel efficiency.
+\end{exercise}
+
+\begin{exercise}[1]
+Define strong scaling.
+\end{exercise}
+
+\begin{exercise}[1]
+Define weak scaling.
+\end{exercise}
+
+\begin{exercise}[1]
+Define checkpointing.
+\end{exercise}
+
+\begin{exercise}[1]
+Define data provenance.
+\end{exercise}
+
+\begin{exercise}[2]
+Compare the operation counts of algorithms requiring
+
+\[
+O(n),
+\qquad
+O(n^2),
+\qquad
+O(n^3)
+\]
+
+work as \(n\) increases.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why a sparse matrix-vector product may be memory-bound.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain temporal and spatial locality.
+\end{exercise}
+
+\begin{exercise}[2]
+Give an example of a vectorized mathematical operation.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why numerical libraries can outperform scalar high-level loops.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute speedup from given values of \(T_1\) and \(T_p\).
+\end{exercise}
+
+\begin{exercise}[2]
+Compute parallel efficiency.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply Amdahl's law for a specified serial fraction and processor count.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the maximum theoretical speedup as
+
+\[
+p\to\infty.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why strong-scaling efficiency eventually decreases.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a weak-scaling experiment.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of task parallelism.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of data parallelism.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between shared and distributed memory.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain a race condition.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why synchronization reduces parallel efficiency.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe halo exchange for a finite-difference PDE solver.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Monte Carlo is naturally parallel.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why global dot products can become bottlenecks in Krylov solvers.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare single and double precision conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe a mixed-precision linear-solver strategy.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why parallel floating-point sums can differ in their final digits.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare sequential and pairwise summation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain compensated summation.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish bitwise and numerical reproducibility.
+\end{exercise}
+
+\begin{exercise}[3]
+List the information required to reproduce a computational experiment.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a checkpoint strategy for a twelve-hour simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the tradeoff in checkpoint frequency.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a parameter sweep over two model parameters.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why parameter sweeps are often embarrassingly parallel.
+\end{exercise}
+
+\begin{exercise}[3]
+Design an ensemble simulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a simple computational dependency graph.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between unit testing and regression testing.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a convergence test for a second-order numerical method.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a small residual does not guarantee a small discretization
+error.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a conservation diagnostic for a population model.
+\end{exercise}
+
+\begin{exercise}[3]
+Nondimensionalize a simple ODE using a characteristic time scale.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between sensitivity and uncertainty.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a quantitative diagnostic to accompany a scientific visualization.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why excessive output can reduce simulation performance.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare a dense \(N\times N\) storage requirement with a sparse matrix
+containing \(O(N)\) nonzeros.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain matrix-free computation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a finite-difference Jacobian-vector product.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the asymptotic costs of a direct DFT and an FFT.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the FFT is important in spectral PDE solvers.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe a randomized low-rank matrix approximation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of surrogate models in expensive optimization.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe a reduced-order representation
+
+\[
+u\approx V_ra.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate the computational cost of a simulation with \(M\) time steps and
+\(O(N)\) work per step.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the surface-to-volume effect in parallel PDE decomposition.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the purpose of profiling.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a fair benchmark comparing two numerical algorithms.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why changing problem size can change which algorithm is fastest.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the roofline performance model.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Amdahl's law.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Gustafson-type scaled-speedup arguments.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze communication complexity of a domain-decomposed PDE method.
+\end{exercise}
+
+\begin{exercise}[4]
+Study parallel matrix multiplication.
+\end{exercise}
+
+\begin{exercise}[4]
+Study communication-avoiding linear algebra.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate parallel Krylov methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study asynchronous iterative methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze load balancing for adaptive meshes.
+\end{exercise}
+
+\begin{exercise}[4]
+Study mixed-precision iterative refinement.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze floating-point reproducibility of parallel reductions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study compensated and reproducible summation algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study arbitrary-precision computational complexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study checkpointing models for failure-prone large-scale systems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study parallel pseudorandom number generation.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate randomized numerical linear algebra.
+\end{exercise}
+
+\begin{exercise}[4]
+Study matrix-free Newton--Krylov methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study proper orthogonal decomposition for reduced-order modeling.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate in situ visualization and analysis.
+\end{exercise}
+
+\begin{exercise}[4]
+Study performance portability across CPUs and GPUs.
+\end{exercise}
+
+\begin{exercise}[4]
+Design a fully reproducible large-scale computational experiment.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:scientific-computing-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scientific computing combines
+
+\[
+\boxed{
+\text{mathematical models}
++
+\text{numerical algorithms}
++
+\text{software}
++
+\text{computer architecture}.
+}
+\]
+
+Computational cost depends on more than arithmetic.
+
+It also depends on
+
+\[
+\boxed{
+\text{memory movement}
++
+\text{communication}
++
+\text{synchronization}.
+}
+\]
+
+Parallel speedup is
+
+\[
+\boxed{
+S_p
+=
+\frac{
+T_1
+}{
+T_p
+},
+}
+\]
+
+and parallel efficiency is
+
+\[
+\boxed{
+E_p
+=
+\frac{
+S_p
+}{
+p
+}.
+}
+\]
+
+Amdahl's law gives
+
+\[
+\boxed{
+S_p
+=
+\frac{
+1
+}{
+s+\frac{1-s}{p}
+}.
+}
+\]
+
+Large scientific calculations rely on
+
+\[
+\boxed{
+\text{sparse algorithms},
+}
+\]
+
+\[
+\boxed{
+\text{parallelism},
+}
+\]
+
+\[
+\boxed{
+\text{accelerators},
+}
+\]
+
+\[
+\boxed{
+\text{checkpointing},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{reproducible workflows}.
+}
+\]
+
+Reliable scientific computing therefore requires simultaneous attention to
+
+\[
+\boxed{
+\text{correct mathematics}
++
+\text{numerical stability}
++
+\text{computational efficiency}
++
+\text{software verification}
++
+\text{scientific reproducibility}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:scientific-computing-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Scientific Computing integrates the numerical methods developed throughout
+Chapter~11 into complete computational workflows. Numerical Analysis
+provides error and stability principles; Numerical Linear Algebra supplies
+matrix algorithms; Numerical Optimization supplies iterative decision
+methods; Numerical ODEs and PDEs generate large simulation problems; and
+Monte Carlo Methods supply stochastic computation. Scientific Computing
+adds the implementation principles required to execute these methods
+reliably and efficiently, including memory-aware algorithms, parallelism,
+high-performance computing, precision selection, checkpointing,
+verification, and reproducibility. The next section, Symbolic Computation,
+moves from approximate numerical calculation to exact manipulation of
+mathematical expressions, algebraic identities, equations, derivatives,
+integrals, and symbolic mathematical objects.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.7 Scientific Computing
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard scientific-computing principles.
+%   - Standard high-performance and parallel-computing concepts.
+%   - Standard numerical-software verification and reproducibility
+%     practices.
+%
+% Used for:
+%   - scientific computing definition;
+%   - model, algorithm, and implementation separation;
+%   - computational error sources;
+%   - algorithmic complexity;
+%   - operation counts;
+%   - memory hierarchy;
+%   - locality;
+%   - arithmetic intensity;
+%   - memory-bound and compute-bound computation;
+%   - vectorization;
+%   - numerical libraries;
+%   - profiling and benchmarking;
+%   - parallel computing;
+%   - task and data parallelism;
+%   - shared-memory systems;
+%   - race conditions and synchronization;
+%   - distributed-memory systems;
+%   - message passing;
+%   - domain decomposition;
+%   - halo exchange;
+%   - speedup and parallel efficiency;
+%   - Amdahl's law;
+%   - strong and weak scaling;
+%   - load balancing;
+%   - communication overhead;
+%   - latency and bandwidth;
+%   - granularity;
+%   - embarrassingly parallel computation;
+%   - GPU computing;
+%   - accelerator data movement;
+%   - single, double, mixed, and arbitrary precision;
+%   - floating-point reduction order;
+%   - pairwise and compensated summation;
+%   - deterministic and nondeterministic computation;
+%   - bitwise and numerical reproducibility;
+%   - computational experiment documentation;
+%   - data provenance;
+%   - configuration and logging;
+%   - checkpointing;
+%   - parameter sweeps;
+%   - ensemble simulation;
+%   - batch processing;
+%   - workflow automation;
+%   - unit and regression testing;
+%   - convergence and residual testing;
+%   - conservation checks;
+%   - dimensional analysis;
+%   - nondimensionalization;
+%   - sensitivity studies;
+%   - scientific visualization;
+%   - reduction operations;
+%   - I/O and in situ analysis;
+%   - high-performance computing;
+%   - scalability;
+%   - performance portability;
+%   - sparse and matrix-free computation;
+%   - Jacobian-vector products;
+%   - Fast Fourier Transform;
+%   - randomized algorithms;
+%   - randomized linear algebra preview;
+%   - parameter-estimation pipelines;
+%   - surrogate models;
+%   - reduced-order models;
+%   - proper orthogonal decomposition preview;
+%   - simulation and memory complexity;
+%   - parallel Monte Carlo;
+%   - parallel PDE computation;
+%   - surface-to-volume scaling;
+%   - parallel linear algebra;
+%   - asynchronous computation;
+%   - fault tolerance;
+%   - applications and exercises.
+%
+% Notes:
+%   - Symbolic Computation is developed next in Section 11.8.
+%   - Computer Algebra follows in Section 11.9.
+%   - Mathematical Simulation follows in Section 11.10.
+%   - High-Performance Mathematical Computing is developed in
+%     Section 11.11.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

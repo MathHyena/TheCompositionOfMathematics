@@ -1,0 +1,4187 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 13.6 CONTROL THEORY
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Control Theory}
+\label{sec:control-theory}
+
+\prerequisite{
+Linear algebra, differential equations, dynamical systems, Laplace
+transforms, optimization, numerical methods, probability, mathematical
+modeling, and mathematical physics.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of control theory;
+    \item distinguish open-loop and closed-loop control;
+    \item identify plant, controller, actuator, sensor, input, output,
+          disturbance, and reference signals;
+    \item formulate state-space models;
+    \item distinguish state variables from outputs;
+    \item understand linear time-invariant systems;
+    \item solve linear state equations using matrix exponentials;
+    \item understand equilibrium points;
+    \item linearize nonlinear systems;
+    \item understand transfer functions;
+    \item connect state-space and transfer-function representations;
+    \item understand poles and zeros;
+    \item recognize stability from poles;
+    \item understand asymptotic, Lyapunov, and exponential stability;
+    \item analyze stability using eigenvalues;
+    \item recognize marginal stability;
+    \item understand BIBO stability;
+    \item construct feedback laws;
+    \item understand proportional control;
+    \item understand integral control;
+    \item understand derivative control;
+    \item formulate PID control;
+    \item understand steady-state error;
+    \item recognize overshoot, rise time, settling time, and damping;
+    \item understand characteristic equations;
+    \item understand root-locus ideas conceptually;
+    \item recognize frequency response;
+    \item understand Bode plots conceptually;
+    \item recognize gain and phase margins;
+    \item understand controllability;
+    \item construct controllability matrices;
+    \item understand observability;
+    \item construct observability matrices;
+    \item understand state feedback;
+    \item recognize pole placement;
+    \item understand observers;
+    \item formulate Luenberger observers;
+    \item understand separation between estimation and control conceptually;
+    \item recognize canonical forms;
+    \item understand Lyapunov functions;
+    \item verify stability using Lyapunov methods;
+    \item recognize Lyapunov equations for linear systems;
+    \item understand nonlinear feedback conceptually;
+    \item recognize feedback linearization conceptually;
+    \item understand optimal control;
+    \item formulate quadratic cost functions;
+    \item understand linear-quadratic regulation;
+    \item recognize Riccati equations;
+    \item understand finite- and infinite-horizon control;
+    \item recognize Pontryagin's Maximum Principle conceptually;
+    \item understand Hamilton--Jacobi--Bellman equations conceptually;
+    \item recognize model predictive control;
+    \item understand constraints in control;
+    \item recognize robust control;
+    \item understand uncertainty and model mismatch;
+    \item recognize sensitivity functions conceptually;
+    \item understand disturbance rejection;
+    \item understand tracking;
+    \item recognize feedforward control;
+    \item understand stochastic control conceptually;
+    \item recognize Kalman filtering;
+    \item understand state estimation under noise;
+    \item recognize discrete-time control systems;
+    \item analyze discrete-time stability;
+    \item understand digital control;
+    \item recognize sampling effects;
+    \item understand delay in control systems;
+    \item recognize saturation and actuator constraints;
+    \item understand anti-windup conceptually;
+    \item recognize nonlinear control challenges;
+    \item understand adaptive control conceptually;
+    \item recognize system identification;
+    \item understand controllability and observability Gramians conceptually;
+    \item recognize balancing and model reduction conceptually;
+    \item understand networked and distributed control conceptually;
+    \item connect control theory with optimization, dynamical systems,
+          probability, robotics, aerospace, process systems, and finance.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Control Theory?}
+\label{subsec:what-is-control-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Control theory studies how inputs can be chosen to influence the behavior of
+dynamical systems.
+
+The general objective is to make a system:
+
+\[
+\boxed{
+\text{stable},
+}
+\]
+
+\[
+\boxed{
+\text{accurate},
+}
+\]
+
+\[
+\boxed{
+\text{fast},
+}
+\]
+
+\[
+\boxed{
+\text{robust},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{optimal}
+}
+\]
+
+according to a desired performance criterion.
+
+A controlled system may be mechanical, electrical, biological, economic, or
+computational.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Control-System Components}
+\label{subsec:control-system-components}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A control system may contain:
+
+\[
+\boxed{
+\text{plant}
+}
+\]
+
+for the physical or mathematical system being controlled;
+
+\[
+\boxed{
+\text{controller}
+}
+\]
+
+for the rule selecting inputs;
+
+\[
+\boxed{
+\text{actuator}
+}
+\]
+
+for applying control actions;
+
+\[
+\boxed{
+\text{sensor}
+}
+\]
+
+for measuring the system;
+
+and
+
+\[
+\boxed{
+\text{reference}
+}
+\]
+
+for the desired behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Open-Loop Control}
+\label{subsec:open-loop-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In open-loop control, the control input does not depend on the measured
+current output.
+
+Schematically,
+
+\[
+\boxed{
+r(t)
+\longrightarrow
+u(t)
+\longrightarrow
+\text{plant}
+\longrightarrow
+y(t).
+}
+\]
+
+The controller does not automatically correct deviations caused by
+disturbances or model error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closed-Loop Control}
+\label{subsec:closed-loop-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Closed-loop control uses feedback.
+
+A measured output is compared with a reference:
+
+\[
+\boxed{
+e(t)
+=
+r(t)-y(t).
+}
+\]
+
+The controller then chooses
+
+\[
+\boxed{
+u(t)
+=
+\mathcal{K}[e].
+}
+\]
+
+Feedback can reduce error and reject disturbances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Negative Feedback}
+\label{subsec:negative-feedback-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Negative feedback acts to oppose deviations from the desired state.
+
+For a simple proportional law,
+
+\[
+\boxed{
+u
+=
+K(r-y),
+}
+\]
+
+where \(K>0\).
+
+If \(y\) becomes too large relative to \(r\), the control action changes in
+the direction that reduces \(y\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State-Space Models}
+\label{subsec:control-state-space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A general nonlinear state-space model is
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+f(\mathbf{x},\mathbf{u},t),
+}
+\]
+
+\[
+\boxed{
+\mathbf{y}
+=
+h(\mathbf{x},\mathbf{u},t).
+}
+\]
+
+Here:
+
+\[
+\mathbf{x}
+=
+\text{state vector},
+\]
+
+\[
+\mathbf{u}
+=
+\text{control input},
+\]
+
+and
+
+\[
+\mathbf{y}
+=
+\text{measured output}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear State-Space Systems}
+\label{subsec:linear-state-space-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A continuous-time linear time-invariant system has form
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u},
+}
+\]
+
+\[
+\boxed{
+\mathbf{y}
+=
+C\mathbf{x}
++
+D\mathbf{u}.
+}
+\]
+
+The matrices are:
+
+\[
+A
+=
+\text{state matrix},
+\]
+
+\[
+B
+=
+\text{input matrix},
+\]
+
+\[
+C
+=
+\text{output matrix},
+\]
+
+and
+
+\[
+D
+=
+\text{direct-feedthrough matrix}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Equation Solution}
+\label{subsec:state-equation-solution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u}(t),
+\]
+
+the solution is
+
+\[
+\boxed{
+\mathbf{x}(t)
+=
+e^{At}\mathbf{x}_0
++
+\int_0^t
+e^{A(t-\tau)}
+B\mathbf{u}(\tau)
+\,d\tau.
+}
+\]
+
+The matrix exponential
+
+\[
+e^{At}
+\]
+
+plays the role that \(e^{at}\) plays in scalar differential equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Scalar Controlled System}
+\label{subsec:worked-scalar-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Constant Control Input}
+
+Consider
+
+\[
+\dot{x}
+=
+-2x+u
+\]
+
+with constant input
+
+\[
+u=4
+\]
+
+and
+
+\[
+x(0)=0.
+\]
+
+Then
+
+\[
+\dot{x}+2x=4.
+\]
+
+The equilibrium is
+
+\[
+x^*=2.
+\]
+
+The solution is
+
+\[
+x(t)
+=
+2+Ce^{-2t}.
+\]
+
+Using \(x(0)=0\),
+
+\[
+C=-2.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+x(t)
+=
+2(1-e^{-2t}).
+}
+\]
+\end{answerbox}
+
+The state approaches \(2\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equilibrium Points}
+\label{subsec:control-equilibrium-points}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\dot{\mathbf{x}}
+=
+f(\mathbf{x},\mathbf{u}),
+\]
+
+an equilibrium associated with constant input \(\mathbf{u}^*\) satisfies
+
+\[
+\boxed{
+f(\mathbf{x}^*,\mathbf{u}^*)=0.
+}
+\]
+
+Control often seeks to stabilize a selected equilibrium.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linearization}
+\label{subsec:control-linearization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\dot{\mathbf{x}}
+=
+f(\mathbf{x},\mathbf{u}).
+\]
+
+Near equilibrium
+
+\[
+(\mathbf{x}^*,\mathbf{u}^*),
+\]
+
+define perturbations
+
+\[
+\delta\mathbf{x}
+=
+\mathbf{x}-\mathbf{x}^*,
+\]
+
+\[
+\delta\mathbf{u}
+=
+\mathbf{u}-\mathbf{u}^*.
+\]
+
+The linearized system is
+
+\[
+\boxed{
+\delta\dot{\mathbf{x}}
+=
+A\delta\mathbf{x}
++
+B\delta\mathbf{u},
+}
+\]
+
+where
+
+\[
+\boxed{
+A
+=
+\left.
+\frac{\partial f}{\partial\mathbf{x}}
+\right|_{(\mathbf{x}^*,\mathbf{u}^*)},
+}
+\]
+
+and
+
+\[
+\boxed{
+B
+=
+\left.
+\frac{\partial f}{\partial\mathbf{u}}
+\right|_{(\mathbf{x}^*,\mathbf{u}^*)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transfer Functions}
+\label{subsec:control-transfer-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a linear time-invariant system with zero initial conditions, the transfer
+function relates Laplace transforms of output and input:
+
+\[
+\boxed{
+G(s)
+=
+\frac{Y(s)}{U(s)}.
+}
+\]
+
+Transfer functions provide an input-output description without explicitly
+displaying internal state variables.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transfer Function From a Differential Equation}
+\label{subsec:transfer-function-differential-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+a_2\ddot{y}
++
+a_1\dot{y}
++
+a_0y
+=
+b_1\dot{u}
++
+b_0u.
+\]
+
+With zero initial conditions,
+
+\[
+(a_2s^2+a_1s+a_0)Y(s)
+=
+(b_1s+b_0)U(s).
+\]
+
+Therefore,
+
+\[
+\boxed{
+G(s)
+=
+\frac{b_1s+b_0}
+{a_2s^2+a_1s+a_0}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transfer Function From State Space}
+\label{subsec:state-space-transfer-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x}+B\mathbf{u},
+\]
+
+\[
+\mathbf{y}
+=
+C\mathbf{x}+D\mathbf{u},
+\]
+
+the transfer matrix is
+
+\[
+\boxed{
+G(s)
+=
+C(sI-A)^{-1}B+D.
+}
+\]
+
+This connects internal state dynamics to input-output behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Poles}
+\label{subsec:control-poles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Poles are values of \(s\) at which the transfer function becomes singular.
+
+For a minimal state-space realization, poles correspond to eigenvalues of
+\(A\).
+
+The characteristic equation is
+
+\[
+\boxed{
+\det(sI-A)=0.
+}
+\]
+
+Pole locations strongly determine temporal behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Zeros}
+\label{subsec:control-zeros}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Zeros are values of \(s\) that cause the transfer function numerator to
+vanish.
+
+For scalar
+
+\[
+G(s)
+=
+\frac{N(s)}{D(s)},
+\]
+
+zeros satisfy
+
+\[
+\boxed{
+N(s)=0.
+}
+\]
+
+Zeros affect transient response, frequency response, and achievable control
+performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continuous-Time Linear Stability}
+\label{subsec:continuous-linear-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the autonomous system
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x},
+\]
+
+the equilibrium
+
+\[
+\mathbf{x}=0
+\]
+
+is asymptotically stable if every eigenvalue of \(A\) satisfies
+
+\[
+\boxed{
+\operatorname{Re}(\lambda_i)<0.
+}
+\]
+
+Such a matrix is called Hurwitz.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Eigenvalue Stability}
+\label{subsec:worked-eigenvalue-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Stable Linear System}
+
+Let
+
+\[
+A
+=
+\begin{bmatrix}
+-2 & 0\\
+0 & -5
+\end{bmatrix}.
+\]
+
+The eigenvalues are
+
+\[
+\lambda_1=-2,
+\qquad
+\lambda_2=-5.
+\]
+
+Both have negative real part.
+
+\begin{answerbox}
+\[
+\boxed{
+\mathbf{x}=0
+\text{ is asymptotically stable}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unstable Linear Systems}
+\label{subsec:unstable-linear-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(A\) has an eigenvalue satisfying
+
+\[
+\boxed{
+\operatorname{Re}(\lambda)>0,
+}
+\]
+
+then the equilibrium is unstable.
+
+Solutions generally contain exponentially growing modes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Marginal Cases}
+\label{subsec:marginal-stability-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Eigenvalues on the imaginary axis require additional care.
+
+For example,
+
+\[
+\lambda=\pm i\omega
+\]
+
+can produce persistent oscillation.
+
+Repeated or defective imaginary-axis eigenvalues can create unbounded
+responses.
+
+Thus zero real part alone does not guarantee stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{BIBO Stability}
+\label{subsec:bibo-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A system is bounded-input bounded-output stable if every bounded input
+produces a bounded output.
+
+For a proper rational continuous-time transfer function with no unstable
+pole-zero cancellations in the realized input-output dynamics, BIBO
+stability requires all relevant poles to lie strictly in the left half-plane.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feedback State Control}
+\label{subsec:state-feedback-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u}.
+\]
+
+Choose state feedback
+
+\[
+\boxed{
+\mathbf{u}
+=
+-K\mathbf{x}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+(A-BK)\mathbf{x}.
+}
+\]
+
+The controller modifies the closed-loop eigenvalues.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reference Tracking With State Feedback}
+\label{subsec:state-feedback-reference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple tracking law may be written
+
+\[
+\boxed{
+\mathbf{u}
+=
+-K\mathbf{x}
++
+N\mathbf{r},
+}
+\]
+
+where \(N\) is chosen to obtain an appropriate steady-state response to the
+reference \(\mathbf{r}\).
+
+State feedback primarily shapes the dynamics, while feedforward terms can
+help set the desired equilibrium.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pole Placement}
+\label{subsec:pole-placement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a system is controllable, one can assign the eigenvalues of
+
+\[
+A-BK
+\]
+
+to desired locations within important limitations of the model.
+
+The goal is to choose
+
+\[
+\boxed{
+K
+}
+\]
+
+so that the closed-loop characteristic polynomial has specified roots.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controllability}
+\label{subsec:controllability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A state is controllable if an appropriate input can move the system to that
+state in finite time.
+
+For the LTI system
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u},
+\]
+
+the controllability matrix is
+
+\[
+\boxed{
+\mathcal{C}
+=
+\begin{bmatrix}
+B & AB & A^2B & \cdots & A^{n-1}B
+\end{bmatrix}.
+}
+\]
+
+The system is controllable when
+
+\[
+\boxed{
+\operatorname{rank}\mathcal{C}=n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Controllability}
+\label{subsec:worked-controllability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Two-State System}
+
+Let
+
+\[
+A
+=
+\begin{bmatrix}
+0 & 1\\
+0 & 0
+\end{bmatrix},
+\qquad
+B
+=
+\begin{bmatrix}
+0\\
+1
+\end{bmatrix}.
+\]
+
+Then
+
+\[
+AB
+=
+\begin{bmatrix}
+1\\
+0
+\end{bmatrix}.
+\]
+
+Thus
+
+\[
+\mathcal{C}
+=
+\begin{bmatrix}
+0 & 1\\
+1 & 0
+\end{bmatrix}.
+\]
+
+Since
+
+\[
+\operatorname{rank}\mathcal{C}=2,
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\text{the system is controllable}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncontrollable Modes}
+\label{subsec:uncontrollable-modes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\operatorname{rank}\mathcal{C}<n,
+\]
+
+some state directions cannot be influenced by the input.
+
+An unstable uncontrollable mode cannot be stabilized through the available
+control channel.
+
+This illustrates why actuator placement matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Observability}
+\label{subsec:observability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A system is observable if its initial state can be uniquely reconstructed
+from input-output measurements over a finite interval.
+
+For
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u},
+\]
+
+\[
+\mathbf{y}
+=
+C\mathbf{x},
+\]
+
+the observability matrix is
+
+\[
+\boxed{
+\mathcal{O}
+=
+\begin{bmatrix}
+C\\
+CA\\
+CA^2\\
+\vdots\\
+CA^{n-1}
+\end{bmatrix}.
+}
+\]
+
+The system is observable if
+
+\[
+\boxed{
+\operatorname{rank}\mathcal{O}=n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Observability}
+\label{subsec:worked-observability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Observing Both States}
+
+Let
+
+\[
+A
+=
+\begin{bmatrix}
+0 & 1\\
+0 & 0
+\end{bmatrix},
+\qquad
+C
+=
+\begin{bmatrix}
+1 & 0
+\end{bmatrix}.
+\]
+
+Then
+
+\[
+CA
+=
+\begin{bmatrix}
+0 & 1
+\end{bmatrix}.
+\]
+
+Therefore,
+
+\[
+\mathcal{O}
+=
+\begin{bmatrix}
+1 & 0\\
+0 & 1
+\end{bmatrix}.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+\operatorname{rank}\mathcal{O}=2,
+}
+\]
+
+so the system is observable.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Observers}
+\label{subsec:state-observers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Often not every state can be measured directly.
+
+An observer estimates the state using known inputs and measured outputs.
+
+A Luenberger observer has form
+
+\[
+\boxed{
+\dot{\hat{\mathbf{x}}}
+=
+A\hat{\mathbf{x}}
++
+B\mathbf{u}
++
+L
+\left(
+\mathbf{y}
+-
+C\hat{\mathbf{x}}
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Observer Error Dynamics}
+\label{subsec:observer-error-dynamics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define estimation error
+
+\[
+\boxed{
+\mathbf{e}
+=
+\mathbf{x}
+-
+\hat{\mathbf{x}}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\dot{\mathbf{e}}
+=
+(A-LC)\mathbf{e}.
+}
+\]
+
+If the pair \((A,C)\) is observable, \(L\) can be selected to place observer
+error poles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controller-Observer Combination}
+\label{subsec:controller-observer-combination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When states are not directly measured, use estimated-state feedback:
+
+\[
+\boxed{
+\mathbf{u}
+=
+-K\hat{\mathbf{x}}.
+}
+\]
+
+For linear systems under standard controllability and observability
+conditions, controller and observer dynamics can be designed separately.
+
+This is related to the separation principle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proportional Control}
+\label{subsec:proportional-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A proportional controller is
+
+\[
+\boxed{
+u(t)
+=
+K_Pe(t).
+}
+\]
+
+Large \(K_P\) can reduce error and increase responsiveness.
+
+However, excessive gain may cause overshoot, oscillation, noise
+amplification, or instability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integral Control}
+\label{subsec:integral-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Integral control uses accumulated error:
+
+\[
+\boxed{
+u(t)
+=
+K_I
+\int_0^t
+e(\tau)\,d\tau.
+}
+\]
+
+Integral action is particularly useful for removing persistent steady-state
+error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derivative Control}
+\label{subsec:derivative-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Derivative control responds to the rate of error change:
+
+\[
+\boxed{
+u(t)
+=
+K_D
+\frac{de}{dt}.
+}
+\]
+
+Derivative action can improve damping but is sensitive to measurement noise.
+
+Practical implementations typically use filtered derivatives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PID Control}
+\label{subsec:pid-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A proportional-integral-derivative controller is
+
+\[
+\boxed{
+u(t)
+=
+K_Pe(t)
++
+K_I
+\int_0^t
+e(\tau)\,d\tau
++
+K_D
+\frac{de}{dt}.
+}
+\]
+
+PID controllers are widely used because they combine simple structure with
+effective performance in many practical systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Proportional Feedback}
+\label{subsec:worked-proportional-feedback}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Stabilizing a Scalar System}
+
+Consider
+
+\[
+\dot{x}
+=
+2x+u.
+\]
+
+Without control, the system is unstable.
+
+Choose
+
+\[
+u=-Kx.
+\]
+
+Then
+
+\[
+\dot{x}
+=
+(2-K)x.
+\]
+
+For asymptotic stability,
+
+\[
+2-K<0.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+K>2.
+}
+\]
+\end{answerbox}
+
+For example, \(K=5\) gives
+
+\[
+\dot{x}=-3x.
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Steady-State Error}
+\label{subsec:steady-state-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For tracking error
+
+\[
+e(t)=r(t)-y(t),
+\]
+
+the steady-state error is
+
+\[
+\boxed{
+e_{\mathrm{ss}}
+=
+\lim_{t\to\infty}e(t),
+}
+\]
+
+when the limit exists.
+
+Control design often seeks
+
+\[
+\boxed{
+e_{\mathrm{ss}}=0.
+}
+\]
+
+Integral action is a common mechanism for achieving zero steady-state error
+against certain constant references and disturbances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transient Performance}
+\label{subsec:control-transient-performance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Important transient measures include:
+
+\[
+\boxed{
+\text{rise time},
+}
+\]
+
+\[
+\boxed{
+\text{peak time},
+}
+\]
+
+\[
+\boxed{
+\text{overshoot},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{settling time}.
+}
+\]
+
+These quantify how quickly and smoothly a controlled system approaches its
+desired behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Standard Form}
+\label{subsec:second-order-control-standard-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common second-order transfer function is
+
+\[
+\boxed{
+G(s)
+=
+\frac{\omega_n^2}
+{s^2+2\zeta\omega_ns+\omega_n^2}.
+}
+\]
+
+Here:
+
+\[
+\omega_n
+=
+\text{natural frequency},
+\]
+
+and
+
+\[
+\zeta
+=
+\text{damping ratio}.
+\]
+
+These parameters strongly influence transient response.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Damping Ratio}
+\label{subsec:control-damping-ratio}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+0<\zeta<1,
+\]
+
+the system is underdamped.
+
+For
+
+\[
+\zeta=1,
+\]
+
+it is critically damped.
+
+For
+
+\[
+\zeta>1,
+\]
+
+it is overdamped.
+
+Increasing damping generally reduces oscillation but may slow response.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic Equation}
+\label{subsec:control-characteristic-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Closed-loop poles are roots of the characteristic equation.
+
+For unity negative feedback with forward transfer function \(K G(s)\),
+
+\[
+\boxed{
+1+KG(s)=0.
+}
+\]
+
+Changing controller gain moves the closed-loop poles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Root Locus}
+\label{subsec:root-locus}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A root locus shows how closed-loop poles move as a controller gain varies.
+
+It provides geometric insight into:
+
+\[
+\boxed{
+\text{stability},
+}
+\]
+
+\[
+\boxed{
+\text{damping},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{transient response}.
+}
+\]
+
+Root-locus methods are especially useful for classical single-input
+single-output design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Frequency Response}
+\label{subsec:control-frequency-response}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For transfer function
+
+\[
+G(s),
+\]
+
+evaluate
+
+\[
+\boxed{
+G(i\omega).
+}
+\]
+
+Its magnitude and phase describe how sinusoidal inputs are amplified and
+shifted at frequency \(\omega\).
+
+Frequency-domain methods are central in robust feedback design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bode Magnitude and Phase}
+\label{subsec:bode-plots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Bode plot displays
+
+\[
+\boxed{
+20\log_{10}|G(i\omega)|
+}
+\]
+
+against logarithmic frequency, together with
+
+\[
+\boxed{
+\arg G(i\omega).
+}
+\]
+
+This representation makes products of transfer functions easier to analyze
+because magnitudes add on a decibel scale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gain Margin}
+\label{subsec:gain-margin}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gain margin measures how much loop gain can increase before a nominal
+closed-loop system reaches an instability boundary, under the standard
+frequency-response interpretation.
+
+A larger positive gain margin typically indicates greater tolerance to gain
+uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Phase Margin}
+\label{subsec:phase-margin}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Phase margin measures additional phase lag that can be introduced before the
+feedback system reaches the instability boundary.
+
+It is often used as a practical robustness indicator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feedforward Control}
+\label{subsec:feedforward-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Feedforward control uses known or measured information about desired motion
+or disturbances before output error develops.
+
+Schematically,
+
+\[
+\boxed{
+u
+=
+u_{\mathrm{ff}}
++
+u_{\mathrm{fb}}.
+}
+\]
+
+Feedforward improves nominal response.
+
+Feedback corrects uncertainty and disturbances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Disturbance Rejection}
+\label{subsec:disturbance-rejection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a disturbance \(d(t)\) affects the plant.
+
+A feedback controller should reduce its influence on the output.
+
+The closed-loop mapping from disturbance to output is therefore an important
+design quantity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity Function}
+\label{subsec:control-sensitivity-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For scalar loop transfer function
+
+\[
+L(s)=C(s)P(s),
+\]
+
+the sensitivity function is
+
+\[
+\boxed{
+S(s)
+=
+\frac{1}{1+L(s)}.
+}
+\]
+
+Small \(|S(i\omega)|\) indicates reduced sensitivity to certain disturbances
+and modeling errors at frequency \(\omega\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complementary Sensitivity}
+\label{subsec:complementary-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The complementary sensitivity function is
+
+\[
+\boxed{
+T(s)
+=
+\frac{L(s)}
+{1+L(s)}.
+}
+\]
+
+These satisfy
+
+\[
+\boxed{
+S(s)+T(s)=1.
+}
+\]
+
+Control design balances disturbance rejection, tracking, uncertainty, and
+noise amplification across frequency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lyapunov Stability}
+\label{subsec:control-lyapunov-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\dot{\mathbf{x}}
+=
+f(\mathbf{x}),
+\]
+
+a Lyapunov function \(V(\mathbf{x})\) is a scalar function used to measure
+distance-like behavior relative to an equilibrium.
+
+Typical conditions are
+
+\[
+\boxed{
+V(\mathbf{x})>0
+\quad
+\text{for }\mathbf{x}\neq0,
+}
+\]
+
+\[
+\boxed{
+V(0)=0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\dot V(\mathbf{x})<0
+\quad
+\text{for }\mathbf{x}\neq0.
+}
+\]
+
+These conditions imply asymptotic stability under standard hypotheses.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Lyapunov Function}
+\label{subsec:worked-lyapunov-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Scalar Nonlinear Stability}
+
+Consider
+
+\[
+\dot{x}
+=
+-x^3.
+\]
+
+Choose
+
+\[
+V(x)
+=
+\frac12x^2.
+\]
+
+Then
+
+\[
+V(x)>0
+\]
+
+for \(x\neq0\), and
+
+\[
+V(0)=0.
+\]
+
+Also,
+
+\[
+\dot V
+=
+x\dot{x}
+=
+-x^4.
+\]
+
+Thus
+
+\[
+\dot V<0
+\]
+
+for \(x\neq0\).
+
+\begin{answerbox}
+\[
+\boxed{
+x=0
+\text{ is asymptotically stable}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lyapunov Equation for Linear Systems}
+\label{subsec:linear-lyapunov-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x},
+\]
+
+seek
+
+\[
+\boxed{
+V(\mathbf{x})
+=
+\mathbf{x}^{T}P\mathbf{x},
+}
+\]
+
+with \(P\) positive definite.
+
+Then
+
+\[
+\dot V
+=
+\mathbf{x}^{T}
+(A^TP+PA)
+\mathbf{x}.
+\]
+
+Choose \(P\) satisfying
+
+\[
+\boxed{
+A^TP+PA
+=
+-Q,
+}
+\]
+
+where \(Q\) is positive definite.
+
+For Hurwitz \(A\), this equation has a unique positive-definite solution
+\(P\) for each positive-definite \(Q\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control}
+\label{subsec:control-optimal-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Optimal control chooses a time-dependent input to minimize a performance
+criterion subject to system dynamics.
+
+A general problem is
+
+\[
+\boxed{
+\min_{\mathbf{u}(\cdot)}
+\left[
+\Phi(\mathbf{x}(T))
++
+\int_0^T
+L(\mathbf{x},\mathbf{u},t)
+\,dt
+\right]
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+f(\mathbf{x},\mathbf{u},t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Performance Index}
+\label{subsec:quadratic-performance-index}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For linear systems, a common objective is
+
+\[
+\boxed{
+J
+=
+\int_0^\infty
+\left(
+\mathbf{x}^TQ\mathbf{x}
++
+\mathbf{u}^TR\mathbf{u}
+\right)
+dt.
+}
+\]
+
+The matrix \(Q\) penalizes state deviation.
+
+The matrix \(R\) penalizes control effort.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear-Quadratic Regulator}
+\label{subsec:linear-quadratic-regulator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u}
+\]
+
+and quadratic infinite-horizon cost.
+
+Under standard stabilizability and detectability conditions, the optimal
+control has form
+
+\[
+\boxed{
+\mathbf{u}
+=
+-K\mathbf{x},
+}
+\]
+
+where
+
+\[
+\boxed{
+K
+=
+R^{-1}B^TP.
+}
+\]
+
+The matrix \(P\) satisfies an algebraic Riccati equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algebraic Riccati Equation}
+\label{subsec:algebraic-riccati-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The continuous-time algebraic Riccati equation is
+
+\[
+\boxed{
+A^TP
++
+PA
+-
+PBR^{-1}B^TP
++
+Q
+=
+0.
+}
+\]
+
+Its stabilizing solution determines the LQR feedback gain.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Scalar LQR}
+\label{subsec:worked-scalar-lqr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Optimal Feedback for a Scalar Integrator}
+
+Consider
+
+\[
+\dot{x}=u
+\]
+
+with cost
+
+\[
+J
+=
+\int_0^\infty
+(x^2+u^2)\,dt.
+\]
+
+Here,
+
+\[
+A=0,
+\qquad
+B=1,
+\qquad
+Q=1,
+\qquad
+R=1.
+\]
+
+The Riccati equation becomes
+
+\[
+-P^2+1=0.
+\]
+
+The positive stabilizing solution is
+
+\[
+P=1.
+\]
+
+Thus
+
+\[
+K=1.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+u=-x.
+}
+\]
+\end{answerbox}
+
+The closed-loop system is
+
+\[
+\dot{x}=-x.
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Horizon LQR}
+\label{subsec:finite-horizon-lqr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For finite time horizon \(T\), the optimal feedback generally becomes
+time-dependent:
+
+\[
+\boxed{
+\mathbf{u}(t)
+=
+-R^{-1}B^TP(t)\mathbf{x}(t).
+}
+\]
+
+The matrix \(P(t)\) satisfies a differential Riccati equation solved
+backward from a terminal condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pontryagin Maximum Principle}
+\label{subsec:pontryagin-maximum-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For system
+
+\[
+\dot{\mathbf{x}}
+=
+f(\mathbf{x},\mathbf{u},t),
+\]
+
+define a control Hamiltonian
+
+\[
+\boxed{
+\mathcal{H}
+=
+L(\mathbf{x},\mathbf{u},t)
++
+\boldsymbol{\lambda}^{T}
+f(\mathbf{x},\mathbf{u},t).
+}
+\]
+
+Necessary conditions for an optimum include state dynamics, costate
+dynamics, and an optimality condition for \(\mathbf{u}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Costate Equation}
+\label{subsec:costate-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The costate satisfies
+
+\[
+\boxed{
+\dot{\boldsymbol{\lambda}}
+=
+-
+\frac{\partial\mathcal{H}}
+{\partial\mathbf{x}}.
+}
+\]
+
+The state satisfies
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+\frac{\partial\mathcal{H}}
+{\partial\boldsymbol{\lambda}}.
+}
+\]
+
+This creates a coupled two-point boundary-value problem in many optimal
+control problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hamilton--Jacobi--Bellman Equation}
+\label{subsec:hjb-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming describes optimal control through a value function
+
+\[
+V(\mathbf{x},t).
+\]
+
+The continuous-time Hamilton--Jacobi--Bellman equation has schematic form
+
+\[
+\boxed{
+-V_t
+=
+\min_{\mathbf{u}}
+\left\{
+L(\mathbf{x},\mathbf{u},t)
++
+\nabla V
+\cdot
+f(\mathbf{x},\mathbf{u},t)
+\right\}.
+}
+\]
+
+The HJB equation characterizes optimal feedback directly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Predictive Control}
+\label{subsec:model-predictive-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Model predictive control repeatedly solves a finite-horizon optimization
+problem.
+
+At each decision time:
+
+\begin{enumerate}
+    \item measure or estimate the current state;
+    \item predict future system behavior;
+    \item optimize a sequence of future controls;
+    \item apply only the first control action;
+    \item shift the horizon forward;
+    \item repeat.
+\end{enumerate}
+
+This is also called receding-horizon control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Model Predictive Control Is Useful}
+\label{subsec:mpc-advantages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MPC can explicitly handle constraints such as
+
+\[
+\boxed{
+u_{\min}
+\leq
+u_k
+\leq
+u_{\max},
+}
+\]
+
+and
+
+\[
+\boxed{
+x_{\min}
+\leq
+x_k
+\leq
+x_{\max}.
+}
+\]
+
+This makes it attractive for industrial processes, vehicles, energy systems,
+and constrained multivariable control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Constraints}
+\label{subsec:control-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Real actuators have limits.
+
+Examples include:
+
+\[
+\boxed{
+\text{maximum force},
+}
+\]
+
+\[
+\boxed{
+\text{maximum voltage},
+}
+\]
+
+\[
+\boxed{
+\text{maximum steering angle},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{rate limits}.
+}
+\]
+
+Ignoring constraints can make an otherwise mathematically valid controller
+physically impossible to implement.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Actuator Saturation}
+\label{subsec:actuator-saturation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A saturated actuator may satisfy
+
+\[
+\boxed{
+u
+=
+\operatorname{sat}(u_c),
+}
+\]
+
+where \(u_c\) is the requested control and
+
+\[
+\operatorname{sat}(u_c)
+=
+\begin{cases}
+u_{\max}, & u_c>u_{\max},\\
+u_c, & u_{\min}\leq u_c\leq u_{\max},\\
+u_{\min}, & u_c<u_{\min}.
+\end{cases}
+\]
+
+Saturation introduces nonlinearity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integral Windup}
+\label{subsec:integral-windup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When an actuator saturates, an integral controller can continue accumulating
+error.
+
+This may produce a large internal integral state and poor recovery after the
+system leaves saturation.
+
+This phenomenon is called integral windup.
+
+Anti-windup methods limit or correct the integral state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robust Control}
+\label{subsec:robust-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Real models contain uncertainty.
+
+A robust controller seeks acceptable performance despite:
+
+\[
+\boxed{
+\text{parameter variation},
+}
+\]
+
+\[
+\boxed{
+\text{unmodeled dynamics},
+}
+\]
+
+\[
+\boxed{
+\text{disturbances},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{measurement noise}.
+}
+\]
+
+Stability under the nominal model alone is not always sufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric Uncertainty}
+\label{subsec:parametric-uncertainty-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a model depends on uncertain parameter \(\theta\):
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+A(\theta)\mathbf{x}
++
+B(\theta)\mathbf{u}.
+}
+\]
+
+A robust design may seek stability for all
+
+\[
+\boxed{
+\theta
+\in
+\Theta.
+}
+\]
+
+This converts control design into a family of stability problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Control}
+\label{subsec:stochastic-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stochastic system may satisfy
+
+\[
+\boxed{
+d\mathbf{x}
+=
+f(\mathbf{x},\mathbf{u},t)\,dt
++
+G(\mathbf{x},t)\,d\mathbf{W}_t.
+}
+\]
+
+The controller must account for random disturbances.
+
+Objectives commonly involve expected cost:
+
+\[
+\boxed{
+\min
+\mathbb{E}[J].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Estimation Under Noise}
+\label{subsec:state-estimation-noise}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+A\mathbf{x}_k
++
+B\mathbf{u}_k
++
+\mathbf{w}_k,
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbf{y}_k
+=
+C\mathbf{x}_k
++
+\mathbf{v}_k,
+}
+\]
+
+where \(\mathbf{w}_k\) and \(\mathbf{v}_k\) are process and measurement
+noise.
+
+One seeks an estimate
+
+\[
+\boxed{
+\hat{\mathbf{x}}_k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kalman Filter}
+\label{subsec:kalman-filter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For linear systems with standard Gaussian noise assumptions, the Kalman
+filter recursively combines:
+
+\[
+\boxed{
+\text{model prediction}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{measurement correction}.
+}
+\]
+
+A prediction step estimates the next state.
+
+A correction step adjusts that estimate based on the measurement residual.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kalman Measurement Update}
+\label{subsec:kalman-measurement-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A conceptual measurement update is
+
+\[
+\boxed{
+\hat{\mathbf{x}}_{k|k}
+=
+\hat{\mathbf{x}}_{k|k-1}
++
+K_k
+\left(
+\mathbf{y}_k
+-
+C\hat{\mathbf{x}}_{k|k-1}
+\right).
+}
+\]
+
+The matrix \(K_k\) is the Kalman gain.
+
+It balances model uncertainty against measurement uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete-Time State Space}
+\label{subsec:discrete-time-state-space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrete-time linear system is
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+A\mathbf{x}_k
++
+B\mathbf{u}_k,
+}
+\]
+
+\[
+\boxed{
+\mathbf{y}_k
+=
+C\mathbf{x}_k
++
+D\mathbf{u}_k.
+}
+\]
+
+Such models arise naturally from sampled digital control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete-Time Stability}
+\label{subsec:discrete-time-stability-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\mathbf{x}_{k+1}
+=
+A\mathbf{x}_k,
+\]
+
+asymptotic stability requires
+
+\[
+\boxed{
+|\lambda_i|<1
+}
+\]
+
+for every eigenvalue of \(A\).
+
+Thus continuous-time stability uses the left half-plane, while discrete-time
+stability uses the interior of the unit disk.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Discrete Stability}
+\label{subsec:worked-discrete-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Stable Difference System}
+
+Let
+
+\[
+A
+=
+\begin{bmatrix}
+0.5 & 0\\
+0 & -0.8
+\end{bmatrix}.
+\]
+
+The eigenvalues are
+
+\[
+0.5
+\]
+
+and
+
+\[
+-0.8.
+\]
+
+Both satisfy
+
+\[
+|\lambda|<1.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\mathbf{x}_{k+1}=A\mathbf{x}_k
+\text{ is asymptotically stable}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sampling}
+\label{subsec:control-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Digital controllers measure and update systems at discrete times
+
+\[
+\boxed{
+t_k=kT_s,
+}
+\]
+
+where \(T_s\) is the sampling period.
+
+If sampling is too slow, important system dynamics may be missed.
+
+Thus digital control design must account for sampling frequency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continuous-to-Discrete Conversion}
+\label{subsec:continuous-discrete-control-conversion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u},
+\]
+
+assuming a zero-order-held input over each sample interval \(T_s\),
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+A_d\mathbf{x}_k
++
+B_d\mathbf{u}_k,
+}
+\]
+
+where
+
+\[
+\boxed{
+A_d
+=
+e^{AT_s},
+}
+\]
+
+and
+
+\[
+\boxed{
+B_d
+=
+\int_0^{T_s}
+e^{A\tau}B\,d\tau.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time Delay}
+\label{subsec:control-time-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Control systems may contain sensing, communication, computation, or actuator
+delays.
+
+A delayed input may appear as
+
+\[
+\boxed{
+\dot{\mathbf{x}}(t)
+=
+A\mathbf{x}(t)
++
+B\mathbf{u}(t-\tau).
+}
+\]
+
+Delays introduce additional phase lag and can destabilize feedback systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Control}
+\label{subsec:nonlinear-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many real systems are nonlinear:
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+f(\mathbf{x},\mathbf{u}).
+}
+\]
+
+Nonlinear control must account for phenomena such as:
+
+\[
+\boxed{
+\text{multiple equilibria},
+}
+\]
+
+\[
+\boxed{
+\text{saturation},
+}
+\]
+
+\[
+\boxed{
+\text{limit cycles},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{state-dependent dynamics}.
+}
+\]
+
+Linearization may only describe local behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feedback Linearization}
+\label{subsec:feedback-linearization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Feedback linearization seeks a nonlinear control transformation that cancels
+certain nonlinear terms.
+
+For a scalar system
+
+\[
+\dot{x}
+=
+f(x)+g(x)u,
+\]
+
+if \(g(x)\neq0\), choose
+
+\[
+\boxed{
+u
+=
+\frac{
+v-f(x)
+}{
+g(x)
+}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\dot{x}=v.
+}
+\]
+
+This method requires sufficiently accurate model knowledge.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adaptive Control}
+\label{subsec:adaptive-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adaptive control modifies controller parameters while the system operates.
+
+This is useful when system parameters are unknown or slowly changing.
+
+Schematically,
+
+\[
+\boxed{
+\text{controller}
++
+\text{online parameter update}.
+}
+\]
+
+Stability of the adaptation law is a central concern.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{System Identification}
+\label{subsec:system-identification-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+System identification estimates mathematical models from observed input and
+output data.
+
+A general goal is to infer
+
+\[
+\boxed{
+\text{model structure}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{parameters}
+}
+\]
+
+from experiments.
+
+Identification and control are strongly connected because controller quality
+depends on model quality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Persistent Excitation}
+\label{subsec:persistent-excitation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To estimate model parameters reliably, input signals must often excite enough
+independent system behavior.
+
+If an experiment never activates certain dynamics, those dynamics may be
+unidentifiable.
+
+This motivates the idea of sufficiently informative or persistently exciting
+inputs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controllability Gramian}
+\label{subsec:controllability-gramian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a stable continuous-time LTI system, the infinite-horizon controllability
+Gramian is
+
+\[
+\boxed{
+W_c
+=
+\int_0^\infty
+e^{At}
+BB^T
+e^{A^Tt}
+\,dt.
+}
+\]
+
+It satisfies
+
+\[
+\boxed{
+AW_c
++
+W_cA^T
++
+BB^T
+=
+0.
+}
+\]
+
+The Gramian quantifies how strongly different state directions can be reached
+by inputs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Observability Gramian}
+\label{subsec:observability-gramian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The observability Gramian is
+
+\[
+\boxed{
+W_o
+=
+\int_0^\infty
+e^{A^Tt}
+C^TC
+e^{At}
+\,dt.
+}
+\]
+
+It satisfies
+
+\[
+\boxed{
+A^TW_o
++
+W_oA
++
+C^TC
+=
+0.
+}
+\]
+
+It measures how strongly different state directions appear in the output.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Balanced Realizations}
+\label{subsec:balanced-realizations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A balanced realization transforms coordinates so controllability and
+observability Gramians are equal and diagonal:
+
+\[
+\boxed{
+W_c
+=
+W_o
+=
+\operatorname{diag}
+(\sigma_1,\ldots,\sigma_n).
+}
+\]
+
+The values \(\sigma_i\) are Hankel singular values.
+
+Small values identify states that are simultaneously difficult to control
+and observe.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Balanced Truncation}
+\label{subsec:balanced-truncation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Balanced truncation removes state directions associated with small Hankel
+singular values.
+
+This produces a lower-order approximation while preserving important
+input-output behavior.
+
+It connects control theory with model reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distributed Control}
+\label{subsec:distributed-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large systems may contain multiple controllers.
+
+Each controller may use only local information.
+
+Examples include:
+
+\[
+\boxed{
+\text{vehicle formations},
+}
+\]
+
+\[
+\boxed{
+\text{power grids},
+}
+\]
+
+\[
+\boxed{
+\text{sensor networks},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{multi-agent robotics}.
+}
+\]
+
+This leads to distributed and networked control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consensus Dynamics}
+\label{subsec:consensus-dynamics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic continuous-time consensus model is
+
+\[
+\boxed{
+\dot{x}_i
+=
+\sum_j
+a_{ij}
+(x_j-x_i).
+}
+\]
+
+Using graph Laplacian \(L\),
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+-L\mathbf{x}.
+}
+\]
+
+Under suitable connectivity conditions, the states approach a common value.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control-Theory Workflow}
+\label{subsec:control-theory-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical control-design workflow is:
+
+\begin{enumerate}
+    \item define the physical or mathematical system;
+    \item identify control objectives;
+    \item select state variables;
+    \item identify available actuators;
+    \item identify measurable outputs;
+    \item construct the dynamical model;
+    \item identify equilibrium points;
+    \item linearize if appropriate;
+    \item analyze open-loop stability;
+    \item test controllability;
+    \item test observability;
+    \item identify disturbances and uncertainty;
+    \item specify performance requirements;
+    \item specify actuator and state constraints;
+    \item choose a control architecture;
+    \item design feedback gains or an optimization-based controller;
+    \item design an observer when states are not measured;
+    \item analyze closed-loop stability;
+    \item evaluate transient response;
+    \item evaluate steady-state error;
+    \item evaluate disturbance rejection;
+    \item evaluate robustness;
+    \item test actuator saturation;
+    \item account for delays and sampling;
+    \item simulate nonlinear and uncertain models;
+    \item verify controller implementation;
+    \item validate performance experimentally;
+    \item revise the model or controller when necessary.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:control-theory-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing State and Output}
+
+The state contains the information needed to describe system evolution.
+
+The output is what is measured or reported.
+
+In general,
+
+\[
+\boxed{
+\mathbf{y}
+\neq
+\mathbf{x}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming All States Are Measurable}
+
+Many physical systems have internal states that cannot be measured directly.
+
+An observer or state estimator may be needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Open-Loop and Closed-Loop Stability}
+
+A plant can be unstable in open loop but stabilized through feedback.
+
+Conversely, poorly designed feedback can destabilize an otherwise stable
+plant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Feedback Gain Is Always Better}
+
+High gain can improve response in some respects but may also increase:
+
+\[
+\boxed{
+\text{noise sensitivity},
+}
+\]
+
+\[
+\boxed{
+\text{actuator saturation},
+}
+\]
+
+\[
+\boxed{
+\text{oscillation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{robustness problems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Poles and Zeros}
+
+Poles are associated primarily with system modes and stability.
+
+Zeros describe input-output cancellation behavior.
+
+They have different roles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Pole Location Alone for Every Stability Question}
+
+Pole tests apply directly to linear time-invariant systems.
+
+Nonlinear systems require additional analysis, often using linearization or
+Lyapunov methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Internal Stability and BIBO Stability}
+
+These concepts are closely related for minimal LTI systems but are not
+identical in every realization, especially when hidden unstable modes or
+pole-zero cancellations are present.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Controllability}
+
+Pole placement cannot arbitrarily move modes that are uncontrollable.
+
+Always check
+
+\[
+\operatorname{rank}\mathcal{C}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Observability}
+
+An observer cannot reconstruct modes that do not affect the measured output.
+
+Always check
+
+\[
+\operatorname{rank}\mathcal{O}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Linearization Is Globally Valid}
+
+Linearization is generally local.
+
+A controller designed near one equilibrium may perform poorly far from that
+state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Steady-State Error}
+
+A stable system can still fail to track its reference accurately.
+
+Stability and tracking accuracy are separate design objectives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Derivative Control Without Noise Consideration}
+
+Differentiation amplifies high-frequency measurement noise.
+
+Practical derivative control is usually filtered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Integral Windup}
+
+Integral action combined with actuator saturation can produce large transient
+errors.
+
+Anti-windup measures may be necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming PID Is Always Sufficient}
+
+PID is powerful but may be inadequate for strongly nonlinear, highly
+multivariable, constrained, delayed, or uncertain systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Actuator Limits}
+
+A theoretical input may require impossible forces, voltages, rates, or power.
+
+Physical constraints must be included.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Measurement Noise}
+
+Feedback based directly on noisy measurements can cause excessive control
+activity.
+
+Filtering or state estimation may be necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Model Uncertainty}
+
+A controller optimized for one exact model may perform poorly on the actual
+system.
+
+Robustness should be tested.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Feedforward and Feedback}
+
+Feedforward acts using known desired motion or disturbances.
+
+Feedback acts using measured error or state.
+
+They serve complementary purposes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing LQR With Arbitrary Pole Placement}
+
+LQR chooses feedback by minimizing a quadratic performance index.
+
+Pole placement directly assigns desired closed-loop poles.
+
+They are related but not equivalent design procedures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Optimal Means Physically Best in Every Sense}
+
+An optimal controller is optimal relative to the chosen:
+
+\[
+\boxed{
+\text{model},
+}
+\]
+
+\[
+\boxed{
+\text{cost function},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{constraints}.
+}
+\]
+
+Changing these can change the optimal solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Sampling in Digital Control}
+
+A continuous-time controller cannot always be implemented digitally without
+considering sampling and discretization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Continuous-Time Stability Conditions in Discrete Time}
+
+Continuous-time stability requires
+
+\[
+\operatorname{Re}(\lambda)<0.
+\]
+
+Discrete-time stability requires
+
+\[
+|\lambda|<1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Delay}
+
+Feedback delay adds phase lag and can reduce stability margins.
+
+Even small delays may matter in fast systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Estimation and Control}
+
+A state estimator attempts to infer the system state.
+
+A controller chooses actions.
+
+They interact but solve different problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Simulation Guarantees Real-World Stability}
+
+Simulation explores selected models and scenarios.
+
+Formal analysis, robustness testing, and experimental validation remain
+important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:control-theory-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Aerospace.}
+Control theory stabilizes aircraft, spacecraft, launch vehicles, and
+autonomous flight systems.
+
+\medskip
+
+\textbf{Robotics.}
+Feedback controls robot position, velocity, orientation, manipulation, and
+trajectory tracking.
+
+\medskip
+
+\textbf{Automotive Systems.}
+Cruise control, steering, braking, suspension, and powertrain systems use
+feedback and estimation.
+
+\medskip
+
+\textbf{Process Control.}
+Chemical plants use controllers to regulate temperature, pressure, flow,
+composition, and production rates.
+
+\medskip
+
+\textbf{Electrical Systems.}
+Control methods regulate motors, converters, generators, power grids, and
+electronic circuits.
+
+\medskip
+
+\textbf{Biomechanics and Medicine.}
+Control models appear in prosthetics, drug delivery, physiological
+regulation, and medical devices.
+
+\medskip
+
+\textbf{Economics and Finance.}
+Dynamic policy, portfolio adjustment, and resource allocation can be viewed
+through optimal and stochastic control.
+
+\medskip
+
+\textbf{Energy Systems.}
+Control coordinates batteries, renewable generation, buildings, microgrids,
+and thermal systems.
+
+\medskip
+
+\textbf{Networks and Multi-Agent Systems.}
+Distributed control coordinates fleets, communication systems, power
+networks, and autonomous agents.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:control-theory-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define control theory.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish open-loop and closed-loop control.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a plant.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a control input.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a state variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Write the continuous-time LTI state-space model.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a transfer function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a pole.
+\end{exercise}
+
+\begin{exercise}[1]
+Define controllability.
+\end{exercise}
+
+\begin{exercise}[1]
+Define observability.
+\end{exercise}
+
+\begin{exercise}[2]
+Solve
+
+\[
+\dot{x}
+=
+-3x+2,
+\qquad
+x(0)=1.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the equilibrium of
+
+\[
+\dot{x}
+=
+-ax+bu.
+\]
+
+Assume \(a\neq0\) and constant \(u\).
+\end{exercise}
+
+\begin{exercise}[2]
+Linearize
+
+\[
+\dot{x}
+=
+x^2+u
+\]
+
+about an equilibrium.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the transfer function of
+
+\[
+\ddot{y}
++
+3\dot{y}
++
+2y
+=
+u.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the poles of
+
+\[
+G(s)
+=
+\frac{1}
+{s^2+3s+2}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether those poles define a stable continuous-time system.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine stability of
+
+\[
+A
+=
+\begin{bmatrix}
+-1 & 0\\
+0 & 2
+\end{bmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Determine stability of a \(2\times2\) system from its characteristic
+polynomial.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+\dot{x}
+=
+3x+u,
+\]
+
+find the proportional state-feedback gain \(K\) such that
+
+\[
+u=-Kx
+\]
+
+produces closed-loop pole \(-4\).
+\end{exercise}
+
+\begin{exercise}[2]
+Construct the controllability matrix for a two-state LTI system.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine controllability of
+
+\[
+A
+=
+\begin{bmatrix}
+0 & 1\\
+0 & 0
+\end{bmatrix},
+\qquad
+B
+=
+\begin{bmatrix}
+1\\
+0
+\end{bmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Construct the observability matrix for a two-state system.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine observability of
+
+\[
+A
+=
+\begin{bmatrix}
+0 & 1\\
+0 & 0
+\end{bmatrix},
+\qquad
+C
+=
+\begin{bmatrix}
+0 & 1
+\end{bmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Luenberger observer for a simple observable two-state system.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a proportional control law.
+\end{exercise}
+
+\begin{exercise}[2]
+Write an integral control law.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a derivative control law.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the PID control law.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how integral control can remove constant steady-state error.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why derivative action amplifies measurement noise.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+G(s)
+=
+\frac{\omega_n^2}
+{s^2+2\zeta\omega_ns+\omega_n^2},
+\]
+
+identify \(\omega_n\) and \(\zeta\).
+\end{exercise}
+
+\begin{exercise}[3]
+Classify the response for several values of \(\zeta\).
+\end{exercise}
+
+\begin{exercise}[2]
+Explain root locus conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Define frequency response.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain a Bode magnitude plot.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain gain margin and phase margin.
+\end{exercise}
+
+\begin{exercise}[2]
+Define the sensitivity function
+
+\[
+S(s)=\frac{1}{1+L(s)}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+S+T=1
+\]
+
+for complementary sensitivity
+
+\[
+T=\frac{L}{1+L}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Define a Lyapunov function.
+\end{exercise}
+
+\begin{exercise}[3]
+Use
+
+\[
+V(x)=\frac12x^2
+\]
+
+to analyze
+
+\[
+\dot{x}=-x-x^3.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+\dot V
+=
+\mathbf{x}^T
+(A^TP+PA)
+\mathbf{x}
+\]
+
+for
+
+\[
+V=\mathbf{x}^TP\mathbf{x}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a simple continuous Lyapunov equation.
+\end{exercise}
+
+\begin{exercise}[2]
+Define an optimal control problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a quadratic LQR cost.
+\end{exercise}
+
+\begin{exercise}[2]
+State the continuous algebraic Riccati equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve the scalar Riccati equation for
+
+\[
+\dot{x}=u,
+\qquad
+J=\int_0^\infty(x^2+u^2)\,dt.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how \(Q\) and \(R\) affect LQR design qualitatively.
+\end{exercise}
+
+\begin{exercise}[2]
+Define the control Hamiltonian used in Pontryagin's Maximum Principle.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the costate equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the Hamilton--Jacobi--Bellman equation conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain model predictive control.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why MPC handles constraints naturally.
+\end{exercise}
+
+\begin{exercise}[2]
+Define actuator saturation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain integral windup.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain anti-windup conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Define robust control conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Give three sources of uncertainty relevant to controller design.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a stochastic state-space model.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the role of a Kalman filter.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the Kalman innovation or measurement residual.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the discrete-time state equation.
+\end{exercise}
+
+\begin{exercise}[2]
+State the discrete-time eigenvalue stability condition.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine stability of a matrix with eigenvalues
+
+\[
+0.9,
+\qquad
+-1.1.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+A_d=e^{AT_s}
+\]
+
+for sampled zero-input dynamics.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why time delay can destabilize a feedback system.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain nonlinear feedback linearization conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply feedback linearization to
+
+\[
+\dot{x}
+=
+x^2+u.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Define adaptive control conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Define system identification.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain persistent excitation conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain controllability and observability Gramians conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain balanced truncation.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a consensus model on a graph.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of the graph Laplacian in consensus.
+\end{exercise}
+
+\begin{exercise}[4]
+Design state feedback for a controllable two-state system using pole
+placement.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct a full-order observer and analyze its error dynamics.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the separation principle for an observer-based controller.
+\end{exercise}
+
+\begin{exercise}[4]
+Design a PID controller for a second-order plant.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze a closed-loop system using root locus.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct Bode plots for a rational transfer function.
+\end{exercise}
+
+\begin{exercise}[4]
+Compute gain and phase margins for a feedback loop.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Nyquist stability conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct a quadratic Lyapunov function for a stable linear system.
+\end{exercise}
+
+\begin{exercise}[4]
+Use Lyapunov's direct method on a nonlinear two-state system.
+\end{exercise}
+
+\begin{exercise}[4]
+Design an infinite-horizon LQR controller for a two-state system.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the finite-horizon Riccati equation.
+\end{exercise}
+
+\begin{exercise}[4]
+Apply Pontryagin's Maximum Principle to a minimum-energy control problem.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive an HJB equation for a simple deterministic control problem.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct a constrained model predictive controller.
+\end{exercise}
+
+\begin{exercise}[4]
+Study robust stability under parameter uncertainty.
+\end{exercise}
+
+\begin{exercise}[4]
+Implement a Kalman filter for a noisy state-space model.
+\end{exercise}
+
+\begin{exercise}[4]
+Design an LQG controller conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze a digital controller under different sampling periods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stability of a delayed feedback system.
+\end{exercise}
+
+\begin{exercise}[4]
+Design an anti-windup modification for a PI controller.
+\end{exercise}
+
+\begin{exercise}[4]
+Study feedback linearization of a nonlinear mechanical system.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct an adaptive parameter estimator for a simple uncertain plant.
+\end{exercise}
+
+\begin{exercise}[4]
+Perform system identification from simulated input-output data.
+\end{exercise}
+
+\begin{exercise}[4]
+Compute controllability and observability Gramians numerically.
+\end{exercise}
+
+\begin{exercise}[4]
+Perform balanced truncation on a stable linear model.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze consensus of a networked multi-agent system.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:control-theory-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Control theory studies how inputs influence dynamical systems.
+
+A standard linear state-space model is
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+A\mathbf{x}
++
+B\mathbf{u},
+}
+\]
+
+\[
+\boxed{
+\mathbf{y}
+=
+C\mathbf{x}
++
+D\mathbf{u}.
+}
+\]
+
+Feedback modifies the input using measured or estimated system behavior:
+
+\[
+\boxed{
+\mathbf{u}
+=
+-K\mathbf{x}.
+}
+\]
+
+The closed-loop dynamics become
+
+\[
+\boxed{
+\dot{\mathbf{x}}
+=
+(A-BK)\mathbf{x}.
+}
+\]
+
+Controllability determines whether inputs can influence all required state
+directions:
+
+\[
+\boxed{
+\operatorname{rank}
+\begin{bmatrix}
+B & AB & \cdots & A^{n-1}B
+\end{bmatrix}
+=
+n.
+}
+\]
+
+Observability determines whether state information can be reconstructed from
+outputs:
+
+\[
+\boxed{
+\operatorname{rank}
+\begin{bmatrix}
+C\\
+CA\\
+\vdots\\
+CA^{n-1}
+\end{bmatrix}
+=
+n.
+}
+\]
+
+Stability can be studied through eigenvalues or Lyapunov functions.
+
+Classical control includes:
+
+\[
+\boxed{
+\text{PID}
+}
+\]
+
+and frequency-response methods.
+
+Modern control includes:
+
+\[
+\boxed{
+\text{state feedback},
+}
+\]
+
+\[
+\boxed{
+\text{observers},
+}
+\]
+
+\[
+\boxed{
+\text{LQR},
+}
+\]
+
+\[
+\boxed{
+\text{MPC},
+}
+\]
+
+\[
+\boxed{
+\text{robust control},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stochastic control}.
+}
+\]
+
+The central structure is
+
+\[
+\boxed{
+\text{model}
++
+\text{measurement}
++
+\text{feedback}
++
+\text{optimization}
+}
+\]
+
+used to produce desired behavior despite uncertainty and disturbances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:control-theory-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Control Theory combines differential equations, dynamical systems, linear
+algebra, optimization, probability, and computation to determine how a
+system should be influenced through feedback. It builds naturally on the
+physical and continuum models of Sections~\ref{sec:mathematical-physics},
+\ref{sec:continuum-mechanics}, and \ref{sec:fluid-dynamics}, where many
+systems are governed by differential equations but require stabilization,
+tracking, estimation, or optimization. State-space methods connect directly
+with linear algebra, Lyapunov methods connect with dynamical systems,
+optimal control connects with Chapter~10, and stochastic estimation connects
+with Chapters~7 and~8. The next section, Network Science, studies systems
+whose behavior depends fundamentally on graph structure, connectivity,
+centrality, diffusion, synchronization, contagion, and interactions among
+many connected components.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 13.6 Control Theory
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard linear and nonlinear control theory.
+%   - Standard state-space, frequency-domain, optimal, stochastic,
+%     robust, digital, and networked control methods.
+%
+% Used for:
+%   - open-loop and closed-loop control;
+%   - plants, controllers, actuators, and sensors;
+%   - state-space models;
+%   - linear time-invariant systems;
+%   - matrix-exponential solutions;
+%   - equilibria;
+%   - linearization;
+%   - transfer functions;
+%   - poles and zeros;
+%   - continuous-time stability;
+%   - BIBO stability;
+%   - feedback;
+%   - state feedback;
+%   - pole placement;
+%   - controllability;
+%   - controllability matrices;
+%   - observability;
+%   - observability matrices;
+%   - observers;
+%   - Luenberger observers;
+%   - separation principle;
+%   - proportional control;
+%   - integral control;
+%   - derivative control;
+%   - PID control;
+%   - steady-state error;
+%   - transient response;
+%   - second-order systems;
+%   - damping;
+%   - root locus;
+%   - frequency response;
+%   - Bode plots;
+%   - gain and phase margins;
+%   - feedforward control;
+%   - disturbance rejection;
+%   - sensitivity functions;
+%   - Lyapunov stability;
+%   - Lyapunov equations;
+%   - optimal control;
+%   - quadratic cost;
+%   - LQR;
+%   - Riccati equations;
+%   - Pontryagin Maximum Principle;
+%   - costates;
+%   - Hamilton--Jacobi--Bellman equations;
+%   - model predictive control;
+%   - constraints;
+%   - actuator saturation;
+%   - integral windup;
+%   - robust control;
+%   - uncertainty;
+%   - stochastic control;
+%   - state estimation;
+%   - Kalman filters;
+%   - discrete-time systems;
+%   - digital control;
+%   - sampling;
+%   - continuous-to-discrete conversion;
+%   - delay;
+%   - nonlinear control;
+%   - feedback linearization;
+%   - adaptive control;
+%   - system identification;
+%   - persistent excitation;
+%   - controllability and observability Gramians;
+%   - balanced realization;
+%   - balanced truncation;
+%   - distributed control;
+%   - consensus dynamics;
+%   - applications and exercises.
+%
+% Notes:
+%   - Network Science is developed next in Section 13.7.
+%   - Mathematical Finance follows in Section 13.8.
+%   - Mathematical Economics follows in Section 13.9.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

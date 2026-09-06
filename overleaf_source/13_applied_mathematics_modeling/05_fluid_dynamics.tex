@@ -1,0 +1,4252 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 13.5 FLUID DYNAMICS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Fluid Dynamics}
+\label{sec:fluid-dynamics}
+
+\prerequisite{
+Vector calculus, differential equations, partial differential equations,
+continuum mechanics, tensor notation, mathematical physics,
+and mathematical modeling.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the continuum description of a fluid;
+    \item distinguish Eulerian and Lagrangian fluid descriptions;
+    \item define velocity, pressure, density, and viscosity fields;
+    \item understand streamlines, pathlines, and streaklines;
+    \item compute the material derivative;
+    \item understand fluid acceleration;
+    \item formulate conservation of mass;
+    \item derive the continuity equation;
+    \item understand incompressible flow;
+    \item distinguish compressible and incompressible fluids;
+    \item understand pressure in a fluid;
+    \item derive hydrostatic pressure;
+    \item understand the Cauchy stress tensor for fluids;
+    \item distinguish inviscid and viscous fluids;
+    \item understand Newtonian fluids;
+    \item formulate the Newtonian constitutive stress law;
+    \item derive the Euler equations;
+    \item derive the Navier--Stokes equations conceptually;
+    \item recognize the incompressible Navier--Stokes equations;
+    \item understand body forces;
+    \item interpret the nonlinear convective term;
+    \item recognize steady and unsteady flow;
+    \item understand rotational and irrotational flow;
+    \item define vorticity;
+    \item understand circulation;
+    \item recognize Kelvin's circulation theorem conceptually;
+    \item understand stream functions in two-dimensional incompressible flow;
+    \item understand velocity potentials;
+    \item formulate potential flow;
+    \item derive Bernoulli's equation under appropriate assumptions;
+    \item apply Bernoulli's equation;
+    \item understand stagnation pressure;
+    \item recognize pressure-velocity conversion;
+    \item understand boundary conditions in fluid dynamics;
+    \item recognize no-slip and no-penetration conditions;
+    \item understand free-surface conditions conceptually;
+    \item distinguish internal and external flows;
+    \item understand pipe flow;
+    \item derive Poiseuille flow;
+    \item understand volume flow rate;
+    \item recognize shear stress in viscous flow;
+    \item understand Reynolds number;
+    \item distinguish laminar and turbulent regimes conceptually;
+    \item understand nondimensionalization of Navier--Stokes;
+    \item recognize inertial and viscous dominance;
+    \item understand boundary layers conceptually;
+    \item recognize boundary-layer thickness;
+    \item understand flow separation conceptually;
+    \item recognize drag and lift;
+    \item understand dimensional drag coefficients;
+    \item recognize potential-flow limitations;
+    \item understand circulation-generated lift conceptually;
+    \item recognize compressible flow;
+    \item define Mach number;
+    \item understand speed of sound conceptually;
+    \item recognize subsonic, transonic, supersonic, and hypersonic regimes;
+    \item understand shock waves conceptually;
+    \item recognize conservation laws across discontinuities;
+    \item understand shallow-water models conceptually;
+    \item recognize Froude number;
+    \item understand gravity waves;
+    \item recognize geophysical fluid dynamics conceptually;
+    \item understand Coriolis effects conceptually;
+    \item recognize rotating-fluid balances;
+    \item understand diffusion and advection of scalars;
+    \item formulate advection-diffusion equations;
+    \item recognize Peclet number;
+    \item understand thermal convection conceptually;
+    \item recognize buoyancy-driven flow;
+    \item understand Rayleigh number conceptually;
+    \item recognize turbulence modeling challenges;
+    \item understand Reynolds averaging conceptually;
+    \item recognize Reynolds stresses;
+    \item understand numerical fluid simulation conceptually;
+    \item distinguish finite difference, finite volume, and finite element
+          viewpoints conceptually;
+    \item recognize conservation requirements in numerical schemes;
+    \item understand CFL-type time-step restrictions conceptually;
+    \item recognize model and numerical uncertainty;
+    \item connect fluid dynamics with continuum mechanics, PDEs,
+          numerical mathematics, transport, control, and physics.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Fluid Dynamics?}
+\label{subsec:what-is-fluid-dynamics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fluid dynamics studies the motion of liquids and gases.
+
+A fluid is modeled as a continuum whose state is described by fields such as
+
+\[
+\boxed{
+\rho(\mathbf{x},t)
+}
+\]
+
+for density,
+
+\[
+\boxed{
+\mathbf{v}(\mathbf{x},t)
+}
+\]
+
+for velocity,
+
+\[
+\boxed{
+p(\mathbf{x},t)
+}
+\]
+
+for pressure, and possibly
+
+\[
+\boxed{
+T(\mathbf{x},t)
+}
+\]
+
+for temperature.
+
+The governing equations arise from conservation laws together with
+constitutive relations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fluids as Continua}
+\label{subsec:fluids-as-continua}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At molecular scales, fluids consist of discrete particles.
+
+At larger scales, one may approximate the fluid as continuously distributed.
+
+This allows physical quantities to be represented as differentiable fields.
+
+The continuum approximation is valid when the characteristic system scale is
+much larger than the molecular mean free path.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Eulerian Description}
+\label{subsec:fluid-eulerian-description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fluid dynamics most commonly uses the Eulerian description.
+
+One observes the fluid at fixed spatial positions.
+
+For example,
+
+\[
+\boxed{
+\mathbf{v}
+=
+\mathbf{v}(\mathbf{x},t)
+}
+\]
+
+gives the velocity of fluid currently occupying location \(\mathbf{x}\).
+
+This contrasts with following individual material particles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrangian Description}
+\label{subsec:fluid-lagrangian-description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Lagrangian description tracks individual fluid particles.
+
+If a particle begins at label \(\mathbf{X}\), its trajectory is
+
+\[
+\boxed{
+\mathbf{x}
+=
+\boldsymbol{\chi}(\mathbf{X},t).
+}
+\]
+
+Its velocity is
+
+\[
+\boxed{
+\frac{\partial\boldsymbol{\chi}}
+{\partial t}.
+}
+\]
+
+Particle tracking is useful for transport, mixing, and numerical simulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Velocity Field}
+\label{subsec:fluid-velocity-field}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The velocity field is
+
+\[
+\boxed{
+\mathbf{v}
+=
+(u,v,w).
+}
+\]
+
+In Cartesian coordinates,
+
+\[
+u
+=
+u(x,y,z,t),
+\]
+
+\[
+v
+=
+v(x,y,z,t),
+\]
+
+\[
+w
+=
+w(x,y,z,t).
+\]
+
+The field describes the local direction and speed of fluid motion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Steady and Unsteady Flow}
+\label{subsec:steady-unsteady-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A flow is steady when its Eulerian fields do not depend explicitly on time.
+
+For velocity,
+
+\[
+\boxed{
+\frac{\partial\mathbf{v}}{\partial t}
+=
+0.
+}
+\]
+
+A flow can be steady while individual fluid particles still accelerate due
+to spatial variations in velocity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Material Derivative in a Fluid}
+\label{subsec:fluid-material-derivative}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For scalar field \(f(\mathbf{x},t)\),
+
+\[
+\boxed{
+\frac{Df}{Dt}
+=
+\frac{\partial f}{\partial t}
++
+\mathbf{v}\cdot\nabla f.
+}
+\]
+
+For the velocity field itself,
+
+\[
+\boxed{
+\frac{D\mathbf{v}}{Dt}
+=
+\frac{\partial\mathbf{v}}{\partial t}
++
+(\mathbf{v}\cdot\nabla)\mathbf{v}.
+}
+\]
+
+This is the acceleration of a fluid particle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local and Convective Acceleration}
+\label{subsec:local-convective-acceleration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fluid acceleration decomposes as
+
+\[
+\boxed{
+\mathbf{a}
+=
+\frac{\partial\mathbf{v}}{\partial t}
++
+(\mathbf{v}\cdot\nabla)\mathbf{v}.
+}
+\]
+
+The first term is local acceleration.
+
+The second is convective acceleration.
+
+Thus a steady flow can still have nonzero acceleration if velocity changes
+from place to place.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Convective Acceleration}
+\label{subsec:worked-convective-acceleration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Steady One-Dimensional Flow}
+
+Suppose
+
+\[
+v(x)=ax
+\]
+
+in one dimension.
+
+Since the flow is steady,
+
+\[
+\frac{\partial v}{\partial t}=0.
+\]
+
+The material acceleration is
+
+\[
+\frac{Dv}{Dt}
+=
+v\frac{dv}{dx}.
+\]
+
+Because
+
+\[
+\frac{dv}{dx}=a,
+\]
+
+we obtain
+
+\[
+\frac{Dv}{Dt}
+=
+(ax)a.
+\]
+
+Thus
+
+\begin{answerbox}
+\[
+\boxed{
+\frac{Dv}{Dt}
+=
+a^2x.
+}
+\]
+\end{answerbox}
+
+The flow accelerates despite having no explicit time dependence.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Streamlines}
+\label{subsec:streamlines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A streamline is a curve tangent everywhere to the instantaneous velocity
+field.
+
+If
+
+\[
+\mathbf{x}(s)
+\]
+
+parameterizes the curve, then
+
+\[
+\boxed{
+\frac{d\mathbf{x}}{ds}
+\parallel
+\mathbf{v}.
+}
+\]
+
+In two dimensions,
+
+\[
+\boxed{
+\frac{dy}{dx}
+=
+\frac{v}{u},
+}
+\]
+
+when \(u\neq0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pathlines}
+\label{subsec:pathlines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A pathline is the actual trajectory of one fluid particle.
+
+It satisfies
+
+\[
+\boxed{
+\frac{d\mathbf{x}}{dt}
+=
+\mathbf{v}(\mathbf{x},t).
+}
+\]
+
+In steady flow, streamlines and pathlines coincide.
+
+In unsteady flow, they generally differ.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Streaklines}
+\label{subsec:streaklines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A streakline is the set of particles that have previously passed through a
+specified spatial point.
+
+Smoke released continuously from a fixed source visualizes a streakline.
+
+In steady flow,
+
+\[
+\boxed{
+\text{streamlines}
+=
+\text{pathlines}
+=
+\text{streaklines}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fluid Density}
+\label{subsec:fluid-density}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Density is mass per unit volume:
+
+\[
+\boxed{
+\rho
+=
+\frac{dm}{dV}.
+}
+\]
+
+In general,
+
+\[
+\rho
+=
+\rho(\mathbf{x},t).
+\]
+
+Liquids are often approximated as incompressible.
+
+Gases frequently require variable-density models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conservation of Mass}
+\label{subsec:fluid-mass-conservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mass conservation gives
+
+\[
+\boxed{
+\frac{\partial\rho}{\partial t}
++
+\nabla\cdot(\rho\mathbf{v})
+=
+0.
+}
+\]
+
+This is the continuity equation.
+
+Expanding the divergence,
+
+\[
+\boxed{
+\frac{D\rho}{Dt}
++
+\rho\nabla\cdot\mathbf{v}
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incompressible Flow}
+\label{subsec:incompressible-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For constant density,
+
+\[
+\frac{D\rho}{Dt}=0.
+\]
+
+Therefore mass conservation becomes
+
+\[
+\boxed{
+\nabla\cdot\mathbf{v}
+=
+0.
+}
+\]
+
+This is the incompressibility condition.
+
+It means local fluid volume is preserved.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Checking Incompressibility}
+\label{subsec:worked-checking-incompressibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Two-Dimensional Velocity Field}
+
+Let
+
+\[
+\mathbf{v}(x,y)
+=
+\begin{bmatrix}
+ax\\
+-ay
+\end{bmatrix}.
+\]
+
+Then
+
+\[
+\nabla\cdot\mathbf{v}
+=
+\frac{\partial(ax)}{\partial x}
++
+\frac{\partial(-ay)}{\partial y}.
+\]
+
+Thus
+
+\[
+\nabla\cdot\mathbf{v}
+=
+a-a
+=
+0.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\nabla\cdot\mathbf{v}=0,
+}
+\]
+
+so the flow is incompressible.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pressure}
+\label{subsec:fluid-pressure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pressure is the isotropic normal stress in a fluid.
+
+For an inviscid fluid, the stress tensor is
+
+\[
+\boxed{
+\boldsymbol{\sigma}
+=
+-p\mathbf{I}.
+}
+\]
+
+The negative sign reflects the usual convention that positive pressure is
+compressive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hydrostatics}
+\label{subsec:hydrostatics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fluid at rest satisfies
+
+\[
+\mathbf{v}=0.
+\]
+
+Momentum balance becomes
+
+\[
+\boxed{
+0
+=
+-\nabla p
++
+\rho\mathbf{b}.
+}
+\]
+
+For gravity,
+
+\[
+\mathbf{b}
+=
+-g\mathbf{e}_z.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\frac{dp}{dz}
+=
+-\rho g.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hydrostatic Pressure}
+\label{subsec:hydrostatic-pressure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If density is constant,
+
+\[
+\frac{dp}{dz}
+=
+-\rho g.
+\]
+
+Integrating,
+
+\[
+\boxed{
+p(z)
+=
+p_0
++
+\rho g(z_0-z).
+}
+\]
+
+Thus pressure increases with depth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Pressure With Depth}
+\label{subsec:worked-pressure-depth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Water Pressure}
+
+Suppose water has density
+
+\[
+\rho=1000\text{ kg/m}^3
+\]
+
+and depth is
+
+\[
+h=5\text{ m}.
+\]
+
+The gauge pressure increase is
+
+\[
+\Delta p
+=
+\rho gh.
+\]
+
+Using
+
+\[
+g=9.81\text{ m/s}^2,
+\]
+
+we obtain
+
+\[
+\Delta p
+=
+1000(9.81)(5).
+\]
+
+Thus
+
+\begin{answerbox}
+\[
+\boxed{
+\Delta p
+=
+4.905\times10^4\text{ Pa}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Viscosity}
+\label{subsec:fluid-viscosity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Viscosity measures resistance to relative motion between neighboring fluid
+layers.
+
+For a simple Newtonian shear flow,
+
+\[
+\boxed{
+\tau
+=
+\mu
+\frac{du}{dy},
+}
+\]
+
+where
+
+\[
+\mu
+\]
+
+is dynamic viscosity.
+
+Large \(\mu\) corresponds to strong viscous resistance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newtonian Fluids}
+\label{subsec:newtonian-fluids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Newtonian fluid has viscous stress proportional to the rate of deformation.
+
+For an incompressible Newtonian fluid,
+
+\[
+\boxed{
+\boldsymbol{\sigma}
+=
+-p\mathbf{I}
++
+2\mu\mathbf{D},
+}
+\]
+
+where
+
+\[
+\boxed{
+\mathbf{D}
+=
+\frac12
+\left(
+\nabla\mathbf{v}
++
+(\nabla\mathbf{v})^T
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General Newtonian Stress Law}
+\label{subsec:general-newtonian-stress}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a compressible Newtonian fluid, one often writes
+
+\[
+\boxed{
+\boldsymbol{\sigma}
+=
+-p\mathbf{I}
++
+2\mu\mathbf{D}
++
+\lambda_v
+(\nabla\cdot\mathbf{v})\mathbf{I},
+}
+\]
+
+where \(\lambda_v\) is a second viscosity coefficient.
+
+For incompressible flow,
+
+\[
+\nabla\cdot\mathbf{v}=0,
+\]
+
+so the final term vanishes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kinematic Viscosity}
+\label{subsec:kinematic-viscosity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kinematic viscosity is defined by
+
+\[
+\boxed{
+\nu
+=
+\frac{\mu}{\rho}.
+}
+\]
+
+Its dimensions are
+
+\[
+\boxed{
+[\nu]
+=
+L^2T^{-1}.
+}
+\]
+
+This has the same dimensions as a diffusion coefficient.
+
+Indeed, viscosity diffuses momentum through a fluid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Balance of Linear Momentum}
+\label{subsec:fluid-linear-momentum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The continuum momentum equation is
+
+\[
+\boxed{
+\rho
+\frac{D\mathbf{v}}{Dt}
+=
+\nabla\cdot\boldsymbol{\sigma}
++
+\rho\mathbf{b}.
+}
+\]
+
+This equation becomes the Euler or Navier--Stokes equations depending on the
+chosen stress law.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler Equations}
+\label{subsec:euler-fluid-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an inviscid fluid,
+
+\[
+\boldsymbol{\sigma}
+=
+-p\mathbf{I}.
+\]
+
+Therefore,
+
+\[
+\nabla\cdot\boldsymbol{\sigma}
+=
+-\nabla p.
+\]
+
+Momentum balance becomes
+
+\[
+\boxed{
+\rho
+\left[
+\frac{\partial\mathbf{v}}{\partial t}
++
+(\mathbf{v}\cdot\nabla)\mathbf{v}
+\right]
+=
+-\nabla p
++
+\rho\mathbf{b}.
+}
+\]
+
+These are the Euler equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Navier--Stokes Equations}
+\label{subsec:navier-stokes-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a Newtonian fluid with constant viscosity and incompressible flow,
+
+\[
+\boxed{
+\rho
+\left[
+\frac{\partial\mathbf{v}}{\partial t}
++
+(\mathbf{v}\cdot\nabla)\mathbf{v}
+\right]
+=
+-\nabla p
++
+\mu\nabla^2\mathbf{v}
++
+\rho\mathbf{b}.
+}
+\]
+
+Together with
+
+\[
+\boxed{
+\nabla\cdot\mathbf{v}=0,
+}
+\]
+
+these are the incompressible Navier--Stokes equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Meaning of the Navier--Stokes Terms}
+\label{subsec:navier-stokes-term-meaning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The term
+
+\[
+\rho\frac{\partial\mathbf{v}}{\partial t}
+\]
+
+represents local inertia.
+
+The term
+
+\[
+\boxed{
+\rho(\mathbf{v}\cdot\nabla)\mathbf{v}
+}
+\]
+
+represents convective inertia.
+
+The term
+
+\[
+\boxed{
+-\nabla p
+}
+\]
+
+is pressure forcing.
+
+The term
+
+\[
+\boxed{
+\mu\nabla^2\mathbf{v}
+}
+\]
+
+represents viscous momentum diffusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinearity of Fluid Motion}
+\label{subsec:fluid-nonlinearity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The term
+
+\[
+\boxed{
+(\mathbf{v}\cdot\nabla)\mathbf{v}
+}
+\]
+
+is nonlinear in velocity.
+
+This nonlinearity allows fluid systems to exhibit:
+
+\[
+\boxed{
+\text{instability},
+}
+\]
+
+\[
+\boxed{
+\text{vortex interaction},
+}
+\]
+
+\[
+\boxed{
+\text{chaotic dynamics},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{turbulence}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{No-Slip Boundary Condition}
+\label{subsec:no-slip-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a viscous fluid touching a stationary solid wall, the standard no-slip
+condition is
+
+\[
+\boxed{
+\mathbf{v}=0.
+}
+\]
+
+For a moving wall with velocity \(\mathbf{V}_w\),
+
+\[
+\boxed{
+\mathbf{v}
+=
+\mathbf{V}_w.
+}
+\]
+
+The fluid velocity matches the wall velocity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{No-Penetration Condition}
+\label{subsec:no-penetration-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an impermeable wall,
+
+\[
+\boxed{
+\mathbf{v}\cdot\mathbf{n}
+=
+\mathbf{V}_w\cdot\mathbf{n}.
+}
+\]
+
+For a stationary wall,
+
+\[
+\boxed{
+\mathbf{v}\cdot\mathbf{n}=0.
+}
+\]
+
+In inviscid flow, tangential slip may still be allowed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vorticity}
+\label{subsec:fluid-vorticity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Vorticity is
+
+\[
+\boxed{
+\boldsymbol{\omega}
+=
+\nabla\times\mathbf{v}.
+}
+\]
+
+It measures local rotational motion of the fluid.
+
+A flow is irrotational when
+
+\[
+\boxed{
+\boldsymbol{\omega}=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Vorticity}
+\label{subsec:worked-vorticity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Solid-Body Rotation}
+
+Consider
+
+\[
+\mathbf{v}(x,y)
+=
+\begin{bmatrix}
+-\Omega y\\
+\Omega x\\
+0
+\end{bmatrix}.
+\]
+
+Then
+
+\[
+\nabla\times\mathbf{v}
+=
+\begin{bmatrix}
+0\\
+0\\
+2\Omega
+\end{bmatrix}.
+\]
+
+Thus
+
+\begin{answerbox}
+\[
+\boxed{
+\boldsymbol{\omega}
+=
+2\Omega\mathbf{e}_z.
+}
+\]
+\end{answerbox}
+
+Rigid rotation therefore has uniform nonzero vorticity.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circulation}
+\label{subsec:fluid-circulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Circulation around a closed curve \(C\) is
+
+\[
+\boxed{
+\Gamma
+=
+\oint_C
+\mathbf{v}\cdot d\mathbf{r}.
+}
+\]
+
+By Stokes' theorem,
+
+\[
+\boxed{
+\Gamma
+=
+\int_S
+\boldsymbol{\omega}\cdot\mathbf{n}\,dS.
+}
+\]
+
+Thus circulation measures total vorticity flux through a surface bounded by
+the curve.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kelvin's Circulation Theorem}
+\label{subsec:kelvin-circulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under suitable inviscid and conservative-force assumptions, circulation
+around a closed material loop is conserved:
+
+\[
+\boxed{
+\frac{D\Gamma}{Dt}
+=
+0.
+}
+\]
+
+This theorem connects vorticity evolution with fluid-particle motion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Velocity Potential}
+\label{subsec:velocity-potential}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For irrotational flow in a simply connected region,
+
+\[
+\boxed{
+\nabla\times\mathbf{v}=0
+}
+\]
+
+implies the existence of a velocity potential \(\phi\) such that
+
+\[
+\boxed{
+\mathbf{v}
+=
+\nabla\phi.
+}
+\]
+
+For incompressible flow,
+
+\[
+\nabla\cdot\mathbf{v}=0,
+\]
+
+so
+
+\[
+\boxed{
+\nabla^2\phi=0.
+}
+\]
+
+Thus potential flow reduces to Laplace's equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stream Function}
+\label{subsec:stream-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two-dimensional incompressible flow, define a stream function \(\psi\)
+by
+
+\[
+\boxed{
+u
+=
+\frac{\partial\psi}{\partial y},
+\qquad
+v
+=
+-\frac{\partial\psi}{\partial x}.
+}
+\]
+
+Then
+
+\[
+\frac{\partial u}{\partial x}
++
+\frac{\partial v}{\partial y}
+=
+0
+\]
+
+automatically.
+
+Curves
+
+\[
+\boxed{
+\psi=\text{constant}
+}
+\]
+
+are streamlines.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bernoulli's Equation}
+\label{subsec:bernoulli-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For steady, incompressible, inviscid flow with conservative body forces,
+Bernoulli's equation along a streamline is
+
+\[
+\boxed{
+p
++
+\frac12\rho v^2
++
+\rho gz
+=
+\text{constant}.
+}
+\]
+
+Each term has dimensions of pressure or energy per unit volume.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bernoulli Head Form}
+\label{subsec:bernoulli-head}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dividing by \(\rho g\),
+
+\[
+\boxed{
+\frac{p}{\rho g}
++
+\frac{v^2}{2g}
++
+z
+=
+\text{constant}.
+}
+\]
+
+The three terms are called:
+
+\[
+\boxed{
+\text{pressure head},
+}
+\]
+
+\[
+\boxed{
+\text{velocity head},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{elevation head}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bernoulli Speed}
+\label{subsec:worked-bernoulli-speed}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Horizontal Pressure-Speed Relation}
+
+Consider steady inviscid flow at equal elevation.
+
+Bernoulli gives
+
+\[
+p_1
++
+\frac12\rho v_1^2
+=
+p_2
++
+\frac12\rho v_2^2.
+\]
+
+Suppose
+
+\[
+v_1=2,
+\qquad
+v_2=4,
+\qquad
+\rho=1000.
+\]
+
+Then
+
+\[
+p_1-p_2
+=
+\frac12\rho
+(v_2^2-v_1^2).
+\]
+
+Thus
+
+\[
+p_1-p_2
+=
+\frac12(1000)(16-4).
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+p_1-p_2
+=
+6000\text{ Pa}.
+}
+\]
+\end{answerbox}
+
+The faster region has lower pressure under these assumptions.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stagnation Pressure}
+\label{subsec:stagnation-pressure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For horizontal incompressible inviscid flow, bringing fluid reversibly to
+rest gives stagnation pressure
+
+\[
+\boxed{
+p_0
+=
+p
++
+\frac12\rho v^2.
+}
+\]
+
+The term
+
+\[
+\frac12\rho v^2
+\]
+
+is dynamic pressure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Volume Flow Rate}
+\label{subsec:volume-flow-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The volume flow rate through a surface \(A\) is
+
+\[
+\boxed{
+Q
+=
+\int_A
+\mathbf{v}\cdot\mathbf{n}\,dA.
+}
+\]
+
+For uniform velocity normal to the surface,
+
+\[
+\boxed{
+Q
+=
+vA.
+}
+\]
+
+Its dimensions are
+
+\[
+\boxed{
+L^3T^{-1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mass Flow Rate}
+\label{subsec:mass-flow-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The mass flow rate is
+
+\[
+\boxed{
+\dot m
+=
+\int_A
+\rho
+\mathbf{v}\cdot\mathbf{n}
+\,dA.
+}
+\]
+
+For constant density and uniform normal velocity,
+
+\[
+\boxed{
+\dot m
+=
+\rho vA.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{One-Dimensional Continuity Relation}
+\label{subsec:one-dimensional-continuity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For steady incompressible flow through a tube,
+
+\[
+\boxed{
+A_1v_1
+=
+A_2v_2.
+}
+\]
+
+Thus if cross-sectional area decreases, average velocity increases.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Area Change}
+\label{subsec:worked-area-change}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Velocity Through a Narrower Pipe}
+
+Suppose
+
+\[
+A_1=4A_2
+\]
+
+and
+
+\[
+v_1=2\text{ m/s}.
+\]
+
+Continuity gives
+
+\[
+A_1v_1
+=
+A_2v_2.
+\]
+
+Therefore,
+
+\[
+4A_2(2)
+=
+A_2v_2.
+\]
+
+Thus
+
+\begin{answerbox}
+\[
+\boxed{
+v_2=8\text{ m/s}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Internal Flow}
+\label{subsec:internal-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Internal flow occurs when fluid is bounded by solid surfaces, as in:
+
+\[
+\boxed{
+\text{pipes},
+}
+\]
+
+\[
+\boxed{
+\text{ducts},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{channels}.
+}
+\]
+
+Viscous interaction with walls strongly influences the velocity distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Plane Couette Flow}
+\label{subsec:plane-couette-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider fluid between two parallel plates.
+
+Let the lower plate be stationary and upper plate move with velocity \(U\).
+
+For steady incompressible flow with no pressure gradient,
+
+\[
+\boxed{
+\mu\frac{d^2u}{dy^2}=0.
+}
+\]
+
+With
+
+\[
+u(0)=0,
+\qquad
+u(h)=U,
+\]
+
+the solution is
+
+\[
+\boxed{
+u(y)
+=
+\frac{U}{h}y.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Couette Shear Stress}
+\label{subsec:couette-shear-stress}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+u(y)=\frac{U}{h}y,
+\]
+
+the velocity gradient is
+
+\[
+\frac{du}{dy}
+=
+\frac{U}{h}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\tau
+=
+\mu
+\frac{U}{h}.
+}
+\]
+
+The shear stress is uniform across the fluid layer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pressure-Driven Channel Flow}
+\label{subsec:pressure-driven-channel-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For steady fully developed flow between stationary parallel plates,
+
+\[
+u=u(y),
+\]
+
+and the momentum equation reduces to
+
+\[
+\boxed{
+0
+=
+-\frac{dp}{dx}
++
+\mu
+\frac{d^2u}{dy^2}.
+}
+\]
+
+A constant pressure gradient produces a parabolic velocity profile.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Poiseuille Pipe Flow}
+\label{subsec:poiseuille-pipe-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For steady fully developed laminar flow through a circular pipe of radius
+\(R\),
+
+\[
+\boxed{
+u(r)
+=
+-\frac{1}{4\mu}
+\frac{dp}{dx}
+\left(
+R^2-r^2
+\right).
+}
+\]
+
+For flow in the positive \(x\)-direction,
+
+\[
+\frac{dp}{dx}<0.
+\]
+
+The velocity is largest at the centerline.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum and Average Pipe Velocity}
+\label{subsec:pipe-average-velocity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At \(r=0\),
+
+\[
+\boxed{
+u_{\max}
+=
+-\frac{R^2}{4\mu}
+\frac{dp}{dx}.
+}
+\]
+
+The cross-sectional average velocity is
+
+\[
+\boxed{
+\bar u
+=
+\frac12u_{\max}.
+}
+\]
+
+Thus laminar pipe flow has a characteristic parabolic profile.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hagen--Poiseuille Flow Rate}
+\label{subsec:hagen-poiseuille-law}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Integrating the velocity profile over the pipe cross section gives
+
+\[
+\boxed{
+Q
+=
+-\frac{\pi R^4}{8\mu}
+\frac{dp}{dx}.
+}
+\]
+
+For a pipe of length \(L\) with pressure drop
+
+\[
+\Delta p
+=
+p_{\text{in}}-p_{\text{out}},
+\]
+
+\[
+\boxed{
+Q
+=
+\frac{\pi R^4}{8\mu L}
+\Delta p.
+}
+\]
+
+The \(R^4\) dependence makes flow rate highly sensitive to pipe radius.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Radius Sensitivity}
+\label{subsec:worked-radius-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Doubling Pipe Radius}
+
+For Poiseuille flow,
+
+\[
+Q
+\propto
+R^4.
+\]
+
+If the radius doubles,
+
+\[
+R_2=2R_1.
+\]
+
+Then
+
+\[
+\frac{Q_2}{Q_1}
+=
+\left(
+\frac{R_2}{R_1}
+\right)^4
+=
+2^4.
+\]
+
+Thus
+
+\begin{answerbox}
+\[
+\boxed{
+Q_2=16Q_1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reynolds Number}
+\label{subsec:reynolds-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Reynolds number is
+
+\[
+\boxed{
+\operatorname{Re}
+=
+\frac{\rho UL}{\mu}
+=
+\frac{UL}{\nu}.
+}
+\]
+
+It compares inertial and viscous effects.
+
+Large Reynolds number suggests stronger inertial effects.
+
+Small Reynolds number indicates dominant viscous effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deriving Reynolds Number by Scaling}
+\label{subsec:reynolds-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The inertial term scales like
+
+\[
+\boxed{
+\rho
+\frac{U^2}{L}.
+}
+\]
+
+The viscous term scales like
+
+\[
+\boxed{
+\mu
+\frac{U}{L^2}.
+}
+\]
+
+Their ratio is
+
+\[
+\frac{
+\rho U^2/L
+}{
+\mu U/L^2
+}
+=
+\frac{\rho UL}{\mu}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Re}
+=
+\frac{\rho UL}{\mu}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nondimensional Navier--Stokes}
+\label{subsec:nondimensional-navier-stokes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\mathbf{x}
+=
+L\mathbf{x}^*,
+\qquad
+\mathbf{v}
+=
+U\mathbf{v}^*,
+\qquad
+t
+=
+\frac{L}{U}t^*.
+\]
+
+Using pressure scale
+
+\[
+\rho U^2,
+\]
+
+the dimensionless incompressible Navier--Stokes equation becomes
+
+\[
+\boxed{
+\frac{\partial\mathbf{v}^*}{\partial t^*}
++
+(\mathbf{v}^*\cdot\nabla^*)\mathbf{v}^*
+=
+-\nabla^*p^*
++
+\frac{1}{\operatorname{Re}}
+\nabla^{*2}\mathbf{v}^*.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Low Reynolds Number Flow}
+\label{subsec:low-reynolds-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When
+
+\[
+\operatorname{Re}\ll1,
+\]
+
+viscous effects dominate inertia.
+
+The inertial terms may become negligible, giving the Stokes equations
+
+\[
+\boxed{
+0
+=
+-\nabla p
++
+\mu\nabla^2\mathbf{v}
++
+\rho\mathbf{b},
+}
+\]
+
+with
+
+\[
+\boxed{
+\nabla\cdot\mathbf{v}=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{High Reynolds Number Flow}
+\label{subsec:high-reynolds-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When
+
+\[
+\operatorname{Re}\gg1,
+\]
+
+inertia dominates in much of the flow.
+
+Viscosity may nevertheless remain crucial near solid boundaries and inside
+thin shear layers.
+
+Thus high Reynolds number does not mean viscosity can always be ignored
+everywhere.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Laminar Flow}
+\label{subsec:laminar-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Laminar flow has relatively smooth and organized fluid motion.
+
+Neighboring layers move with limited irregular mixing.
+
+Examples include:
+
+\[
+\boxed{
+\text{slow viscous flows}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{fully developed Poiseuille flow}
+}
+\]
+
+under suitable conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Turbulent Flow}
+\label{subsec:turbulent-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Turbulent flow contains complex fluctuations across many spatial and temporal
+scales.
+
+Typical features include:
+
+\[
+\boxed{
+\text{irregular velocity fluctuations},
+}
+\]
+
+\[
+\boxed{
+\text{enhanced mixing},
+}
+\]
+
+\[
+\boxed{
+\text{vortical structures},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{broad scale interaction}.
+}
+\]
+
+Turbulence remains one of the most challenging areas of applied mathematics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transition to Turbulence}
+\label{subsec:transition-to-turbulence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Increasing Reynolds number can destabilize laminar flows.
+
+The transition depends not only on Reynolds number but also on:
+
+\[
+\boxed{
+\text{geometry},
+}
+\]
+
+\[
+\boxed{
+\text{disturbance amplitude},
+}
+\]
+
+\[
+\boxed{
+\text{surface roughness},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{boundary conditions}.
+}
+\]
+
+There is no single universal transition Reynolds number for all flows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary Layers}
+\label{subsec:boundary-layers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At high Reynolds number, viscous effects are often concentrated near solid
+walls.
+
+A thin region forms in which velocity changes rapidly from the wall value to
+the outer-flow value.
+
+This region is the boundary layer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary-Layer Scaling}
+\label{subsec:boundary-layer-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a boundary layer has streamwise scale \(L\) and thickness \(\delta\),
+with
+
+\[
+\delta\ll L.
+\]
+
+Velocity gradients normal to the wall scale like
+
+\[
+\boxed{
+\frac{U}{\delta},
+}
+\]
+
+which can be much larger than streamwise gradients of scale
+
+\[
+\boxed{
+\frac{U}{L}.
+}
+\]
+
+This makes viscosity important inside the thin layer even when
+\(\operatorname{Re}\) is large.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow Separation}
+\label{subsec:flow-separation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A boundary layer can detach from a solid surface.
+
+This phenomenon is called flow separation.
+
+Separation is associated with:
+
+\[
+\boxed{
+\text{adverse pressure gradients},
+}
+\]
+
+\[
+\boxed{
+\text{strong deceleration near walls},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{large wake formation}.
+}
+\]
+
+It strongly influences drag and lift.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{External Flow}
+\label{subsec:external-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+External flow occurs around bodies such as:
+
+\[
+\boxed{
+\text{airfoils},
+}
+\]
+
+\[
+\boxed{
+\text{vehicles},
+}
+\]
+
+\[
+\boxed{
+\text{buildings},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{spheres}.
+}
+\]
+
+Important quantities include drag, lift, separation, wakes, and boundary
+layers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Drag}
+\label{subsec:fluid-drag}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Drag acts approximately parallel to the incoming flow direction.
+
+A common scaling is
+
+\[
+\boxed{
+F_D
+=
+\frac12
+\rho U^2
+C_DA,
+}
+\]
+
+where
+
+\[
+C_D
+\]
+
+is the drag coefficient and \(A\) is a reference area.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lift}
+\label{subsec:fluid-lift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Lift acts approximately perpendicular to the incoming flow direction.
+
+A common representation is
+
+\[
+\boxed{
+F_L
+=
+\frac12
+\rho U^2
+C_LA.
+}
+\]
+
+The lift coefficient \(C_L\) depends on geometry, angle of attack, Reynolds
+number, Mach number, and flow state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circulation and Lift}
+\label{subsec:circulation-and-lift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In idealized two-dimensional inviscid flow, circulation around a body can
+produce lift.
+
+The Kutta--Joukowski relation is
+
+\[
+\boxed{
+L'
+=
+\rho U_\infty\Gamma,
+}
+\]
+
+where \(L'\) is lift per unit span and \(\Gamma\) is circulation, under the
+standard sign convention appropriate to the setup.
+
+This connects global circulation with aerodynamic force.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Potential Flow}
+\label{subsec:potential-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Potential flow assumes
+
+\[
+\boxed{
+\nabla\times\mathbf{v}=0.
+}
+\]
+
+For incompressible flow,
+
+\[
+\mathbf{v}
+=
+\nabla\phi
+\]
+
+and
+
+\[
+\boxed{
+\nabla^2\phi=0.
+}
+\]
+
+Potential flow is mathematically elegant and useful away from strongly
+viscous regions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{D'Alembert Paradox}
+\label{subsec:dalembert-paradox}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ideal steady incompressible inviscid potential flow around a symmetric body
+can predict zero net drag.
+
+Real bodies experience drag because viscosity creates boundary layers,
+separation, and wakes.
+
+This mismatch is known as D'Alembert's paradox.
+
+It illustrates the danger of neglecting a physically small term that has
+large effects near boundaries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Compressible Flow}
+\label{subsec:compressible-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In compressible flow,
+
+\[
+\boxed{
+\rho
+}
+\]
+
+can vary substantially.
+
+Mass conservation remains
+
+\[
+\boxed{
+\rho_t
++
+\nabla\cdot(\rho\mathbf{v})
+=
+0.
+}
+\]
+
+Momentum and energy equations must be coupled with an equation of state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equation of State}
+\label{subsec:fluid-equation-of-state}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an ideal gas,
+
+\[
+\boxed{
+p
+=
+\rho RT,
+}
+\]
+
+where \(R\) is the specific gas constant.
+
+This relates thermodynamic variables
+
+\[
+p,\rho,T.
+\]
+
+Compressible fluid dynamics therefore couples mechanics with thermodynamics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Speed of Sound}
+\label{subsec:speed-of-sound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The speed of sound measures propagation speed of small pressure disturbances.
+
+For an ideal gas under adiabatic conditions,
+
+\[
+\boxed{
+a
+=
+\sqrt{\gamma RT},
+}
+\]
+
+where \(\gamma\) is the ratio of specific heats.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mach Number}
+\label{subsec:mach-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Mach number is
+
+\[
+\boxed{
+\operatorname{Ma}
+=
+\frac{U}{a}.
+}
+\]
+
+It compares flow speed to local sound speed.
+
+Typical classifications are:
+
+\[
+\boxed{
+\operatorname{Ma}<1
+\quad
+\text{subsonic},
+}
+\]
+
+\[
+\boxed{
+\operatorname{Ma}\approx1
+\quad
+\text{transonic},
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Ma}>1
+\quad
+\text{supersonic}.
+}
+\]
+
+Very large Mach numbers are often called hypersonic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shock Waves}
+\label{subsec:shock-waves}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A shock wave is a thin region across which quantities such as
+
+\[
+\boxed{
+p,
+\quad
+\rho,
+\quad
+T,
+\quad
+U
+}
+\]
+
+change rapidly.
+
+In idealized continuum models, the shock may be treated as a discontinuity.
+
+Conservation laws determine jump conditions across the shock.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rankine--Hugoniot Concept}
+\label{subsec:rankine-hugoniot-concept}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a conservation law
+
+\[
+\boxed{
+u_t+f(u)_x=0,
+}
+\]
+
+a discontinuity moving with speed \(s\) satisfies
+
+\[
+\boxed{
+s[u]
+=
+[f(u)],
+}
+\]
+
+where
+
+\[
+[u]
+=
+u_R-u_L.
+\]
+
+This is a Rankine--Hugoniot jump condition.
+
+It expresses conservation across a moving discontinuity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shallow-Water Equations}
+\label{subsec:shallow-water-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When horizontal length scales greatly exceed fluid depth, vertical structure
+may be averaged.
+
+In one dimension, a basic shallow-water system is
+
+\[
+\boxed{
+h_t+(hu)_x=0,
+}
+\]
+
+\[
+\boxed{
+(hu)_t
++
+\left(
+hu^2+\frac12gh^2
+\right)_x
+=
+0,
+}
+\]
+
+for idealized flat-bottom inviscid flow.
+
+Here \(h\) is fluid depth and \(u\) is depth-averaged velocity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Froude Number}
+\label{subsec:froude-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Froude number is
+
+\[
+\boxed{
+\operatorname{Fr}
+=
+\frac{U}{\sqrt{gL}}.
+}
+\]
+
+It compares inertial effects to gravity-wave effects.
+
+In shallow water, one often uses depth \(h\):
+
+\[
+\boxed{
+\operatorname{Fr}
+=
+\frac{U}{\sqrt{gh}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subcritical and Supercritical Flow}
+\label{subsec:subcritical-supercritical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For shallow-water flow,
+
+\[
+\boxed{
+\operatorname{Fr}<1
+}
+\]
+
+is subcritical,
+
+while
+
+\[
+\boxed{
+\operatorname{Fr}>1
+}
+\]
+
+is supercritical.
+
+The distinction affects propagation of gravity-wave information and the
+structure of hydraulic transitions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rotating Fluids}
+\label{subsec:rotating-fluids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a rotating reference frame, momentum equations include Coriolis
+acceleration.
+
+The Coriolis term has form
+
+\[
+\boxed{
+2\boldsymbol{\Omega}\times\mathbf{v},
+}
+\]
+
+where \(\boldsymbol{\Omega}\) is the angular velocity of the rotating frame.
+
+This effect is important in large-scale atmospheric and oceanic flows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coriolis Parameter}
+\label{subsec:coriolis-parameter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+On a rotating planet, a simplified local Coriolis parameter is
+
+\[
+\boxed{
+f
+=
+2\Omega\sin\phi,
+}
+\]
+
+where \(\phi\) is latitude.
+
+Large-scale horizontal momentum equations often contain terms proportional to
+
+\[
+\boxed{
+f\mathbf{k}\times\mathbf{v}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geostrophic Balance}
+\label{subsec:geostrophic-balance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At large scales, pressure-gradient and Coriolis forces may approximately
+balance:
+
+\[
+\boxed{
+f\mathbf{k}\times\mathbf{v}
+=
+-\frac{1}{\rho}\nabla_h p.
+}
+\]
+
+This is geostrophic balance.
+
+It is fundamental in atmospheric and oceanic dynamics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scalar Transport}
+\label{subsec:fluid-scalar-transport}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scalar concentration \(c(\mathbf{x},t)\) transported by a fluid may satisfy
+
+\[
+\boxed{
+\frac{\partial c}{\partial t}
++
+\mathbf{v}\cdot\nabla c
+=
+D\nabla^2c
++
+R(c),
+}
+\]
+
+where
+
+\[
+D
+\]
+
+is diffusivity and \(R(c)\) represents sources, sinks, or reactions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advection}
+\label{subsec:fluid-advection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pure advection satisfies
+
+\[
+\boxed{
+c_t
++
+\mathbf{v}\cdot\nabla c
+=
+0.
+}
+\]
+
+The scalar is transported with the flow.
+
+Along a particle trajectory,
+
+\[
+\boxed{
+\frac{Dc}{Dt}=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diffusion}
+\label{subsec:fluid-diffusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pure diffusion satisfies
+
+\[
+\boxed{
+c_t
+=
+D\nabla^2c.
+}
+\]
+
+Diffusion tends to smooth concentration gradients.
+
+Advection and diffusion compete in many transport problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Peclet Number}
+\label{subsec:peclet-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Peclet number is
+
+\[
+\boxed{
+\operatorname{Pe}
+=
+\frac{UL}{D}.
+}
+\]
+
+It compares advective transport to diffusive transport.
+
+Large \(\operatorname{Pe}\) indicates advection dominance.
+
+Small \(\operatorname{Pe}\) indicates diffusion dominance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Thermal Convection}
+\label{subsec:thermal-convection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Temperature differences can create density differences.
+
+In a gravitational field, these density differences can produce buoyant
+motion.
+
+This leads to thermal convection.
+
+The problem couples:
+
+\[
+\boxed{
+\text{momentum},
+}
+\]
+
+\[
+\boxed{
+\text{temperature transport},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{buoyancy}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boussinesq Approximation}
+\label{subsec:boussinesq-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For small density variations, one may treat density as constant except in
+the buoyancy term.
+
+A common approximation is
+
+\[
+\boxed{
+\rho
+\approx
+\rho_0
+\left[
+1-\alpha(T-T_0)
+\right].
+}
+\]
+
+This is the basis of the Boussinesq approximation in many natural-convection
+problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rayleigh Number}
+\label{subsec:rayleigh-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common Rayleigh number is
+
+\[
+\boxed{
+\operatorname{Ra}
+=
+\frac{
+g\alpha\Delta T L^3
+}{
+\nu\kappa
+},
+}
+\]
+
+where
+
+\[
+\alpha
+=
+\text{thermal expansion coefficient},
+\]
+
+\[
+\nu
+=
+\text{kinematic viscosity},
+\]
+
+and
+
+\[
+\kappa
+=
+\text{thermal diffusivity}.
+\]
+
+It measures the tendency of buoyancy to overcome viscous and thermal
+diffusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Turbulence Averaging}
+\label{subsec:turbulence-averaging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A turbulent velocity may be decomposed as
+
+\[
+\boxed{
+\mathbf{v}
+=
+\overline{\mathbf{v}}
++
+\mathbf{v}'.
+}
+\]
+
+The mean satisfies
+
+\[
+\boxed{
+\overline{\mathbf{v}'}
+=
+0.
+}
+\]
+
+Substituting this decomposition into Navier--Stokes and averaging generates
+additional fluctuation terms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reynolds Stresses}
+\label{subsec:reynolds-stresses}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Reynolds averaging introduces terms involving
+
+\[
+\boxed{
+\overline{v_i'v_j'}.
+}
+\]
+
+These behave like additional momentum-flux terms.
+
+They are commonly represented through a Reynolds stress tensor.
+
+The need to model these unknown correlations creates the turbulence closure
+problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Turbulence Closure Problem}
+\label{subsec:turbulence-closure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Averaging nonlinear equations produces new unknown moments.
+
+Equations for those moments introduce still higher-order moments.
+
+Thus the averaged system does not automatically close.
+
+Additional models are required.
+
+This is the turbulence closure problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Direct Numerical Simulation}
+\label{subsec:direct-numerical-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Direct numerical simulation attempts to resolve all dynamically relevant
+fluid scales without a turbulence model.
+
+This can be extremely computationally expensive because turbulent flows
+contain a wide range of scales.
+
+DNS is therefore usually limited to moderate Reynolds numbers or relatively
+simple geometries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Large-Eddy Simulation}
+\label{subsec:large-eddy-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large-eddy simulation resolves large turbulent structures while modeling
+smaller unresolved scales.
+
+Conceptually,
+
+\[
+\boxed{
+\text{large scales}
+=
+\text{resolved},
+}
+\]
+
+\[
+\boxed{
+\text{small scales}
+=
+\text{modeled}.
+}
+\]
+
+This reduces computational cost compared with DNS.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reynolds-Averaged Models}
+\label{subsec:reynolds-averaged-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Reynolds-averaged Navier--Stokes methods model mean flow rather than every
+instantaneous turbulent fluctuation.
+
+They introduce closure relations for Reynolds stresses.
+
+These models are widely used in engineering because they are much cheaper
+than resolving all turbulent scales.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Fluid Dynamics}
+\label{subsec:numerical-fluid-dynamics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computational fluid dynamics numerically approximates fluid equations.
+
+Common methods include:
+
+\[
+\boxed{
+\text{finite difference methods},
+}
+\]
+
+\[
+\boxed{
+\text{finite volume methods},
+}
+\]
+
+\[
+\boxed{
+\text{finite element methods},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{spectral methods}.
+}
+\]
+
+Different formulations emphasize different mathematical properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Volume Viewpoint}
+\label{subsec:finite-volume-viewpoint}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite volume methods integrate conservation laws over control volumes.
+
+For a conservation law,
+
+\[
+\boxed{
+u_t+\nabla\cdot\mathbf{F}(u)=0,
+}
+\]
+
+integration over a cell gives
+
+\[
+\boxed{
+\frac{d}{dt}
+\int_Vu\,dV
+=
+-
+\int_{\partial V}
+\mathbf{F}\cdot\mathbf{n}\,dA.
+}
+\]
+
+Thus conservation is built directly into the numerical formulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Stability}
+\label{subsec:fluid-numerical-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical scheme may become unstable if the time step is too large relative
+to the spatial mesh and signal speed.
+
+A typical explicit condition has form
+
+\[
+\boxed{
+\frac{U\Delta t}{\Delta x}
+\leq
+C,
+}
+\]
+
+where \(C\) depends on the method.
+
+This is a CFL-type restriction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Diffusion}
+\label{subsec:numerical-diffusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical schemes may artificially smooth sharp gradients.
+
+This effect is called numerical diffusion.
+
+It can reduce oscillations but may also smear:
+
+\[
+\boxed{
+\text{shocks},
+}
+\]
+
+\[
+\boxed{
+\text{interfaces},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{thin boundary layers}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Dispersion}
+\label{subsec:numerical-dispersion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical dispersion occurs when different numerical wave components travel
+at incorrect phase speeds.
+
+This can create artificial oscillations or phase errors.
+
+Wave and compressible-flow simulations must carefully control both numerical
+dispersion and diffusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Verification and Validation in CFD}
+\label{subsec:cfd-verification-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Verification asks:
+
+\[
+\boxed{
+\text{Are the fluid equations being solved correctly?}
+}
+\]
+
+Validation asks:
+
+\[
+\boxed{
+\text{Do the equations adequately describe the physical flow?}
+}
+\]
+
+Grid refinement tests numerical convergence.
+
+Experimental comparison tests physical adequacy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Grid Refinement}
+\label{subsec:fluid-grid-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose simulations use mesh sizes
+
+\[
+h,
+\qquad
+\frac{h}{2},
+\qquad
+\frac{h}{4}.
+\]
+
+If computed quantities approach a limiting value as the grid is refined,
+this provides evidence of numerical convergence.
+
+Grid independence should be checked before interpreting small-scale flow
+features.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fluid Dynamics Workflow}
+\label{subsec:fluid-dynamics-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical fluid-modeling workflow is:
+
+\begin{enumerate}
+    \item define the fluid domain;
+    \item identify characteristic length, velocity, and time scales;
+    \item determine whether density variation matters;
+    \item determine whether viscosity matters;
+    \item determine whether temperature or concentration must be modeled;
+    \item choose Eulerian or Lagrangian variables;
+    \item impose mass conservation;
+    \item impose momentum conservation;
+    \item select a constitutive stress law;
+    \item include gravity or other body forces;
+    \item define an equation of state if compressibility matters;
+    \item determine initial conditions;
+    \item impose wall, inlet, outlet, or free-surface conditions;
+    \item nondimensionalize the equations;
+    \item compute Reynolds, Mach, Froude, Peclet, or other relevant numbers;
+    \item identify dominant physical effects;
+    \item determine whether analytical simplifications are possible;
+    \item check for steady, irrotational, fully developed, or symmetric flow;
+    \item determine whether turbulence modeling is necessary;
+    \item choose an appropriate numerical method;
+    \item perform mesh and time-step refinement;
+    \item verify conservation numerically;
+    \item compare with experiments or observations;
+    \item quantify uncertainty;
+    \item communicate model assumptions and limitations.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:fluid-dynamics-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing Steady Flow With Zero Acceleration}
+
+Steady flow means
+
+\[
+\frac{\partial\mathbf{v}}{\partial t}=0.
+\]
+
+Acceleration may still arise from
+
+\[
+(\mathbf{v}\cdot\nabla)\mathbf{v}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Incompressible Flow With Zero Velocity Divergence Without Context}
+
+For the standard incompressible continuum model,
+
+\[
+\nabla\cdot\mathbf{v}=0.
+\]
+
+More generally, mass conservation should be derived from the density field and
+material-volume behavior rather than assumed blindly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Constant Density for Every Fluid}
+
+Liquids are often approximately constant-density.
+
+Gases can undergo strong density variation, especially at significant Mach
+numbers or temperature changes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Pressure and Viscous Stress}
+
+Pressure is the isotropic part of stress.
+
+Viscous stresses arise from deformation rates.
+
+A Newtonian fluid combines both.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting the Convective Term}
+
+The nonlinear term
+
+\[
+(\mathbf{v}\cdot\nabla)\mathbf{v}
+\]
+
+is essential in most flows with spatial velocity variation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying Bernoulli's Equation Without Checking Assumptions}
+
+The standard Bernoulli relation requires appropriate conditions such as
+steady, inviscid flow and conservative body forces.
+
+In rotational flow, the constant may differ from streamline to streamline.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Bernoulli's Equation as a Universal Pressure Law}
+
+Pressure is determined by the full governing equations and boundary
+conditions.
+
+Bernoulli is a special consequence of those equations under restricted
+assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Viscosity at Walls}
+
+Even when viscosity is small in the bulk flow, no-slip boundary conditions
+can create strong viscous effects near walls.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming High Reynolds Number Means Inviscid Everywhere}
+
+High Reynolds number often produces thin viscous boundary layers.
+
+Viscosity may control separation, drag, and wake formation even when its bulk
+effect is small.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Laminar and Steady}
+
+A laminar flow may be unsteady.
+
+A turbulent flow may possess a statistically steady mean.
+
+The terms describe different properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Universal Transition Reynolds Number}
+
+Transition depends on geometry and disturbance environment.
+
+A Reynolds number threshold from one flow should not be transferred blindly
+to another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Streamlines and Pathlines in Unsteady Flow}
+
+Streamlines describe instantaneous velocity geometry.
+
+Pathlines describe actual particle trajectories.
+
+They coincide only under steady-flow conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Units of Viscosity}
+
+Dynamic viscosity and kinematic viscosity are different quantities:
+
+\[
+\mu
+\neq
+\nu.
+\]
+
+They satisfy
+
+\[
+\nu=\frac{\mu}{\rho}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Vorticity With Angular Velocity}
+
+For rigid-body rotation, vorticity is twice the local angular velocity.
+
+Thus these quantities are related but not identical.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Irrotational Flow Has No Curved Streamlines}
+
+Irrotational means
+
+\[
+\nabla\times\mathbf{v}=0.
+\]
+
+Streamlines can still curve.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Potential Flow Predicts Real Drag Correctly}
+
+Ideal potential flow can miss viscous drag mechanisms entirely.
+
+Boundary-layer and wake effects must be included for realistic drag.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Compressibility Near the Speed of Sound}
+
+When Mach number is not small, density changes and acoustic effects can become
+important.
+
+Incompressible approximations may fail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Shock Waves as Ordinary Smooth Solutions}
+
+Ideal shocks are discontinuities in continuum fields.
+
+They require conservation-law jump conditions and weak-solution concepts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Energy Equation in Compressible Flow}
+
+Mass and momentum equations alone generally do not determine a compressible
+thermodynamic flow.
+
+An energy equation and equation of state are typically required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Froude and Reynolds Numbers}
+
+Reynolds number compares inertia with viscosity.
+
+Froude number compares inertia with gravity-wave effects.
+
+They describe different physical balances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Peclet and Reynolds Numbers}
+
+Peclet number compares advection with scalar diffusion.
+
+Reynolds number compares inertia with momentum diffusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Turbulence Closure}
+
+Averaging Navier--Stokes introduces unknown Reynolds stresses.
+
+A turbulence model or higher-fidelity simulation approach is needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming CFD Output Is Automatically Physical}
+
+A visually smooth simulation may still violate:
+
+\[
+\boxed{
+\text{conservation},
+}
+\]
+
+\[
+\boxed{
+\text{mesh independence},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{model validity}.
+}
+\]
+
+Verification and validation remain necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Excessively Large Time Step}
+
+Explicit numerical methods may become unstable when the time step violates
+transport or wave-propagation stability restrictions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:fluid-dynamics-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Aerodynamics.}
+Fluid equations describe lift, drag, boundary layers, wakes, aircraft flows,
+and high-speed compressible motion.
+
+\medskip
+
+\textbf{Hydrodynamics.}
+Ships, channels, waves, rivers, and underwater systems are modeled through
+incompressible and free-surface flows.
+
+\medskip
+
+\textbf{Atmospheric Science.}
+Large-scale fluid models describe winds, pressure systems, convection, and
+rotating atmospheric dynamics.
+
+\medskip
+
+\textbf{Oceanography.}
+Fluid models describe currents, waves, stratification, tides, and transport
+in rotating oceans.
+
+\medskip
+
+\textbf{Biomechanics.}
+Blood flow, airflow, and transport through biological systems are modeled
+using viscous-fluid equations.
+
+\medskip
+
+\textbf{Chemical Engineering.}
+Advection, diffusion, reaction, mixing, and multiphase transport are central
+to process models.
+
+\medskip
+
+\textbf{Environmental Modeling.}
+Pollutants, nutrients, sediments, and heat can be transported through air and
+water using advection-diffusion models.
+
+\medskip
+
+\textbf{Energy Systems.}
+Turbomachinery, combustion, heat transfer, wind turbines, and pipelines
+depend on fluid-dynamic modeling.
+
+\medskip
+
+\textbf{Computational Fluid Dynamics.}
+Numerical PDE methods approximate flows too complicated for closed-form
+analysis.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:fluid-dynamics-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a fluid velocity field.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish Eulerian and Lagrangian fluid descriptions.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a streamline.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a pathline.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a streakline.
+\end{exercise}
+
+\begin{exercise}[1]
+Define vorticity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define circulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define dynamic viscosity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define kinematic viscosity.
+\end{exercise}
+
+\begin{exercise}[1]
+State the incompressible Navier--Stokes equations.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the material acceleration for
+
+\[
+\mathbf{v}(x,y)
+=
+(x,-y).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+\mathbf{v}(x,y)
+=
+(x,-y)
+\]
+
+is incompressible.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+\mathbf{v}(x,y)
+=
+(x,y)
+\]
+
+is incompressible.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the continuity equation for variable density.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive
+
+\[
+\nabla\cdot\mathbf{v}=0
+\]
+
+from the continuity equation for constant density.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive hydrostatic pressure for a constant-density fluid.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the pressure increase at depth \(h\) in a liquid of density \(\rho\).
+\end{exercise}
+
+\begin{exercise}[2]
+Write the Newtonian shear relation
+
+\[
+\tau=\mu\frac{du}{dy}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Compute kinematic viscosity given \(\mu\) and \(\rho\).
+\end{exercise}
+
+\begin{exercise}[2]
+State the Euler equations.
+\end{exercise}
+
+\begin{exercise}[2]
+Identify each term in the incompressible Navier--Stokes equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Navier--Stokes is nonlinear.
+\end{exercise}
+
+\begin{exercise}[2]
+State the no-slip condition.
+\end{exercise}
+
+\begin{exercise}[2]
+State the no-penetration condition.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the vorticity of
+
+\[
+\mathbf{v}
+=
+(-y,x,0).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether
+
+\[
+\mathbf{v}
+=
+\nabla\phi
+\]
+
+is irrotational when \(\phi\) is twice continuously differentiable.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that incompressible potential flow satisfies Laplace's equation.
+\end{exercise}
+
+\begin{exercise}[2]
+Define a two-dimensional stream function.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that a stream function automatically satisfies incompressibility.
+\end{exercise}
+
+\begin{exercise}[2]
+State Bernoulli's equation.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the assumptions behind Bernoulli's equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Use Bernoulli's equation to compare pressures at two points of different
+speed but equal elevation.
+\end{exercise}
+
+\begin{exercise}[2]
+Define stagnation pressure.
+\end{exercise}
+
+\begin{exercise}[2]
+Define volume flow rate.
+\end{exercise}
+
+\begin{exercise}[2]
+Define mass flow rate.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive
+
+\[
+A_1v_1=A_2v_2
+\]
+
+for steady incompressible one-dimensional flow.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the velocity profile for plane Couette flow.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute Couette shear stress.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the pressure-driven flow equation between parallel plates.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Poiseuille velocity profile in a circular pipe.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Hagen--Poiseuille flow-rate relation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the significance of the \(R^4\) dependence in pipe flow.
+\end{exercise}
+
+\begin{exercise}[2]
+Define Reynolds number.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive Reynolds number by comparing inertial and viscous scales.
+\end{exercise}
+
+\begin{exercise}[3]
+Nondimensionalize incompressible Navier--Stokes and identify
+\(\operatorname{Re}\).
+\end{exercise}
+
+\begin{exercise}[2]
+Explain low Reynolds number flow.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain high Reynolds number flow.
+\end{exercise}
+
+\begin{exercise}[2]
+Distinguish laminar and turbulent flow.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a universal transition Reynolds number does not exist.
+\end{exercise}
+
+\begin{exercise}[2]
+Define a boundary layer.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why viscosity remains important inside a high-Reynolds-number
+boundary layer.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain flow separation conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Define drag coefficient.
+\end{exercise}
+
+\begin{exercise}[2]
+Define lift coefficient.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how circulation can contribute to lift.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain D'Alembert's paradox.
+\end{exercise}
+
+\begin{exercise}[2]
+Define Mach number.
+\end{exercise}
+
+\begin{exercise}[2]
+Classify flows as subsonic or supersonic from a given Mach number.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why compressibility becomes important as Mach number increases.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain a shock wave conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Rankine--Hugoniot relation for a scalar conservation law.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the one-dimensional shallow-water equations.
+\end{exercise}
+
+\begin{exercise}[2]
+Define Froude number.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish subcritical and supercritical shallow-water flow.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the Coriolis acceleration term.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain geostrophic balance.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the advection-diffusion equation.
+\end{exercise}
+
+\begin{exercise}[2]
+Define Peclet number.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret large and small Peclet numbers.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the Boussinesq approximation.
+\end{exercise}
+
+\begin{exercise}[2]
+Define Rayleigh number conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the competition represented by Rayleigh number.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the Reynolds decomposition
+
+\[
+\mathbf{v}
+=
+\overline{\mathbf{v}}
++
+\mathbf{v}'.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Reynolds stresses.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the turbulence closure problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Distinguish DNS, LES, and Reynolds-averaged modeling conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the finite volume viewpoint.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why finite volume methods are naturally conservative.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain a CFL-type stability restriction.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish numerical diffusion and physical viscosity.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain numerical dispersion.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between CFD verification and validation.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe a grid-refinement study.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the incompressible Navier--Stokes equations from continuum momentum
+balance and Newtonian stress.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the vorticity equation for incompressible flow.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Kelvin's circulation theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study two-dimensional potential flow using complex variables.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct potential flows from sources, sinks, vortices, and uniform flow.
+\end{exercise}
+
+\begin{exercise}[4]
+Study flow around a cylinder using potential flow.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Kutta--Joukowski lift relation conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Study boundary-layer scaling from Navier--Stokes.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the classical boundary-layer equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Stokes flow past a sphere.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the derivation of Poiseuille flow in cylindrical coordinates.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive energy conservation for a compressible fluid.
+\end{exercise}
+
+\begin{exercise}[4]
+Study one-dimensional compressible Euler equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive shock jump conditions from conservation laws.
+\end{exercise}
+
+\begin{exercise}[4]
+Study shallow-water characteristics.
+\end{exercise}
+
+\begin{exercise}[4]
+Study hydraulic jumps.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive geostrophic balance from rotating momentum equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study thermal convection in a fluid layer.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the onset of Rayleigh--Bénard convection.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Reynolds-averaged Navier--Stokes equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study turbulence energy cascades conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct a finite volume discretization of a scalar advection equation.
+\end{exercise}
+
+\begin{exercise}[4]
+Compare numerical schemes for advection using stability and numerical
+diffusion.
+\end{exercise}
+
+\begin{exercise}[4]
+Develop a numerical incompressible-flow simulation and perform a grid
+refinement study.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:fluid-dynamics-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fluid dynamics specializes continuum mechanics to flowing liquids and gases.
+
+Mass conservation gives
+
+\[
+\boxed{
+\frac{\partial\rho}{\partial t}
++
+\nabla\cdot(\rho\mathbf{v})
+=
+0.
+}
+\]
+
+For incompressible flow,
+
+\[
+\boxed{
+\nabla\cdot\mathbf{v}=0.
+}
+\]
+
+Momentum balance with an inviscid stress law gives the Euler equations:
+
+\[
+\boxed{
+\rho
+\frac{D\mathbf{v}}{Dt}
+=
+-\nabla p
++
+\rho\mathbf{b}.
+}
+\]
+
+For an incompressible Newtonian fluid, the governing equations become
+
+\[
+\boxed{
+\rho
+\left[
+\mathbf{v}_t
++
+(\mathbf{v}\cdot\nabla)\mathbf{v}
+\right]
+=
+-\nabla p
++
+\mu\nabla^2\mathbf{v}
++
+\rho\mathbf{b}.
+}
+\]
+
+Important structures include
+
+\[
+\boxed{
+\boldsymbol{\omega}
+=
+\nabla\times\mathbf{v}
+}
+\]
+
+for vorticity,
+
+\[
+\boxed{
+\Gamma
+=
+\oint_C
+\mathbf{v}\cdot d\mathbf{r}
+}
+\]
+
+for circulation, and
+
+\[
+\boxed{
+p+\frac12\rho v^2+\rho gz
+=
+\text{constant}
+}
+\]
+
+for Bernoulli's relation under its appropriate assumptions.
+
+Nondimensional analysis introduces quantities such as
+
+\[
+\boxed{
+\operatorname{Re}
+=
+\frac{\rho UL}{\mu},
+}
+\]
+
+\[
+\boxed{
+\operatorname{Ma}
+=
+\frac{U}{a},
+}
+\]
+
+\[
+\boxed{
+\operatorname{Fr}
+=
+\frac{U}{\sqrt{gL}},
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Pe}
+=
+\frac{UL}{D}.
+}
+\]
+
+These numbers identify the physical processes dominating a flow.
+
+Fluid dynamics therefore combines
+
+\[
+\boxed{
+\text{conservation}
++
+\text{constitutive behavior}
++
+\text{transport}
++
+\text{scaling}
++
+\text{computation}
+}
+\]
+
+to describe systems ranging from microscopic viscous motion to atmospheric,
+oceanic, aerodynamic, and turbulent flows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:fluid-dynamics-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Fluid Dynamics specializes the continuum framework of
+Section~\ref{sec:continuum-mechanics} to liquids and gases. Mass, momentum,
+and energy conservation produce the governing field equations, while
+Newtonian constitutive laws introduce viscosity and pressure into the stress
+tensor. Vector calculus describes vorticity, circulation, and potential
+flow; partial differential equations describe waves, diffusion, shocks, and
+transport; nondimensionalization reveals Reynolds, Mach, Froude, Peclet, and
+other controlling parameters; and numerical mathematics provides the basis
+for computational fluid dynamics. The next section, Control Theory,
+develops mathematical methods for influencing dynamical systems through
+feedback, stability analysis, state-space models, controllability,
+observability, and optimal control.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 13.5 Fluid Dynamics
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard incompressible and compressible fluid mechanics.
+%   - Standard continuum balance laws and Newtonian constitutive theory.
+%   - Standard potential flow, viscous flow, boundary-layer,
+%     transport, geophysical, turbulent, and computational fluid dynamics.
+%
+% Used for:
+%   - continuum fluid description;
+%   - Eulerian and Lagrangian viewpoints;
+%   - velocity fields;
+%   - streamlines, pathlines, and streaklines;
+%   - material derivatives;
+%   - local and convective acceleration;
+%   - density;
+%   - mass conservation;
+%   - incompressibility;
+%   - pressure;
+%   - hydrostatics;
+%   - viscosity;
+%   - Newtonian fluids;
+%   - dynamic and kinematic viscosity;
+%   - Euler equations;
+%   - Navier--Stokes equations;
+%   - nonlinear convection;
+%   - wall boundary conditions;
+%   - vorticity;
+%   - circulation;
+%   - Kelvin circulation theorem;
+%   - velocity potentials;
+%   - stream functions;
+%   - Bernoulli equation;
+%   - stagnation pressure;
+%   - flow rates;
+%   - one-dimensional continuity;
+%   - Couette flow;
+%   - pressure-driven channel flow;
+%   - Poiseuille flow;
+%   - Hagen--Poiseuille law;
+%   - Reynolds number;
+%   - nondimensional Navier--Stokes;
+%   - low and high Reynolds number flow;
+%   - laminar flow;
+%   - turbulent flow;
+%   - transition;
+%   - boundary layers;
+%   - separation;
+%   - external flows;
+%   - lift and drag;
+%   - circulation-generated lift;
+%   - potential flow;
+%   - D'Alembert paradox;
+%   - compressible flow;
+%   - equations of state;
+%   - speed of sound;
+%   - Mach number;
+%   - shock waves;
+%   - Rankine--Hugoniot relations;
+%   - shallow-water equations;
+%   - Froude number;
+%   - rotating fluids;
+%   - Coriolis effects;
+%   - geostrophic balance;
+%   - scalar transport;
+%   - advection and diffusion;
+%   - Peclet number;
+%   - thermal convection;
+%   - Boussinesq approximation;
+%   - Rayleigh number;
+%   - Reynolds averaging;
+%   - Reynolds stresses;
+%   - turbulence closure;
+%   - DNS;
+%   - LES;
+%   - Reynolds-averaged models;
+%   - computational fluid dynamics;
+%   - finite volume methods;
+%   - CFL-type restrictions;
+%   - numerical diffusion and dispersion;
+%   - CFD verification and validation;
+%   - grid refinement;
+%   - applications and exercises.
+%
+% Notes:
+%   - Control Theory is developed next in Section 13.6.
+%   - Network Science follows in Section 13.7.
+%   - Mathematical Finance follows in Section 13.8.
+%   - Mathematical Economics follows in Section 13.9.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

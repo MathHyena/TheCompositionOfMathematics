@@ -1,0 +1,4250 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.4 STATISTICAL ESTIMATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Statistical Estimation}
+\label{sec:statistical-estimation}
+
+\prerequisite{
+Descriptive statistics, sampling distributions, probability
+distributions, expectation, variance, likelihood, derivatives,
+optimization, laws of large numbers, central limit theorems, and basic
+multivariable calculus.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item distinguish parameters, estimators, and estimates;
+    \item define point estimation;
+    \item compute bias, variance, and mean squared error;
+    \item distinguish unbiasedness from consistency;
+    \item understand efficiency and relative efficiency;
+    \item understand sufficient statistics;
+    \item use the factorization theorem;
+    \item understand complete statistics conceptually;
+    \item apply the Rao--Blackwell theorem;
+    \item understand the Lehmann--Scheff\'e theorem;
+    \item construct method-of-moments estimators;
+    \item define likelihood and log-likelihood functions;
+    \item compute maximum likelihood estimators;
+    \item understand invariance of maximum likelihood estimators;
+    \item derive score functions;
+    \item define Fisher information;
+    \item understand the Cram\'er--Rao lower bound;
+    \item compare estimator efficiency;
+    \item understand asymptotic consistency of maximum likelihood;
+    \item understand asymptotic normality of estimators;
+    \item compute approximate standard errors using Fisher information;
+    \item understand observed information;
+    \item recognize multiparameter estimation;
+    \item distinguish scalar and matrix Fisher information;
+    \item understand constrained estimation;
+    \item recognize Bayesian estimators conceptually;
+    \item understand shrinkage and regularization conceptually;
+    \item recognize robust estimation;
+    \item understand M-estimators conceptually;
+    \item connect estimation with confidence intervals, hypothesis
+          testing, regression, Bayesian statistics, and statistical
+          learning.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Goal of Statistical Estimation}
+\label{subsec:goal-statistical-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A statistical model contains unknown quantities called parameters.
+
+For example, suppose
+
+\[
+X_1,\ldots,X_n
+\overset{\text{i.i.d.}}{\sim}
+N(\mu,\sigma^2).
+\]
+
+The quantities
+
+\[
+\mu
+\]
+
+and
+
+\[
+\sigma^2
+\]
+
+are population parameters.
+
+Because these values are unknown, they must be estimated from the
+observed sample.
+
+Statistical estimation develops systematic methods for constructing and
+evaluating such estimates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameter Space}
+\label{subsec:parameter-space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A statistical model may be written
+
+\[
+\boxed{
+\{f(x;\theta):\theta\in\Theta\},
+}
+\]
+
+where
+
+\[
+\theta
+\]
+
+is the parameter and
+
+\[
+\Theta
+\]
+
+is the parameter space.
+
+For example, in a Bernoulli model,
+
+\[
+X\sim\operatorname{Bernoulli}(p),
+\]
+
+the parameter space is
+
+\[
+\boxed{
+\Theta=[0,1].
+}
+\]
+
+For a normal mean with known variance,
+
+\[
+\boxed{
+\Theta=\mathbb{R}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimator and Estimate}
+\label{subsec:estimator-estimate-statistical-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Estimator}
+An estimator is a statistic
+
+\[
+\boxed{
+\widehat{\theta}
+=
+T(X_1,\ldots,X_n)
+}
+\]
+
+used to estimate an unknown parameter \(\theta\).
+\end{definitionbox}
+
+Before the sample is observed,
+
+\[
+\widehat{\theta}
+\]
+
+is a random variable.
+
+After observing data
+
+\[
+x_1,\ldots,x_n,
+\]
+
+the value
+
+\[
+\widehat{\theta}(x_1,\ldots,x_n)
+\]
+
+is called an estimate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Point Estimation}
+\label{subsec:point-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Point Estimate}
+A point estimate is a single numerical value used to estimate an unknown
+parameter.
+\end{definitionbox}
+
+Examples include
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\overline{X},
+}
+\]
+
+\[
+\boxed{
+\widehat{p}
+=
+\frac{X}{n},
+}
+\]
+
+and
+
+\[
+\boxed{
+\widehat{\sigma}^2
+=
+S^2.
+}
+\]
+
+Point estimation gives one best-guess value rather than a range of
+plausible values.
+
+Confidence intervals are developed in the next section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Properties of Good Estimators}
+\label{subsec:properties-good-estimators}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Several properties are commonly used to evaluate estimators:
+
+\[
+\boxed{
+\text{unbiasedness},
+}
+\]
+
+\[
+\boxed{
+\text{small variance},
+}
+\]
+
+\[
+\boxed{
+\text{small mean squared error},
+}
+\]
+
+\[
+\boxed{
+\text{consistency},
+}
+\]
+
+\[
+\boxed{
+\text{efficiency},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{robustness}.
+}
+\]
+
+No single property is universally sufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bias}
+\label{subsec:bias-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Bias}
+The bias of an estimator \(\widehat{\theta}\) is
+
+\[
+\boxed{
+\operatorname{Bias}(\widehat{\theta})
+=
+\mathbb{E}[\widehat{\theta}]
+-
+\theta.
+}
+\]
+\end{definitionbox}
+
+If
+
+\[
+\mathbb{E}[\widehat{\theta}]
+=
+\theta,
+\]
+
+then \(\widehat{\theta}\) is unbiased.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Unbiased Sample Mean}
+\label{subsec:worked-unbiased-sample-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Sample Mean}
+
+Suppose
+
+\[
+X_1,\ldots,X_n
+\]
+
+are i.i.d. with
+
+\[
+\mathbb{E}[X_i]=\mu.
+\]
+
+Then
+
+\[
+\overline{X}
+=
+\frac1n
+\sum_{i=1}^{n}X_i.
+\]
+
+Taking expectations,
+
+\[
+\mathbb{E}[\overline{X}]
+=
+\frac1n
+\sum_{i=1}^{n}\mu
+=
+\mu.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\operatorname{Bias}(\overline{X})=0.
+}
+\]
+\end{answerbox}
+
+Therefore the sample mean is unbiased for \(\mu\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Biased Variance Estimator}
+\label{subsec:biased-variance-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\widetilde{S}^2
+=
+\frac1n
+\sum_{i=1}^{n}
+(X_i-\overline{X})^2.
+\]
+
+Under i.i.d. sampling with finite variance,
+
+\[
+\boxed{
+\mathbb{E}[\widetilde{S}^2]
+=
+\frac{n-1}{n}\sigma^2.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Bias}(\widetilde{S}^2)
+=
+-\frac{\sigma^2}{n}.
+}
+\]
+
+This explains why division by \(n-1\) is used for the usual unbiased
+sample variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of an Estimator}
+\label{subsec:variance-estimator-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The variance
+
+\[
+\boxed{
+\operatorname{Var}(\widehat{\theta})
+}
+\]
+
+measures how much the estimator varies across repeated samples.
+
+An estimator with smaller variance is more precise.
+
+For example,
+
+\[
+\boxed{
+\operatorname{Var}(\overline{X})
+=
+\frac{\sigma^2}{n}.
+}
+\]
+
+Thus increasing sample size generally improves precision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean Squared Error}
+\label{subsec:mse-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Mean Squared Error}
+The mean squared error of an estimator \(\widehat{\theta}\) is
+
+\[
+\boxed{
+\operatorname{MSE}(\widehat{\theta})
+=
+\mathbb{E}
+\left[
+(\widehat{\theta}-\theta)^2
+\right].
+}
+\]
+\end{definitionbox}
+
+The MSE combines bias and variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bias--Variance Decomposition}
+\label{subsec:bias-variance-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fundamental identity is
+
+\[
+\boxed{
+\operatorname{MSE}(\widehat{\theta})
+=
+\operatorname{Var}(\widehat{\theta})
++
+\operatorname{Bias}(\widehat{\theta})^2.
+}
+\]
+
+This means a small amount of bias may sometimes be acceptable if it
+produces a large reduction in variance.
+
+This idea becomes important in shrinkage and regularization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Comparing Two Estimators}
+\label{subsec:worked-comparing-estimators}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Bias Versus Variance}
+
+Suppose estimator \(T_1\) has
+
+\[
+\operatorname{Bias}(T_1)=0
+\]
+
+and
+
+\[
+\operatorname{Var}(T_1)=9.
+\]
+
+Estimator \(T_2\) has
+
+\[
+\operatorname{Bias}(T_2)=1
+\]
+
+and
+
+\[
+\operatorname{Var}(T_2)=4.
+\]
+
+Then
+
+\[
+\operatorname{MSE}(T_1)=9,
+\]
+
+while
+
+\[
+\operatorname{MSE}(T_2)
+=
+4+1^2
+=
+5.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+T_2
+\text{ has smaller MSE despite being biased.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency}
+\label{subsec:consistency-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Consistent Estimator}
+An estimator sequence
+
+\[
+\widehat{\theta}_n
+\]
+
+is consistent for \(\theta\) if
+
+\[
+\boxed{
+\widehat{\theta}_n
+\xrightarrow{P}
+\theta
+}
+\]
+
+as
+
+\[
+n\to\infty.
+\]
+\end{definitionbox}
+
+Consistency means the estimator becomes increasingly concentrated near
+the true parameter as sample size grows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency of the Sample Mean}
+\label{subsec:consistency-sample-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under i.i.d. sampling with
+
+\[
+\mathbb{E}[|X_1|]<\infty,
+\]
+
+the law of large numbers gives
+
+\[
+\boxed{
+\overline{X}_n
+\xrightarrow{P}
+\mu.
+}
+\]
+
+Under the strong law,
+
+\[
+\boxed{
+\overline{X}_n
+\xrightarrow{\text{a.s.}}
+\mu.
+}
+\]
+
+Thus the sample mean is consistent for the population mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean-Square Consistency}
+\label{subsec:mean-square-consistency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\mathbb{E}
+[
+(\widehat{\theta}_n-\theta)^2
+]
+\to0,
+\]
+
+then
+
+\[
+\widehat{\theta}_n
+\]
+
+converges to \(\theta\) in mean square.
+
+Since mean-square convergence implies convergence in probability,
+
+\[
+\boxed{
+\operatorname{MSE}(\widehat{\theta}_n)\to0
+\Longrightarrow
+\widehat{\theta}_n\xrightarrow{P}\theta.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unbiasedness Does Not Imply Consistency}
+\label{subsec:unbiased-not-consistent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An estimator may be unbiased for every \(n\) but fail to become more
+concentrated around the parameter.
+
+For consistency, variance must typically shrink appropriately.
+
+Thus
+
+\[
+\boxed{
+\text{unbiasedness}
+\neq
+\text{consistency}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency Does Not Require Unbiasedness}
+\label{subsec:consistent-biased}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sequence of estimators may have finite-sample bias that approaches zero.
+
+If
+
+\[
+\operatorname{Bias}(\widehat{\theta}_n)\to0
+\]
+
+and
+
+\[
+\operatorname{Var}(\widehat{\theta}_n)\to0,
+\]
+
+then
+
+\[
+\operatorname{MSE}(\widehat{\theta}_n)\to0,
+\]
+
+which implies consistency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Efficiency}
+\label{subsec:estimator-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(T_1\) and \(T_2\) are unbiased estimators of the same parameter.
+
+If
+
+\[
+\operatorname{Var}(T_1)
+<
+\operatorname{Var}(T_2),
+\]
+
+then \(T_1\) is more efficient in the variance sense.
+
+A relative efficiency measure may be written
+
+\[
+\boxed{
+\operatorname{Eff}(T_1,T_2)
+=
+\frac{
+\operatorname{Var}(T_2)
+}{
+\operatorname{Var}(T_1)
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sufficient Statistics}
+\label{subsec:sufficient-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Sufficient Statistic}
+A statistic \(T(X_1,\ldots,X_n)\) is sufficient for parameter \(\theta\)
+if, conditional on \(T\), the distribution of the full sample does not
+depend on \(\theta\).
+\end{definitionbox}
+
+Informally,
+
+\[
+\boxed{
+T
+\text{ contains all sample information about }\theta.
+}
+\]
+
+Sufficiency provides a principled form of data reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factorization Theorem}
+\label{subsec:factorization-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Neyman--Fisher Factorization Theorem]
+A statistic \(T(X)\) is sufficient for \(\theta\) if the joint density or
+mass function can be written as
+
+\[
+\boxed{
+f(x_1,\ldots,x_n;\theta)
+=
+g(T(x_1,\ldots,x_n),\theta)
+h(x_1,\ldots,x_n),
+}
+\]
+
+where \(h\) does not depend on \(\theta\).
+\end{theorem}
+
+This theorem is one of the main tools for identifying sufficient
+statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bernoulli Sufficiency}
+\label{subsec:worked-bernoulli-sufficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Bernoulli Sample}
+
+Suppose
+
+\[
+X_1,\ldots,X_n
+\overset{\text{i.i.d.}}{\sim}
+\operatorname{Bernoulli}(p).
+\]
+
+The joint PMF is
+
+\[
+\prod_{i=1}^{n}
+p^{x_i}(1-p)^{1-x_i}.
+\]
+
+Therefore,
+
+\[
+=
+p^{\sum x_i}
+(1-p)^{n-\sum x_i}.
+\]
+
+This depends on the sample through
+
+\[
+T
+=
+\sum_{i=1}^{n}X_i.
+\]
+
+By the factorization theorem,
+
+\begin{answerbox}
+\[
+\boxed{
+\sum_{i=1}^{n}X_i
+\text{ is sufficient for }p.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Normal Mean Sufficiency}
+\label{subsec:worked-normal-mean-sufficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Normal Mean with Known Variance}
+
+Suppose
+
+\[
+X_i
+\overset{\text{i.i.d.}}{\sim}
+N(\mu,\sigma^2),
+\]
+
+with known \(\sigma^2\).
+
+The joint density is proportional to
+
+\[
+\exp
+\left[
+-\frac1{2\sigma^2}
+\sum_{i=1}^{n}
+(x_i-\mu)^2
+\right].
+\]
+
+Expand:
+
+\[
+\sum(x_i-\mu)^2
+=
+\sum x_i^2
+-
+2\mu\sum x_i
++
+n\mu^2.
+\]
+
+The dependence on \(\mu\) occurs through
+
+\[
+\sum x_i.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\sum_{i=1}^{n}X_i
+\text{ and equivalently }\overline{X}
+\text{ are sufficient for }\mu.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimal Sufficiency Preview}
+\label{subsec:minimal-sufficiency-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A minimal sufficient statistic is a sufficient statistic that represents
+the greatest possible reduction of the data without losing information
+about the parameter.
+
+Every other sufficient statistic must contain at least as much
+parameter-relevant information in an appropriate sense.
+
+Minimal sufficiency is developed more fully in mathematical statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete Statistics}
+\label{subsec:complete-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Complete Statistic}
+A statistic \(T\) is complete for a family indexed by \(\theta\) if
+
+\[
+\mathbb{E}_\theta[g(T)]=0
+\]
+
+for every \(\theta\) implies
+
+\[
+\boxed{
+P_\theta(g(T)=0)=1
+}
+\]
+
+for every \(\theta\).
+\end{definitionbox}
+
+Completeness is a technical property that helps establish uniqueness of
+optimal unbiased estimators.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rao--Blackwell Theorem}
+\label{subsec:rao-blackwell}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Rao--Blackwell Theorem]
+Let \(U\) be an estimator of \(\theta\), and let \(T\) be sufficient for
+\(\theta\).
+
+Define
+
+\[
+\boxed{
+U^*
+=
+\mathbb{E}[U\mid T].
+}
+\]
+
+Then \(U^*\) has no larger mean squared error than \(U\) under squared
+error loss.
+
+If \(U\) is unbiased, then \(U^*\) is also unbiased and
+
+\[
+\boxed{
+\operatorname{Var}(U^*)
+\leq
+\operatorname{Var}(U).
+}
+\]
+\end{theorem}
+
+Conditioning on a sufficient statistic can therefore improve an
+estimator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Rao--Blackwell Works}
+\label{subsec:why-rao-blackwell}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By the law of total variance,
+
+\[
+\operatorname{Var}(U)
+=
+\mathbb{E}
+[
+\operatorname{Var}(U\mid T)
+]
++
+\operatorname{Var}
+(
+\mathbb{E}[U\mid T]
+).
+\]
+
+Therefore,
+
+\[
+\operatorname{Var}
+(
+\mathbb{E}[U\mid T]
+)
+\leq
+\operatorname{Var}(U).
+\]
+
+Thus conditioning removes variation unrelated to the information in the
+sufficient statistic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lehmann--Scheff\'e Theorem}
+\label{subsec:lehmann-scheffe}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Lehmann--Scheff\'e Theorem]
+If \(T\) is complete and sufficient for \(\theta\), and \(g(T)\) is an
+unbiased estimator of a parameter function \(\tau(\theta)\), then
+\(g(T)\) is the unique minimum-variance unbiased estimator of
+\(\tau(\theta)\), up to almost-sure equality.
+\end{theorem}
+
+Such an estimator is commonly called a uniformly minimum-variance
+unbiased estimator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{UMVU Estimators}
+\label{subsec:umvu-estimators}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+UMVU stands for
+
+\[
+\boxed{
+\text{Uniformly Minimum-Variance Unbiased}.
+}
+\]
+
+An estimator \(\widehat{\tau}\) is UMVU if it is unbiased and has variance
+no larger than any other unbiased estimator for every parameter value.
+
+The Lehmann--Scheff\'e theorem provides a powerful route to proving this
+property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Method of Moments}
+\label{subsec:method-of-moments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The method of moments estimates parameters by matching theoretical
+moments to sample moments.
+
+Suppose a model depends on parameters
+
+\[
+\theta_1,\ldots,\theta_k.
+\]
+
+Set
+
+\[
+\boxed{
+\mathbb{E}_\theta[X^j]
+=
+\frac1n
+\sum_{i=1}^{n}X_i^j
+}
+\]
+
+for
+
+\[
+j=1,\ldots,k,
+\]
+
+and solve the resulting equations for the parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Method of Moments for Poisson}
+\label{subsec:worked-mom-poisson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Poisson Rate}
+
+Suppose
+
+\[
+X_1,\ldots,X_n
+\overset{\text{i.i.d.}}{\sim}
+\operatorname{Poisson}(\lambda).
+\]
+
+The theoretical mean is
+
+\[
+\mathbb{E}[X]=\lambda.
+\]
+
+Set this equal to the sample mean:
+
+\[
+\lambda
+=
+\overline{X}.
+\]
+
+Therefore the method-of-moments estimator is
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\lambda}_{MM}
+=
+\overline{X}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Method of Moments for Uniform}
+\label{subsec:worked-mom-uniform}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Uniform Upper Endpoint}
+
+Suppose
+
+\[
+X_i
+\sim
+\operatorname{Uniform}(0,\theta).
+\]
+
+Then
+
+\[
+\mathbb{E}[X]
+=
+\frac{\theta}{2}.
+\]
+
+Equating with the sample mean,
+
+\[
+\overline{X}
+=
+\frac{\theta}{2}.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\theta}_{MM}
+=
+2\overline{X}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood Function}
+\label{subsec:likelihood-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose observed data are
+
+\[
+x_1,\ldots,x_n.
+\]
+
+The likelihood function is the joint probability or density viewed as a
+function of the unknown parameter.
+
+\begin{definitionbox}{Likelihood}
+For observed data \(x\), the likelihood is
+
+\[
+\boxed{
+L(\theta;x)
+=
+f(x;\theta).
+}
+\]
+\end{definitionbox}
+
+The data are treated as fixed.
+
+The parameter is treated as the variable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood Is Not a Probability Distribution for the Parameter}
+\label{subsec:likelihood-not-probability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In frequentist likelihood theory,
+
+\[
+L(\theta;x)
+\]
+
+is not generally normalized over \(\theta\).
+
+Thus,
+
+\[
+\boxed{
+L(\theta;x)
+}
+\]
+
+does not represent
+
+\[
+P(\theta\mid x)
+\]
+
+in ordinary frequentist inference.
+
+Posterior probabilities for parameters belong to Bayesian inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Likelihood}
+\label{subsec:log-likelihood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because products can be difficult to differentiate, one usually works
+with the logarithm of the likelihood:
+
+\[
+\boxed{
+\ell(\theta)
+=
+\log L(\theta).
+}
+\]
+
+Since logarithms are strictly increasing,
+
+\[
+\boxed{
+\arg\max_\theta L(\theta)
+=
+\arg\max_\theta \ell(\theta).
+}
+\]
+
+For independent observations, products become sums.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Likelihood Estimator}
+\label{subsec:maximum-likelihood-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Maximum Likelihood Estimator}
+The maximum likelihood estimator, abbreviated MLE, is a parameter value
+that maximizes the likelihood:
+
+\[
+\boxed{
+\widehat{\theta}_{MLE}
+=
+\arg\max_{\theta\in\Theta}
+L(\theta).
+}
+\]
+\end{definitionbox}
+
+Equivalently,
+
+\[
+\boxed{
+\widehat{\theta}_{MLE}
+=
+\arg\max_{\theta\in\Theta}
+\ell(\theta).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Likelihood Workflow}
+\label{subsec:mle-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A typical MLE procedure is:
+
+\begin{enumerate}
+    \item write the joint likelihood;
+    \item simplify it;
+    \item take the logarithm;
+    \item differentiate with respect to the parameter;
+    \item solve the score equation;
+    \item check boundaries of the parameter space;
+    \item verify that the solution gives a maximum.
+\end{enumerate}
+
+A derivative equal to zero identifies only a candidate point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bernoulli MLE}
+\label{subsec:worked-bernoulli-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Estimating a Bernoulli Probability}
+
+Suppose
+
+\[
+X_1,\ldots,X_n
+\overset{\text{i.i.d.}}{\sim}
+\operatorname{Bernoulli}(p).
+\]
+
+The likelihood is
+
+\[
+L(p)
+=
+\prod_{i=1}^{n}
+p^{x_i}
+(1-p)^{1-x_i}.
+\]
+
+Let
+
+\[
+S
+=
+\sum_{i=1}^{n}x_i.
+\]
+
+Then
+
+\[
+L(p)
+=
+p^S(1-p)^{n-S}.
+\]
+
+The log-likelihood is
+
+\[
+\ell(p)
+=
+S\ln p
++
+(n-S)\ln(1-p).
+\]
+
+Differentiate:
+
+\[
+\ell'(p)
+=
+\frac{S}{p}
+-
+\frac{n-S}{1-p}.
+\]
+
+Set equal to zero:
+
+\[
+\frac{S}{p}
+=
+\frac{n-S}{1-p}.
+\]
+
+Solving,
+
+\[
+S(1-p)=p(n-S),
+\]
+
+so
+
+\[
+S=np.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{p}_{MLE}
+=
+\frac Sn
+=
+\overline{X}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Poisson MLE}
+\label{subsec:worked-poisson-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Estimating a Poisson Rate}
+
+Suppose
+
+\[
+X_i
+\overset{\text{i.i.d.}}{\sim}
+\operatorname{Poisson}(\lambda).
+\]
+
+The likelihood is
+
+\[
+L(\lambda)
+=
+\prod_{i=1}^{n}
+e^{-\lambda}
+\frac{\lambda^{x_i}}{x_i!}.
+\]
+
+Thus,
+
+\[
+L(\lambda)
+=
+e^{-n\lambda}
+\lambda^{\sum x_i}
+\prod_{i=1}^{n}
+\frac1{x_i!}.
+\]
+
+The log-likelihood is
+
+\[
+\ell(\lambda)
+=
+-n\lambda
++
+\left(
+\sum x_i
+\right)
+\ln\lambda
+-
+\sum\ln(x_i!).
+\]
+
+Differentiate:
+
+\[
+\ell'(\lambda)
+=
+-n
++
+\frac{
+\sum x_i
+}{
+\lambda
+}.
+\]
+
+Set equal to zero:
+
+\[
+-n
++
+\frac{
+\sum x_i
+}{
+\lambda
+}
+=
+0.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\lambda}_{MLE}
+=
+\overline{X}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Exponential MLE}
+\label{subsec:worked-exponential-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Exponential Rate Parameter}
+
+Suppose
+
+\[
+X_i
+\overset{\text{i.i.d.}}{\sim}
+\operatorname{Exp}(\lambda),
+\]
+
+with rate parameter \(\lambda\).
+
+The density is
+
+\[
+f(x;\lambda)
+=
+\lambda e^{-\lambda x},
+\qquad
+x\geq0.
+\]
+
+The likelihood is
+
+\[
+L(\lambda)
+=
+\lambda^n
+e^{-\lambda\sum x_i}.
+\]
+
+The log-likelihood is
+
+\[
+\ell(\lambda)
+=
+n\ln\lambda
+-
+\lambda
+\sum x_i.
+\]
+
+Differentiate:
+
+\[
+\ell'(\lambda)
+=
+\frac n\lambda
+-
+\sum x_i.
+\]
+
+Setting this equal to zero gives
+
+\[
+\lambda
+=
+\frac{
+n
+}{
+\sum x_i
+}.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\lambda}_{MLE}
+=
+\frac1{\overline{X}}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Normal Mean MLE}
+\label{subsec:worked-normal-mean-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Normal Mean with Known Variance}
+
+Suppose
+
+\[
+X_i
+\overset{\text{i.i.d.}}{\sim}
+N(\mu,\sigma^2),
+\]
+
+where \(\sigma^2\) is known.
+
+Ignoring constants not involving \(\mu\),
+
+\[
+\ell(\mu)
+=
+-
+\frac1{2\sigma^2}
+\sum_{i=1}^{n}
+(x_i-\mu)^2.
+\]
+
+Maximizing this is equivalent to minimizing
+
+\[
+\sum
+(x_i-\mu)^2.
+\]
+
+Differentiate:
+
+\[
+\frac{d}{d\mu}
+\sum
+(x_i-\mu)^2
+=
+-2\sum(x_i-\mu).
+\]
+
+Setting equal to zero gives
+
+\[
+n\mu
+=
+\sum x_i.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\mu}_{MLE}
+=
+\overline{X}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normal Variance MLE}
+\label{subsec:normal-variance-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+X_i
+\overset{\text{i.i.d.}}{\sim}
+N(\mu,\sigma^2),
+\]
+
+with both \(\mu\) and \(\sigma^2\) unknown.
+
+The joint MLEs are
+
+\[
+\boxed{
+\widehat{\mu}_{MLE}
+=
+\overline{X},
+}
+\]
+
+and
+
+\[
+\boxed{
+\widehat{\sigma}^2_{MLE}
+=
+\frac1n
+\sum_{i=1}^{n}
+(X_i-\overline{X})^2.
+}
+\]
+
+The variance MLE uses denominator \(n\), not \(n-1\).
+
+Therefore it is biased for finite \(n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MLE Need Not Be Unbiased}
+\label{subsec:mle-not-unbiased}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Maximum likelihood maximizes fit to the observed data.
+
+It does not automatically guarantee unbiasedness.
+
+For the normal variance,
+
+\[
+\mathbb{E}
+[
+\widehat{\sigma}^2_{MLE}
+]
+=
+\frac{n-1}{n}\sigma^2.
+\]
+
+Thus,
+
+\[
+\boxed{
+\widehat{\sigma}^2_{MLE}
+}
+\]
+
+is biased downward.
+
+Nevertheless, it is consistent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary Maximum Likelihood Estimates}
+\label{subsec:boundary-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An MLE need not occur where
+
+\[
+\ell'(\theta)=0.
+\]
+
+The maximum may occur at a boundary.
+
+For example, in a Bernoulli sample containing only failures,
+
+\[
+\sum X_i=0,
+\]
+
+the MLE is
+
+\[
+\boxed{
+\widehat{p}=0.
+}
+\]
+
+Similarly, if every observation is a success,
+
+\[
+\boxed{
+\widehat{p}=1.
+}
+\]
+
+Therefore parameter-space constraints must always be checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uniform Distribution Endpoint MLE}
+\label{subsec:uniform-endpoint-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+X_i
+\overset{\text{i.i.d.}}{\sim}
+\operatorname{Uniform}(0,\theta).
+\]
+
+The density is
+
+\[
+f(x;\theta)
+=
+\frac1\theta
+\mathbf{1}_{[0,\theta]}(x).
+\]
+
+The joint likelihood is
+
+\[
+L(\theta)
+=
+\theta^{-n}
+\mathbf{1}_{\{
+\theta\geq X_{(n)}
+\}},
+\]
+
+where
+
+\[
+X_{(n)}
+=
+\max_iX_i.
+\]
+
+For allowable \(\theta\), the factor \(\theta^{-n}\) decreases as
+\(\theta\) increases.
+
+Therefore,
+
+\[
+\boxed{
+\widehat{\theta}_{MLE}
+=
+X_{(n)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: MLE Versus Method of Moments}
+\label{subsec:worked-mle-versus-mom}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Uniform Upper Endpoint}
+
+For
+
+\[
+X_i
+\sim
+\operatorname{Uniform}(0,\theta),
+\]
+
+the method-of-moments estimator is
+
+\[
+\widehat{\theta}_{MM}
+=
+2\overline{X}.
+\]
+
+The maximum likelihood estimator is
+
+\[
+\widehat{\theta}_{MLE}
+=
+X_{(n)}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\theta}_{MM}=2\overline{X},
+\qquad
+\widehat{\theta}_{MLE}=X_{(n)}.
+}
+\]
+\end{answerbox}
+
+Different estimation principles can therefore produce different
+estimators.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Invariance Property of MLEs}
+\label{subsec:mle-invariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\widehat{\theta}
+\]
+
+is the MLE of \(\theta\).
+
+For a parameter transformation
+
+\[
+\eta=g(\theta),
+\]
+
+the MLE of \(\eta\) is
+
+\[
+\boxed{
+\widehat{\eta}
+=
+g(\widehat{\theta})
+}
+\]
+
+under the usual interpretation of the transformed parameter.
+
+This is called the invariance property of maximum likelihood.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: MLE Invariance}
+\label{subsec:worked-mle-invariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Exponential Mean}
+
+Suppose
+
+\[
+X_i
+\sim
+\operatorname{Exp}(\lambda),
+\]
+
+where \(\lambda\) is the rate.
+
+The population mean is
+
+\[
+\mu
+=
+\frac1\lambda.
+\]
+
+Since
+
+\[
+\widehat{\lambda}_{MLE}
+=
+\frac1{\overline{X}},
+\]
+
+MLE invariance gives
+
+\[
+\widehat{\mu}_{MLE}
+=
+\frac1{
+\widehat{\lambda}_{MLE}
+}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\mu}_{MLE}
+=
+\overline{X}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Score Function}
+\label{subsec:score-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Score Function}
+The score function is the derivative of the log-likelihood:
+
+\[
+\boxed{
+U(\theta)
+=
+\frac{\partial}{\partial\theta}
+\ell(\theta).
+}
+\]
+\end{definitionbox}
+
+For regular interior MLEs, the estimator often satisfies
+
+\[
+\boxed{
+U(\widehat{\theta})=0.
+}
+\]
+
+This is called the score equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Score}
+\label{subsec:expected-score}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under standard regularity conditions,
+
+\[
+\boxed{
+\mathbb{E}_\theta[U(\theta)]
+=
+0.
+}
+\]
+
+This follows by differentiating
+
+\[
+\int f(x;\theta)\,dx=1
+\]
+
+with respect to \(\theta\).
+
+The result requires conditions allowing differentiation under the
+integral sign.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fisher Information}
+\label{subsec:fisher-information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Fisher Information}
+For one observation, the Fisher information in parameter \(\theta\) is
+
+\[
+\boxed{
+I(\theta)
+=
+\mathbb{E}_\theta
+\left[
+U(\theta)^2
+\right].
+}
+\]
+\end{definitionbox}
+
+Under standard regularity conditions,
+
+\[
+\boxed{
+I(\theta)
+=
+-
+\mathbb{E}_\theta
+\left[
+\ell''(\theta)
+\right].
+}
+\]
+
+Fisher information measures how strongly the likelihood responds to
+changes in the parameter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Information in an Independent Sample}
+\label{subsec:fisher-information-sample}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For \(n\) independent identically distributed observations,
+
+\[
+\boxed{
+I_n(\theta)
+=
+nI_1(\theta).
+}
+\]
+
+Thus information grows linearly with sample size.
+
+Consequently, standard estimation error typically shrinks at rate
+
+\[
+\boxed{
+\frac1{\sqrt{n}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bernoulli Fisher Information}
+\label{subsec:worked-bernoulli-information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Fisher Information for Bernoulli Data}
+
+For one Bernoulli observation,
+
+\[
+\ell(p)
+=
+X\ln p
++
+(1-X)\ln(1-p).
+\]
+
+The score is
+
+\[
+U(p)
+=
+\frac{X}{p}
+-
+\frac{1-X}{1-p}.
+\]
+
+The second derivative is
+
+\[
+\ell''(p)
+=
+-\frac{X}{p^2}
+-
+\frac{1-X}{(1-p)^2}.
+\]
+
+Taking negative expectation,
+
+\[
+I(p)
+=
+\frac{p}{p^2}
++
+\frac{1-p}{(1-p)^2}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+I(p)
+=
+\frac1{
+p(1-p)
+}.
+}
+\]
+\end{answerbox}
+
+For \(n\) observations,
+
+\[
+\boxed{
+I_n(p)
+=
+\frac{n}{
+p(1-p)
+}.
+}
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Poisson Fisher Information}
+\label{subsec:worked-poisson-information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Poisson Information}
+
+For one Poisson observation,
+
+\[
+\ell(\lambda)
+=
+-\lambda
++
+X\ln\lambda
+-
+\ln(X!).
+\]
+
+Then
+
+\[
+\ell''(\lambda)
+=
+-\frac{X}{\lambda^2}.
+\]
+
+Therefore,
+
+\[
+I(\lambda)
+=
+-
+\mathbb{E}
+[
+\ell''(\lambda)
+].
+\]
+
+Since
+
+\[
+\mathbb{E}[X]=\lambda,
+\]
+
+we obtain
+
+\begin{answerbox}
+\[
+\boxed{
+I(\lambda)
+=
+\frac1\lambda.
+}
+\]
+\end{answerbox}
+
+For \(n\) observations,
+
+\[
+\boxed{
+I_n(\lambda)
+=
+\frac n\lambda.
+}
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cram\'er--Rao Lower Bound}
+\label{subsec:cramer-rao}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Cram\'er--Rao Lower Bound]
+Under regularity conditions, if \(\widehat{\theta}\) is an unbiased
+estimator of a scalar parameter \(\theta\), then
+
+\[
+\boxed{
+\operatorname{Var}(\widehat{\theta})
+\geq
+\frac1{I_n(\theta)}.
+}
+\]
+\end{theorem}
+
+More generally, for an unbiased estimator of \(g(\theta)\),
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{g(\theta)}
+)
+\geq
+\frac{
+[g'(\theta)]^2
+}{
+I_n(\theta)
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Efficient Estimators}
+\label{subsec:efficient-estimators-crlb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An unbiased estimator that achieves the Cram\'er--Rao lower bound is
+called efficient in the Cram\'er--Rao sense.
+
+Thus if
+
+\[
+\operatorname{Var}(\widehat{\theta})
+=
+\frac1{I_n(\theta)},
+\]
+
+then
+
+\[
+\boxed{
+\widehat{\theta}
+\text{ is efficient}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Efficiency of Bernoulli Sample Proportion}
+\label{subsec:worked-bernoulli-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Sample Proportion}
+
+For Bernoulli data,
+
+\[
+I_n(p)
+=
+\frac{n}{
+p(1-p)
+}.
+\]
+
+Therefore the Cram\'er--Rao lower bound is
+
+\[
+\frac1{I_n(p)}
+=
+\frac{
+p(1-p)
+}{n}.
+\]
+
+But
+
+\[
+\operatorname{Var}(\widehat{p})
+=
+\frac{
+p(1-p)
+}{n}.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{p}
+=
+\overline{X}
+\text{ attains the Cram\'er--Rao bound}.
+}
+\]
+\end{answerbox}
+
+Thus it is efficient among unbiased estimators under the regular model.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Observed Information}
+\label{subsec:observed-information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The observed information is
+
+\[
+\boxed{
+J(\theta)
+=
+-
+\ell''(\theta).
+}
+\]
+
+Unlike Fisher information, which is an expectation under the model,
+observed information depends on the realized data.
+
+Evaluating at the MLE gives
+
+\[
+\boxed{
+J(\widehat{\theta}).
+}
+\]
+
+This is often used to approximate the variance of the MLE.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asymptotic Normality of MLEs}
+\label{subsec:asymptotic-normality-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under suitable regularity conditions,
+
+\[
+\boxed{
+\sqrt{n}
+(
+\widehat{\theta}_{MLE}
+-
+\theta
+)
+\xrightarrow{d}
+N
+\left(
+0,
+\frac1{I_1(\theta)}
+\right).
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+\widehat{\theta}_{MLE}
+\approx
+N
+\left(
+\theta,
+\frac1{nI_1(\theta)}
+\right).
+}
+\]
+
+This is one of the most important asymptotic results in statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximate Standard Error of the MLE}
+\label{subsec:approx-se-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The asymptotic standard error is
+
+\[
+\boxed{
+\operatorname{SE}
+(
+\widehat{\theta}_{MLE}
+)
+\approx
+\frac1{
+\sqrt{
+I_n(\theta)
+}
+}.
+}
+\]
+
+Since \(\theta\) is unknown, one may plug in the MLE:
+
+\[
+\boxed{
+\widehat{\operatorname{SE}}
+(
+\widehat{\theta}_{MLE}
+)
+\approx
+\frac1{
+\sqrt{
+I_n(\widehat{\theta})
+}
+}.
+}
+\]
+
+Observed information may also be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Approximate SE of Bernoulli MLE}
+\label{subsec:worked-se-bernoulli-mle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Bernoulli Standard Error}
+
+For Bernoulli data,
+
+\[
+I_n(p)
+=
+\frac{n}{
+p(1-p)
+}.
+\]
+
+Therefore,
+
+\[
+\operatorname{SE}(\widehat{p})
+\approx
+\sqrt{
+\frac{
+p(1-p)
+}{n}
+}.
+\]
+
+Replacing \(p\) by \(\widehat{p}\),
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\operatorname{SE}}(\widehat{p})
+=
+\sqrt{
+\frac{
+\widehat{p}(1-\widehat{p})
+}{n}
+}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency of Maximum Likelihood}
+\label{subsec:mle-consistency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under suitable identifiability and regularity assumptions,
+
+\[
+\boxed{
+\widehat{\theta}_{MLE}
+\xrightarrow{P}
+\theta.
+}
+\]
+
+The intuition is that the average log-likelihood converges to its
+population expectation, which is maximized at the true parameter under
+correct model specification.
+
+Consistency is asymptotic and does not imply perfect finite-sample
+behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood Curvature}
+\label{subsec:likelihood-curvature}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sharply peaked log-likelihood indicates that small parameter changes
+produce large decreases in fit.
+
+A flat log-likelihood indicates more uncertainty.
+
+The second derivative
+
+\[
+-\ell''(\theta)
+\]
+
+measures local curvature.
+
+Thus greater information corresponds to greater likelihood curvature
+near the true value.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Likelihood Ratio}
+\label{subsec:likelihood-ratio-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Likelihoods can also compare parameter values.
+
+The relative likelihood of \(\theta\) compared with the MLE is
+
+\[
+\boxed{
+R(\theta)
+=
+\frac{
+L(\theta)
+}{
+L(\widehat{\theta})
+}.
+}
+\]
+
+Since the MLE maximizes the likelihood,
+
+\[
+\boxed{
+0\leq R(\theta)\leq1.
+}
+\]
+
+Values close to \(1\) indicate parameter values fitting nearly as well as
+the MLE.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Profile Likelihood Preview}
+\label{subsec:profile-likelihood-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the parameter vector is
+
+\[
+(\theta,\eta),
+\]
+
+where \(\theta\) is the parameter of interest and \(\eta\) is a nuisance
+parameter.
+
+For each fixed \(\theta\), maximize the likelihood over \(\eta\):
+
+\[
+\widehat{\eta}(\theta)
+=
+\arg\max_\eta
+L(\theta,\eta).
+\]
+
+The profile likelihood is
+
+\[
+\boxed{
+L_p(\theta)
+=
+L
+(
+\theta,
+\widehat{\eta}(\theta)
+).
+}
+\]
+
+This reduces a multiparameter problem to a function of the parameter of
+interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nuisance Parameters}
+\label{subsec:nuisance-parameters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nuisance parameter affects the model but is not the main quantity of
+scientific interest.
+
+For example, in
+
+\[
+N(\mu,\sigma^2),
+\]
+
+one may care primarily about \(\mu\) while \(\sigma^2\) remains unknown.
+
+Then \(\sigma^2\) acts as a nuisance parameter.
+
+Statistical procedures often require estimating, profiling, conditioning,
+or integrating over nuisance parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiparameter Estimation}
+\label{subsec:multiparameter-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boldsymbol{\theta}
+=
+(\theta_1,\ldots,\theta_k)^T.
+\]
+
+The score becomes a vector:
+
+\[
+\boxed{
+\mathbf{U}(\boldsymbol{\theta})
+=
+\nabla_{\boldsymbol{\theta}}
+\ell(\boldsymbol{\theta}).
+}
+\]
+
+The MLE often satisfies
+
+\[
+\boxed{
+\mathbf{U}
+(
+\widehat{\boldsymbol{\theta}}
+)
+=
+\mathbf{0}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fisher Information Matrix}
+\label{subsec:fisher-information-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a parameter vector
+
+\[
+\boldsymbol{\theta},
+\]
+
+the Fisher information matrix is
+
+\[
+\boxed{
+I(\boldsymbol{\theta})
+=
+\mathbb{E}
+\left[
+\mathbf{U}
+\mathbf{U}^T
+\right].
+}
+\]
+
+Under regularity conditions,
+
+\[
+\boxed{
+I(\boldsymbol{\theta})
+=
+-
+\mathbb{E}
+\left[
+\nabla^2
+\ell(\boldsymbol{\theta})
+\right].
+}
+\]
+
+The inverse information matrix approximates the covariance matrix of the
+MLE.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate MLE Asymptotic Normality}
+\label{subsec:multivariate-mle-normality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under suitable regularity conditions,
+
+\[
+\boxed{
+\sqrt{n}
+\left(
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+\right)
+\xrightarrow{d}
+N_k
+\left(
+\mathbf{0},
+I_1(\boldsymbol{\theta})^{-1}
+\right).
+}
+\]
+
+Thus approximately,
+
+\[
+\boxed{
+\operatorname{Cov}
+(
+\widehat{\boldsymbol{\theta}}
+)
+\approx
+I_n(\boldsymbol{\theta})^{-1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameter Identifiability}
+\label{subsec:parameter-identifiability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A model is identifiable if distinct parameter values correspond to
+distinct probability distributions.
+
+Formally,
+
+\[
+\boxed{
+P_{\theta_1}
+=
+P_{\theta_2}
+\Longrightarrow
+\theta_1=\theta_2.
+}
+\]
+
+If a model is not identifiable, data cannot uniquely distinguish certain
+parameter values.
+
+Identifiability is fundamental for consistent estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Nonidentifiability}
+\label{subsec:worked-nonidentifiability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Squared Parameter}
+
+Suppose a distribution depends only on
+
+\[
+\theta^2.
+\]
+
+Then parameters
+
+\[
+\theta
+\]
+
+and
+
+\[
+-\theta
+\]
+
+produce the same distribution.
+
+Unless the parameter space restricts the sign,
+
+\begin{answerbox}
+\[
+\boxed{
+\theta
+\text{ is not identifiable}.
+}
+\]
+\end{answerbox}
+
+The identifiable quantity is \(\theta^2\), or perhaps \(|\theta|\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constrained Estimation}
+\label{subsec:constrained-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parameters often satisfy constraints.
+
+Examples include
+
+\[
+\boxed{
+p\in[0,1],
+}
+\]
+
+\[
+\boxed{
+\sigma^2>0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\sum_{i=1}^{k}p_i=1.
+}
+\]
+
+Optimization must respect the parameter space.
+
+An unconstrained critical point outside \(\Theta\) cannot be a valid
+estimate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Loss Functions}
+\label{subsec:loss-functions-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Estimation can be viewed as a decision problem.
+
+A loss function measures the cost of estimating \(\theta\) by \(a\).
+
+Squared-error loss is
+
+\[
+\boxed{
+L(\theta,a)
+=
+(a-\theta)^2.
+}
+\]
+
+Absolute-error loss is
+
+\[
+\boxed{
+L(\theta,a)
+=
+|a-\theta|.
+}
+\]
+
+Different loss functions can favor different estimators.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Risk Function}
+\label{subsec:risk-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The risk of an estimator is its expected loss:
+
+\[
+\boxed{
+R(\theta,\widehat{\theta})
+=
+\mathbb{E}_\theta
+[
+L(\theta,\widehat{\theta})
+].
+}
+\]
+
+Under squared-error loss,
+
+\[
+\boxed{
+R(\theta,\widehat{\theta})
+=
+\operatorname{MSE}(\widehat{\theta}).
+}
+\]
+
+Decision-theoretic estimation compares estimators through their risk
+functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bayesian Estimation Preview}
+\label{subsec:bayesian-estimation-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bayesian estimation treats the parameter as uncertain before observing
+the data.
+
+A prior distribution
+
+\[
+\pi(\theta)
+\]
+
+is combined with the likelihood:
+
+\[
+L(\theta;x).
+\]
+
+Bayes' theorem gives the posterior
+
+\[
+\boxed{
+\pi(\theta\mid x)
+\propto
+L(\theta;x)\pi(\theta).
+}
+\]
+
+Point estimates can then be chosen from the posterior distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Posterior Mean}
+\label{subsec:posterior-mean-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under squared-error loss, the Bayes estimator is the posterior mean:
+
+\[
+\boxed{
+\widehat{\theta}_{Bayes}
+=
+\mathbb{E}[\theta\mid X].
+}
+\]
+
+Under absolute-error loss, a posterior median is optimal.
+
+Under zero-one-type loss in suitable settings, a posterior mode may be
+used.
+
+Thus the preferred estimator depends on the loss function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MAP Estimation}
+\label{subsec:map-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The maximum a posteriori estimate, abbreviated MAP, maximizes the
+posterior density:
+
+\[
+\boxed{
+\widehat{\theta}_{MAP}
+=
+\arg\max_\theta
+\pi(\theta\mid x).
+}
+\]
+
+Because
+
+\[
+\pi(\theta\mid x)
+\propto
+L(\theta;x)\pi(\theta),
+\]
+
+the MAP estimate balances likelihood and prior information.
+
+If the prior is effectively flat over the relevant region, MAP and MLE
+may coincide.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shrinkage Estimation}
+\label{subsec:shrinkage-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A shrinkage estimator deliberately moves an estimate toward a target.
+
+A simple form is
+
+\[
+\boxed{
+\widehat{\theta}_{shrink}
+=
+(1-\lambda)
+\widehat{\theta}
++
+\lambda\theta_0,
+}
+\]
+
+where
+
+\[
+0\leq\lambda\leq1.
+\]
+
+Shrinkage introduces bias but can reduce variance enough to lower mean
+squared error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regularization}
+\label{subsec:regularization-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Regularized estimation modifies an objective function by penalizing
+undesirable parameter values.
+
+A generic form is
+
+\[
+\boxed{
+\widehat{\theta}
+=
+\arg\min_\theta
+\left\{
+\text{data loss}
++
+\lambda
+\text{ penalty}
+\right\}.
+}
+\]
+
+Regularization is central to modern regression and statistical learning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ridge-Type Estimation Preview}
+\label{subsec:ridge-preview-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A quadratic penalty has the form
+
+\[
+\boxed{
+\lambda
+\|\boldsymbol{\beta}\|_2^2.
+}
+\]
+
+This shrinks coefficient estimates toward zero.
+
+It generally increases bias but can substantially reduce variance when
+predictors are highly correlated or dimension is large.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lasso-Type Estimation Preview}
+\label{subsec:lasso-preview-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An absolute-value penalty has the form
+
+\[
+\boxed{
+\lambda
+\|\boldsymbol{\beta}\|_1.
+}
+\]
+
+This can produce some coefficient estimates equal to zero.
+
+Thus regularization can simultaneously perform estimation and variable
+selection.
+
+A full treatment appears in statistical learning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robust Estimation}
+\label{subsec:robust-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An estimator is robust if its behavior does not change excessively under
+small departures from assumptions or contamination by unusual
+observations.
+
+The sample mean is sensitive to extreme values.
+
+The median is more resistant.
+
+Thus robust estimation often trades some efficiency under an idealized
+model for improved stability under model misspecification.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{M-Estimators Preview}
+\label{subsec:m-estimators-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An M-estimator minimizes an objective of the form
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+\rho
+\left(
+\frac{
+X_i-\theta
+}{
+s
+}
+\right),
+}
+\]
+
+where \(\rho\) controls how residuals are penalized.
+
+For squared loss,
+
+\[
+\rho(u)=u^2,
+\]
+
+the solution is the sample mean.
+
+For absolute loss,
+
+\[
+\rho(u)=|u|,
+\]
+
+the solution is a median.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimating Equations}
+\label{subsec:estimating-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many estimators can be characterized as solutions of equations
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+\psi(X_i,\theta)
+=
+0.
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{score equations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{M-estimation equations}.
+}
+\]
+
+This provides a broad framework encompassing many classical and modern
+estimators.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asymptotic Efficiency}
+\label{subsec:asymptotic-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two consistent estimators satisfy
+
+\[
+\sqrt{n}
+(
+T_{1n}-\theta
+)
+\xrightarrow{d}
+N(0,V_1)
+\]
+
+and
+
+\[
+\sqrt{n}
+(
+T_{2n}-\theta
+)
+\xrightarrow{d}
+N(0,V_2).
+\]
+
+One estimator is asymptotically more efficient if its asymptotic
+variance is smaller.
+
+A common relative efficiency is
+
+\[
+\boxed{
+\frac{V_2}{V_1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asymptotic Efficiency of the MLE}
+\label{subsec:mle-asymptotic-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under regular parametric models, the MLE often has asymptotic variance
+
+\[
+\boxed{
+\frac1{
+nI_1(\theta)
+}.
+}
+\]
+
+This matches the asymptotic information lower bound.
+
+Therefore regular MLEs are often asymptotically efficient.
+
+This is one reason maximum likelihood is so widely used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Delta Method for Estimators}
+\label{subsec:delta-method-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\sqrt{n}
+(
+\widehat{\theta}-\theta
+)
+\xrightarrow{d}
+N(0,V).
+\]
+
+For differentiable \(g\),
+
+\[
+\boxed{
+\sqrt{n}
+[
+g(\widehat{\theta})-g(\theta)
+]
+\xrightarrow{d}
+N
+\left(
+0,
+[g'(\theta)]^2V
+\right).
+}
+\]
+
+This allows standard errors for transformed parameters to be
+approximated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Estimated Odds}
+\label{subsec:worked-delta-odds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Odds from a Sample Proportion}
+
+Suppose
+
+\[
+\widehat{p}
+\]
+
+estimates \(p\), and define the odds
+
+\[
+g(p)
+=
+\frac{p}{1-p}.
+\]
+
+Then
+
+\[
+g'(p)
+=
+\frac1{(1-p)^2}.
+\]
+
+If
+
+\[
+\operatorname{Var}(\widehat{p})
+\approx
+\frac{
+p(1-p)
+}{n},
+\]
+
+the delta method gives
+
+\[
+\operatorname{Var}
+(
+g(\widehat{p})
+)
+\approx
+\left[
+\frac1{(1-p)^2}
+\right]^2
+\frac{
+p(1-p)
+}{n}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{\text{odds}}
+)
+\approx
+\frac{
+p
+}{
+n(1-p)^3
+}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Plug-In Principle}
+\label{subsec:plugin-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common estimation strategy replaces an unknown population quantity by
+its empirical analogue.
+
+For example,
+
+\[
+\mu
+=
+\mathbb{E}[X]
+\]
+
+is estimated by
+
+\[
+\overline{X}.
+\]
+
+A distributional functional
+
+\[
+T(F)
+\]
+
+may be estimated by
+
+\[
+\boxed{
+T(F_n),
+}
+\]
+
+where \(F_n\) is the empirical distribution.
+
+This is called the plug-in principle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Estimation}
+\label{subsec:bootstrap-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bootstrap methods approximate estimator properties by repeatedly
+resampling from the empirical distribution.
+
+They can estimate:
+
+\[
+\boxed{
+\text{standard errors},
+}
+\]
+
+\[
+\boxed{
+\text{bias},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{sampling distributions}.
+}
+\]
+
+A basic bootstrap bias estimate is
+
+\[
+\boxed{
+\widehat{\operatorname{Bias}}_{\text{boot}}
+=
+\overline{\widehat{\theta}^*}
+-
+\widehat{\theta}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jackknife Preview}
+\label{subsec:jackknife-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The jackknife systematically removes one observation at a time.
+
+Let
+
+\[
+\widehat{\theta}_{(-i)}
+\]
+
+be the estimate computed after deleting observation \(i\).
+
+The collection
+
+\[
+\widehat{\theta}_{(-1)},
+\ldots,
+\widehat{\theta}_{(-n)}
+\]
+
+can be used to estimate bias and variance.
+
+The jackknife predates the bootstrap and remains useful for smooth
+statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimator Sensitivity}
+\label{subsec:estimator-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An estimator may be sensitive to:
+
+\[
+\boxed{
+\text{outliers},
+}
+\]
+
+\[
+\boxed{
+\text{model misspecification},
+}
+\]
+
+\[
+\boxed{
+\text{small sample size},
+}
+\]
+
+\[
+\boxed{
+\text{parameter boundaries},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{dependence among observations}.
+}
+\]
+
+Therefore numerical performance should be evaluated in addition to
+formal optimality properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Misspecification}
+\label{subsec:model-misspecification-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Maximum likelihood assumes the chosen parametric family adequately
+describes the data-generating mechanism.
+
+If the true distribution is outside the model family, the MLE may
+converge to a parameter value that best approximates the true
+distribution in a specific information-theoretic sense rather than to a
+literal true parameter.
+
+Thus a mathematically optimal estimator under the wrong model can still
+be scientifically misleading.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimating Under Dependence}
+\label{subsec:estimation-under-dependence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many formulas in this section assume independent observations.
+
+For dependent data,
+
+\[
+\operatorname{Var}
+\left(
+\frac1n
+\sum X_i
+\right)
+\]
+
+includes covariance terms:
+
+\[
+\boxed{
+\frac1{n^2}
+\left[
+\sum_i
+\operatorname{Var}(X_i)
++
+2
+\sum_{i<j}
+\operatorname{Cov}(X_i,X_j)
+\right].
+}
+\]
+
+Time series, clustered samples, and repeated measurements require
+appropriate dependence-aware methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimation Workflow}
+\label{subsec:estimation-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A systematic estimation workflow is:
+
+\begin{enumerate}
+    \item define the parameter of interest;
+    \item specify the probability model;
+    \item check parameter constraints;
+    \item choose an estimation principle;
+    \item derive the estimator;
+    \item examine bias;
+    \item compute or approximate variance;
+    \item evaluate mean squared error;
+    \item check consistency;
+    \item examine efficiency when relevant;
+    \item identify sufficient statistics when possible;
+    \item compute standard errors;
+    \item inspect robustness to unusual observations;
+    \item verify model assumptions;
+    \item connect the point estimate to interval estimation or testing.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:statistical-estimation-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing Parameter and Estimate}
+
+A parameter is a fixed unknown population quantity.
+
+An estimate is a numerical value calculated from observed data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Estimator and Estimate}
+
+The estimator is random before sampling.
+
+The estimate is the realized numerical value.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Unbiased Means Best}
+
+An unbiased estimator can have very large variance.
+
+Mean squared error considers both bias and variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Biased Estimator Is Bad}
+
+A biased estimator may have substantially smaller MSE.
+
+Shrinkage estimators provide important examples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Consistency with Unbiasedness}
+
+Consistency is an asymptotic property.
+
+Unbiasedness is an expectation property at a given sample size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Parameter Constraints}
+
+An estimator must belong to the parameter space.
+
+For example,
+
+\[
+p
+\]
+
+must satisfy
+
+\[
+0\leq p\leq1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Likelihood as \(P(\theta\mid X)\)}
+
+In frequentist inference, likelihood is a function of the parameter for
+fixed observed data.
+
+It is not a posterior probability distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Setting the Score to Zero Without Checking the Maximum}
+
+A score equation identifies candidate extrema.
+
+One must still check:
+
+\[
+\boxed{
+\text{second derivatives},
+}
+\]
+
+\[
+\boxed{
+\text{boundaries},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{direct likelihood behavior}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Support That Depends on the Parameter}
+
+In models such as
+
+\[
+\operatorname{Uniform}(0,\theta),
+\]
+
+the support depends on \(\theta\).
+
+Standard differentiation-based regularity arguments may fail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every MLE Is Unbiased}
+
+MLEs are often biased at finite sample sizes.
+
+Their major strengths are often consistency and asymptotic efficiency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Cram\'er--Rao Bound Without Checking Conditions}
+
+The classical Cram\'er--Rao bound requires regularity conditions.
+
+It may not apply directly to irregular models or parameter-dependent
+support.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Observed and Expected Information}
+
+Observed information depends on the realized sample.
+
+Fisher information averages over the sampling model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Nuisance Parameters}
+
+Uncertainty in nuisance parameters can affect the uncertainty of the
+parameter of interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Complex Means Better}
+
+An estimator should be judged by its statistical properties,
+interpretability, robustness, and relevance to the scientific problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:statistical-estimation-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Survey Research.}
+Population means, totals, proportions, and subgroup quantities are
+estimated from samples.
+
+\medskip
+
+\textbf{Scientific Experiments.}
+Treatment effects, response rates, and model parameters are estimated
+from experimental observations.
+
+\medskip
+
+\textbf{Engineering.}
+Failure rates, process means, variances, and reliability parameters are
+estimated from observed systems.
+
+\medskip
+
+\textbf{Environmental Science.}
+Researchers estimate concentrations, trends, spatial effects, and model
+parameters from environmental measurements.
+
+\medskip
+
+\textbf{Biology and Epidemiology.}
+Population growth rates, disease risks, survival parameters, and
+treatment effects require statistical estimation.
+
+\medskip
+
+\textbf{Economics and Finance.}
+Regression coefficients, volatility, returns, and structural parameters
+are estimated from observational data.
+
+\medskip
+
+\textbf{Machine Learning.}
+Training a statistical model usually means estimating parameters from
+data, often through likelihood or regularized loss minimization.
+
+\medskip
+
+\textbf{Bayesian Statistics.}
+Parameters are estimated through posterior distributions combining prior
+information and likelihood.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:statistical-estimation-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define an estimator.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish an estimator from an estimate.
+\end{exercise}
+
+\begin{exercise}[1]
+Define bias.
+\end{exercise}
+
+\begin{exercise}[1]
+Define consistency.
+\end{exercise}
+
+\begin{exercise}[1]
+Define mean squared error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a sufficient statistic.
+\end{exercise}
+
+\begin{exercise}[1]
+State the factorization theorem.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the likelihood function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the maximum likelihood estimator.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the score function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Fisher information.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Cram\'er--Rao lower bound.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that the sample mean is unbiased for the population mean.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that
+
+\[
+\frac1n
+\sum_{i=1}^{n}
+(X_i-\overline{X})^2
+\]
+
+is biased for \(\sigma^2\).
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose an estimator has bias \(2\) and variance \(9\). Find its MSE.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose estimator \(T_1\) has variance \(4\) and estimator \(T_2\) has
+variance \(10\), and both are unbiased. Which is more efficient?
+\end{exercise}
+
+\begin{exercise}[2]
+Find the method-of-moments estimator of \(\lambda\) for
+
+\[
+X_i\sim\operatorname{Poisson}(\lambda).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the method-of-moments estimator of \(\theta\) for
+
+\[
+X_i\sim\operatorname{Uniform}(0,\theta).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the MLE of \(p\) for a Bernoulli sample.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the MLE of \(\lambda\) for a Poisson sample.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the MLE of the exponential rate parameter.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the MLE of a normal mean when variance is known.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the MLE of \(\theta\) for
+
+\[
+X_i\sim\operatorname{Uniform}(0,\theta).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the bias--variance decomposition of MSE.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that if
+
+\[
+\operatorname{Bias}(\widehat{\theta}_n)\to0
+\]
+
+and
+
+\[
+\operatorname{Var}(\widehat{\theta}_n)\to0,
+\]
+
+then \(\widehat{\theta}_n\) is consistent.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the factorization theorem to show that
+
+\[
+\sum X_i
+\]
+
+is sufficient for \(p\) in a Bernoulli model.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the factorization theorem to identify a sufficient statistic for
+\(\lambda\) in a Poisson model.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that \(\overline{X}\) is sufficient for \(\mu\) in a normal model
+with known variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the MLEs of both \(\mu\) and \(\sigma^2\) for a normal sample.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the normal variance MLE is biased.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the normal variance MLE is consistent.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the score function for Bernoulli data.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Fisher information for Bernoulli data.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Fisher information for Poisson data.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Fisher information for a normal mean with known variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the Bernoulli sample proportion attains the Cram\'er--Rao lower
+bound.
+\end{exercise}
+
+\begin{exercise}[3]
+For
+
+\[
+X_i\sim N(\mu,\sigma^2)
+\]
+
+with known \(\sigma^2\), show that \(\overline{X}\) attains the
+Cram\'er--Rao bound for estimating \(\mu\).
+\end{exercise}
+
+\begin{exercise}[3]
+Use the invariance property of MLEs to find the MLE of
+
+\[
+e^\mu
+\]
+
+if \(\widehat{\mu}\) is the MLE of \(\mu\).
+\end{exercise}
+
+\begin{exercise}[3]
+Suppose
+
+\[
+\widehat{\theta}
+\]
+
+is asymptotically normal. Apply the delta method to
+
+\[
+g(\theta)=1/\theta.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why an MLE may occur at the boundary of the parameter space.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the regular Cram\'er--Rao argument is problematic for
+\(\operatorname{Uniform}(0,\theta)\).
+\end{exercise}
+
+\begin{exercise}[3]
+Show using the law of total variance why Rao--Blackwellization cannot
+increase variance for an unbiased estimator.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how a complete sufficient statistic leads to uniqueness of an
+UMVU estimator.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an example where a biased estimator has smaller MSE than an
+unbiased estimator.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare MLE and method-of-moments estimators for the upper endpoint of a
+uniform distribution.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between expected Fisher information and observed
+information.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the Cram\'er--Rao lower bound under standard regularity conditions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study minimal sufficient statistics using likelihood ratios.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate complete sufficient statistics for one-parameter exponential
+families.
+\end{exercise}
+
+\begin{exercise}[4]
+Apply the Lehmann--Scheff\'e theorem to construct UMVU estimators.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the asymptotic consistency of maximum likelihood estimators.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the asymptotic normality of MLEs using a Taylor expansion of the
+score function.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the multiparameter Cram\'er--Rao inequality.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate profile likelihood and nuisance parameters.
+\end{exercise}
+
+\begin{exercise}[4]
+Study estimating equations and M-estimators.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Huber robust estimation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Bayesian estimators under squared, absolute, and zero-one loss.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate shrinkage estimation and the James--Stein phenomenon.
+\end{exercise}
+
+\begin{exercise}[4]
+Study bootstrap bias correction.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate jackknife variance estimation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study estimator behavior under model misspecification.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:statistical-estimation-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An estimator is a statistic
+
+\[
+\boxed{
+\widehat{\theta}
+=
+T(X_1,\ldots,X_n)
+}
+\]
+
+used to estimate an unknown parameter.
+
+Its bias is
+
+\[
+\boxed{
+\operatorname{Bias}(\widehat{\theta})
+=
+\mathbb{E}[\widehat{\theta}]
+-
+\theta.
+}
+\]
+
+Its mean squared error is
+
+\[
+\boxed{
+\operatorname{MSE}(\widehat{\theta})
+=
+\operatorname{Var}(\widehat{\theta})
++
+\operatorname{Bias}(\widehat{\theta})^2.
+}
+\]
+
+Consistency means
+
+\[
+\boxed{
+\widehat{\theta}_n
+\xrightarrow{P}
+\theta.
+}
+\]
+
+A sufficient statistic compresses the sample without losing
+parameter-relevant information.
+
+The factorization theorem identifies sufficiency through
+
+\[
+\boxed{
+f(x;\theta)
+=
+g(T(x),\theta)h(x).
+}
+\]
+
+The maximum likelihood estimator satisfies
+
+\[
+\boxed{
+\widehat{\theta}_{MLE}
+=
+\arg\max_{\theta}
+L(\theta).
+}
+\]
+
+The score is
+
+\[
+\boxed{
+U(\theta)
+=
+\ell'(\theta).
+}
+\]
+
+Fisher information is
+
+\[
+\boxed{
+I(\theta)
+=
+\mathbb{E}[U(\theta)^2]
+=
+-
+\mathbb{E}[\ell''(\theta)]
+}
+\]
+
+under regularity conditions.
+
+The Cram\'er--Rao bound is
+
+\[
+\boxed{
+\operatorname{Var}(\widehat{\theta})
+\geq
+\frac1{I_n(\theta)}
+}
+\]
+
+for regular unbiased estimation of a scalar parameter.
+
+Regular MLEs often satisfy
+
+\[
+\boxed{
+\sqrt{n}
+(
+\widehat{\theta}_{MLE}-\theta
+)
+\xrightarrow{d}
+N
+\left(
+0,
+\frac1{I_1(\theta)}
+\right).
+}
+\]
+
+Statistical estimation therefore studies how sample data are converted
+into parameter estimates and how the quality of those estimates is
+measured mathematically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:statistical-estimation-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Statistical Estimation builds directly on the sampling distributions of
+Section~\ref{sec:sampling-distributions}. Sampling distributions provide
+the bias, variance, standard errors, and asymptotic behavior used to
+evaluate estimators. Likelihood connects probability models with
+parameter estimation, while sufficient statistics, Fisher information,
+and efficiency formalize how much information a sample contains about an
+unknown parameter. The next section, Confidence Intervals, uses point
+estimators and their sampling distributions to construct ranges of
+plausible parameter values. Hypothesis Testing then uses the same
+likelihood, information, and sampling-distribution ideas to evaluate
+statistical claims.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.4 Statistical Estimation
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard mathematical statistics.
+%   - Standard likelihood theory.
+%   - Standard decision-theoretic and asymptotic estimation concepts.
+%
+% Used for:
+%   - point estimation;
+%   - parameters, estimators, and estimates;
+%   - bias;
+%   - variance;
+%   - mean squared error;
+%   - bias--variance decomposition;
+%   - consistency;
+%   - mean-square consistency;
+%   - efficiency;
+%   - sufficient statistics;
+%   - factorization theorem;
+%   - minimal sufficiency preview;
+%   - completeness;
+%   - Rao--Blackwell theorem;
+%   - Lehmann--Scheffé theorem;
+%   - UMVU estimators;
+%   - method of moments;
+%   - likelihood and log-likelihood;
+%   - maximum likelihood estimation;
+%   - Bernoulli, Poisson, exponential, normal, and uniform MLEs;
+%   - boundary likelihood estimates;
+%   - invariance of MLEs;
+%   - score functions;
+%   - Fisher information;
+%   - Cramér--Rao lower bound;
+%   - estimator efficiency;
+%   - observed information;
+%   - MLE consistency;
+%   - asymptotic normality;
+%   - likelihood curvature;
+%   - relative and profile likelihoods;
+%   - nuisance parameters;
+%   - multiparameter estimation;
+%   - Fisher information matrices;
+%   - identifiability;
+%   - constrained estimation;
+%   - loss and risk;
+%   - Bayesian estimation preview;
+%   - MAP estimation;
+%   - shrinkage and regularization;
+%   - robust estimation;
+%   - M-estimators;
+%   - estimating equations;
+%   - delta-method estimation;
+%   - plug-in principle;
+%   - bootstrap and jackknife estimation;
+%   - model misspecification;
+%   - estimation under dependence;
+%   - applications and exercises.
+%
+% Notes:
+%   - Confidence Intervals are developed next in Section 8.5.
+%   - Hypothesis Testing is developed in Section 8.6.
+%   - Mathematical Statistics in Section 8.13 develops sufficiency,
+%     completeness, information, decision theory, and asymptotics more
+%     deeply.
+%   - Bayesian estimation is developed fully in Section 8.14.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

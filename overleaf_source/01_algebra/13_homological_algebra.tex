@@ -1,0 +1,2291 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 1.13 HOMOLOGICAL ALGEBRA
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Homological Algebra}
+\label{sec:homological-algebra}
+
+\prerequisite{
+Linear algebra from \cref{sec:linear-algebra}, abstract algebra from
+\cref{sec:abstract-algebra}, group theory from \cref{sec:group-theory},
+ring theory from \cref{sec:ring-theory}, and module theory from
+\cref{sec:module-theory}. Familiarity with category-theoretic language is
+helpful but not required for the introductory development.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of homological algebra;
+    \item interpret kernels, images, and quotients as measurements of exactness;
+    \item define chain complexes and cochain complexes;
+    \item explain the condition \(d^2=0\);
+    \item compute cycles, boundaries, and homology groups;
+    \item recognize exact and short exact sequences;
+    \item determine whether elementary sequences are exact;
+    \item define chain maps and induced maps on homology;
+    \item understand chain homotopy at an introductory level;
+    \item define projective, injective, and free resolutions conceptually;
+    \item explain the role of derived functors;
+    \item recognize the functors \(\operatorname{Ext}\) and \(\operatorname{Tor}\);
+    \item interpret long exact sequences;
+    \item explain how homological algebra connects algebra with topology and geometry.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Homological Algebra?}
+\label{subsec:why-homological-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many algebraic problems involve a sequence of maps rather than a single
+object.
+
+A typical pattern is
+
+\[ A\xrightarrow{f}B\xrightarrow{g}C. \]
+
+The relationship between the two maps is often more important than either
+map individually.
+
+In particular, one asks whether
+
+\[ \Image(f)=\Ker(g). \]
+
+If these two subobjects agree, then everything sent to zero by \(g\) already
+came from \(A\).
+
+Homological algebra develops systematic methods for measuring the failure of
+such sequences to be exact.
+
+\begin{conceptbox}
+Homological algebra studies algebraic objects by organizing them into
+sequences of maps and measuring where exactness fails.
+
+The resulting measurements are called \emph{homology}.
+\end{conceptbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Fundamental Pattern}
+\label{subsec:fundamental-homological-pattern}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The central picture is
+
+\begin{center}
+\begin{tikzcd}[column sep=large]
+A \arrow[r,"f"] & B \arrow[r,"g"] & C
+\end{tikzcd}
+\end{center}
+
+with the compatibility condition
+
+\[ g\circ f=0. \]
+
+This implies
+
+\[ \Image(f)\subseteq\Ker(g). \]
+
+If equality holds, the sequence is exact at \(B\).
+
+If equality does not hold, the quotient
+
+\[ \frac{\Ker(g)}{\Image(f)} \]
+
+measures the discrepancy.
+
+This quotient is the basic prototype of a homology object.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequences of Homomorphisms}
+\label{subsec:sequences-homomorphisms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider a sequence
+
+\[ \cdots\longrightarrow A_{n+1}
+\xrightarrow{d_{n+1}}A_n
+\xrightarrow{d_n}A_{n-1}
+\longrightarrow\cdots. \]
+
+The maps
+
+\[ d_n \]
+
+are often called \emph{differentials} or \emph{boundary maps}.
+
+The letter \(d\) is traditionally associated with differentiation and
+boundary operations.
+
+The subscript indicates the degree from which the map begins:
+
+\[ d_n:A_n\to A_{n-1}. \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chain Complexes}
+\label{subsec:chain-complexes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Chain Complex}
+A \emph{chain complex} is a sequence of modules or abelian groups
+\[ \cdots\xrightarrow{d_{n+2}}C_{n+1}
+\xrightarrow{d_{n+1}}C_n
+\xrightarrow{d_n}C_{n-1}
+\xrightarrow{d_{n-1}}\cdots \]
+such that
+\[ d_n\circ d_{n+1}=0 \]
+for every \(n\).
+\end{definitionbox}
+
+The condition is often abbreviated
+
+\[ d^2=0. \]
+
+This is read ``\(d\) squared equals zero.''
+
+It does not mean that the maps themselves are zero. It means that applying
+two consecutive differentials always produces the zero map.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Visual Structure of a Chain Complex}
+\label{subsec:chain-complex-visual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{center}
+\begin{tikzcd}[column sep=large]
+\cdots
+\arrow[r] &
+C_{n+1}
+\arrow[r,"d_{n+1}"] &
+C_n
+\arrow[r,"d_n"] &
+C_{n-1}
+\arrow[r] &
+\cdots
+\end{tikzcd}
+\end{center}
+
+The defining condition says that every two-step path is zero:
+
+\[ C_{n+1}\xrightarrow{d_{n+1}}C_n\xrightarrow{d_n}C_{n-1} \]
+
+satisfies
+
+\[ d_nd_{n+1}=0. \]
+
+Therefore,
+
+\[ \Image(d_{n+1})\subseteq\Ker(d_n). \]
+
+This inclusion makes the homology quotient possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cycles}
+\label{subsec:cycles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Cycles}
+The elements of
+\[ Z_n=\Ker(d_n) \]
+are called the \emph{\(n\)-cycles}.
+\end{definitionbox}
+
+The notation
+
+\[ Z_n \]
+
+is read ``\(Z\) sub \(n\).''
+
+An element \(z\in C_n\) is a cycle when
+
+\[ d_n(z)=0. \]
+
+Thus cycles are elements that have zero boundary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundaries}
+\label{subsec:boundaries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Boundaries}
+The elements of
+\[ B_n=\Image(d_{n+1}) \]
+are called the \emph{\(n\)-boundaries}.
+\end{definitionbox}
+
+An element \(b\in C_n\) is a boundary when there exists
+
+\[ c\in C_{n+1} \]
+
+such that
+
+\[ b=d_{n+1}(c). \]
+
+Since \(d^2=0\),
+
+\[ B_n\subseteq Z_n. \]
+
+Every boundary is therefore automatically a cycle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homology}
+\label{subsec:homology-definition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The distinction between cycles and boundaries produces homology.
+
+\begin{definitionbox}{Homology}
+The \emph{\(n\)th homology} of a chain complex \(C_\bullet\) is
+\[ H_n(C_\bullet)=\frac{Z_n}{B_n}
+=\frac{\Ker(d_n)}{\Image(d_{n+1})}. \]
+\end{definitionbox}
+
+The notation
+
+\[ C_\bullet \]
+
+is read ``\(C\) bullet'' and represents the entire chain complex.
+
+The notation
+
+\[ H_n(C_\bullet) \]
+
+is read ``the \(n\)th homology of \(C\) bullet.''
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Homology Measures}
+\label{subsec:what-homology-measures}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because
+
+\[ B_n\subseteq Z_n, \]
+
+the quotient
+
+\[ Z_n/B_n \]
+
+identifies cycles that differ by a boundary.
+
+A nonzero homology class therefore represents a cycle that is not itself a
+boundary.
+
+Schematically,
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=14mm,
+    box/.style={draw,rounded corners,align=center,inner sep=6pt},
+    >=stealth
+]
+\node[box] (Cn) {\(C_n\)};
+\node[box,below left=of Cn] (Zn) {cycles\\\(Z_n=\Ker d_n\)};
+\node[box,below=of Zn] (Bn) {boundaries\\\(B_n=\Image d_{n+1}\)};
+\node[box,right=of Zn] (Hn) {homology\\\(H_n=Z_n/B_n\)};
+
+\draw[->] (Cn)--(Zn);
+\draw[->] (Bn)--node[left]{contained in}(Zn);
+\draw[->] (Zn)--node[above]{quotient}(Hn);
+\end{tikzpicture}
+\end{center}
+
+\begin{importantbox}
+Homology measures cycles that cannot be explained as boundaries.
+\end{importantbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Small Linear-Algebra Example}
+\label{subsec:homology-linear-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[ \R^2\xrightarrow{d_2}\R^2\xrightarrow{d_1}\R \]
+
+where
+
+\[ d_2(x,y)=(y,0),\qquad d_1(x,y)=y. \]
+
+First check the chain condition:
+
+\[ d_1(d_2(x,y))=d_1(y,0)=0. \]
+
+Thus
+
+\[ d_1d_2=0. \]
+
+At degree \(1\),
+
+\[ Z_1=\Ker(d_1)=\{(x,0):x\in\R\}. \]
+
+Meanwhile,
+
+\[ B_1=\Image(d_2)=\{(y,0):y\in\R\}. \]
+
+Hence
+
+\[ Z_1=B_1. \]
+
+Therefore,
+
+\[ H_1=Z_1/B_1=0. \]
+
+There are no nontrivial homology classes at degree \(1\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Computing Homology}
+\label{subsec:worked-computing-homology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Homology of a Simple Chain Complex}
+
+Consider
+
+\[ 0\longrightarrow\R
+\xrightarrow{d_2}\R^2
+\xrightarrow{d_1}\R
+\longrightarrow0 \]
+
+with
+
+\[ d_2(t)=(t,0),\qquad d_1(x,y)=y. \]
+
+Compute \(H_1\).
+
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.42\textwidth}X@{}}
+Find the cycles. &
+\(\displaystyle Z_1=\Ker(d_1)=\{(x,0):x\in\R\}\)\\
+Find the boundaries. &
+\(\displaystyle B_1=\Image(d_2)=\{(t,0):t\in\R\}\)\\
+Compare the two spaces. & \(Z_1=B_1\)\\
+Form the quotient. & \(H_1=Z_1/B_1=0\)
+\end{tabularx}
+
+\begin{answerbox}
+\[ \boxed{H_1=0} \]
+\end{answerbox}
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Sequences}
+\label{subsec:exact-sequences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Exact Sequence}
+A sequence
+\[ \cdots\longrightarrow A_{n+1}
+\xrightarrow{f_{n+1}}A_n
+\xrightarrow{f_n}A_{n-1}
+\longrightarrow\cdots \]
+is \emph{exact at \(A_n\)} if
+\[ \Image(f_{n+1})=\Ker(f_n). \]
+It is \emph{exact} if it is exact at every object where exactness is
+required.
+\end{definitionbox}
+
+Exactness means that everything killed by one map came from the preceding
+map.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exactness and Homology}
+\label{subsec:exactness-homology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a chain complex,
+
+\[ H_n=\frac{\Ker(d_n)}{\Image(d_{n+1})}. \]
+
+Therefore,
+
+\[ H_n=0 \]
+
+precisely when
+
+\[ \Ker(d_n)=\Image(d_{n+1}). \]
+
+Hence:
+
+\begin{theorem}[Exactness and Vanishing Homology]
+A chain complex is exact at \(C_n\) if and only if
+\[ H_n(C_\bullet)=0. \]
+\end{theorem}
+
+Thus homology directly measures failure of exactness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Short Exact Sequences}
+\label{subsec:short-exact-sequences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One of the most important configurations in algebra is
+
+\[ 0\longrightarrow A\xrightarrow{f}B\xrightarrow{g}C\longrightarrow0. \]
+
+\begin{definitionbox}{Short Exact Sequence}
+A sequence
+\[ 0\longrightarrow A\xrightarrow{f}B\xrightarrow{g}C\longrightarrow0 \]
+is a \emph{short exact sequence} if it is exact at \(A\), \(B\), and \(C\).
+\end{definitionbox}
+
+Exactness implies three important facts.
+
+At \(A\),
+
+\[ \Ker(f)=0, \]
+
+so \(f\) is injective.
+
+At \(B\),
+
+\[ \Image(f)=\Ker(g). \]
+
+At \(C\),
+
+\[ \Image(g)=C, \]
+
+so \(g\) is surjective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reading a Short Exact Sequence}
+\label{subsec:reading-short-exact-sequence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sequence
+
+\[ 0\longrightarrow A\xrightarrow{f}B\xrightarrow{g}C\longrightarrow0 \]
+
+can be interpreted as saying that \(A\) sits inside \(B\), and the quotient
+of \(B\) by that copy of \(A\) is \(C\).
+
+More precisely,
+
+\[ C\cong B/\Image(f). \]
+
+Thus short exact sequences encode extensions of one algebraic object by
+another.
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=14mm,
+    box/.style={draw,rounded corners,align=center,inner sep=5pt},
+    >=stealth
+]
+\node[box] (A) {\(A\)};
+\node[box,right=of A] (B) {\(B\)};
+\node[box,right=of B] (C) {\(C\)};
+
+\draw[->,thick] (A)--node[above]{injects}(B);
+\draw[->,thick] (B)--node[above]{quotient}(C);
+\end{tikzpicture}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Standard Short Exact Sequence}
+\label{subsec:standard-short-exact-sequence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(n\geq1\). Consider
+
+\[ 0\longrightarrow\Z
+\xrightarrow{\times n}\Z
+\xrightarrow{\pi}\Z/n\Z
+\longrightarrow0. \]
+
+The map
+
+\[ \times n:\Z\to\Z \]
+
+means multiplication by \(n\):
+
+\[ k\mapsto nk. \]
+
+The map
+
+\[ \pi:\Z\to\Z/n\Z \]
+
+is the quotient map
+
+\[ k\mapsto[k]_n. \]
+
+We have
+
+\[ \Ker(\pi)=n\Z=\Image(\times n). \]
+
+Therefore the sequence is exact.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Testing Exactness}
+\label{subsec:worked-testing-exactness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Short Exact Sequence}
+
+Determine whether
+
+\[ 0\longrightarrow\R
+\xrightarrow{f}\R^2
+\xrightarrow{g}\R
+\longrightarrow0 \]
+
+is exact when
+
+\[ f(t)=(t,0),\qquad g(x,y)=y. \]
+
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.42\textwidth}X@{}}
+Check \(f\) is injective. & \(f(t)=0\Rightarrow t=0\)\\
+Find the image of \(f\). &
+\(\displaystyle \Image(f)=\{(t,0):t\in\R\}\)\\
+Find the kernel of \(g\). &
+\(\displaystyle \Ker(g)=\{(x,0):x\in\R\}\)\\
+Compare. & \(\Image(f)=\Ker(g)\)\\
+Check \(g\) is surjective. & \(g(0,y)=y\)
+\end{tabularx}
+
+\begin{answerbox}
+\[ \boxed{\text{The sequence is exact.}} \]
+\end{answerbox}
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Split Exact Sequences}
+\label{subsec:split-exact-sequences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A short exact sequence
+
+\[ 0\to A\xrightarrow{f}B\xrightarrow{g}C\to0 \]
+
+is especially simple when \(B\) can be decomposed into pieces corresponding
+to \(A\) and \(C\).
+
+\begin{definitionbox}{Split Exact Sequence}
+A short exact sequence
+\[ 0\to A\xrightarrow{f}B\xrightarrow{g}C\to0 \]
+is \emph{split} if, under suitable equivalent conditions, there exists a map
+\[ s:C\to B \]
+such that
+\[ g\circ s=\identity_C. \]
+\end{definitionbox}
+
+The map \(s\) is called a \emph{section} or \emph{splitting map}.
+
+For modules, a split short exact sequence gives
+
+\[ B\cong A\oplus C. \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complexes Versus Exact Sequences}
+\label{subsec:complexes-vs-exact}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every exact sequence is a chain complex because
+
+\[ \Image(d_{n+1})=\Ker(d_n) \]
+
+implies
+
+\[ \Image(d_{n+1})\subseteq\Ker(d_n), \]
+
+and therefore
+
+\[ d_nd_{n+1}=0. \]
+
+The converse is not true.
+
+A chain complex requires only
+
+\[ \Image(d_{n+1})\subseteq\Ker(d_n). \]
+
+Exactness requires equality.
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=12mm,
+    box/.style={draw,rounded corners,align=center,inner sep=6pt},
+    >=stealth
+]
+\node[box] (chain) {Chain complex\\\(\Image d_{n+1}\subseteq\Ker d_n\)};
+\node[box,below=of chain] (exact) {Exact at \(C_n\)\\\(\Image d_{n+1}=\Ker d_n\)};
+
+\draw[->,thick] (exact)--node[right]{stronger condition}(chain);
+\end{tikzpicture}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cochain Complexes}
+\label{subsec:cochain-complexes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A closely related convention reverses the indexing direction.
+
+\begin{definitionbox}{Cochain Complex}
+A \emph{cochain complex} is a sequence
+\[ \cdots\longrightarrow C^{n-1}
+\xrightarrow{d^{n-1}}C^n
+\xrightarrow{d^n}C^{n+1}
+\longrightarrow\cdots \]
+such that
+\[ d^{n+1}\circ d^n=0. \]
+\end{definitionbox}
+
+Superscripts are used rather than subscripts.
+
+The corresponding quotient is called \emph{cohomology}:
+
+\[ H^n(C^\bullet)=\frac{\Ker(d^n)}{\Image(d^{n-1})}. \]
+
+The notation is read ``the \(n\)th cohomology of \(C\) bullet.''
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homology Versus Cohomology}
+\label{subsec:homology-vs-cohomology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The two conventions can be compared as follows.
+
+\begin{center}
+\begin{tabularx}{0.94\textwidth}{@{}lXX@{}}
+\toprule
+ & \textbf{Homology} & \textbf{Cohomology}\\
+\midrule
+Index & lower \(C_n\) & upper \(C^n\)\\
+Direction & degree decreases & degree increases\\
+Maps & \(d_n:C_n\to C_{n-1}\) & \(d^n:C^n\to C^{n+1}\)\\
+Invariant & \(H_n\) & \(H^n\)\\
+Basic quotient &
+\(\Ker d_n/\Image d_{n+1}\) &
+\(\Ker d^n/\Image d^{n-1}\)\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The distinction becomes especially important in topology, geometry, and
+derived functor theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chain Maps}
+\label{subsec:chain-maps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Homomorphisms between individual modules are not enough when working with
+chain complexes.
+
+The maps must respect the differentials.
+
+\begin{definitionbox}{Chain Map}
+Let \(C_\bullet\) and \(D_\bullet\) be chain complexes. A \emph{chain map}
+\[ f_\bullet:C_\bullet\to D_\bullet \]
+is a collection of maps
+\[ f_n:C_n\to D_n \]
+such that
+\[ d_n^D\circ f_n=f_{n-1}\circ d_n^C \]
+for every \(n\).
+\end{definitionbox}
+
+Equivalently, the following diagram commutes.
+
+\begin{center}
+\begin{tikzcd}[column sep=large,row sep=large]
+C_n \arrow[r,"d_n^C"] \arrow[d,"f_n"'] &
+C_{n-1} \arrow[d,"f_{n-1}"]\\
+D_n \arrow[r,"d_n^D"'] &
+D_{n-1}
+\end{tikzcd}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chain Maps Preserve Cycles and Boundaries}
+\label{subsec:chain-maps-cycles-boundaries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(z\in C_n\) is a cycle.
+
+Then
+
+\[ d_n^C(z)=0. \]
+
+Since \(f_\bullet\) is a chain map,
+
+\[ d_n^D(f_n(z))=f_{n-1}(d_n^C(z))=0. \]
+
+Thus \(f_n(z)\) is a cycle.
+
+Now suppose
+
+\[ b=d_{n+1}^C(c) \]
+
+is a boundary.
+
+Then
+
+\[ f_n(b)=f_n(d_{n+1}^C(c))
+=d_{n+1}^D(f_{n+1}(c)). \]
+
+Therefore \(f_n(b)\) is a boundary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Induced Maps on Homology}
+\label{subsec:induced-homology-map}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because chain maps send cycles to cycles and boundaries to boundaries, they
+produce maps between homology groups.
+
+\begin{theorem}[Induced Map on Homology]
+A chain map
+\[ f_\bullet:C_\bullet\to D_\bullet \]
+induces a homomorphism
+\[ H_n(f):H_n(C_\bullet)\to H_n(D_\bullet) \]
+defined by
+\[ H_n(f)([z])=[f_n(z)]. \]
+\end{theorem}
+
+The square-bracket notation
+
+\[ [z] \]
+
+denotes the homology class represented by the cycle \(z\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Functoriality of Homology}
+\label{subsec:functoriality-homology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Homology respects identities and compositions.
+
+If
+
+\[ \identity_{C_\bullet}:C_\bullet\to C_\bullet \]
+
+is the identity chain map, then
+
+\[ H_n(\identity_{C_\bullet})
+=\identity_{H_n(C_\bullet)}. \]
+
+If
+
+\[ C_\bullet\xrightarrow{f}D_\bullet\xrightarrow{g}E_\bullet, \]
+
+then
+
+\[ H_n(g\circ f)=H_n(g)\circ H_n(f). \]
+
+Thus homology behaves as a functor.
+
+This categorical viewpoint becomes central in advanced homological algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chain Homotopy}
+\label{subsec:chain-homotopy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Two chain maps may be different while still producing the same map on
+homology.
+
+The appropriate relation is called \emph{chain homotopy}.
+
+\begin{definitionbox}{Chain Homotopy}
+Two chain maps
+\[ f,g:C_\bullet\to D_\bullet \]
+are \emph{chain homotopic} if there exist maps
+\[ h_n:C_n\to D_{n+1} \]
+such that
+\[ f_n-g_n=d_{n+1}^Dh_n+h_{n-1}d_n^C. \]
+\end{definitionbox}
+
+The maps \(h_n\) form the chain homotopy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homotopic Maps Induce the Same Homology Map}
+\label{subsec:homotopic-same-homology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(f\) and \(g\) are chain homotopic and \(z\in C_n\) is a cycle.
+
+Since
+
+\[ d_n^C(z)=0, \]
+
+we obtain
+
+\[ f_n(z)-g_n(z)=d_{n+1}^D(h_n(z)). \]
+
+Thus \(f_n(z)\) and \(g_n(z)\) differ by a boundary.
+
+Therefore they represent the same homology class:
+
+\[ [f_n(z)]=[g_n(z)]. \]
+
+Hence
+
+\begin{theorem}[Chain-Homotopy Invariance]
+If chain maps \(f\) and \(g\) are chain homotopic, then
+\[ H_n(f)=H_n(g) \]
+for every \(n\).
+\end{theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Free Modules Revisited}
+\label{subsec:free-modules-homological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A free \(R\)-module has a basis and is isomorphic to a direct sum of copies
+of \(R\).
+
+For example,
+
+\[ R^n \]
+
+is free.
+
+Free modules are particularly useful because maps out of them can be
+constructed by specifying images of basis elements.
+
+Homological algebra often replaces a complicated module by a sequence of
+free modules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projective Modules}
+\label{subsec:projective-modules-homological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Projective modules generalize free modules.
+
+One useful characterization is based on lifting maps.
+
+\begin{definitionbox}{Projective Module}
+An \(R\)-module \(P\) is \emph{projective} if whenever
+\[ M\xrightarrow{\pi}N\to0 \]
+is surjective and
+\[ f:P\to N \]
+is a homomorphism, there exists
+\[ \widetilde f:P\to M \]
+such that
+\[ \pi\circ\widetilde f=f. \]
+\end{definitionbox}
+
+The symbol
+
+\[ \widetilde f \]
+
+is read ``\(f\) tilde.''
+
+It represents a lift of \(f\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Projective Lifting Property}
+\label{subsec:projective-lifting-visual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The lifting condition is represented by
+
+\begin{center}
+\begin{tikzcd}[column sep=large,row sep=large]
+& P \arrow[d,"f"] \arrow[dl,dashed,"\widetilde f"']\\
+M \arrow[r,two heads,"\pi"'] & N \arrow[r] & 0
+\end{tikzcd}
+\end{center}
+
+The dashed arrow is the desired lift.
+
+Every free module is projective.
+
+Not every projective module is necessarily free.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Injective Modules}
+\label{subsec:injective-modules-homological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Injective modules satisfy a dual extension property.
+
+\begin{definitionbox}{Injective Module}
+An \(R\)-module \(I\) is \emph{injective} if whenever
+\[ 0\to A\xrightarrow{\iota}B \]
+is injective and
+\[ f:A\to I \]
+is a homomorphism, there exists
+\[ \widetilde f:B\to I \]
+such that
+\[ \widetilde f\circ\iota=f. \]
+\end{definitionbox}
+
+The map originally defined on \(A\) can therefore be extended to \(B\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projective Versus Injective}
+\label{subsec:projective-vs-injective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The two ideas are dual.
+
+\begin{center}
+\begin{tabularx}{0.94\textwidth}{@{}lXX@{}}
+\toprule
+ & \textbf{Projective} & \textbf{Injective}\\
+\midrule
+Basic behavior & lift through surjections & extend across injections\\
+Typical direction & maps out of \(P\) & maps into \(I\)\\
+Common use & projective resolutions & injective resolutions\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resolutions}
+\label{subsec:resolutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A resolution replaces an algebraic object by an exact sequence of simpler
+objects.
+
+\begin{definitionbox}{Projective Resolution}
+A \emph{projective resolution} of an \(R\)-module \(M\) is an exact sequence
+\[ \cdots\longrightarrow P_2\longrightarrow P_1
+\longrightarrow P_0\longrightarrow M\longrightarrow0 \]
+where every \(P_n\) is projective.
+\end{definitionbox}
+
+If each \(P_n\) is free, the sequence is called a \emph{free resolution}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Visualizing a Resolution}
+\label{subsec:resolution-visual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=8mm and 10mm,
+    box/.style={draw,rounded corners,inner sep=5pt},
+    >=stealth
+]
+\node[box] (P2) {\(P_2\)};
+\node[box,right=of P2] (P1) {\(P_1\)};
+\node[box,right=of P1] (P0) {\(P_0\)};
+\node[box,right=of P0] (M) {\(M\)};
+\node[right=of M] (zero) {\(0\)};
+
+\draw[->] (P2)--(P1);
+\draw[->] (P1)--(P0);
+\draw[->] (P0)--(M);
+\draw[->] (M)--(zero);
+
+\node[below=5mm of P1] {projective or free modules};
+\end{tikzpicture}
+\end{center}
+
+The module \(M\) may be complicated, but the \(P_n\) are chosen to have
+better algebraic properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Free Resolution of \(\Z/n\Z\)}
+\label{subsec:resolution-zn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As a \(\Z\)-module, \(\Z/n\Z\) has the free resolution
+
+\[ 0\longrightarrow\Z
+\xrightarrow{\times n}\Z
+\longrightarrow\Z/n\Z
+\longrightarrow0. \]
+
+Both copies of \(\Z\) are free \(\Z\)-modules.
+
+The map
+
+\[ \Z\to\Z/n\Z \]
+
+is the natural quotient map.
+
+This small resolution is extremely useful when computing \(\operatorname{Tor}\)
+and \(\operatorname{Ext}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Resolutions Matter}
+\label{subsec:why-resolutions-matter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one wants to apply a functor to a module \(M\).
+
+The functor may fail to preserve exact sequences.
+
+Instead of applying it directly to \(M\), one may:
+
+\begin{enumerate}
+    \item construct a projective or injective resolution;
+    \item apply the functor to the resolution;
+    \item compute the resulting homology or cohomology.
+\end{enumerate}
+
+The resulting invariants measure the failure of exactness.
+
+This is the origin of \emph{derived functors}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Functors and Exactness}
+\label{subsec:functors-exactness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[ 0\to A\to B\to C\to0 \]
+
+is exact.
+
+After applying a functor \(F\), one obtains
+
+\[ F(A)\to F(B)\to F(C). \]
+
+The new sequence may no longer be exact everywhere.
+
+A functor that preserves every short exact sequence is called an
+\emph{exact functor}.
+
+Many important functors preserve only part of an exact sequence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Left and Right Exact Functors}
+\label{subsec:left-right-exact}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A covariant functor \(F\) is \emph{left exact} if
+
+\[ 0\to A\to B\to C \]
+
+exact implies
+
+\[ 0\to F(A)\to F(B)\to F(C) \]
+
+is exact.
+
+It is \emph{right exact} if
+
+\[ A\to B\to C\to0 \]
+
+exact implies
+
+\[ F(A)\to F(B)\to F(C)\to0 \]
+
+is exact.
+
+Derived functors measure the part of exactness that is lost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Hom Functor}
+\label{subsec:hom-functor-homological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a fixed \(R\)-module \(M\), one can consider
+
+\[ \operatorname{Hom}_R(M,-). \]
+
+This is a covariant functor in the second argument.
+
+It is generally left exact but not necessarily right exact.
+
+Its right derived functors produce
+
+\[ \operatorname{Ext}_R^n(M,N). \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ext}
+\label{subsec:ext}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The notation
+
+\[ \operatorname{Ext}_R^n(M,N) \]
+
+is read
+
+``Ext over \(R\), degree \(n\), of \(M\) and \(N\).''
+
+The name \emph{Ext} comes from \emph{extension}.
+
+At a conceptual level, Ext measures certain failures of exactness of the
+Hom functor.
+
+\begin{conceptbox}
+Very roughly,
+
+\[ \boxed{\operatorname{Ext}\text{ measures extension phenomena and the
+failure of Hom to be fully exact.}} \]
+\end{conceptbox}
+
+In degree zero,
+
+\[ \operatorname{Ext}_R^0(M,N)\cong\operatorname{Hom}_R(M,N). \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extensions and \(\operatorname{Ext}^1\)}
+\label{subsec:ext1-extensions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One reason for the name Ext is that
+
+\[ \operatorname{Ext}_R^1(M,N) \]
+
+is closely related to equivalence classes of module extensions
+
+\[ 0\to N\to E\to M\to0. \]
+
+A zero class corresponds, in the standard interpretation, to a split
+extension.
+
+Thus \(\operatorname{Ext}^1\) records how one module may be assembled as an
+extension of another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Tensor Product Functor}
+\label{subsec:tensor-functor-homological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a fixed module \(M\), consider
+
+\[ M\otimes_R -. \]
+
+The tensor symbol
+
+\[ \otimes \]
+
+is read ``tensor.''
+
+The tensor product functor is generally right exact but need not be left
+exact.
+
+Its left derived functors produce Tor.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tor}
+\label{subsec:tor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The notation
+
+\[ \operatorname{Tor}_n^R(M,N) \]
+
+is read
+
+``Tor over \(R\), degree \(n\), of \(M\) and \(N\).''
+
+At degree zero,
+
+\[ \operatorname{Tor}_0^R(M,N)\cong M\otimes_RN. \]
+
+Higher Tor groups measure failure of the tensor product to preserve
+injectivity and exactness on the left.
+
+\begin{conceptbox}
+Very roughly,
+
+\[ \boxed{\operatorname{Tor}\text{ measures the failure of tensor products
+to be fully exact.}} \]
+\end{conceptbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computing Tor from a Resolution}
+\label{subsec:computing-tor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[ \cdots\to P_1\to P_0\to M\to0 \]
+
+is a projective resolution of \(M\).
+
+Tensor the projective part with \(N\):
+
+\[ \cdots\to P_1\otimes_RN\to P_0\otimes_RN\to0. \]
+
+The homology of this new complex gives
+
+\[ \operatorname{Tor}_n^R(M,N). \]
+
+Schematically,
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=12mm,
+    box/.style={draw,rounded corners,align=center,inner sep=5pt},
+    >=stealth
+]
+\node[box] (M) {module \(M\)};
+\node[box,right=of M] (res) {projective\\resolution};
+\node[box,right=of res] (tensor) {tensor with \(N\)};
+\node[box,right=of tensor] (hom) {take homology};
+\node[box,below=of hom] (tor) {\(\operatorname{Tor}_n^R(M,N)\)};
+
+\draw[->] (M)--(res);
+\draw[->] (res)--(tensor);
+\draw[->] (tensor)--(hom);
+\draw[->] (hom)--(tor);
+\end{tikzpicture}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: A Basic Tor Computation}
+\label{subsec:worked-tor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Use the free resolution
+
+\[ 0\to\Z\xrightarrow{\times n}\Z\to\Z/n\Z\to0. \]
+
+Tensor the projective part with \(\Z/m\Z\):
+
+\[ 0\to\Z/m\Z\xrightarrow{\times n}\Z/m\Z\to0. \]
+
+The first homology is the kernel of multiplication by \(n\):
+
+\[ \operatorname{Tor}_1^\Z(\Z/n\Z,\Z/m\Z)
+\cong\Ker\left(
+\Z/m\Z\xrightarrow{\times n}\Z/m\Z
+\right). \]
+
+The result is
+
+\[ \boxed{
+\operatorname{Tor}_1^\Z(\Z/n\Z,\Z/m\Z)
+\cong\Z/\gcd(n,m)\Z.} \]
+
+This formula illustrates how Tor detects shared torsion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computing Ext from a Resolution}
+\label{subsec:computing-ext}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Again let
+
+\[ \cdots\to P_1\to P_0\to M\to0 \]
+
+be a projective resolution.
+
+Apply
+
+\[ \operatorname{Hom}_R(-,N). \]
+
+Because Hom is contravariant in its first argument, the arrows reverse:
+
+\[ 0\to\operatorname{Hom}_R(P_0,N)
+\to\operatorname{Hom}_R(P_1,N)
+\to\operatorname{Hom}_R(P_2,N)\to\cdots. \]
+
+This is a cochain complex.
+
+Its cohomology gives
+
+\[ \operatorname{Ext}_R^n(M,N). \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: A Basic Ext Computation}
+\label{subsec:worked-ext}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Start with
+
+\[ 0\to\Z\xrightarrow{\times n}\Z\to\Z/n\Z\to0. \]
+
+Apply
+
+\[ \operatorname{Hom}_{\Z}(-,\Z). \]
+
+Since
+
+\[ \operatorname{Hom}_{\Z}(\Z,\Z)\cong\Z, \]
+
+we obtain
+
+\[ 0\longrightarrow\Z\xrightarrow{\times n}\Z\longrightarrow0. \]
+
+The first cohomology is the cokernel:
+
+\[ \operatorname{Ext}_{\Z}^1(\Z/n\Z,\Z)
+\cong\Z/n\Z. \]
+
+Therefore,
+
+\begin{answerbox}
+\[ \boxed{\operatorname{Ext}_{\Z}^1(\Z/n\Z,\Z)\cong\Z/n\Z.} \]
+\end{answerbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Long Exact Sequences}
+\label{subsec:long-exact-sequences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One of the central strengths of homological algebra is that a short exact
+sequence of complexes can generate a long exact sequence of homology groups.
+
+Suppose
+
+\[ 0\to A_\bullet\to B_\bullet\to C_\bullet\to0 \]
+
+is a short exact sequence of chain complexes.
+
+Then there is a long exact sequence
+
+\[ \cdots\to H_n(A)
+\to H_n(B)
+\to H_n(C)
+\xrightarrow{\partial_n}
+H_{n-1}(A)
+\to H_{n-1}(B)
+\to\cdots. \]
+
+The symbol
+
+\[ \partial_n \]
+
+uses the partial-boundary symbol \(\partial\), pronounced ``partial,'' and is
+read here as ``the connecting homomorphism in degree \(n\).''
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Connecting Homomorphism}
+\label{subsec:connecting-homomorphism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The map
+
+\[ \partial_n:H_n(C)\to H_{n-1}(A) \]
+
+is called the \emph{connecting homomorphism}.
+
+It links homology groups in adjacent degrees and is responsible for turning
+a short exact sequence into a long exact sequence.
+
+Schematically,
+
+\begin{center}
+\begin{tikzcd}[column sep=small]
+\cdots \arrow[r] &
+H_n(A) \arrow[r] &
+H_n(B) \arrow[r] &
+H_n(C)
+\arrow[out=-35,in=145,looseness=1.4,rr,"\partial_n"] &&
+H_{n-1}(A) \arrow[r] &
+H_{n-1}(B) \arrow[r] &
+H_{n-1}(C) \arrow[r] &
+\cdots
+\end{tikzcd}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Long Exact Sequences Matter}
+\label{subsec:why-long-exact}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two of the three homology theories in a short exact sequence are
+known.
+
+The long exact sequence may allow the third to be determined.
+
+Thus exact sequences turn difficult computations into relationships among
+simpler computations.
+
+This principle appears repeatedly throughout modern mathematics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Snake Lemma}
+\label{subsec:snake-lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A foundational result behind connecting homomorphisms is the Snake Lemma.
+
+Consider a commutative diagram with exact rows:
+
+\begin{center}
+\begin{tikzcd}[column sep=large,row sep=large]
+0 \arrow[r] &
+A' \arrow[r] \arrow[d,"f'"] &
+B' \arrow[r] \arrow[d,"g'"] &
+C' \arrow[r] \arrow[d,"h'"] &
+0\\
+0 \arrow[r] &
+A \arrow[r] &
+B \arrow[r] &
+C \arrow[r] &
+0
+\end{tikzcd}
+\end{center}
+
+Under the standard hypotheses, the Snake Lemma produces an exact sequence
+
+\[ 0\to\Ker(f')\to\Ker(g')\to\Ker(h')
+\xrightarrow{\delta}
+\operatorname{coker}(f')
+\to\operatorname{coker}(g')
+\to\operatorname{coker}(h')\to0. \]
+
+The Greek letter
+
+\[ \delta \]
+
+is delta, pronounced ``DEL-tuh.''
+
+The map \(\delta\) is a connecting homomorphism.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cokernels}
+\label{subsec:cokernels-homological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Snake Lemma naturally involves cokernels.
+
+\begin{definitionbox}{Cokernel}
+For a homomorphism
+\[ f:A\to B, \]
+the \emph{cokernel} is
+\[ \operatorname{coker}(f)=B/\Image(f). \]
+\end{definitionbox}
+
+The cokernel measures failure of \(f\) to be surjective.
+
+Indeed,
+
+\[ \operatorname{coker}(f)=0 \]
+
+if and only if \(f\) is surjective.
+
+Compare this with
+
+\[ \Ker(f)=0, \]
+
+which detects injectivity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kernel and Cokernel}
+\label{subsec:kernel-cokernel-comparison}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{center}
+\begin{tabularx}{0.9\textwidth}{@{}lXX@{}}
+\toprule
+ & \textbf{Kernel} & \textbf{Cokernel}\\
+\midrule
+Definition & \(\Ker(f)\) & \(B/\Image(f)\)\\
+Detects & failure of injectivity & failure of surjectivity\\
+Vanishing means & \(f\) injective & \(f\) surjective\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+These two constructions are fundamental throughout homological and
+categorical algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Five Lemma}
+\label{subsec:five-lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another useful result concerns a commutative diagram with exact rows:
+
+\begin{center}
+\begin{tikzcd}[column sep=small,row sep=large]
+A_1 \arrow[r] \arrow[d,"f_1"] &
+A_2 \arrow[r] \arrow[d,"f_2"] &
+A_3 \arrow[r] \arrow[d,"f_3"] &
+A_4 \arrow[r] \arrow[d,"f_4"] &
+A_5 \arrow[d,"f_5"]\\
+B_1 \arrow[r] &
+B_2 \arrow[r] &
+B_3 \arrow[r] &
+B_4 \arrow[r] &
+B_5
+\end{tikzcd}
+\end{center}
+
+Under the standard injectivity and surjectivity hypotheses on the surrounding
+vertical maps, the Five Lemma allows one to conclude that
+
+\[ f_3 \]
+
+is an isomorphism.
+
+Its importance lies in transferring information through exact diagrams.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homological Dimension}
+\label{subsec:homological-dimension}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The length of the shortest projective resolution of a module measures how
+far that module is from being projective.
+
+\begin{definitionbox}{Projective Dimension}
+The \emph{projective dimension} of an \(R\)-module \(M\), denoted
+\[ \operatorname{pd}_R(M), \]
+is the minimum length of a projective resolution of \(M\), when such a finite
+length exists.
+\end{definitionbox}
+
+A projective module has
+
+\[ \operatorname{pd}_R(M)=0. \]
+
+If no finite projective resolution exists, its projective dimension is
+infinite.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Dimension}
+\label{subsec:global-dimension}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The projective dimensions of all modules over a ring can be combined into a
+ring invariant.
+
+\begin{definitionbox}{Global Dimension}
+The \emph{global dimension} of a ring \(R\) is
+\[ \operatorname{gl.dim}(R)
+=\sup\{\operatorname{pd}_R(M):M\text{ is an }R\text{-module}\}. \]
+\end{definitionbox}
+
+The notation
+
+\[ \sup \]
+
+means supremum and is read ``supremum.''
+
+Global dimension measures the overall homological complexity of a ring.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homology as an Algebraic Detector}
+\label{subsec:homology-detector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Homology can be understood as a detector of hidden structure.
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=11mm,
+    box/.style={draw,rounded corners,align=center,inner sep=5pt},
+    >=stealth
+]
+\node[box] (objects) {Algebraic or\\geometric objects};
+\node[box,below=of objects] (complex) {Build a\\chain complex};
+\node[box,below=of complex] (cycles) {Find cycles\\\(\Ker d\)};
+\node[box,below=of cycles] (boundaries) {Identify boundaries\\\(\Image d\)};
+\node[box,below=of boundaries] (homology) {Form quotient\\\(\Ker d/\Image d\)};
+\node[box,below=of homology] (invariant) {Homological\\invariant};
+
+\draw[->] (objects)--(complex);
+\draw[->] (complex)--(cycles);
+\draw[->] (cycles)--(boundaries);
+\draw[->] (boundaries)--(homology);
+\draw[->] (homology)--(invariant);
+\end{tikzpicture}
+\end{center}
+
+This same pattern appears in many different branches of mathematics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homological Algebra and Topology}
+\label{subsec:homological-algebra-topology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Homological algebra grew partly from algebraic topology.
+
+A topological space can be converted into a chain complex
+
+\[ \cdots\to C_2(X)\to C_1(X)\to C_0(X)\to0. \]
+
+The resulting homology groups
+
+\[ H_n(X) \]
+
+detect features such as connected components, loops, and higher-dimensional
+holes.
+
+The full construction belongs to algebraic topology, but its algebraic
+machinery is precisely the machinery developed here.
+
+\begin{applicationbox}
+A geometric object can be transformed into algebra:
+
+\[ \text{space}\longrightarrow
+\text{chain complex}\longrightarrow
+\text{homology groups}. \]
+
+The resulting groups are often easier to compare than the original spaces.
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homological Algebra and Commutative Algebra}
+\label{subsec:homological-commutative-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Homological methods are fundamental in commutative algebra.
+
+They are used to study:
+
+\begin{itemize}
+    \item projective and free resolutions;
+    \item regular sequences;
+    \item depth;
+    \item projective dimension;
+    \item regular local rings;
+    \item syzygies;
+    \item local cohomology.
+\end{itemize}
+
+The canonical development of these ring-theoretic topics belongs to
+\cref{sec:commutative-algebra}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Syzygies}
+\label{subsec:syzygies-homological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a module \(M\) has a presentation
+
+\[ R^m\xrightarrow{A}R^n\to M\to0. \]
+
+The relations among the generators of \(M\) are represented by the image of
+\(A\).
+
+Relations among those relations form another module.
+
+These higher relations are called \emph{syzygies}.
+
+A free resolution organizes successive layers of syzygies:
+
+\[ \cdots\to F_2\to F_1\to F_0\to M\to0. \]
+
+Thus resolutions systematically record relations, relations among relations,
+and so on.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homological Algebra and Algebraic Geometry}
+\label{subsec:homological-algebraic-geometry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modern algebraic geometry uses homological methods extensively.
+
+Examples include:
+
+\begin{itemize}
+    \item sheaf cohomology;
+    \item derived functors;
+    \item derived categories;
+    \item Ext groups of sheaves;
+    \item spectral sequences;
+    \item deformation theory.
+\end{itemize}
+
+These ideas allow geometric information to be encoded in algebraic
+invariants.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homological Algebra and Representation Theory}
+\label{subsec:homological-representation-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For representations viewed as modules, Ext groups measure extension
+phenomena between representations.
+
+For example,
+
+\[ \operatorname{Ext}^1(M,N) \]
+
+can detect nontrivial ways of combining \(M\) and \(N\) into a larger
+representation.
+
+Projective resolutions also allow representations to be studied through
+homological dimensions and derived invariants.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derived Categories: A Preview}
+\label{subsec:derived-categories-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Advanced homological algebra studies chain complexes themselves as primary
+objects.
+
+Two complexes that differ in ways invisible to homology are often treated as
+equivalent after formally inverting certain maps called
+\emph{quasi-isomorphisms}.
+
+\begin{definitionbox}{Quasi-Isomorphism}
+A chain map
+\[ f:C_\bullet\to D_\bullet \]
+is a \emph{quasi-isomorphism} if it induces isomorphisms
+\[ H_n(f):H_n(C_\bullet)\xrightarrow{\sim}H_n(D_\bullet) \]
+for every \(n\).
+\end{definitionbox}
+
+The symbol
+
+\[ \xrightarrow{\sim} \]
+
+is commonly read ``maps isomorphically to.''
+
+Derived categories provide a framework in which quasi-isomorphic complexes
+behave as equivalent objects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectral Sequences: A Preview}
+\label{subsec:spectral-sequences-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some chain complexes are too complicated to compute directly.
+
+A \emph{spectral sequence} organizes a sequence of successive approximations
+
+\[ E_r^{p,q} \]
+
+that, under suitable conditions, converges toward desired homological
+information.
+
+The notation
+
+\[ E_r^{p,q} \]
+
+is read ``\(E\) sub \(r\), superscript \(p,q\).''
+
+A typical differential has the form
+
+\[ d_r:E_r^{p,q}\to E_r^{p-r,q+r-1}. \]
+
+Spectral sequences are powerful but technically substantial, so their full
+theory belongs to advanced homological algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Recurring Homological Pattern}
+\label{subsec:recurring-homological-pattern}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many constructions in homological algebra follow the same general process.
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=9mm,
+    box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small},
+    >=stealth
+]
+\node[box] (obj) {Complicated object};
+\node[box,below=of obj] (resolve) {Resolve using simpler objects};
+\node[box,below=of resolve] (functor) {Apply a functor};
+\node[box,below=of functor] (complex) {Obtain a complex};
+\node[box,below=of complex] (homology) {Compute homology};
+\node[box,below=of homology] (derived) {Derived invariant};
+
+\draw[->] (obj)--(resolve);
+\draw[->] (resolve)--(functor);
+\draw[->] (functor)--(complex);
+\draw[->] (complex)--(homology);
+\draw[->] (homology)--(derived);
+\end{tikzpicture}
+\end{center}
+
+For example:
+
+\[ \text{projective resolution}
+\longrightarrow
+-\otimes_RN
+\longrightarrow
+\operatorname{Tor}, \]
+
+while
+
+\[ \text{projective resolution}
+\longrightarrow
+\operatorname{Hom}_R(-,N)
+\longrightarrow
+\operatorname{Ext}. \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:homological-algebra-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Assuming \(d^2=0\) Means \(d=0\)}
+
+The condition
+
+\[ d^2=0 \]
+
+means consecutive differentials compose to zero.
+
+Individual differential maps may be highly nontrivial.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Cycles and Boundaries}
+
+Cycles are
+
+\[ Z_n=\Ker(d_n), \]
+
+while boundaries are
+
+\[ B_n=\Image(d_{n+1}). \]
+
+Every boundary is a cycle, but not every cycle must be a boundary.
+
+The difference is exactly what homology measures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reversing the Homology Quotient}
+
+Homology is
+
+\[ H_n=\frac{\Ker(d_n)}{\Image(d_{n+1})}, \]
+
+not the reverse quotient.
+
+The denominator is contained in the numerator because \(d^2=0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing a Chain Complex with an Exact Sequence}
+
+A chain complex requires
+
+\[ \Image(d_{n+1})\subseteq\Ker(d_n). \]
+
+Exactness requires
+
+\[ \Image(d_{n+1})=\Ker(d_n). \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting What Exactness Means at the Ends}
+
+In
+
+\[ 0\to A\xrightarrow{f}B, \]
+
+exactness at \(A\) means \(f\) is injective.
+
+In
+
+\[ B\xrightarrow{g}C\to0, \]
+
+exactness at \(C\) means \(g\) is surjective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Short Exact Sequence Splits}
+
+A short exact sequence need not be split.
+
+Splitting is an additional property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Projective Module Is Free}
+
+Every free module is projective, but projective modules need not always be
+free.
+
+The converse depends on the ring and additional hypotheses.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Ext and Tor}
+
+Ext is associated primarily with derived Hom constructions.
+
+Tor is associated primarily with derived tensor-product constructions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Variance of Hom}
+
+The functor
+
+\[ \operatorname{Hom}_R(M,N) \]
+
+is contravariant in \(M\) and covariant in \(N\).
+
+Consequently, applying Hom in the first argument reverses arrows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Thinking Homology Is Only Topological}
+
+Homology originated strongly from topology, but homological algebra is an
+algebraic framework used throughout algebra, geometry, number theory,
+representation theory, and many other fields.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:homological-algebra-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+\textbf{Algebraic Topology.}
+Chain complexes and homology convert geometric information about spaces into
+groups and modules.
+
+\medskip
+
+\textbf{Commutative Algebra.}
+Free resolutions, projective dimension, Tor, and Ext measure structural
+properties of modules and rings.
+
+\medskip
+
+\textbf{Algebraic Geometry.}
+Sheaf cohomology and derived functors encode global geometric information
+from local algebraic data.
+
+\medskip
+
+\textbf{Representation Theory.}
+Ext groups describe extensions of modules and representations, while
+projective resolutions reveal deeper representation-theoretic structure.
+
+\medskip
+
+\textbf{Category Theory.}
+Homological algebra is naturally formulated through functors, exact
+sequences, natural constructions, and derived categories.
+
+\medskip
+
+\textbf{Number Theory.}
+Cohomological methods appear throughout modern arithmetic, including group
+cohomology and Galois cohomology.
+
+\medskip
+
+\textbf{Differential Geometry.}
+Differential forms form cochain complexes whose cohomology captures global
+information about manifolds.
+
+\medskip
+
+\textbf{Mathematical Physics.}
+Chain complexes and cohomological constructions occur in gauge theory,
+topological field theory, and modern formulations of symmetry.
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:homological-algebra-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+State the definition of a chain complex.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain the meaning of
+\[ d^2=0. \]
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that
+\[ \Image(d_{n+1})\subseteq\Ker(d_n) \]
+in every chain complex.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the cycle module \(Z_n\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define the boundary module \(B_n\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define
+\[ H_n(C_\bullet). \]
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why the quotient
+\[ Z_n/B_n \]
+is well-defined.
+\end{exercise}
+
+\begin{exercise}[2]
+Let
+\[ 0\to\R\xrightarrow{d_2}\R^2\xrightarrow{d_1}\R\to0 \]
+where
+\[ d_2(t)=(0,t),\qquad d_1(x,y)=x. \]
+Compute \(H_1\).
+\end{exercise}
+
+\begin{exercise}[2]
+Let
+\[ d:\R^2\to\R^2 \]
+be defined by
+\[ d(x,y)=(y,0). \]
+Determine whether \(d^2=0\).
+\end{exercise}
+
+\begin{exercise}[2]
+For the map in the previous exercise, compute \(\Ker(d)\) and
+\(\Image(d)\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define exactness at an object \(B\) in
+\[ A\to B\to C. \]
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that a chain complex is exact at \(C_n\) if and only if \(H_n=0\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define a short exact sequence.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that
+\[ 0\to A\xrightarrow{f}B \]
+is exact at \(A\) if and only if \(f\) is injective.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that
+\[ B\xrightarrow{g}C\to0 \]
+is exact at \(C\) if and only if \(g\) is surjective.
+\end{exercise}
+
+\begin{exercise}[2]
+Verify that
+\[ 0\to\Z\xrightarrow{\times n}\Z\to\Z/n\Z\to0 \]
+is exact.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a split short exact sequence.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that
+\[ 0\to A\to A\oplus C\to C\to0 \]
+with the natural inclusion and projection is split exact.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a cochain complex.
+\end{exercise}
+
+\begin{exercise}[1]
+Define \(H^n(C^\bullet)\).
+\end{exercise}
+
+\begin{exercise}[1]
+Explain the indexing difference between homology and cohomology.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a chain map.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that a chain map sends cycles to cycles.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that a chain map sends boundaries to boundaries.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why a chain map induces a well-defined map on homology.
+\end{exercise}
+
+\begin{exercise}[2]
+Verify that homology respects composition of chain maps.
+\end{exercise}
+
+\begin{exercise}[1]
+Define chain homotopy.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that chain-homotopic maps induce the same map on homology.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a projective module using the lifting property.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why free modules are projective.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an injective module.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a projective resolution.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a free resolution.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why
+\[ 0\to\Z\xrightarrow{\times n}\Z\to\Z/n\Z\to0 \]
+is a free resolution of \(\Z/n\Z\).
+\end{exercise}
+
+\begin{exercise}[1]
+Explain what it means for a functor to be exact.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain the difference between left exact and right exact.
+\end{exercise}
+
+\begin{exercise}[1]
+What derived functors arise from
+\[ \operatorname{Hom}_R(M,-)? \]
+\end{exercise}
+
+\begin{exercise}[1]
+What derived functors arise from
+\[ M\otimes_R-? \]
+\end{exercise}
+
+\begin{exercise}[1]
+State the degree-zero relationships
+\[ \operatorname{Ext}_R^0(M,N)\cong\operatorname{Hom}_R(M,N) \]
+and
+\[ \operatorname{Tor}_0^R(M,N)\cong M\otimes_RN. \]
+\end{exercise}
+
+\begin{exercise}[2]
+Use the standard free resolution of \(\Z/n\Z\) to compute
+\[ \operatorname{Tor}_1^\Z(\Z/n\Z,\Z). \]
+\end{exercise}
+
+\begin{exercise}[3]
+Use a free resolution to compute
+\[ \operatorname{Tor}_1^\Z(\Z/6\Z,\Z/15\Z). \]
+\end{exercise}
+
+\begin{exercise}[3]
+Compute
+\[ \operatorname{Ext}_{\Z}^1(\Z/5\Z,\Z). \]
+\end{exercise}
+
+\begin{exercise}[2]
+Explain conceptually what
+\[ \operatorname{Ext}^1_R(M,N) \]
+has to do with short exact sequences.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the cokernel of a homomorphism.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that
+\[ \operatorname{coker}(f)=0 \]
+if and only if \(f\) is surjective.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain how kernels and cokernels respectively measure failures of
+injectivity and surjectivity.
+\end{exercise}
+
+\begin{exercise}[2]
+State the form of the long exact sequence in homology arising from
+\[ 0\to A_\bullet\to B_\bullet\to C_\bullet\to0. \]
+\end{exercise}
+
+\begin{exercise}[1]
+What is the role of the connecting homomorphism
+\[ \partial_n:H_n(C)\to H_{n-1}(A)? \]
+\end{exercise}
+
+\begin{exercise}[2]
+State the conclusion of the Snake Lemma in terms of kernels and cokernels.
+\end{exercise}
+
+\begin{exercise}[1]
+Describe the purpose of the Five Lemma.
+\end{exercise}
+
+\begin{exercise}[1]
+Define projective dimension.
+\end{exercise}
+
+\begin{exercise}[1]
+Define global dimension.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a quasi-isomorphism.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why quasi-isomorphisms are important in derived-category theory.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the meaning of a syzygy in a free resolution.
+\end{exercise}
+
+\begin{exercise}[2]
+Describe the general process
+\[ \text{resolution}\to\text{functor}\to\text{homology} \]
+used to construct derived functors.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:homological-algebra-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Homological algebra organizes algebraic information into complexes and exact
+sequences. The fundamental relation \(d^2=0\) ensures that boundaries are
+cycles, allowing the homology quotient
+\(\Ker(d_n)/\Image(d_{n+1})\) to measure failure of exactness. Short exact
+sequences encode extensions, while chain maps and chain homotopies allow
+complexes to be compared structurally. Projective, injective, and free
+resolutions replace complicated modules by better-behaved objects. Applying
+nonexact functors to these resolutions leads to derived invariants such as
+\(\operatorname{Ext}\) and \(\operatorname{Tor}\). Long exact sequences,
+connecting homomorphisms, and diagram lemmas provide powerful computational
+tools. These ideas form a common algebraic language connecting module
+theory, commutative algebra, representation theory, algebraic topology,
+algebraic geometry, differential geometry, number theory, and category
+theory.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 1.13 Homological Algebra
+%------------------------------------------------------------
+%
+% Sources:
+%   - Charles A. Weibel,
+%     An Introduction to Homological Algebra.
+%     Key: weibel1994homological
+%
+% Used for:
+%   - chain complexes and homology;
+%   - exact sequences;
+%   - chain maps and chain homotopy;
+%   - projective and injective modules;
+%   - resolutions;
+%   - derived-functor framework;
+%   - Ext and Tor;
+%   - long exact sequences;
+%   - introductory homological dimension;
+%   - advanced connections and terminology.
+%
+% Notes:
+%   - Module theory is treated canonically in Section 1.8.
+%   - Commutative-algebra applications belong canonically to Section 1.9.
+%   - Representation-theoretic applications belong canonically to
+%     Section 1.11.
+%   - Category-theoretic foundations and categorical formulations of
+%     kernels, cokernels, exactness, and derived constructions are developed
+%     canonically in Section 1.16.
+%   - Topological homology and cohomology receive their canonical treatment
+%     in the Algebraic Topology branch.
+%   - Derived categories and spectral sequences are previews only and are
+%     not intended here as complete advanced treatments.
+%   - Visualizations and pedagogical organization are independently
+%     developed for this text.
+%
+\nocite{weibel1994homological}

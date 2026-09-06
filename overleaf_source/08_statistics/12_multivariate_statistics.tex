@@ -1,0 +1,4344 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.12 MULTIVARIATE STATISTICS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Multivariate Statistics}
+\label{sec:multivariate-statistics}
+
+\prerequisite{
+Linear algebra, matrices, eigenvalues and eigenvectors, covariance,
+correlation, multivariate probability, normal distributions, statistical
+estimation, confidence intervals, hypothesis testing, regression, and
+analysis of variance.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item represent multivariate observations as random vectors;
+    \item define population mean vectors and covariance matrices;
+    \item compute sample mean vectors and sample covariance matrices;
+    \item interpret covariance and correlation matrices;
+    \item understand positive semidefiniteness of covariance matrices;
+    \item define the multivariate normal distribution;
+    \item understand marginal and conditional normal distributions;
+    \item compute Mahalanobis distance;
+    \item distinguish Euclidean and covariance-adjusted distance;
+    \item understand quadratic forms in multivariate statistics;
+    \item perform one-sample Hotelling \(T^2\) tests;
+    \item understand confidence regions for mean vectors;
+    \item perform two-sample Hotelling \(T^2\) tests conceptually;
+    \item understand simultaneous inference for several means;
+    \item understand the purpose of MANOVA;
+    \item recognize Wilks' lambda, Pillai's trace, Hotelling--Lawley
+          trace, and Roy's largest root;
+    \item understand principal component analysis;
+    \item derive principal components from covariance eigenvectors;
+    \item calculate explained-variance proportions;
+    \item distinguish covariance-based and correlation-based PCA;
+    \item understand dimension reduction;
+    \item understand factor analysis conceptually;
+    \item distinguish PCA from factor analysis;
+    \item understand linear discriminant analysis;
+    \item understand quadratic discriminant analysis;
+    \item understand canonical correlation analysis;
+    \item recognize multivariate outliers;
+    \item understand covariance estimation problems in high dimensions;
+    \item recognize regularized covariance estimation;
+    \item understand standardization and scaling issues;
+    \item understand missing-data complications in multivariate analysis;
+    \item connect multivariate statistics with regression, ANOVA,
+          statistical learning, and computational statistics.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Multivariate Statistics?}
+\label{subsec:why-multivariate-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many datasets contain several variables measured on each observational
+unit.
+
+For example, one individual might have measurements
+
+\[
+\boxed{
+\text{height},
+\quad
+\text{weight},
+\quad
+\text{blood pressure},
+\quad
+\text{age},
+\quad
+\text{cholesterol}.
+}
+\]
+
+Analyzing each variable separately can miss relationships among them.
+
+Multivariate statistics studies several variables jointly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Observation}
+\label{subsec:multivariate-observation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multivariate observation can be written as a vector
+
+\[
+\boxed{
+\mathbf{X}
+=
+\begin{pmatrix}
+X_1\\
+X_2\\
+\vdots\\
+X_p
+\end{pmatrix}.
+}
+\]
+
+The dimension
+
+\[
+p
+\]
+
+is the number of variables measured on each unit.
+
+A sample of size \(n\) consists of vectors
+
+\[
+\boxed{
+\mathbf{X}_1,
+\ldots,
+\mathbf{X}_n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Data Matrix}
+\label{subsec:multivariate-data-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multivariate dataset can be represented as
+
+\[
+\boxed{
+X
+=
+\begin{pmatrix}
+x_{11} & x_{12} & \cdots & x_{1p}\\
+x_{21} & x_{22} & \cdots & x_{2p}\\
+\vdots & \vdots & \ddots & \vdots\\
+x_{n1} & x_{n2} & \cdots & x_{np}
+\end{pmatrix}.
+}
+\]
+
+Rows correspond to observational units.
+
+Columns correspond to variables.
+
+Thus
+
+\[
+X
+\]
+
+is an
+
+\[
+\boxed{
+n\times p
+}
+\]
+
+matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean Vector}
+\label{subsec:population-mean-vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The population mean vector is
+
+\[
+\boxed{
+\boldsymbol{\mu}
+=
+\mathbb{E}[\mathbf{X}]
+=
+\begin{pmatrix}
+\mu_1\\
+\mu_2\\
+\vdots\\
+\mu_p
+\end{pmatrix}.
+}
+\]
+
+Each component is
+
+\[
+\boxed{
+\mu_j
+=
+\mathbb{E}[X_j].
+}
+\]
+
+Thus the mean vector records the mean of every variable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariance Matrix}
+\label{subsec:population-covariance-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The covariance matrix is
+
+\[
+\boxed{
+\Sigma
+=
+\operatorname{Cov}(\mathbf{X})
+=
+\mathbb{E}
+\left[
+(\mathbf{X}-\boldsymbol{\mu})
+(\mathbf{X}-\boldsymbol{\mu})^T
+\right].
+}
+\]
+
+It has the form
+
+\[
+\boxed{
+\Sigma
+=
+\begin{pmatrix}
+\sigma_{11} & \sigma_{12} & \cdots & \sigma_{1p}\\
+\sigma_{21} & \sigma_{22} & \cdots & \sigma_{2p}\\
+\vdots & \vdots & \ddots & \vdots\\
+\sigma_{p1} & \sigma_{p2} & \cdots & \sigma_{pp}
+\end{pmatrix}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diagonal Entries of the Covariance Matrix}
+\label{subsec:covariance-matrix-diagonal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The diagonal entries are variances:
+
+\[
+\boxed{
+\sigma_{jj}
+=
+\operatorname{Var}(X_j).
+}
+\]
+
+Thus
+
+\[
+\Sigma
+\]
+
+contains all individual variable variances on its diagonal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Off-Diagonal Entries}
+\label{subsec:covariance-matrix-offdiagonal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+j\neq k,
+\]
+
+the entry
+
+\[
+\boxed{
+\sigma_{jk}
+=
+\operatorname{Cov}(X_j,X_k)
+}
+\]
+
+measures linear association between variables \(X_j\) and \(X_k\).
+
+Because covariance is symmetric,
+
+\[
+\boxed{
+\sigma_{jk}
+=
+\sigma_{kj}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\Sigma^T=\Sigma.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Positive Semidefinite Covariance Matrices}
+\label{subsec:covariance-positive-semidefinite}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For any vector
+
+\[
+\mathbf{a}\in\mathbb{R}^p,
+\]
+
+consider the linear combination
+
+\[
+\mathbf{a}^T\mathbf{X}.
+\]
+
+Its variance is
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\mathbf{a}^T\mathbf{X}
+)
+=
+\mathbf{a}^T
+\Sigma
+\mathbf{a}.
+}
+\]
+
+Since variance cannot be negative,
+
+\[
+\boxed{
+\mathbf{a}^T
+\Sigma
+\mathbf{a}
+\geq0.
+}
+\]
+
+Thus every covariance matrix is positive semidefinite.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Positive Definite Covariance Matrix}
+\label{subsec:positive-definite-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\mathbf{a}^T
+\Sigma
+\mathbf{a}>0
+\]
+
+for every nonzero \(\mathbf{a}\), then \(\Sigma\) is positive definite.
+
+In that case,
+
+\[
+\boxed{
+\det(\Sigma)>0
+}
+\]
+
+and
+
+\[
+\boxed{
+\Sigma^{-1}
+}
+\]
+
+exists.
+
+Singularity means some linear combination of the variables has zero
+variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Correlation Matrix}
+\label{subsec:multivariate-correlation-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The correlation between variables \(X_j\) and \(X_k\) is
+
+\[
+\boxed{
+\rho_{jk}
+=
+\frac{
+\sigma_{jk}
+}{
+\sqrt{
+\sigma_{jj}\sigma_{kk}
+}
+}.
+}
+\]
+
+The correlation matrix is
+
+\[
+\boxed{
+R
+=
+(\rho_{jk}).
+}
+\]
+
+Its diagonal entries satisfy
+
+\[
+\boxed{
+\rho_{jj}=1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariance Versus Correlation Matrices}
+\label{subsec:covariance-versus-correlation-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Covariance depends on measurement units.
+
+Correlation is dimensionless.
+
+Therefore covariance-based analysis is sensitive to scale, whereas
+correlation-based analysis effectively standardizes the variables.
+
+This distinction becomes especially important in principal component
+analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Mean Vector}
+\label{subsec:sample-mean-vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given observations
+
+\[
+\mathbf{X}_1,\ldots,\mathbf{X}_n,
+\]
+
+the sample mean vector is
+
+\[
+\boxed{
+\overline{\mathbf{X}}
+=
+\frac1n
+\sum_{i=1}^{n}
+\mathbf{X}_i.
+}
+\]
+
+Componentwise,
+
+\[
+\boxed{
+\overline{X}_j
+=
+\frac1n
+\sum_{i=1}^{n}
+X_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Covariance Matrix}
+\label{subsec:sample-covariance-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sample covariance matrix is
+
+\[
+\boxed{
+S
+=
+\frac1{n-1}
+\sum_{i=1}^{n}
+(
+\mathbf{X}_i-\overline{\mathbf{X}}
+)
+(
+\mathbf{X}_i-\overline{\mathbf{X}}
+)^T.
+}
+\]
+
+The entry in row \(j\), column \(k\) is
+
+\[
+\boxed{
+s_{jk}
+=
+\frac1{n-1}
+\sum_{i=1}^{n}
+(X_{ij}-\overline{X}_j)
+(X_{ik}-\overline{X}_k).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Correlation Matrix}
+\label{subsec:sample-correlation-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sample correlation is
+
+\[
+\boxed{
+r_{jk}
+=
+\frac{
+s_{jk}
+}{
+\sqrt{
+s_{jj}s_{kk}
+}
+}.
+}
+\]
+
+Collecting all pairwise sample correlations gives the sample correlation
+matrix
+
+\[
+\boxed{
+R=(r_{jk}).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Sample Mean Vector}
+\label{subsec:worked-sample-mean-vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Two Variables}
+
+Suppose the observations are
+
+\[
+\mathbf{x}_1=
+\begin{pmatrix}
+1\\
+4
+\end{pmatrix},
+\qquad
+\mathbf{x}_2=
+\begin{pmatrix}
+3\\
+6
+\end{pmatrix},
+\qquad
+\mathbf{x}_3=
+\begin{pmatrix}
+5\\
+8
+\end{pmatrix}.
+\]
+
+Then
+
+\[
+\overline{\mathbf{x}}
+=
+\frac13
+\left[
+\begin{pmatrix}
+1\\
+4
+\end{pmatrix}
++
+\begin{pmatrix}
+3\\
+6
+\end{pmatrix}
++
+\begin{pmatrix}
+5\\
+8
+\end{pmatrix}
+\right].
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\overline{\mathbf{x}}
+=
+\begin{pmatrix}
+3\\
+6
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Transformations of Random Vectors}
+\label{subsec:linear-transformations-random-vectors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\mathbf{Y}
+=
+A\mathbf{X}+\mathbf{b}.
+\]
+
+Then
+
+\[
+\boxed{
+\mathbb{E}[\mathbf{Y}]
+=
+A\boldsymbol{\mu}+\mathbf{b}.
+}
+\]
+
+The covariance matrix transforms as
+
+\[
+\boxed{
+\operatorname{Cov}(\mathbf{Y})
+=
+A\Sigma A^T.
+}
+\]
+
+This identity is central throughout multivariate statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of a Linear Combination}
+\label{subsec:variance-linear-combination-multivariate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For scalar
+
+\[
+Y
+=
+\mathbf{a}^T\mathbf{X},
+\]
+
+we have
+
+\[
+\boxed{
+\mathbb{E}[Y]
+=
+\mathbf{a}^T\boldsymbol{\mu},
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Var}(Y)
+=
+\mathbf{a}^T\Sigma\mathbf{a}.
+}
+\]
+
+Many multivariate procedures search for useful linear combinations of
+variables.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Normal Distribution}
+\label{subsec:multivariate-normal-distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A random vector
+
+\[
+\mathbf{X}\in\mathbb{R}^p
+\]
+
+has a multivariate normal distribution with mean
+\(\boldsymbol{\mu}\) and covariance matrix \(\Sigma\) if
+
+\[
+\boxed{
+\mathbf{X}
+\sim
+N_p
+(
+\boldsymbol{\mu},
+\Sigma
+).
+}
+\]
+
+One characterization is that every linear combination
+
+\[
+\boxed{
+\mathbf{a}^T\mathbf{X}
+}
+\]
+
+is normally distributed for every fixed vector \(\mathbf{a}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Normal Density}
+\label{subsec:multivariate-normal-density}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(\Sigma\) is positive definite, the density is
+
+\[
+\boxed{
+f(\mathbf{x})
+=
+\frac{
+1
+}{
+(2\pi)^{p/2}
+|\Sigma|^{1/2}
+}
+\exp
+\left[
+-\frac12
+(
+\mathbf{x}-\boldsymbol{\mu}
+)^T
+\Sigma^{-1}
+(
+\mathbf{x}-\boldsymbol{\mu}
+)
+\right].
+}
+\]
+
+Here,
+
+\[
+|\Sigma|
+\]
+
+denotes the determinant of \(\Sigma\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometry of the Multivariate Normal}
+\label{subsec:geometry-multivariate-normal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Contours of equal multivariate normal density satisfy
+
+\[
+\boxed{
+(
+\mathbf{x}-\boldsymbol{\mu}
+)^T
+\Sigma^{-1}
+(
+\mathbf{x}-\boldsymbol{\mu}
+)
+=
+c.
+}
+\]
+
+These contours are ellipsoids.
+
+The eigenvectors of \(\Sigma\) determine the ellipsoid directions.
+
+The eigenvalues determine the squared scale along those directions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Marginal Normal Distributions}
+\label{subsec:marginal-multivariate-normal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every subvector of a multivariate normal vector is itself multivariate
+normal.
+
+For example, partition
+
+\[
+\mathbf{X}
+=
+\begin{pmatrix}
+\mathbf{X}_1\\
+\mathbf{X}_2
+\end{pmatrix},
+\]
+
+with
+
+\[
+\boldsymbol{\mu}
+=
+\begin{pmatrix}
+\boldsymbol{\mu}_1\\
+\boldsymbol{\mu}_2
+\end{pmatrix},
+\]
+
+and
+
+\[
+\Sigma
+=
+\begin{pmatrix}
+\Sigma_{11}
+&
+\Sigma_{12}
+\\
+\Sigma_{21}
+&
+\Sigma_{22}
+\end{pmatrix}.
+\]
+
+Then
+
+\[
+\boxed{
+\mathbf{X}_1
+\sim
+N
+(
+\boldsymbol{\mu}_1,
+\Sigma_{11}
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditional Multivariate Normal Distribution}
+\label{subsec:conditional-multivariate-normal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under the same partition,
+
+\[
+\boxed{
+\mathbf{X}_1
+\mid
+\mathbf{X}_2=\mathbf{x}_2
+}
+\]
+
+is multivariate normal with conditional mean
+
+\[
+\boxed{
+\boldsymbol{\mu}_1
++
+\Sigma_{12}
+\Sigma_{22}^{-1}
+(
+\mathbf{x}_2-\boldsymbol{\mu}_2
+)
+}
+\]
+
+and conditional covariance
+
+\[
+\boxed{
+\Sigma_{11}
+-
+\Sigma_{12}
+\Sigma_{22}^{-1}
+\Sigma_{21}.
+}
+\]
+
+This formula connects multivariate normal theory directly with linear
+regression.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncorrelated Normal Variables Are Independent}
+\label{subsec:uncorrelated-normal-independent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a jointly multivariate normal vector, zero covariance implies
+independence.
+
+Thus if
+
+\[
+\boxed{
+\operatorname{Cov}(X_j,X_k)=0
+}
+\]
+
+for jointly normal components, then
+
+\[
+\boxed{
+X_j
+\perp X_k.
+}
+\]
+
+This implication is special to particular distributional families and is
+not true in general.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mahalanobis Distance}
+\label{subsec:mahalanobis-distance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The squared Mahalanobis distance from \(\mathbf{x}\) to mean
+\(\boldsymbol{\mu}\) is
+
+\[
+\boxed{
+D_M^2
+=
+(
+\mathbf{x}-\boldsymbol{\mu}
+)^T
+\Sigma^{-1}
+(
+\mathbf{x}-\boldsymbol{\mu}
+).
+}
+\]
+
+The Mahalanobis distance is
+
+\[
+\boxed{
+D_M
+=
+\sqrt{
+D_M^2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euclidean Versus Mahalanobis Distance}
+\label{subsec:euclidean-versus-mahalanobis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Euclidean distance is
+
+\[
+\boxed{
+\|\mathbf{x}-\boldsymbol{\mu}\|_2.
+}
+\]
+
+It treats all coordinate directions equally.
+
+Mahalanobis distance adjusts for:
+
+\[
+\boxed{
+\text{different variable scales}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{correlations among variables}.
+}
+\]
+
+Thus a direction with high natural variability contributes less than a
+direction with low variability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Diagonal Mahalanobis Distance}
+\label{subsec:worked-mahalanobis-distance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Independent Components}
+
+Suppose
+
+\[
+\boldsymbol{\mu}
+=
+\begin{pmatrix}
+0\\
+0
+\end{pmatrix},
+\qquad
+\Sigma
+=
+\begin{pmatrix}
+4&0\\
+0&1
+\end{pmatrix},
+\]
+
+and
+
+\[
+\mathbf{x}
+=
+\begin{pmatrix}
+2\\
+1
+\end{pmatrix}.
+\]
+
+Then
+
+\[
+\Sigma^{-1}
+=
+\begin{pmatrix}
+1/4&0\\
+0&1
+\end{pmatrix}.
+\]
+
+Therefore,
+
+\[
+D_M^2
+=
+\begin{pmatrix}
+2&1
+\end{pmatrix}
+\begin{pmatrix}
+1/4&0\\
+0&1
+\end{pmatrix}
+\begin{pmatrix}
+2\\
+1
+\end{pmatrix}.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+D_M^2
+=
+2,
+\qquad
+D_M=\sqrt2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mahalanobis Distance Under Normality}
+\label{subsec:mahalanobis-normality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\mathbf{X}
+\sim
+N_p
+(
+\boldsymbol{\mu},
+\Sigma
+),
+\]
+
+then
+
+\[
+\boxed{
+(
+\mathbf{X}-\boldsymbol{\mu}
+)^T
+\Sigma^{-1}
+(
+\mathbf{X}-\boldsymbol{\mu}
+)
+\sim
+\chi^2_p.
+}
+\]
+
+This makes Mahalanobis distance useful for identifying unusually distant
+multivariate observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Outliers}
+\label{subsec:multivariate-outliers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An observation may appear ordinary on every variable separately but
+still represent an unusual multivariate combination.
+
+For example, two measurements may individually be common but rarely occur
+together.
+
+Mahalanobis distance can detect this joint unusualness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{One-Sample Mean-Vector Testing}
+\label{subsec:one-sample-mean-vector-testing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\mathbf{X}_1,\ldots,\mathbf{X}_n
+\]
+
+are i.i.d. observations from a \(p\)-dimensional population.
+
+Consider
+
+\[
+\boxed{
+H_0:
+\boldsymbol{\mu}
+=
+\boldsymbol{\mu}_0.
+}
+\]
+
+Testing each component separately creates a multiple-testing problem.
+
+Hotelling's \(T^2\) provides a joint test.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hotelling's \(T^2\) Statistic}
+\label{subsec:hotelling-t-squared}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The one-sample statistic is
+
+\[
+\boxed{
+T^2
+=
+n
+(
+\overline{\mathbf{X}}
+-
+\boldsymbol{\mu}_0
+)^T
+S^{-1}
+(
+\overline{\mathbf{X}}
+-
+\boldsymbol{\mu}_0
+).
+}
+\]
+
+This is a multivariate analogue of the one-sample squared \(t\)-statistic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hotelling \(T^2\) Reference Distribution}
+\label{subsec:hotelling-reference-distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under multivariate normal sampling and
+
+\[
+H_0:
+\boldsymbol{\mu}
+=
+\boldsymbol{\mu}_0,
+\]
+
+\[
+\boxed{
+\frac{
+n-p
+}{
+p(n-1)
+}
+T^2
+\sim
+F_{p,n-p},
+}
+\]
+
+provided
+
+\[
+\boxed{
+n>p.
+}
+\]
+
+Thus the test uses an \(F\)-distribution after rescaling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduction to the One-Sample \(t\)-Test}
+\label{subsec:hotelling-reduction-t}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When
+
+\[
+p=1,
+\]
+
+Hotelling's statistic becomes
+
+\[
+T^2
+=
+n
+\frac{
+(\overline{X}-\mu_0)^2
+}{
+S^2
+}.
+\]
+
+But
+
+\[
+t
+=
+\frac{
+\overline{X}-\mu_0
+}{
+S/\sqrt{n}
+}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+T^2=t^2.
+}
+\]
+
+Thus Hotelling's test generalizes the ordinary one-sample \(t\)-test.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Hotelling Statistic Setup}
+\label{subsec:worked-hotelling-setup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Testing a Two-Dimensional Mean}
+
+Suppose
+
+\[
+n=20,
+\]
+
+\[
+\overline{\mathbf{x}}
+=
+\begin{pmatrix}
+5\\
+8
+\end{pmatrix},
+\]
+
+and the null mean is
+
+\[
+\boldsymbol{\mu}_0
+=
+\begin{pmatrix}
+4\\
+6
+\end{pmatrix}.
+\]
+
+Suppose
+
+\[
+S^{-1}
+=
+\begin{pmatrix}
+0.5&-0.1\\
+-0.1&0.4
+\end{pmatrix}.
+\]
+
+Then
+
+\[
+\overline{\mathbf{x}}
+-
+\boldsymbol{\mu}_0
+=
+\begin{pmatrix}
+1\\
+2
+\end{pmatrix}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+T^2
+=
+20
+\begin{pmatrix}
+1&2
+\end{pmatrix}
+\begin{pmatrix}
+0.5&-0.1\\
+-0.1&0.4
+\end{pmatrix}
+\begin{pmatrix}
+1\\
+2
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confidence Region for a Mean Vector}
+\label{subsec:confidence-region-mean-vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multivariate confidence set for \(\boldsymbol{\mu}\) can be written
+
+\[
+\boxed{
+n
+(
+\overline{\mathbf{X}}
+-
+\boldsymbol{\mu}
+)^T
+S^{-1}
+(
+\overline{\mathbf{X}}
+-
+\boldsymbol{\mu}
+)
+\leq
+c.
+}
+\]
+
+Under multivariate normality,
+
+\[
+\boxed{
+c
+=
+\frac{
+p(n-1)
+}{
+n-p
+}
+F_{p,n-p;1-\alpha}.
+}
+\]
+
+This produces an ellipsoidal confidence region.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simultaneous Confidence Intervals}
+\label{subsec:simultaneous-multivariate-ci}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The confidence ellipsoid can be used to derive simultaneous intervals for
+linear combinations
+
+\[
+\mathbf{a}^T\boldsymbol{\mu}.
+\]
+
+A general form is
+
+\[
+\boxed{
+\mathbf{a}^T
+\overline{\mathbf{X}}
+\pm
+\sqrt{
+\frac{c}{n}
+\mathbf{a}^TS\mathbf{a}
+}.
+}
+\]
+
+These intervals protect joint coverage over a specified family of linear
+combinations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bonferroni Simultaneous Intervals}
+\label{subsec:bonferroni-multivariate-ci}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If interest is restricted to the \(p\) individual mean components,
+Bonferroni intervals provide a simple alternative.
+
+For component \(j\),
+
+\[
+\boxed{
+\overline{X}_j
+\pm
+t^*
+\sqrt{
+\frac{s_{jj}}{n}
+},
+}
+\]
+
+where \(t^*\) uses a tail probability adjusted for the number of
+simultaneous intervals.
+
+Bonferroni methods can be conservative but are easy to construct.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Sample Mean-Vector Comparison}
+\label{subsec:two-sample-multivariate-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two independent multivariate populations have mean vectors
+
+\[
+\boldsymbol{\mu}_1
+\]
+
+and
+
+\[
+\boldsymbol{\mu}_2.
+\]
+
+A common hypothesis is
+
+\[
+\boxed{
+H_0:
+\boldsymbol{\mu}_1
+=
+\boldsymbol{\mu}_2.
+}
+\]
+
+The point estimator is
+
+\[
+\boxed{
+\overline{\mathbf{X}}_1
+-
+\overline{\mathbf{X}}_2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pooled Covariance Matrix}
+\label{subsec:multivariate-pooled-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under the assumption of common covariance
+
+\[
+\Sigma_1=\Sigma_2=\Sigma,
+\]
+
+the pooled sample covariance matrix is
+
+\[
+\boxed{
+S_p
+=
+\frac{
+(n_1-1)S_1
++
+(n_2-1)S_2
+}{
+n_1+n_2-2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Sample Hotelling \(T^2\)}
+\label{subsec:two-sample-hotelling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The two-sample statistic is
+
+\[
+\boxed{
+T^2
+=
+\frac{
+n_1n_2
+}{
+n_1+n_2
+}
+(
+\overline{\mathbf{X}}_1
+-
+\overline{\mathbf{X}}_2
+)^T
+S_p^{-1}
+(
+\overline{\mathbf{X}}_1
+-
+\overline{\mathbf{X}}_2
+).
+}
+\]
+
+Under multivariate normality and equal covariance matrices, this can be
+transformed to an \(F\)-statistic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Sample Hotelling Reference Distribution}
+\label{subsec:two-sample-hotelling-f}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under the classical null,
+
+\[
+\boxed{
+\frac{
+n_1+n_2-p-1
+}{
+p(n_1+n_2-2)
+}
+T^2
+\sim
+F_{
+p,\,
+n_1+n_2-p-1
+}.
+}
+\]
+
+This requires sufficient sample size for the pooled covariance matrix to
+be nonsingular.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Test Mean Vectors Jointly?}
+\label{subsec:why-test-mean-vectors-jointly}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose five correlated outcomes are measured.
+
+Testing five separate hypotheses ignores their covariance structure and
+creates multiplicity.
+
+A joint multivariate test can detect a combined pattern such as:
+
+\[
+\boxed{
+\text{small coordinated changes across several variables}.
+}
+\]
+
+This may be scientifically important even when no individual univariate
+test is extremely strong.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MANOVA}
+\label{subsec:manova}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multivariate analysis of variance, abbreviated MANOVA, extends ANOVA to
+multiple response variables.
+
+Instead of a scalar response,
+
+\[
+Y,
+\]
+
+each experimental unit has a response vector
+
+\[
+\boxed{
+\mathbf{Y}
+=
+\begin{pmatrix}
+Y_1\\
+\vdots\\
+Y_p
+\end{pmatrix}.
+}
+\]
+
+The objective is to test whether groups differ jointly across the
+response vector.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MANOVA Model}
+\label{subsec:manova-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multivariate linear model can be written
+
+\[
+\boxed{
+Y
+=
+XB+E,
+}
+\]
+
+where
+
+\[
+Y
+\]
+
+is an
+
+\[
+n\times p
+\]
+
+matrix of responses,
+
+\[
+X
+\]
+
+is the design matrix,
+
+\[
+B
+\]
+
+contains regression or treatment coefficients, and
+
+\[
+E
+\]
+
+contains multivariate errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hypothesis and Error Matrices}
+\label{subsec:manova-h-e-matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MANOVA partitions multivariate sums of squares and cross-products into
+matrices.
+
+The hypothesis matrix is often denoted
+
+\[
+\boxed{
+H,
+}
+\]
+
+while the error matrix is
+
+\[
+\boxed{
+E.
+}
+\]
+
+These generalize the scalar ANOVA quantities
+
+\[
+SSR
+\]
+
+and
+
+\[
+SSE.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wilks' Lambda}
+\label{subsec:wilks-lambda-manova}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One MANOVA statistic is Wilks' lambda:
+
+\[
+\boxed{
+\Lambda
+=
+\frac{
+|E|
+}{
+|E+H|
+}.
+}
+\]
+
+Values near \(1\) indicate little additional variation explained by the
+tested effect.
+
+Small values provide stronger evidence against the null.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pillai's Trace}
+\label{subsec:pillais-trace}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another MANOVA statistic is Pillai's trace:
+
+\[
+\boxed{
+V
+=
+\operatorname{tr}
+\left[
+H(H+E)^{-1}
+\right].
+}
+\]
+
+Larger values indicate stronger multivariate group effects.
+
+Pillai's trace is often considered relatively robust among classical
+MANOVA criteria.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hotelling--Lawley Trace}
+\label{subsec:hotelling-lawley-trace}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Hotelling--Lawley trace is
+
+\[
+\boxed{
+T
+=
+\operatorname{tr}
+(
+E^{-1}H
+).
+}
+\]
+
+Larger values indicate greater separation relative to within-group
+variation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Roy's Largest Root}
+\label{subsec:roys-largest-root}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Roy's largest root focuses on the largest eigenvalue of
+
+\[
+\boxed{
+E^{-1}H.
+}
+\]
+
+It emphasizes the strongest single multivariate direction of group
+separation.
+
+Different MANOVA statistics weight the multivariate directions
+differently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MANOVA Versus Separate ANOVAs}
+\label{subsec:manova-versus-anovas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Separate ANOVAs ignore relationships among response variables.
+
+MANOVA incorporates their covariance structure.
+
+However, a significant MANOVA does not automatically identify:
+
+\[
+\boxed{
+\text{which outcomes differ},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{which groups differ}.
+}
+\]
+
+Follow-up analyses are still required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MANOVA Assumptions}
+\label{subsec:manova-assumptions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Classical MANOVA typically assumes:
+
+\[
+\boxed{
+\text{independent observations},
+}
+\]
+
+\[
+\boxed{
+\text{multivariate normality within groups},
+}
+\]
+
+and often
+
+\[
+\boxed{
+\text{equal covariance matrices across groups}.
+}
+\]
+
+The analysis can be sensitive to severe violations, especially with
+small samples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Principal Component Analysis}
+\label{subsec:principal-component-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Principal component analysis, abbreviated PCA, transforms correlated
+variables into new uncorrelated linear combinations.
+
+The first principal component is
+
+\[
+\boxed{
+Z_1
+=
+\mathbf{a}_1^T\mathbf{X},
+}
+\]
+
+where \(\mathbf{a}_1\) is chosen to maximize
+
+\[
+\operatorname{Var}(Z_1)
+\]
+
+subject to
+
+\[
+\boxed{
+\mathbf{a}_1^T\mathbf{a}_1=1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{First Principal Component}
+\label{subsec:first-principal-component}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since
+
+\[
+\operatorname{Var}
+(
+\mathbf{a}^T\mathbf{X}
+)
+=
+\mathbf{a}^T
+\Sigma
+\mathbf{a},
+\]
+
+the optimization problem is
+
+\[
+\boxed{
+\max_{\mathbf{a}}
+\mathbf{a}^T
+\Sigma
+\mathbf{a}
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\mathbf{a}^T\mathbf{a}=1.
+}
+\]
+
+Using a Lagrange multiplier gives
+
+\[
+\boxed{
+\Sigma\mathbf{a}
+=
+\lambda\mathbf{a}.
+}
+\]
+
+Thus principal-component directions are eigenvectors of the covariance
+matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PCA Eigenvalues}
+\label{subsec:pca-eigenvalues}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_p
+\geq0
+\]
+
+be the eigenvalues of \(\Sigma\).
+
+Then the variance of principal component \(j\) is
+
+\[
+\boxed{
+\operatorname{Var}(Z_j)
+=
+\lambda_j.
+}
+\]
+
+The first component therefore captures the largest possible variance
+among unit-length linear combinations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Orthogonality of Principal Components}
+\label{subsec:pca-orthogonality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a symmetric covariance matrix, eigenvectors corresponding to distinct
+eigenvalues can be chosen orthonormal.
+
+Thus
+
+\[
+\boxed{
+\mathbf{a}_i^T
+\mathbf{a}_j
+=
+0
+\qquad
+(i\neq j).
+}
+\]
+
+Consequently,
+
+\[
+\boxed{
+\operatorname{Cov}(Z_i,Z_j)=0.
+}
+\]
+
+Principal components are therefore uncorrelated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Variance in PCA}
+\label{subsec:pca-total-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The total variance of the original variables is
+
+\[
+\boxed{
+\operatorname{tr}(\Sigma)
+=
+\sum_{j=1}^{p}\sigma_{jj}.
+}
+\]
+
+Because the trace equals the sum of eigenvalues,
+
+\[
+\boxed{
+\operatorname{tr}(\Sigma)
+=
+\sum_{j=1}^{p}\lambda_j.
+}
+\]
+
+Thus PCA redistributes the same total variance across orthogonal
+components.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Explained Variance Ratio}
+\label{subsec:pca-explained-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The proportion of total variance explained by principal component \(j\)
+is
+
+\[
+\boxed{
+\frac{
+\lambda_j
+}{
+\sum_{k=1}^{p}\lambda_k
+}.
+}
+\]
+
+The cumulative proportion explained by the first \(m\) components is
+
+\[
+\boxed{
+\frac{
+\sum_{j=1}^{m}\lambda_j
+}{
+\sum_{j=1}^{p}\lambda_j
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: PCA Variance}
+\label{subsec:worked-pca-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Explained Variance}
+
+Suppose a covariance matrix has eigenvalues
+
+\[
+\lambda_1=8,
+\qquad
+\lambda_2=3,
+\qquad
+\lambda_3=1.
+\]
+
+The total variance is
+
+\[
+8+3+1=12.
+\]
+
+The first component explains
+
+\[
+\frac8{12}
+=
+\frac23.
+\]
+
+The first two components explain
+
+\[
+\frac{8+3}{12}
+=
+\frac{11}{12}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+PC_1:
+66.7\%,
+\qquad
+PC_1+PC_2:
+91.7\%.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PCA Scores}
+\label{subsec:pca-scores}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For centered observation
+
+\[
+\mathbf{x}_i-\overline{\mathbf{x}},
+\]
+
+the score on component \(j\) is
+
+\[
+\boxed{
+z_{ij}
+=
+\mathbf{a}_j^T
+(
+\mathbf{x}_i-\overline{\mathbf{x}}
+).
+}
+\]
+
+These scores represent each observation in the lower-dimensional
+principal-component coordinate system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PCA Loadings}
+\label{subsec:pca-loadings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The term loading is used for coefficients describing how original
+variables contribute to components.
+
+Depending on convention, loadings may refer directly to eigenvector
+entries or scaled coefficients such as
+
+\[
+\boxed{
+\sqrt{\lambda_j}\,a_{kj}.
+}
+\]
+
+Therefore the precise software convention should be checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariance PCA Versus Correlation PCA}
+\label{subsec:covariance-versus-correlation-pca}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Covariance PCA uses the sample covariance matrix
+
+\[
+S.
+\]
+
+Correlation PCA uses the standardized variables and therefore the
+correlation matrix
+
+\[
+R.
+\]
+
+If variables have very different units or scales, covariance PCA may be
+dominated by the variables with the largest variances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Standardization Before PCA}
+\label{subsec:standardization-before-pca}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A standardized variable is
+
+\[
+\boxed{
+Z_j
+=
+\frac{
+X_j-\mu_j
+}{
+\sigma_j
+}.
+}
+\]
+
+For sample data,
+
+\[
+\boxed{
+z_{ij}
+=
+\frac{
+x_{ij}-\overline{x}_j
+}{
+s_j
+}.
+}
+\]
+
+PCA on standardized data is equivalent to PCA based on the correlation
+matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PCA as Dimension Reduction}
+\label{subsec:pca-dimension-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+p=20,
+\]
+
+but the first three principal components explain most of the variance.
+
+Then the data may be approximated in a three-dimensional representation.
+
+Thus PCA maps
+
+\[
+\boxed{
+\mathbb{R}^p
+\longrightarrow
+\mathbb{R}^m,
+\qquad
+m<p.
+}
+\]
+
+This is unsupervised dimension reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PCA Reconstruction}
+\label{subsec:pca-reconstruction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+A_m
+=
+\begin{pmatrix}
+\mathbf{a}_1&
+\cdots&
+\mathbf{a}_m
+\end{pmatrix}.
+\]
+
+The lower-dimensional score vector is
+
+\[
+\boxed{
+\mathbf{z}
+=
+A_m^T
+(
+\mathbf{x}-\boldsymbol{\mu}
+).
+}
+\]
+
+An approximation to the original observation is
+
+\[
+\boxed{
+\widehat{\mathbf{x}}
+=
+\boldsymbol{\mu}
++
+A_m\mathbf{z}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Reconstruction Property of PCA}
+\label{subsec:pca-optimal-reconstruction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Among all \(m\)-dimensional linear subspaces, the principal-component
+subspace minimizes mean squared reconstruction error under the usual
+Euclidean criterion.
+
+Thus PCA is not merely an arbitrary rotation.
+
+It provides an optimal linear low-rank representation in this sense.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scree Plot}
+\label{subsec:scree-plot}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scree plot graphs
+
+\[
+\boxed{
+\lambda_j
+}
+\]
+
+against component number \(j\).
+
+A sharp bend or ``elbow'' may suggest a natural dimension for retaining
+components.
+
+However, the elbow rule is subjective and should be combined with:
+
+\[
+\boxed{
+\text{explained variance},
+}
+\]
+
+\[
+\boxed{
+\text{scientific interpretability},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{predictive goals}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PCA Does Not Use the Response Variable}
+\label{subsec:pca-unsupervised}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary PCA chooses directions that explain variation in the predictors.
+
+It does not use an outcome variable to determine which directions are
+predictively useful.
+
+Therefore a low-variance principal component can still be important for
+predicting a response.
+
+PCA is fundamentally unsupervised.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factor Analysis}
+\label{subsec:factor-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Factor analysis models observed variables through a smaller number of
+unobserved latent factors.
+
+A common model is
+
+\[
+\boxed{
+\mathbf{X}
+=
+\boldsymbol{\mu}
++
+\Lambda\mathbf{F}
++
+\boldsymbol{\varepsilon},
+}
+\]
+
+where
+
+\[
+\mathbf{F}
+\]
+
+is a vector of latent factors and
+
+\[
+\Lambda
+\]
+
+is the loading matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factor Model Covariance}
+\label{subsec:factor-model-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under a common standardized factor model,
+
+\[
+\operatorname{Cov}(\mathbf{F})=I
+\]
+
+and
+
+\[
+\operatorname{Cov}(\boldsymbol{\varepsilon})
+=
+\Psi,
+\]
+
+where \(\Psi\) is diagonal.
+
+Then
+
+\[
+\boxed{
+\Sigma
+=
+\Lambda\Lambda^T
++
+\Psi.
+}
+\]
+
+Thus covariance is explained through:
+
+\[
+\boxed{
+\text{common factors}
++
+\text{variable-specific variation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Communality}
+\label{subsec:factor-analysis-communality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For variable \(j\), the communality represents the variance explained by
+the common factors.
+
+If
+
+\[
+\lambda_{jr}
+\]
+
+is the loading of variable \(j\) on factor \(r\), then
+
+\[
+\boxed{
+h_j^2
+=
+\sum_r
+\lambda_{jr}^2
+}
+\]
+
+under a standardized orthogonal-factor model.
+
+The remaining variance is uniqueness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PCA Versus Factor Analysis}
+\label{subsec:pca-versus-factor-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+PCA decomposes total observed variance.
+
+Factor analysis posits a latent-variable model separating common and
+unique variation.
+
+Thus:
+
+\[
+\boxed{
+\text{PCA}
+=
+\text{variance decomposition},
+}
+\]
+
+whereas
+
+\[
+\boxed{
+\text{factor analysis}
+=
+\text{latent covariance model}.
+}
+\]
+
+They are related but not equivalent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factor Rotation}
+\label{subsec:factor-rotation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Factor loadings may be rotated to improve interpretability.
+
+An orthogonal rotation preserves perpendicular factor axes.
+
+An oblique rotation allows factors to correlate.
+
+Common rotation criteria attempt to produce patterns where each variable
+loads strongly on only a few factors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Discriminant Analysis}
+\label{subsec:linear-discriminant-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Linear discriminant analysis, abbreviated LDA, is a classification method
+for multivariate predictors.
+
+Suppose class \(k\) follows
+
+\[
+\boxed{
+\mathbf{X}
+\mid
+Y=k
+\sim
+N_p
+(
+\boldsymbol{\mu}_k,
+\Sigma
+),
+}
+\]
+
+with a covariance matrix shared by all classes.
+
+Bayes' rule then produces linear decision boundaries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LDA Discriminant Function}
+\label{subsec:lda-discriminant-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For class \(k\) with prior probability \(\pi_k\), the LDA discriminant
+function is
+
+\[
+\boxed{
+\delta_k(\mathbf{x})
+=
+\mathbf{x}^T
+\Sigma^{-1}
+\boldsymbol{\mu}_k
+-
+\frac12
+\boldsymbol{\mu}_k^T
+\Sigma^{-1}
+\boldsymbol{\mu}_k
++
+\log\pi_k.
+}
+\]
+
+Assign \(\mathbf{x}\) to the class having the largest
+\(\delta_k(\mathbf{x})\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why LDA Boundaries Are Linear}
+\label{subsec:why-lda-linear}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When comparing two class discriminant functions, the common quadratic
+term involving
+
+\[
+\mathbf{x}^T\Sigma^{-1}\mathbf{x}
+\]
+
+cancels.
+
+The resulting class boundary is therefore linear in \(\mathbf{x}\).
+
+This is the origin of the name linear discriminant analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Discriminant Analysis}
+\label{subsec:quadratic-discriminant-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Quadratic discriminant analysis, abbreviated QDA, allows each class to
+have its own covariance matrix:
+
+\[
+\boxed{
+\mathbf{X}
+\mid
+Y=k
+\sim
+N_p
+(
+\boldsymbol{\mu}_k,
+\Sigma_k
+).
+}
+\]
+
+Because the covariance matrices differ, quadratic terms no longer cancel.
+
+Decision boundaries are therefore generally quadratic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LDA Versus QDA}
+\label{subsec:lda-versus-qda}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+LDA estimates one common covariance matrix.
+
+QDA estimates a separate covariance matrix for every class.
+
+Therefore QDA is more flexible but requires more data.
+
+This creates a bias--variance tradeoff:
+
+\[
+\boxed{
+\text{LDA}
+=
+\text{more structure, lower variance},
+}
+\]
+
+\[
+\boxed{
+\text{QDA}
+=
+\text{less structure, greater flexibility}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fisher's Linear Discriminant}
+\label{subsec:fisher-linear-discriminant}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two groups, Fisher's approach searches for a direction
+\(\mathbf{a}\) maximizing separation of projected group means relative to
+within-group variability.
+
+A criterion is
+
+\[
+\boxed{
+J(\mathbf{a})
+=
+\frac{
+[
+\mathbf{a}^T
+(
+\boldsymbol{\mu}_1-\boldsymbol{\mu}_2
+)
+]^2
+}{
+\mathbf{a}^T
+S_W
+\mathbf{a}
+}.
+}
+\]
+
+The maximizing direction is proportional to
+
+\[
+\boxed{
+S_W^{-1}
+(
+\boldsymbol{\mu}_1-\boldsymbol{\mu}_2
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Canonical Correlation Analysis}
+\label{subsec:canonical-correlation-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Canonical correlation analysis studies association between two sets of
+variables.
+
+Suppose
+
+\[
+\mathbf{X}\in\mathbb{R}^p
+\]
+
+and
+
+\[
+\mathbf{Y}\in\mathbb{R}^q.
+\]
+
+Choose linear combinations
+
+\[
+\boxed{
+U
+=
+\mathbf{a}^T\mathbf{X},
+}
+\]
+
+and
+
+\[
+\boxed{
+V
+=
+\mathbf{b}^T\mathbf{Y}
+}
+\]
+
+to maximize
+
+\[
+\boxed{
+\operatorname{Corr}(U,V).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Canonical Variates}
+\label{subsec:canonical-variates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The maximizing combinations
+
+\[
+U_1
+\]
+
+and
+
+\[
+V_1
+\]
+
+form the first pair of canonical variates.
+
+Subsequent pairs maximize correlation subject to orthogonality-type
+constraints with previous canonical variates.
+
+The corresponding correlations are called canonical correlations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Clustering Preview}
+\label{subsec:multivariate-clustering-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Cluster analysis attempts to divide observations into groups using
+similarity in multivariate space.
+
+Unlike LDA, clustering does not begin with known class labels.
+
+Thus it is an
+
+\[
+\boxed{
+\text{unsupervised learning}
+}
+\]
+
+problem.
+
+Common methods include:
+
+\[
+\boxed{
+k\text{-means}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{hierarchical clustering}.
+}
+\]
+
+These are developed more fully in Statistical Learning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(k\)-Means Objective Preview}
+\label{subsec:kmeans-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose observations are divided into clusters
+
+\[
+C_1,\ldots,C_K.
+\]
+
+The \(k\)-means objective minimizes within-cluster squared Euclidean
+distance:
+
+\[
+\boxed{
+\sum_{k=1}^{K}
+\sum_{\mathbf{x}_i\in C_k}
+\|
+\mathbf{x}_i
+-
+\boldsymbol{\mu}_k
+\|_2^2.
+}
+\]
+
+The cluster center
+
+\[
+\boldsymbol{\mu}_k
+\]
+
+is the mean vector of cluster \(k\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaling in Multivariate Analysis}
+\label{subsec:multivariate-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one variable is measured in dollars with standard deviation
+
+\[
+10000
+\]
+
+while another is measured on a scale with standard deviation
+
+\[
+2.
+\]
+
+Distance- and variance-based procedures can become dominated by the
+first variable.
+
+Thus standardization may be essential before applying:
+
+\[
+\boxed{
+\text{PCA},
+}
+\]
+
+\[
+\boxed{
+\text{clustering},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{distance-based methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Standardization}
+\label{subsec:multivariate-standardization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Componentwise standardization uses
+
+\[
+\boxed{
+Z_j
+=
+\frac{
+X_j-\mu_j
+}{
+\sigma_j
+}.
+}
+\]
+
+After standardization,
+
+\[
+\boxed{
+\mathbb{E}[Z_j]=0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Var}(Z_j)=1.
+}
+\]
+
+The covariance matrix of the standardized vector is the correlation
+matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Whitening}
+\label{subsec:multivariate-whitening}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Whitening transforms a vector so its covariance becomes the identity.
+
+If
+
+\[
+\Sigma
+=
+Q\Lambda Q^T
+\]
+
+is an eigenvalue decomposition with positive eigenvalues, define
+
+\[
+\boxed{
+\mathbf{Z}
+=
+\Lambda^{-1/2}
+Q^T
+(
+\mathbf{X}-\boldsymbol{\mu}
+).
+}
+\]
+
+Then
+
+\[
+\boxed{
+\operatorname{Cov}(\mathbf{Z})=I.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariance Matrix Eigen-Decomposition}
+\label{subsec:covariance-eigendecomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because \(\Sigma\) is symmetric,
+
+\[
+\boxed{
+\Sigma
+=
+Q\Lambda Q^T,
+}
+\]
+
+where
+
+\[
+Q
+\]
+
+contains orthonormal eigenvectors and
+
+\[
+\Lambda
+\]
+
+is diagonal:
+
+\[
+\boxed{
+\Lambda
+=
+\operatorname{diag}
+(
+\lambda_1,\ldots,\lambda_p
+).
+}
+\]
+
+This decomposition underlies PCA, whitening, and multivariate normal
+geometry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wishart Distribution Preview}
+\label{subsec:wishart-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For multivariate normal samples, the sample covariance matrix has a
+matrix-valued analogue of the chi-square distribution.
+
+Specifically,
+
+\[
+\boxed{
+(n-1)S
+}
+\]
+
+has a Wishart distribution with scale matrix \(\Sigma\) and
+
+\[
+n-1
+\]
+
+degrees of freedom under the standard parameterization.
+
+The Wishart distribution is fundamental to classical multivariate
+inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Connection to the Chi-Square Distribution}
+\label{subsec:wishart-chi-square-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When
+
+\[
+p=1,
+\]
+
+the covariance matrix reduces to a scalar variance.
+
+The Wishart result reduces to
+
+\[
+\boxed{
+\frac{
+(n-1)S^2
+}{
+\sigma^2
+}
+\sim
+\chi^2_{n-1}.
+}
+\]
+
+Thus the Wishart distribution generalizes the chi-square variance result
+to covariance matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Testing Covariance Matrices}
+\label{subsec:testing-covariance-matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multivariate problems may involve hypotheses such as
+
+\[
+\boxed{
+H_0:
+\Sigma=\Sigma_0
+}
+\]
+
+or
+
+\[
+\boxed{
+H_0:
+\Sigma_1=\cdots=\Sigma_g.
+}
+\]
+
+Likelihood-ratio procedures can be developed under multivariate
+normality.
+
+Such tests can be highly sensitive to nonnormality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Box's \(M\) Test Preview}
+\label{subsec:box-m-test-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Box's \(M\) test is a classical procedure for testing equality of
+covariance matrices across groups.
+
+It is often used in discussions of MANOVA and discriminant analysis.
+
+However, the procedure can be sensitive to deviations from multivariate
+normality.
+
+Therefore practical analysis should not rely mechanically on this test
+alone.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{High-Dimensional Covariance Problems}
+\label{subsec:high-dimensional-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+p\geq n,
+\]
+
+the ordinary sample covariance matrix cannot have full rank.
+
+Indeed,
+
+\[
+\boxed{
+\operatorname{rank}(S)
+\leq
+n-1.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+S^{-1}
+}
+\]
+
+does not exist when
+
+\[
+p\geq n
+\]
+
+under ordinary centered sampling.
+
+This causes classical multivariate procedures to fail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Curse of Dimensionality}
+\label{subsec:curse-dimensionality-multivariate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As dimension \(p\) grows, the amount of data needed to estimate
+multivariate structure grows rapidly.
+
+Consequences include:
+
+\[
+\boxed{
+\text{unstable covariance estimates},
+}
+\]
+
+\[
+\boxed{
+\text{noisy distances},
+}
+\]
+
+\[
+\boxed{
+\text{overfitting},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{increased computational cost}.
+}
+\]
+
+This phenomenon is broadly called the curse of dimensionality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regularized Covariance Estimation}
+\label{subsec:regularized-covariance-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A regularized covariance estimator shrinks the sample covariance toward a
+simpler matrix.
+
+One generic form is
+
+\[
+\boxed{
+\widehat{\Sigma}_{\lambda}
+=
+(1-\lambda)S
++
+\lambda T,
+}
+\]
+
+where
+
+\[
+T
+\]
+
+is a target matrix.
+
+A common target is a multiple of the identity.
+
+Regularization can improve stability in high dimensions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robust Multivariate Statistics Preview}
+\label{subsec:robust-multivariate-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The ordinary sample mean and covariance matrix can be sensitive to
+multivariate outliers.
+
+Robust multivariate methods replace them with more resistant estimators.
+
+Examples include robust location estimates and robust covariance
+estimators.
+
+These methods are especially useful because one unusual observation can
+distort many covariance entries simultaneously.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Missing Multivariate Data}
+\label{subsec:missing-multivariate-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With \(p\) variables, missingness can occur in many patterns.
+
+One row may be complete while another is missing only variable \(X_3\).
+
+Deleting every row containing any missing value is called complete-case
+analysis.
+
+This can waste substantial information and may introduce bias unless the
+missingness mechanism justifies it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pairwise Deletion}
+\label{subsec:pairwise-deletion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pairwise deletion computes each covariance using all observations
+available for that pair of variables.
+
+Although this uses more observations, the resulting covariance matrix may
+have undesirable properties and may even fail to be positive
+semidefinite.
+
+Thus pairwise deletion should be used cautiously.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Imputation Preview}
+\label{subsec:multivariate-imputation-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Missing values may be filled using an imputation model.
+
+Single imputation treats one completed value as known and can
+underrepresent uncertainty.
+
+Multiple imputation generates several completed datasets and combines the
+resulting analyses.
+
+More complete missing-data theory is developed in computational and
+mathematical statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Visualization of Multivariate Data}
+\label{subsec:multivariate-visualization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Useful visualizations include:
+
+\[
+\boxed{
+\text{scatterplot matrices},
+}
+\]
+
+\[
+\boxed{
+\text{correlation matrices},
+}
+\]
+
+\[
+\boxed{
+\text{parallel-coordinate plots},
+}
+\]
+
+\[
+\boxed{
+\text{PCA score plots},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{biplots}.
+}
+\]
+
+No single visualization captures all high-dimensional structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scatterplot Matrix}
+\label{subsec:scatterplot-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A scatterplot matrix displays pairwise scatterplots for several
+variables.
+
+It can reveal:
+
+\[
+\boxed{
+\text{linear relationships},
+}
+\]
+
+\[
+\boxed{
+\text{nonlinearity},
+}
+\]
+
+\[
+\boxed{
+\text{clusters},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{outliers}.
+}
+\]
+
+However, purely higher-dimensional relationships may remain hidden.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Biplot Preview}
+\label{subsec:pca-biplot}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A PCA biplot displays observations and variable directions in a reduced
+principal-component space.
+
+Observation points represent component scores.
+
+Variable vectors represent loading information.
+
+Interpretation depends on the specific scaling convention used to
+construct the biplot.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Testing Across Variables}
+\label{subsec:multivariate-multiple-testing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(p\) variables are tested separately, the probability of false
+positive findings increases.
+
+Possible responses include:
+
+\[
+\boxed{
+\text{Bonferroni correction},
+}
+\]
+
+\[
+\boxed{
+\text{false-discovery-rate control},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{joint multivariate tests}.
+}
+\]
+
+The correct approach depends on the scientific goal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Effect Interpretation}
+\label{subsec:multivariate-effect-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multivariate test may indicate that groups differ in the vector of
+means.
+
+This does not identify which variables are responsible.
+
+Follow-up analysis may include:
+
+\[
+\boxed{
+\text{individual confidence intervals},
+}
+\]
+
+\[
+\boxed{
+\text{contrasts},
+}
+\]
+
+\[
+\boxed{
+\text{discriminant directions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{dimension-reduction methods}.
+}
+\]
+
+These follow-up analyses should respect multiplicity and study design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Statistics Workflow}
+\label{subsec:multivariate-statistics-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A useful workflow is:
+
+\begin{enumerate}
+    \item identify all variables and their units;
+    \item determine the multivariate scientific question;
+    \item inspect missing values;
+    \item examine univariate distributions;
+    \item inspect pairwise scatterplots;
+    \item compute covariance and correlation matrices;
+    \item identify scale differences;
+    \item standardize variables when appropriate;
+    \item inspect multivariate outliers;
+    \item assess sample size relative to dimension;
+    \item select an inferential or dimension-reduction method;
+    \item verify covariance and distributional assumptions;
+    \item fit the multivariate model;
+    \item examine joint tests before extensive follow-up testing;
+    \item interpret multivariate directions or components carefully;
+    \item validate conclusions using independent or held-out data when
+          prediction is involved.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Multivariate Method}
+\label{subsec:choosing-multivariate-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To compare one population mean vector with a known vector:
+
+\[
+\boxed{
+\text{one-sample Hotelling }T^2.
+}
+\]
+
+To compare two multivariate group means:
+
+\[
+\boxed{
+\text{two-sample Hotelling }T^2.
+}
+\]
+
+To compare several groups on several responses:
+
+\[
+\boxed{
+\text{MANOVA}.
+}
+\]
+
+To reduce dimension without class labels:
+
+\[
+\boxed{
+\text{PCA}.
+}
+\]
+
+To model latent common factors:
+
+\[
+\boxed{
+\text{factor analysis}.
+}
+\]
+
+To classify known groups:
+
+\[
+\boxed{
+\text{LDA or QDA}.
+}
+\]
+
+To study association between two variable sets:
+
+\[
+\boxed{
+\text{canonical correlation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:multivariate-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Analyzing Every Variable Separately Without Multiplicity Control}
+
+Separate univariate tests can inflate the probability of false
+discoveries.
+
+Joint multivariate structure may also be lost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Variable Scale}
+
+Variance- and distance-based methods can be dominated by variables
+measured on large numerical scales.
+
+Standardization may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Correlation When Covariance Is Scientifically Relevant}
+
+Standardizing removes unit-scale differences.
+
+If absolute variation is scientifically meaningful, covariance-based
+analysis may be preferable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Covariance PCA with Incommensurate Units Without Thought}
+
+A variable measured in thousands may dominate a variable measured in
+small units even when the latter is scientifically important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating PCA Components as Causal Variables}
+
+Principal components are algebraically constructed directions of
+variation.
+
+They do not automatically represent underlying causal mechanisms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting PCA as Maximizing Prediction}
+
+PCA maximizes predictor variance, not predictive relevance to an external
+response.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating PCA and Factor Analysis as Identical}
+
+PCA decomposes total variation.
+
+Factor analysis models covariance through latent common factors and
+unique variation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Multivariate Outliers}
+
+An observation may be unusual jointly even when none of its individual
+coordinates appears extreme.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Mahalanobis Distance with an Unstable Covariance Estimate}
+
+If \(S\) is poorly estimated, then
+
+\[
+S^{-1}
+\]
+
+can be extremely unstable.
+
+This is especially dangerous when \(p\) is large relative to \(n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Attempting to Invert a Singular Covariance Matrix}
+
+When
+
+\[
+p\geq n,
+\]
+
+the ordinary centered sample covariance matrix is singular.
+
+Classical inverse-covariance methods require modification or
+regularization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Zero Correlation Means Independence}
+
+Zero covariance or correlation does not generally imply independence.
+
+The implication holds under special models such as joint multivariate
+normality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Covariance Differences in Classification}
+
+LDA assumes a common within-class covariance matrix.
+
+If class covariance structures differ substantially, QDA or another
+method may be more appropriate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using QDA with Too Little Data}
+
+QDA estimates a separate covariance matrix for each class.
+
+This requires considerably more data than LDA.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting a Significant MANOVA Without Follow-Up Analysis}
+
+A significant MANOVA only establishes a multivariate difference.
+
+It does not identify the specific responses or groups responsible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Dependence or Repeated Measures}
+
+Classical multivariate methods still require the observational dependence
+structure to be modeled correctly.
+
+Multiple variables on one subject do not create independent observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:multivariate-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Environmental Science.}
+Temperature, dissolved oxygen, depth, salinity, nutrient levels, and time
+may be analyzed jointly to understand environmental systems.
+
+\medskip
+
+\textbf{Medicine.}
+Multiple biomarkers, physiological measurements, and clinical outcomes
+often form correlated response vectors.
+
+\medskip
+
+\textbf{Education Research.}
+Student performance may be summarized through several grades, assessment
+scores, attendance measures, and survey variables.
+
+\medskip
+
+\textbf{Finance.}
+Covariance matrices describe relationships among asset returns and are
+central to portfolio risk.
+
+\medskip
+
+\textbf{Engineering.}
+Multivariate process-monitoring systems track several correlated quality
+measurements simultaneously.
+
+\medskip
+
+\textbf{Psychology.}
+Factor analysis and PCA are used to study latent structures underlying
+multiple observed measurements.
+
+\medskip
+
+\textbf{Biology.}
+Multivariate methods analyze gene expression, morphology, ecological
+traits, and high-dimensional biological measurements.
+
+\medskip
+
+\textbf{Machine Learning.}
+PCA, discriminant analysis, covariance regularization, and clustering are
+fundamental tools for dimension reduction, classification, and
+unsupervised learning.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:multivariate-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a random vector.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the population mean vector.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the covariance matrix.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain why a covariance matrix is symmetric.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a correlation matrix.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the sample mean vector.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the sample covariance matrix.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Mahalanobis distance.
+\end{exercise}
+
+\begin{exercise}[1]
+State the one-sample Hotelling \(T^2\) statistic.
+\end{exercise}
+
+\begin{exercise}[1]
+Define MANOVA.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a principal component.
+\end{exercise}
+
+\begin{exercise}[1]
+Define explained variance in PCA.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish PCA and factor analysis.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish LDA and QDA.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+\Sigma
+=
+\begin{pmatrix}
+4&2\\
+2&9
+\end{pmatrix},
+\]
+
+identify the two variances and covariance.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the correlation corresponding to the covariance matrix
+
+\[
+\Sigma
+=
+\begin{pmatrix}
+4&2\\
+2&9
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+\mathbf{a}
+=
+\begin{pmatrix}
+1\\
+2
+\end{pmatrix}
+\]
+
+and
+
+\[
+\Sigma
+=
+\begin{pmatrix}
+2&1\\
+1&3
+\end{pmatrix}.
+\]
+
+Compute
+
+\[
+\operatorname{Var}
+(
+\mathbf{a}^T\mathbf{X}
+).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+For observations
+
+\[
+(1,2),
+\quad
+(3,4),
+\quad
+(5,6),
+\]
+
+compute the sample mean vector.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+\boldsymbol{\mu}
+=
+\begin{pmatrix}
+0\\
+0
+\end{pmatrix},
+\qquad
+\Sigma=I,
+\]
+
+compute the Mahalanobis distance of
+
+\[
+\mathbf{x}
+=
+\begin{pmatrix}
+3\\
+4
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+If PCA eigenvalues are
+
+\[
+10,\ 5,\ 3,\ 2,
+\]
+
+compute the proportion of variance explained by the first component.
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous eigenvalues, compute the cumulative proportion explained
+by the first two components.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose \(p=4\) and \(n=30\). State the numerator and denominator degrees
+of freedom for the transformed one-sample Hotelling test.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose \(p=12\) and \(n=10\). Explain why the ordinary sample covariance
+matrix cannot be inverted.
+\end{exercise}
+
+\begin{exercise}[2]
+If an LDA coefficient is based on two classes having equal covariance
+matrices, explain why the decision boundary is linear.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that every covariance matrix is positive semidefinite.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+\operatorname{Cov}(A\mathbf{X})
+=
+A\Sigma A^T.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the variance
+
+\[
+\mathbf{a}^T
+\Sigma
+\mathbf{a}
+\]
+
+for a linear combination.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that standardizing a random vector transforms its covariance matrix
+into its correlation matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify that the multivariate normal density reduces to the ordinary
+normal density when \(p=1\).
+\end{exercise}
+
+\begin{exercise}[3]
+Show that multivariate normal density contours are ellipsoids.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why zero covariance implies independence under joint normality
+but not in general.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that squared Mahalanobis distance is invariant under nonsingular
+linear changes of coordinates.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that Hotelling \(T^2\) reduces to \(t^2\) when \(p=1\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Hotelling's test accounts for correlation among response
+variables.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare Bonferroni intervals with a Hotelling confidence ellipsoid.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between ANOVA and MANOVA.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret small values of Wilks' lambda.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain conceptually how Pillai's trace differs from Roy's largest root.
+\end{exercise}
+
+\begin{exercise}[3]
+Using a Lagrange multiplier, derive the eigenvalue equation
+
+\[
+\Sigma\mathbf{a}
+=
+\lambda\mathbf{a}
+\]
+
+for the first principal component.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that principal components are uncorrelated.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that total variance equals
+
+\[
+\operatorname{tr}(\Sigma)
+=
+\sum_j\lambda_j.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why PCA based on the covariance matrix can be sensitive to
+measurement units.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why PCA is considered unsupervised.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between PCA scores and PCA loadings.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the factor-model covariance
+
+\[
+\Sigma
+=
+\Lambda\Lambda^T+\Psi.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why factor rotation can improve interpretability.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the two-class LDA discriminant boundary.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why QDA needs more observations than LDA.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the objective of canonical correlation analysis.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Euclidean distance can become misleading when variables have
+very different scales.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that a centered \(n\times p\) data matrix has rank at most \(n-1\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why pairwise deletion can produce an invalid covariance matrix.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the multivariate normal conditional distribution.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Schur complement appearing in the conditional covariance
+matrix.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the exact one-sample Hotelling \(T^2\) distribution under
+multivariate normality.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the two-sample Hotelling \(T^2\) statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Study simultaneous inference for all linear combinations of a mean
+vector.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Wilks' lambda from likelihood ratios in MANOVA.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Pillai's trace, Hotelling--Lawley trace, and Roy's largest root.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive PCA using the spectral theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the minimum reconstruction-error property of PCA.
+\end{exercise}
+
+\begin{exercise}[4]
+Study PCA through singular-value decomposition.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate probabilistic PCA.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive maximum-likelihood estimators in the Gaussian factor-analysis
+model.
+\end{exercise}
+
+\begin{exercise}[4]
+Study orthogonal and oblique factor rotations.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive LDA from Bayes classification under multivariate normal class
+models.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Fisher's discriminant direction.
+\end{exercise}
+
+\begin{exercise}[4]
+Study canonical correlation through generalized eigenvalue problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Wishart distribution of the sample covariance matrix.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate likelihood-ratio tests for covariance matrices.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Box's \(M\) test and its sensitivity to nonnormality.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate shrinkage covariance estimators.
+\end{exercise}
+
+\begin{exercise}[4]
+Study robust estimators of multivariate location and covariance.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate high-dimensional PCA when \(p/n\) is not small.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:multivariate-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multivariate statistics studies random vectors
+
+\[
+\boxed{
+\mathbf{X}
+=
+\begin{pmatrix}
+X_1\\
+\vdots\\
+X_p
+\end{pmatrix}.
+}
+\]
+
+The mean vector is
+
+\[
+\boxed{
+\boldsymbol{\mu}
+=
+\mathbb{E}[\mathbf{X}],
+}
+\]
+
+and the covariance matrix is
+
+\[
+\boxed{
+\Sigma
+=
+\mathbb{E}
+\left[
+(
+\mathbf{X}-\boldsymbol{\mu}
+)
+(
+\mathbf{X}-\boldsymbol{\mu}
+)^T
+\right].
+}
+\]
+
+For a linear transformation,
+
+\[
+\boxed{
+\operatorname{Cov}
+(
+A\mathbf{X}
+)
+=
+A\Sigma A^T.
+}
+\]
+
+Mahalanobis distance is
+
+\[
+\boxed{
+D_M^2
+=
+(
+\mathbf{x}-\boldsymbol{\mu}
+)^T
+\Sigma^{-1}
+(
+\mathbf{x}-\boldsymbol{\mu}
+).
+}
+\]
+
+The one-sample Hotelling statistic is
+
+\[
+\boxed{
+T^2
+=
+n
+(
+\overline{\mathbf{X}}
+-
+\boldsymbol{\mu}_0
+)^T
+S^{-1}
+(
+\overline{\mathbf{X}}
+-
+\boldsymbol{\mu}_0
+).
+}
+\]
+
+MANOVA extends ANOVA to multiple response variables.
+
+PCA uses eigenvectors of the covariance or correlation matrix:
+
+\[
+\boxed{
+\Sigma\mathbf{a}_j
+=
+\lambda_j\mathbf{a}_j.
+}
+\]
+
+The proportion of variance explained by component \(j\) is
+
+\[
+\boxed{
+\frac{
+\lambda_j
+}{
+\sum_k\lambda_k
+}.
+}
+\]
+
+Factor analysis models latent common structure:
+
+\[
+\boxed{
+\mathbf{X}
+=
+\boldsymbol{\mu}
++
+\Lambda\mathbf{F}
++
+\boldsymbol{\varepsilon}.
+}
+\]
+
+LDA and QDA use multivariate probability models for classification.
+
+Thus multivariate statistics combines
+
+\[
+\boxed{
+\text{linear algebra}
++
+\text{probability}
++
+\text{covariance}
++
+\text{hypothesis testing}
++
+\text{dimension reduction}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:multivariate-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Multivariate Statistics extends the univariate and regression methods of
+Sections~\ref{sec:statistical-estimation},
+\ref{sec:hypothesis-testing},
+\ref{sec:regression}, and
+\ref{sec:analysis-of-variance} to vector-valued observations. Hotelling's
+\(T^2\) generalizes the one-sample and two-sample \(t\)-tests, while
+MANOVA generalizes ANOVA to several correlated responses. Principal
+component analysis and factor analysis introduce dimension reduction and
+latent structure, and discriminant analysis connects multivariate
+probability with classification. The next section, Mathematical
+Statistics, develops the probability, likelihood, sufficiency,
+information, decision-theoretic, and asymptotic foundations underlying
+the statistical procedures used throughout this chapter.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.12 Multivariate Statistics
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard multivariate statistical theory.
+%   - Standard matrix-based statistical inference.
+%   - Standard dimension-reduction and discrimination methods.
+%
+% Used for:
+%   - random vectors;
+%   - data matrices;
+%   - mean vectors;
+%   - covariance matrices;
+%   - correlation matrices;
+%   - positive semidefinite covariance structure;
+%   - sample mean and covariance matrices;
+%   - linear transformations;
+%   - multivariate normal distributions;
+%   - marginal and conditional normal distributions;
+%   - Mahalanobis distance;
+%   - multivariate outliers;
+%   - one-sample Hotelling T-squared tests;
+%   - confidence ellipsoids;
+%   - simultaneous confidence intervals;
+%   - two-sample Hotelling T-squared tests;
+%   - MANOVA;
+%   - Wilks lambda;
+%   - Pillai trace;
+%   - Hotelling--Lawley trace;
+%   - Roy largest root;
+%   - principal component analysis;
+%   - eigenvalue interpretation;
+%   - explained variance;
+%   - PCA scores and loadings;
+%   - standardization;
+%   - PCA reconstruction;
+%   - factor analysis;
+%   - communalities;
+%   - factor rotation;
+%   - PCA versus factor analysis;
+%   - linear discriminant analysis;
+%   - quadratic discriminant analysis;
+%   - Fisher discriminant analysis;
+%   - canonical correlation;
+%   - clustering preview;
+%   - whitening;
+%   - Wishart distribution preview;
+%   - covariance-matrix testing;
+%   - high-dimensional covariance problems;
+%   - covariance regularization;
+%   - robust multivariate statistics;
+%   - multivariate missing data;
+%   - visualization;
+%   - multiple testing;
+%   - applications and exercises.
+%
+% Notes:
+%   - Mathematical Statistics is developed next in Section 8.13.
+%   - Bayesian Statistics later develops multivariate posterior models.
+%   - Statistical Learning develops PCA, classification, clustering, and
+%     regularization more deeply.
+%   - Computational Statistics develops numerical and resampling methods
+%     for high-dimensional multivariate analysis.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

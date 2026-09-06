@@ -1,0 +1,5110 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.8 SYMBOLIC COMPUTATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Symbolic Computation}
+\label{sec:symbolic-computation}
+
+\prerequisite{
+Algebra, functions, calculus, linear algebra, polynomial arithmetic,
+elementary number theory, logic, algorithms, data structures, and basic
+programming concepts.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of symbolic computation;
+    \item distinguish symbolic and numerical computation;
+    \item understand symbolic expressions as structured mathematical
+          objects;
+    \item recognize expression trees;
+    \item distinguish syntactic and mathematical equality;
+    \item understand canonical and normal forms;
+    \item simplify algebraic expressions symbolically;
+    \item understand expansion, collection, and factorization;
+    \item perform exact polynomial arithmetic;
+    \item understand polynomial greatest common divisors;
+    \item recognize the Euclidean algorithm for polynomials;
+    \item understand square-free factorization conceptually;
+    \item recognize symbolic polynomial factorization;
+    \item understand rational-function simplification;
+    \item perform partial-fraction decomposition conceptually;
+    \item understand exact arithmetic with integers and rational numbers;
+    \item recognize algebraic-number representation conceptually;
+    \item understand arbitrary-precision symbolic arithmetic;
+    \item perform symbolic differentiation;
+    \item derive differentiation rules recursively;
+    \item understand symbolic integration conceptually;
+    \item distinguish elementary antiderivatives from nonelementary
+          integrals;
+    \item understand definite integration symbolically;
+    \item recognize substitution and integration-by-parts strategies;
+    \item understand simplification after differentiation and integration;
+    \item solve algebraic equations symbolically when possible;
+    \item distinguish exact roots from numerical approximations;
+    \item understand radicals and polynomial solvability limitations;
+    \item recognize resultants and elimination conceptually;
+    \item understand substitution-based elimination;
+    \item recognize systems of polynomial equations;
+    \item understand Gröbner-basis ideas conceptually;
+    \item manipulate symbolic matrices;
+    \item compute determinants symbolically;
+    \item understand exact Gaussian elimination;
+    \item recognize symbolic eigenvalue problems;
+    \item understand symbolic series expansions;
+    \item compute Taylor and Laurent series conceptually;
+    \item recognize asymptotic expansions;
+    \item understand symbolic limits;
+    \item recognize piecewise-defined symbolic expressions;
+    \item understand assumptions and domains;
+    \item distinguish real and complex simplification;
+    \item understand branch cuts conceptually;
+    \item recognize pattern matching and rewrite rules;
+    \item understand term rewriting;
+    \item recognize recursive simplification;
+    \item understand expression swell;
+    \item recognize common subexpression elimination;
+    \item understand exact versus approximate constants;
+    \item recognize symbolic manipulation of differential equations;
+    \item understand symbolic transforms conceptually;
+    \item recognize symbolic summation and products;
+    \item understand recurrence relations symbolically;
+    \item distinguish symbolic computation from computer algebra systems;
+    \item connect symbolic computation with algebra, calculus, number
+          theory, differential equations, optimization, theorem proving,
+          and scientific computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Symbolic Computation?}
+\label{subsec:what-is-symbolic-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic computation manipulates mathematical expressions according to
+algebraic, logical, and analytic rules.
+
+Instead of immediately approximating quantities numerically, symbolic
+methods attempt to preserve exact mathematical structure.
+
+For example,
+
+\[
+\boxed{
+\sqrt{2}
+}
+\]
+
+may be stored symbolically rather than approximated by
+
+\[
+1.41421356\ldots
+\]
+
+Similarly,
+
+\[
+\boxed{
+\int x^2\,dx
+=
+\frac{x^3}{3}+C
+}
+\]
+
+is a symbolic result.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Versus Numerical Computation}
+\label{subsec:symbolic-versus-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical computation might evaluate
+
+\[
+\sqrt{2}
+\]
+
+as
+
+\[
+\boxed{
+1.41421356237.
+}
+\]
+
+Symbolic computation retains
+
+\[
+\boxed{
+\sqrt{2}.
+}
+\]
+
+Likewise, a numerical solver may approximate the roots of
+
+\[
+x^2-2=0
+\]
+
+as
+
+\[
+\boxed{
+x\approx\pm1.41421356,
+}
+\]
+
+while a symbolic solver returns
+
+\[
+\boxed{
+x=\pm\sqrt{2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Symbolic Computation Matters}
+\label{subsec:why-symbolic-computation-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Exact symbolic expressions can reveal mathematical structure that decimal
+approximations hide.
+
+Examples include:
+
+\[
+\boxed{
+\text{factorization},
+}
+\]
+
+\[
+\boxed{
+\text{symmetry},
+}
+\]
+
+\[
+\boxed{
+\text{cancellation},
+}
+\]
+
+\[
+\boxed{
+\text{parameter dependence},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{exact identities}.
+}
+\]
+
+Symbolic computation is therefore useful both for solving problems and for
+understanding them.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expressions as Mathematical Objects}
+\label{subsec:symbolic-expressions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A symbolic expression is not merely a string of characters.
+
+It has mathematical structure.
+
+For example,
+
+\[
+\boxed{
+(x+1)^2
+}
+\]
+
+contains:
+
+\[
+\boxed{
+\text{power},
+}
+\]
+
+\[
+\boxed{
+\text{sum},
+}
+\]
+
+\[
+\boxed{
+\text{symbol},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{constant}.
+}
+\]
+
+A symbolic system stores and manipulates this structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expression Trees}
+\label{subsec:expression-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The expression
+
+\[
+(x+1)^2
+\]
+
+can be viewed as a tree whose root is exponentiation.
+
+Conceptually,
+
+\[
+\boxed{
+\operatorname{Power}
+\left(
+\operatorname{Add}(x,1),
+2
+\right).
+}
+\]
+
+Similarly,
+
+\[
+x^2+3x+1
+\]
+
+can be represented as a sum of structured terms.
+
+Tree representations allow algorithms to recursively inspect and transform
+expressions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recursive Expression Processing}
+\label{subsec:recursive-expression-processing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many symbolic algorithms work recursively.
+
+For example, to differentiate
+
+\[
+f(x)+g(x),
+\]
+
+differentiate each child expression:
+
+\[
+\boxed{
+\frac{d}{dx}
+[
+f(x)+g(x)
+]
+=
+f'(x)+g'(x).
+}
+\]
+
+For a product,
+
+\[
+\boxed{
+\frac{d}{dx}
+[
+f(x)g(x)
+]
+=
+f'(x)g(x)+f(x)g'(x).
+}
+\]
+
+Thus symbolic differentiation naturally follows the expression tree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Syntactic and Mathematical Equality}
+\label{subsec:syntactic-mathematical-equality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Two expressions can look different but represent the same mathematical
+function.
+
+For example,
+
+\[
+\boxed{
+(x+1)^2
+}
+\]
+
+and
+
+\[
+\boxed{
+x^2+2x+1
+}
+\]
+
+are syntactically different but algebraically equivalent.
+
+Likewise,
+
+\[
+\boxed{
+\frac{x^2-1}{x-1}
+}
+\]
+
+simplifies to
+
+\[
+x+1
+\]
+
+only when
+
+\[
+\boxed{
+x\neq1.
+}
+\]
+
+Thus symbolic equality may depend on domains and assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Canonical Forms}
+\label{subsec:canonical-forms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A canonical form attempts to represent mathematically equivalent objects
+using the same standardized representation.
+
+For example, a polynomial may be written as
+
+\[
+\boxed{
+a_nx^n
++
+a_{n-1}x^{n-1}
++
+\cdots
++
+a_0.
+}
+\]
+
+Canonical representations make equality testing easier.
+
+If two expressions reduce to the same canonical form, their equality may
+be immediately recognized.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normal Forms}
+\label{subsec:symbolic-normal-forms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A normal form is a standardized endpoint of a transformation process.
+
+Different symbolic tasks use different normal forms.
+
+Examples include:
+
+\[
+\boxed{
+\text{expanded polynomial form},
+}
+\]
+
+\[
+\boxed{
+\text{factored form},
+}
+\]
+
+\[
+\boxed{
+\text{reduced rational form},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Gröbner normal form}.
+}
+\]
+
+There is no single universally best form for every computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplification}
+\label{subsec:symbolic-simplification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic simplification attempts to replace an expression by an equivalent
+expression that is easier to interpret or compute.
+
+Examples include:
+
+\[
+x+0
+\longrightarrow
+x,
+\]
+
+\[
+x\cdot1
+\longrightarrow
+x,
+\]
+
+and
+
+\[
+\boxed{
+x+x
+\longrightarrow
+2x.
+}
+\]
+
+But the notion of ``simpler'' is context dependent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ambiguity of Simplification}
+\label{subsec:simplification-ambiguity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compare
+
+\[
+\boxed{
+(x+1)^5
+}
+\]
+
+with its expanded form.
+
+The factored power is shorter.
+
+The expanded polynomial may be more useful for coefficient extraction.
+
+Similarly,
+
+\[
+\boxed{
+x^2-1
+}
+\]
+
+may be simpler for expansion-based operations, while
+
+\[
+\boxed{
+(x-1)(x+1)
+}
+\]
+
+reveals roots immediately.
+
+Thus symbolic simplification should depend on the intended task.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expansion}
+\label{subsec:symbolic-expansion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Expansion distributes products and powers.
+
+For example,
+
+\[
+(x+2)(x-3)
+\]
+
+expands to
+
+\[
+\boxed{
+x^2-x-6.
+}
+\]
+
+Likewise,
+
+\[
+(x+y)^3
+\]
+
+expands to
+
+\[
+\boxed{
+x^3
++
+3x^2y
++
+3xy^2
++
+y^3.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Collection of Terms}
+\label{subsec:collecting-symbolic-terms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Terms may be grouped according to powers of a selected variable.
+
+For example,
+
+\[
+ax^2+bx+cx^2+d
+\]
+
+can be collected as
+
+\[
+\boxed{
+(a+c)x^2+bx+d.
+}
+\]
+
+Collection is especially useful in polynomial and perturbation
+calculations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factorization}
+\label{subsec:symbolic-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Factorization reverses expansion.
+
+For example,
+
+\[
+x^2-5x+6
+\]
+
+factors as
+
+\[
+\boxed{
+(x-2)(x-3).
+}
+\]
+
+Factorization can reveal:
+
+\[
+\boxed{
+\text{roots},
+}
+\]
+
+\[
+\boxed{
+\text{multiplicities},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{algebraic structure}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Equivalent Forms}
+\label{subsec:worked-symbolic-equivalent-forms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Expand and Refactor}
+
+Consider
+
+\[
+(x-2)(x+5).
+\]
+
+Expanding gives
+
+\[
+x^2+5x-2x-10.
+\]
+
+Therefore,
+
+\[
+x^2+3x-10.
+\]
+
+Factoring the result gives
+
+\[
+(x-2)(x+5).
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+(x-2)(x+5)
+=
+x^2+3x-10.
+}
+\]
+\end{answerbox}
+
+The two forms are mathematically equivalent but useful for different
+purposes.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Integer Arithmetic}
+\label{subsec:exact-integer-arithmetic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Integers can be represented exactly.
+
+Unlike fixed-width machine integers, symbolic integer arithmetic can use
+arbitrarily many digits, limited primarily by computational resources.
+
+Thus symbolic systems can compute quantities such as
+
+\[
+\boxed{
+100!
+}
+\]
+
+exactly.
+
+No floating-point approximation is required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Rational Arithmetic}
+\label{subsec:exact-rational-arithmetic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rational number is represented as
+
+\[
+\boxed{
+\frac{p}{q},
+\qquad
+p,q\in\mathbb{Z},
+\quad
+q\neq0.
+}
+\]
+
+The fraction is often normalized so that
+
+\[
+\gcd(p,q)=1.
+\]
+
+For example,
+
+\[
+\frac{8}{12}
+\]
+
+is reduced to
+
+\[
+\boxed{
+\frac23.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Versus Floating-Point Constants}
+\label{subsec:exact-vs-floating-constants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The expression
+
+\[
+\boxed{
+\frac13
+}
+\]
+
+is exact.
+
+The decimal
+
+\[
+\boxed{
+0.3333333333
+}
+\]
+
+is approximate.
+
+Likewise,
+
+\[
+\boxed{
+\pi
+}
+\]
+
+is an exact symbolic constant, while
+
+\[
+\boxed{
+3.14159
+}
+\]
+
+is a finite numerical approximation.
+
+Mixing exact and approximate inputs may cause a symbolic system to switch
+to approximate arithmetic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Representation}
+\label{subsec:symbolic-polynomial-representation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial
+
+\[
+p(x)
+=
+a_0+a_1x+\cdots+a_nx^n
+\]
+
+may be represented by its coefficients:
+
+\[
+\boxed{
+(a_0,a_1,\ldots,a_n).
+}
+\]
+
+Alternatively, a sparse representation stores only nonzero terms:
+
+\[
+\boxed{
+\{
+(k,a_k)
+:
+a_k\neq0
+\}.
+}
+\]
+
+The best representation depends on polynomial density and degree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Addition}
+\label{subsec:symbolic-polynomial-addition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+p(x)=\sum_{k=0}^{m}a_kx^k
+\]
+
+and
+
+\[
+q(x)=\sum_{k=0}^{n}b_kx^k,
+\]
+
+then
+
+\[
+\boxed{
+p(x)+q(x)
+=
+\sum_k
+(a_k+b_k)x^k.
+}
+\]
+
+Symbolic polynomial addition therefore reduces to coefficient addition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Multiplication}
+\label{subsec:symbolic-polynomial-multiplication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+p(x)
+=
+\sum_i
+a_ix^i
+\]
+
+and
+
+\[
+q(x)
+=
+\sum_j
+b_jx^j,
+\]
+
+then
+
+\[
+\boxed{
+p(x)q(x)
+=
+\sum_k
+\left(
+\sum_{i+j=k}
+a_ib_j
+\right)
+x^k.
+}
+\]
+
+The coefficients are obtained by discrete convolution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Division}
+\label{subsec:symbolic-polynomial-division}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For polynomials \(f\) and nonzero \(g\) over a field, there exist unique
+polynomials \(q\) and \(r\) such that
+
+\[
+\boxed{
+f
+=
+qg+r,
+}
+\]
+
+with
+
+\[
+\boxed{
+\deg r
+<
+\deg g.
+}
+\]
+
+This is the polynomial division algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Greatest Common Divisor}
+\label{subsec:polynomial-gcd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A greatest common divisor of polynomials \(f\) and \(g\) is a polynomial
+\(d\) satisfying
+
+\[
+d\mid f,
+\]
+
+\[
+d\mid g,
+\]
+
+and every common divisor divides \(d\).
+
+Over a field, the gcd is usually normalized to be monic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Euclidean Algorithm}
+\label{subsec:polynomial-euclidean-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Euclidean algorithm repeatedly computes remainders:
+
+\[
+f=q_0g+r_1,
+\]
+
+\[
+g=q_1r_1+r_2,
+\]
+
+and so on.
+
+When the remainder becomes zero, the final nonzero remainder is the gcd,
+up to multiplication by a nonzero constant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Polynomial GCD}
+\label{subsec:worked-polynomial-gcd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Finding a Common Polynomial Factor}
+
+Consider
+
+\[
+f(x)
+=
+x^3-x
+\]
+
+and
+
+\[
+g(x)
+=
+x^2-1.
+\]
+
+Factor:
+
+\[
+f(x)
+=
+x(x-1)(x+1),
+\]
+
+and
+
+\[
+g(x)
+=
+(x-1)(x+1).
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\gcd(f,g)
+=
+x^2-1
+}
+\]
+\end{answerbox}
+
+when the gcd is chosen monic.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Square-Free Polynomials}
+\label{subsec:square-free-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial is square-free if it has no repeated irreducible factor.
+
+Repeated factors can be detected through
+
+\[
+\boxed{
+\gcd
+(
+f,f'
+).
+}
+\]
+
+If
+
+\[
+\gcd(f,f')=1,
+\]
+
+then \(f\) is square-free over a characteristic-zero field.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Repeated Roots}
+\label{subsec:symbolic-repeated-roots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+f(x)
+=
+(x-a)^m g(x),
+\]
+
+where
+
+\[
+g(a)\neq0.
+\]
+
+Then
+
+\[
+a
+\]
+
+is a root of multiplicity \(m\).
+
+A repeated root is simultaneously a root of
+
+\[
+f
+\]
+
+and
+
+\[
+f'.
+\]
+
+Thus polynomial gcd computations detect root multiplicity algebraically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Factorization}
+\label{subsec:polynomial-factorization-symbolic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic polynomial factorization depends strongly on the coefficient
+domain.
+
+For example,
+
+\[
+x^2-2
+\]
+
+is irreducible over
+
+\[
+\mathbb{Q},
+\]
+
+but factors over
+
+\[
+\mathbb{R}
+\]
+
+as
+
+\[
+\boxed{
+(x-\sqrt{2})(x+\sqrt{2}).
+}
+\]
+
+Thus factorization must specify the underlying number system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rational Functions}
+\label{subsec:symbolic-rational-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rational function has form
+
+\[
+\boxed{
+R(x)
+=
+\frac{
+p(x)
+}{
+q(x)
+},
+}
+\]
+
+where \(p\) and \(q\) are polynomials and
+
+\[
+q(x)\neq0.
+\]
+
+Common polynomial factors can be canceled algebraically, but excluded
+domain points must be remembered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rational Simplification}
+\label{subsec:rational-simplification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\frac{
+x^2-1
+}{
+x^2-2x+1
+}.
+\]
+
+Factor:
+
+\[
+x^2-1
+=
+(x-1)(x+1),
+\]
+
+and
+
+\[
+x^2-2x+1
+=
+(x-1)^2.
+\]
+
+Thus,
+
+\[
+\boxed{
+\frac{
+x^2-1
+}{
+x^2-2x+1
+}
+=
+\frac{
+x+1
+}{
+x-1
+},
+\qquad
+x\neq1.
+}
+\]
+
+Domain restrictions remain part of the original expression.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partial Fractions}
+\label{subsec:symbolic-partial-fractions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rational function may be decomposed into simpler rational terms.
+
+For example,
+
+\[
+\frac{
+1
+}{
+(x-1)(x+2)
+}
+\]
+
+can be written
+
+\[
+\boxed{
+\frac{A}{x-1}
++
+\frac{B}{x+2}.
+}
+\]
+
+Solving for the constants gives a representation useful for integration,
+inverse transforms, and differential equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Partial Fractions}
+\label{subsec:worked-partial-fractions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Decomposing a Rational Function}
+
+Write
+
+\[
+\frac1{(x-1)(x+2)}
+=
+\frac{A}{x-1}
++
+\frac{B}{x+2}.
+\]
+
+Multiply by
+
+\[
+(x-1)(x+2):
+\]
+
+\[
+1
+=
+A(x+2)
++
+B(x-1).
+\]
+
+Set
+
+\[
+x=1:
+\]
+
+\[
+1=3A,
+\]
+
+so
+
+\[
+A=\frac13.
+\]
+
+Set
+
+\[
+x=-2:
+\]
+
+\[
+1=-3B,
+\]
+
+so
+
+\[
+B=-\frac13.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\frac1{(x-1)(x+2)}
+=
+\frac1{3(x-1)}
+-
+\frac1{3(x+2)}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Differentiation}
+\label{subsec:symbolic-differentiation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic differentiation applies differentiation rules recursively.
+
+For constants,
+
+\[
+\boxed{
+\frac{d}{dx}c
+=
+0.
+}
+\]
+
+For the variable,
+
+\[
+\boxed{
+\frac{d}{dx}x
+=
+1.
+}
+\]
+
+For powers,
+
+\[
+\boxed{
+\frac{d}{dx}x^n
+=
+nx^{n-1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recursive Differentiation Rules}
+\label{subsec:recursive-differentiation-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a sum,
+
+\[
+\boxed{
+D(f+g)
+=
+D(f)+D(g).
+}
+\]
+
+For a product,
+
+\[
+\boxed{
+D(fg)
+=
+D(f)g
++
+fD(g).
+}
+\]
+
+For a quotient,
+
+\[
+\boxed{
+D
+\left(
+\frac{f}{g}
+\right)
+=
+\frac{
+D(f)g-fD(g)
+}{
+g^2
+}.
+}
+\]
+
+For composition,
+
+\[
+\boxed{
+D
+(
+f(g(x))
+)
+=
+f'(g(x))g'(x).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Symbolic Differentiation}
+\label{subsec:worked-symbolic-differentiation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Differentiating a Composite Product}
+
+Let
+
+\[
+f(x)
+=
+x^2\sin(x^3).
+\]
+
+Using the product rule,
+
+\[
+f'(x)
+=
+2x\sin(x^3)
++
+x^2
+\frac{d}{dx}
+\sin(x^3).
+\]
+
+Using the chain rule,
+
+\[
+\frac{d}{dx}
+\sin(x^3)
+=
+3x^2\cos(x^3).
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+f'(x)
+=
+2x\sin(x^3)
++
+3x^4\cos(x^3).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derivative Simplification}
+\label{subsec:derivative-simplification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Direct recursive differentiation can produce unnecessarily large
+expressions.
+
+For example, applying product and chain rules may create repeated factors.
+
+A symbolic system therefore often follows differentiation with:
+
+\[
+\boxed{
+\text{collection},
+}
+\]
+
+\[
+\boxed{
+\text{factorization},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{common-subexpression reduction}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Higher Derivatives}
+\label{subsec:symbolic-higher-derivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Higher derivatives can be obtained recursively:
+
+\[
+\boxed{
+f^{(n)}
+=
+D^nf.
+}
+\]
+
+For example,
+
+\[
+f(x)=e^{ax}
+\]
+
+satisfies
+
+\[
+\boxed{
+f^{(n)}(x)
+=
+a^ne^{ax}.
+}
+\]
+
+Symbolic computation can detect and exploit such recurring patterns.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Integration}
+\label{subsec:symbolic-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic integration seeks an expression \(F\) satisfying
+
+\[
+\boxed{
+F'(x)=f(x).
+}
+\]
+
+Then
+
+\[
+\boxed{
+\int f(x)\,dx
+=
+F(x)+C.
+}
+\]
+
+Unlike differentiation, there is no simple universal local recursion that
+solves every elementary integration problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Integration Rules}
+\label{subsec:symbolic-integration-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Examples include
+
+\[
+\boxed{
+\int x^n\,dx
+=
+\frac{
+x^{n+1}
+}{
+n+1
+}
++
+C,
+\qquad
+n\neq-1,
+}
+\]
+
+\[
+\boxed{
+\int e^x\,dx
+=
+e^x+C,
+}
+\]
+
+and
+
+\[
+\boxed{
+\int \frac1x\,dx
+=
+\ln|x|+C
+}
+\]
+
+over real intervals not containing \(0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Substitution}
+\label{subsec:symbolic-substitution-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the integrand contains
+
+\[
+f(g(x))g'(x),
+\]
+
+set
+
+\[
+u=g(x).
+\]
+
+Then
+
+\[
+du=g'(x)\,dx.
+\]
+
+Thus,
+
+\[
+\boxed{
+\int
+f(g(x))g'(x)\,dx
+=
+\int
+f(u)\,du.
+}
+\]
+
+Symbolic integration systems search for patterns resembling this structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integration by Parts}
+\label{subsec:symbolic-integration-by-parts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Integration by parts is
+
+\[
+\boxed{
+\int u\,dv
+=
+uv
+-
+\int v\,du.
+}
+\]
+
+Symbolically, the challenge is selecting \(u\) and \(dv\) in a way that
+reduces the complexity of the remaining integral.
+
+This choice requires heuristic or algorithmic strategy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Symbolic Integration}
+\label{subsec:worked-symbolic-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Integration by Parts}
+
+Consider
+
+\[
+\int xe^x\,dx.
+\]
+
+Choose
+
+\[
+u=x,
+\qquad
+dv=e^x\,dx.
+\]
+
+Then
+
+\[
+du=dx,
+\qquad
+v=e^x.
+\]
+
+Therefore,
+
+\[
+\int xe^x\,dx
+=
+xe^x
+-
+\int e^x\,dx.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+\int xe^x\,dx
+=
+e^x(x-1)+C.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonelementary Antiderivatives}
+\label{subsec:nonelementary-antiderivatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Not every elementary function has an elementary antiderivative.
+
+For example,
+
+\[
+\boxed{
+\int e^{-x^2}\,dx
+}
+\]
+
+cannot be expressed using only a finite combination of elementary
+functions.
+
+Instead, one introduces special functions.
+
+This illustrates a fundamental limitation of symbolic integration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Special Functions}
+\label{subsec:symbolic-special-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic systems may express results using named special functions.
+
+Examples include:
+
+\[
+\boxed{
+\operatorname{erf}(x),
+}
+\]
+
+\[
+\boxed{
+\Gamma(x),
+}
+\]
+
+\[
+\boxed{
+\operatorname{Li}_s(x),
+}
+\]
+
+and Bessel functions.
+
+Special functions extend the symbolic vocabulary available for exact
+solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definite Symbolic Integration}
+\label{subsec:definite-symbolic-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A definite integral may be evaluated by:
+
+\[
+\boxed{
+\text{finding an antiderivative},
+}
+\]
+
+\[
+\boxed{
+\text{transforming the integral},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{using known identities}.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+\int_0^1x^2\,dx
+=
+\frac13.
+}
+\]
+
+Some definite integrals have exact values even when no elementary
+indefinite antiderivative exists.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Limits}
+\label{subsec:symbolic-limits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic limit computation seeks
+
+\[
+\boxed{
+\lim_{x\to a}f(x).
+}
+\]
+
+Possible methods include:
+
+\[
+\boxed{
+\text{direct substitution},
+}
+\]
+
+\[
+\boxed{
+\text{factor cancellation},
+}
+\]
+
+\[
+\boxed{
+\text{series expansion},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{algebraic transformation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Symbolic Limit}
+\label{subsec:worked-symbolic-limit}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Removing a Removable Singularity}
+
+Consider
+
+\[
+\lim_{x\to1}
+\frac{
+x^2-1
+}{
+x-1
+}.
+\]
+
+Factor:
+
+\[
+x^2-1
+=
+(x-1)(x+1).
+\]
+
+For
+
+\[
+x\neq1,
+\]
+
+\[
+\frac{
+x^2-1
+}{
+x-1
+}
+=
+x+1.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\lim_{x\to1}
+\frac{
+x^2-1
+}{
+x-1
+}
+=
+2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Series Expansion}
+\label{subsec:symbolic-series-expansion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sufficiently smooth \(f\), a Taylor expansion about \(a\) is
+
+\[
+\boxed{
+f(x)
+=
+\sum_{n=0}^{\infty}
+\frac{
+f^{(n)}(a)
+}{
+n!
+}
+(x-a)^n.
+}
+\]
+
+A symbolic system may produce a truncated series:
+
+\[
+\boxed{
+f(x)
+=
+a_0
++
+a_1(x-a)
++
+\cdots
++
+a_N(x-a)^N
++
+O((x-a)^{N+1}).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Exponential Series}
+\label{subsec:worked-exponential-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Series of \(e^x\)}
+
+Since every derivative of \(e^x\) is \(e^x\),
+
+\[
+f^{(n)}(0)=1.
+\]
+
+Therefore,
+
+\[
+e^x
+=
+1
++
+x
++
+\frac{x^2}{2!}
++
+\frac{x^3}{3!}
++
+\cdots.
+\]
+
+Through cubic order,
+
+\begin{answerbox}
+\[
+\boxed{
+e^x
+=
+1+x+\frac{x^2}{2}+\frac{x^3}{6}+O(x^4).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Laurent Series}
+\label{subsec:symbolic-laurent-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Near singular points, negative powers may be required.
+
+A Laurent series has form
+
+\[
+\boxed{
+\sum_{n=-\infty}^{\infty}
+a_n
+(x-a)^n.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+\frac{e^x}{x}
+=
+\frac1x
++
+1
++
+\frac{x}{2}
++
+\frac{x^2}{6}
++
+\cdots.
+}
+\]
+
+Laurent expansions are important in complex analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asymptotic Expansion}
+\label{subsec:symbolic-asymptotic-expansion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An asymptotic expansion approximates behavior in a limiting regime.
+
+For example,
+
+\[
+\boxed{
+\frac1{1+x}
+\sim
+1-x+x^2-x^3+\cdots
+}
+\]
+
+as
+
+\[
+x\to0.
+\]
+
+An asymptotic series need not converge for fixed nonzero \(x\).
+
+Its meaning concerns successive approximation in the stated limit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Equation Solving}
+\label{subsec:symbolic-equation-solving}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A symbolic equation solver seeks exact expressions satisfying
+
+\[
+\boxed{
+F(x)=0.
+}
+\]
+
+For a linear equation
+
+\[
+ax+b=0,
+\]
+
+with
+
+\[
+a\neq0,
+\]
+
+the solution is
+
+\[
+\boxed{
+x=-\frac{b}{a}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Formula}
+\label{subsec:symbolic-quadratic-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+ax^2+bx+c=0,
+\qquad
+a\neq0,
+\]
+
+the symbolic roots are
+
+\[
+\boxed{
+x
+=
+\frac{
+-b\pm\sqrt{b^2-4ac}
+}{
+2a
+}.
+}
+\]
+
+The discriminant
+
+\[
+\boxed{
+\Delta
+=
+b^2-4ac
+}
+\]
+
+controls the root structure over the real numbers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact and Numerical Roots}
+\label{subsec:exact-numerical-roots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+x^5-x-1=0,
+\]
+
+a symbolic system may not produce a root using elementary radicals.
+
+A numerical solver can still approximate roots.
+
+Thus symbolic and numerical methods complement each other:
+
+\[
+\boxed{
+\text{symbolic where possible}
++
+\text{numerical where necessary}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limits of Radical Solutions}
+\label{subsec:limits-of-radical-solutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+General polynomial equations of degree five or higher cannot always be
+solved using radicals.
+
+This is an algebraic limitation rather than a failure of a particular
+software system.
+
+Symbolic systems may instead represent roots implicitly or using special
+algebraic objects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Root Objects}
+\label{subsec:symbolic-root-objects}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If no convenient closed form exists, a symbolic system may represent a
+root as:
+
+\[
+\boxed{
+\text{the }k\text{-th root of }p(x),
+}
+\]
+
+possibly together with an isolating interval or ordering information.
+
+Such an object can remain exact even without a radical formula.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Systems of Equations}
+\label{subsec:symbolic-systems-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A system may contain several equations:
+
+\[
+\boxed{
+\begin{aligned}
+f_1(x_1,\ldots,x_n)&=0,\\
+f_2(x_1,\ldots,x_n)&=0,\\
+&\vdots\\
+f_m(x_1,\ldots,x_n)&=0.
+\end{aligned}
+}
+\]
+
+Linear systems can be solved exactly by symbolic elimination.
+
+Polynomial nonlinear systems require more advanced algebraic techniques.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Substitution Elimination}
+\label{subsec:symbolic-substitution-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+x+y=3,
+\]
+
+\[
+x^2+y^2=5.
+\]
+
+From the first equation,
+
+\[
+y=3-x.
+\]
+
+Substituting into the second gives
+
+\[
+x^2+(3-x)^2=5.
+\]
+
+Thus a system of two equations is reduced to one polynomial equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Symbolic System}
+\label{subsec:worked-symbolic-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Solving by Elimination}
+
+Solve
+
+\[
+x+y=3,
+\]
+
+\[
+x^2+y^2=5.
+\]
+
+Use
+
+\[
+y=3-x.
+\]
+
+Then
+
+\[
+x^2+(3-x)^2=5.
+\]
+
+Expanding,
+
+\[
+2x^2-6x+4=0.
+\]
+
+Divide by \(2\):
+
+\[
+x^2-3x+2=0.
+\]
+
+Therefore,
+
+\[
+(x-1)(x-2)=0.
+\]
+
+So
+
+\[
+x=1
+\]
+
+or
+
+\[
+x=2.
+\]
+
+Correspondingly,
+
+\[
+y=2
+\]
+
+or
+
+\[
+y=1.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+(x,y)
+=
+(1,2)
+\quad
+\text{or}
+\quad
+(2,1).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resultants}
+\label{subsec:symbolic-resultants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given two polynomials
+
+\[
+f(x,y)
+\]
+
+and
+
+\[
+g(x,y),
+\]
+
+the resultant with respect to \(y\),
+
+\[
+\boxed{
+\operatorname{Res}_y(f,g),
+}
+\]
+
+eliminates \(y\).
+
+If \(f\) and \(g\) have a common solution in \(y\), the resultant vanishes
+at the corresponding \(x\)-value under appropriate conditions.
+
+Resultants provide a systematic elimination method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Ideals Preview}
+\label{subsec:polynomial-ideals-symbolic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given polynomials
+
+\[
+f_1,\ldots,f_m,
+\]
+
+their polynomial ideal consists of all combinations
+
+\[
+\boxed{
+h_1f_1
++
+\cdots
++
+h_mf_m,
+}
+\]
+
+where the \(h_i\) are polynomials.
+
+Polynomial systems can therefore be studied through the ideal generated by
+their equations.
+
+This connects symbolic computation with abstract algebra and algebraic
+geometry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gröbner Bases Preview}
+\label{subsec:groebner-bases-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Gröbner basis is a specially organized generating set for a polynomial
+ideal relative to a chosen monomial ordering.
+
+It can transform a difficult multivariable polynomial system into a form
+better suited for:
+
+\[
+\boxed{
+\text{elimination},
+}
+\]
+
+\[
+\boxed{
+\text{ideal membership},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{solving polynomial systems}.
+}
+\]
+
+The choice of monomial ordering strongly affects the resulting basis and
+computational cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Linear Algebra}
+\label{subsec:symbolic-linear-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Matrices may contain symbolic entries.
+
+For example,
+
+\[
+\boxed{
+A
+=
+\begin{pmatrix}
+a&b\\
+c&d
+\end{pmatrix}.
+}
+\]
+
+Then its determinant is
+
+\[
+\boxed{
+\det(A)
+=
+ad-bc.
+}
+\]
+
+Symbolic linear algebra preserves exact dependence on parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Matrix Inverse}
+\label{subsec:symbolic-matrix-inverse}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+A
+=
+\begin{pmatrix}
+a&b\\
+c&d
+\end{pmatrix},
+\]
+
+if
+
+\[
+ad-bc\neq0,
+\]
+
+then
+
+\[
+\boxed{
+A^{-1}
+=
+\frac1{ad-bc}
+\begin{pmatrix}
+d&-b\\
+-c&a
+\end{pmatrix}.
+}
+\]
+
+The nonzero determinant condition is part of the symbolic result.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Gaussian Elimination}
+\label{subsec:symbolic-gaussian-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gaussian elimination can be performed exactly with symbolic entries.
+
+However, expressions may grow dramatically.
+
+For example, eliminating variables from a symbolic matrix can generate
+large rational expressions.
+
+Thus exactness does not imply computational simplicity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Determinants}
+\label{subsec:symbolic-determinants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A determinant may be expanded using cofactors:
+
+\[
+\boxed{
+\det(A)
+=
+\sum_{j=1}^{n}
+(-1)^{i+j}
+a_{ij}
+M_{ij}.
+}
+\]
+
+But direct cofactor expansion has poor computational complexity.
+
+Practical symbolic systems use elimination and structured algorithms when
+possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Eigenvalues}
+\label{subsec:symbolic-eigenvalues}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Eigenvalues satisfy
+
+\[
+\boxed{
+\det(A-\lambda I)=0.
+}
+\]
+
+For small symbolic matrices, this can produce exact parameter-dependent
+eigenvalues.
+
+For example,
+
+\[
+A
+=
+\begin{pmatrix}
+a&0\\
+0&b
+\end{pmatrix}
+\]
+
+has
+
+\[
+\boxed{
+\lambda_1=a,
+\qquad
+\lambda_2=b.
+}
+\]
+
+For larger general matrices, exact symbolic eigenvalues may become
+impractical.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expression Swell}
+\label{subsec:expression-swell}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Expression swell occurs when intermediate symbolic expressions become much
+larger than the final result.
+
+For example, repeated expansion may produce thousands of terms that later
+cancel.
+
+Expression swell can dominate:
+
+\[
+\boxed{
+\text{memory},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{runtime}.
+}
+\]
+
+Controlling intermediate representation is therefore critical.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Avoiding Unnecessary Expansion}
+\label{subsec:avoid-unnecessary-expansion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+(x_1+\cdots+x_n)^{20}.
+\]
+
+Keeping the expression in compact power form requires little storage.
+
+Fully expanding it may create an enormous number of terms.
+
+Symbolic algorithms should therefore expand only when expansion serves a
+specific purpose.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Subexpression Elimination}
+\label{subsec:common-subexpression-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an expression contains
+
+\[
+x^2+y^2
+\]
+
+many times.
+
+Define
+
+\[
+\boxed{
+t=x^2+y^2.
+}
+\]
+
+Then replace repeated occurrences by \(t\).
+
+This reduces:
+
+\[
+\boxed{
+\text{expression size},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{repeated computation}.
+}
+\]
+
+Common subexpression elimination is important when symbolic formulas are
+converted into numerical code.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pattern Matching}
+\label{subsec:symbolic-pattern-matching}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pattern matching identifies expressions with a specified structural form.
+
+For example, a rule might recognize
+
+\[
+\boxed{
+u+0
+}
+\]
+
+and replace it by
+
+\[
+\boxed{
+u.
+}
+\]
+
+Another rule might recognize
+
+\[
+\boxed{
+u^m u^n
+}
+\]
+
+and combine powers under appropriate assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rewrite Rules}
+\label{subsec:symbolic-rewrite-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rewrite rule has form
+
+\[
+\boxed{
+\text{pattern}
+\longrightarrow
+\text{replacement}.
+}
+\]
+
+Examples include:
+
+\[
+x+0
+\longrightarrow
+x,
+\]
+
+\[
+x\cdot1
+\longrightarrow
+x,
+\]
+
+and
+
+\[
+\boxed{
+\sin^2x+\cos^2x
+\longrightarrow
+1.
+}
+\]
+
+Rules may be algebraic, trigonometric, logical, or domain dependent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Term-Rewriting Systems}
+\label{subsec:term-rewriting-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A term-rewriting system repeatedly applies transformation rules until no
+more applicable rules remain or a desired form is reached.
+
+Important questions include:
+
+\[
+\boxed{
+\text{Does rewriting terminate?}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Is the final result independent of rule order?}
+}
+\]
+
+These lead to the concepts of termination and confluence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Termination}
+\label{subsec:rewriting-termination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rewriting process terminates if it cannot continue indefinitely.
+
+Poorly designed rules can create loops.
+
+For example,
+
+\[
+a
+\longrightarrow
+b
+\]
+
+combined with
+
+\[
+b
+\longrightarrow
+a
+\]
+
+produces infinite rewriting.
+
+Symbolic simplifiers therefore require carefully oriented rules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confluence}
+\label{subsec:rewriting-confluence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rewriting system is confluent if different valid sequences of
+rewrites eventually lead to the same normal form.
+
+Confluence is valuable because the final result does not depend on the
+order in which rules are applied.
+
+Not all symbolic transformation systems are confluent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Assumptions}
+\label{subsec:symbolic-assumptions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many symbolic identities depend on assumptions.
+
+For example,
+
+\[
+\sqrt{x^2}
+\]
+
+is not always equal to \(x\) over the real numbers.
+
+Instead,
+
+\[
+\boxed{
+\sqrt{x^2}
+=
+|x|.
+}
+\]
+
+If the assumption
+
+\[
+x>0
+\]
+
+is known, then
+
+\[
+\boxed{
+\sqrt{x^2}=x.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Real and Complex Domains}
+\label{subsec:real-complex-symbolic-domains}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An identity valid over the positive real numbers may fail over all real or
+complex values.
+
+For example,
+
+\[
+\boxed{
+\sqrt{ab}
+=
+\sqrt{a}\sqrt{b}
+}
+\]
+
+is not universally valid for arbitrary complex \(a\) and \(b\) under
+principal-branch conventions.
+
+Domains and branches therefore matter in symbolic simplification.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branch Cuts}
+\label{subsec:symbolic-branch-cuts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Functions such as
+
+\[
+\log z,
+\]
+
+\[
+\sqrt{z},
+\]
+
+and inverse trigonometric functions are multivalued naturally in complex
+analysis.
+
+A symbolic system usually selects principal branches.
+
+Branch cuts specify where these branches become discontinuous.
+
+Ignoring them can produce false symbolic identities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Piecewise Expressions}
+\label{subsec:symbolic-piecewise-expressions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some exact mathematical results require piecewise descriptions.
+
+For example,
+
+\[
+|x|
+=
+\boxed{
+\begin{cases}
+x,
+&
+x\geq0,
+\\
+-x,
+&
+x<0.
+\end{cases}
+}
+\]
+
+Similarly, solving inequalities or integrating expressions with absolute
+values may naturally produce piecewise answers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Inequalities}
+\label{subsec:symbolic-inequalities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Solving
+
+\[
+f(x)>0
+\]
+
+requires determining where the function has the correct sign.
+
+For a polynomial, symbolic methods can use:
+
+\[
+\boxed{
+\text{factorization},
+}
+\]
+
+\[
+\boxed{
+\text{root isolation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{sign analysis}.
+}
+\]
+
+The result often consists of intervals rather than isolated points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Symbolic Inequality}
+\label{subsec:worked-symbolic-inequality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Solving a Polynomial Inequality}
+
+Solve
+
+\[
+x^2-5x+6>0.
+\]
+
+Factor:
+
+\[
+(x-2)(x-3)>0.
+\]
+
+The product is positive when both factors have the same sign.
+
+Thus,
+
+\[
+x<2
+\]
+
+or
+
+\[
+x>3.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+(-\infty,2)
+\cup
+(3,\infty).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Summation}
+\label{subsec:symbolic-summation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic summation seeks closed forms for expressions such as
+
+\[
+\boxed{
+\sum_{k=1}^{n}
+f(k).
+}
+\]
+
+For example,
+
+\[
+\boxed{
+\sum_{k=1}^{n}
+k
+=
+\frac{
+n(n+1)
+}{
+2
+}.
+}
+\]
+
+Likewise,
+
+\[
+\boxed{
+\sum_{k=1}^{n}
+k^2
+=
+\frac{
+n(n+1)(2n+1)
+}{
+6
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Series}
+\label{subsec:symbolic-geometric-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+r\neq1,
+\]
+
+\[
+\boxed{
+\sum_{k=0}^{n}
+r^k
+=
+\frac{
+1-r^{n+1}
+}{
+1-r
+}.
+}
+\]
+
+For
+
+\[
+|r|<1,
+\]
+
+letting \(n\to\infty\) gives
+
+\[
+\boxed{
+\sum_{k=0}^{\infty}
+r^k
+=
+\frac1{1-r}.
+}
+\]
+
+Symbolic summation can manipulate both finite and infinite sums.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Products}
+\label{subsec:symbolic-products}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite products may also admit closed forms.
+
+For example,
+
+\[
+\boxed{
+\prod_{k=1}^{n}
+k
+=
+n!.
+}
+\]
+
+Another example is
+
+\[
+\boxed{
+\prod_{k=1}^{n}
+\frac{k+1}{k}
+=
+n+1.
+}
+\]
+
+The second product telescopes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Telescoping Structures}
+\label{subsec:symbolic-telescoping}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sum telescopes when consecutive terms cancel.
+
+For example,
+
+\[
+\sum_{k=1}^{n}
+\left(
+\frac1k
+-
+\frac1{k+1}
+\right)
+\]
+
+becomes
+
+\[
+\boxed{
+1-\frac1{n+1}.
+}
+\]
+
+Recognizing telescoping structure is an important symbolic transformation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recurrence Relations}
+\label{subsec:symbolic-recurrence-relations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A recurrence defines sequence values using previous values.
+
+For example,
+
+\[
+\boxed{
+a_{n+1}
+=
+ra_n.
+}
+\]
+
+With
+
+\[
+a_0=C,
+\]
+
+the symbolic solution is
+
+\[
+\boxed{
+a_n
+=
+Cr^n.
+}
+\]
+
+More complicated linear recurrences can be solved using characteristic
+polynomials.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Homogeneous Recurrences}
+\label{subsec:linear-homogeneous-recurrences-symbolic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+a_{n+2}
+-
+3a_{n+1}
++
+2a_n
+=
+0.
+}
+\]
+
+Try
+
+\[
+a_n=r^n.
+\]
+
+Then
+
+\[
+r^2-3r+2=0.
+\]
+
+Factoring,
+
+\[
+(r-1)(r-2)=0.
+\]
+
+Therefore,
+
+\[
+\boxed{
+a_n
+=
+C_1
++
+C_2 2^n.
+}
+\]
+
+Initial values determine \(C_1\) and \(C_2\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Differential Equations}
+\label{subsec:symbolic-differential-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some differential equations admit exact symbolic solutions.
+
+For example,
+
+\[
+y'=ky
+\]
+
+has solution
+
+\[
+\boxed{
+y(t)
+=
+Ce^{kt}.
+}
+\]
+
+With initial condition
+
+\[
+y(0)=y_0,
+\]
+
+we obtain
+
+\[
+\boxed{
+y(t)
+=
+y_0e^{kt}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Separation of Variables}
+\label{subsec:symbolic-separation-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+y'=g(t)h(y),
+\]
+
+formally separate:
+
+\[
+\boxed{
+\frac{dy}{h(y)}
+=
+g(t)\,dt.
+}
+\]
+
+Integrating gives
+
+\[
+\boxed{
+\int
+\frac{dy}{h(y)}
+=
+\int
+g(t)\,dt.
+}
+\]
+
+The resulting implicit relation may then be solved for \(y\) if possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Linear ODEs}
+\label{subsec:symbolic-linear-odes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A first-order linear equation has form
+
+\[
+\boxed{
+y'
++
+p(x)y
+=
+q(x).
+}
+\]
+
+Its integrating factor is
+
+\[
+\boxed{
+\mu(x)
+=
+e^{\int p(x)\,dx}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\frac{d}{dx}
+[
+\mu(x)y(x)
+]
+=
+\mu(x)q(x).
+}
+\]
+
+Symbolic systems can automate this procedure for many input functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Laplace Transforms}
+\label{subsec:symbolic-laplace-transforms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Laplace transform is
+
+\[
+\boxed{
+\mathcal{L}\{f(t)\}(s)
+=
+\int_0^\infty
+e^{-st}f(t)\,dt.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+\mathcal{L}\{1\}
+=
+\frac1s,
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathcal{L}\{e^{at}\}
+=
+\frac1{s-a}.
+}
+\]
+
+Symbolic transforms convert many differential equations into algebraic
+equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Fourier Transforms}
+\label{subsec:symbolic-fourier-transforms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Fourier transform can be written
+
+\[
+\boxed{
+\widehat{f}(\omega)
+=
+\int_{-\infty}^{\infty}
+f(x)e^{-\mathrm{i}\omega x}\,dx,
+}
+\]
+
+under one common convention.
+
+Symbolic transform systems require careful handling of normalization,
+domains, distributions, and convergence assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Optimization}
+\label{subsec:symbolic-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For simple objectives, symbolic differentiation can identify stationary
+points exactly.
+
+Given
+
+\[
+f(x),
+\]
+
+solve
+
+\[
+\boxed{
+f'(x)=0.
+}
+\]
+
+Then classify candidates using
+
+\[
+\boxed{
+f''(x)
+}
+\]
+
+or direct comparison.
+
+For multivariable problems, solve
+
+\[
+\boxed{
+\nabla f(x)=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Symbolic Optimization}
+\label{subsec:worked-symbolic-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Exact Minimizer of a Quadratic}
+
+Consider
+
+\[
+f(x)
+=
+3x^2-12x+7.
+\]
+
+Differentiate:
+
+\[
+f'(x)
+=
+6x-12.
+\]
+
+Set
+
+\[
+6x-12=0.
+\]
+
+Thus,
+
+\[
+x=2.
+\]
+
+Since
+
+\[
+f''(x)=6>0,
+\]
+
+this is the unique minimizer.
+
+\begin{answerbox}
+\[
+\boxed{
+x^*=2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Jacobians}
+\label{subsec:symbolic-jacobians}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For vector function
+
+\[
+F
+=
+\begin{pmatrix}
+f_1\\
+\vdots\\
+f_m
+\end{pmatrix},
+\]
+
+the Jacobian is
+
+\[
+\boxed{
+J_F
+=
+\left[
+\frac{
+\partial f_i
+}{
+\partial x_j
+}
+\right].
+}
+\]
+
+Symbolic Jacobians are useful in:
+
+\[
+\boxed{
+\text{Newton methods},
+}
+\]
+
+\[
+\boxed{
+\text{dynamical systems},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{implicit differential-equation solvers}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Hessians}
+\label{subsec:symbolic-hessians}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For scalar function \(f\), the Hessian is
+
+\[
+\boxed{
+H_f
+=
+\left[
+\frac{
+\partial^2f
+}{
+\partial x_i\partial x_j
+}
+\right].
+}
+\]
+
+Symbolically computing the Hessian provides exact curvature expressions for
+optimization and local analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Code Generation}
+\label{subsec:symbolic-code-generation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A symbolic expression can be transformed into executable numerical code.
+
+For example,
+
+\[
+f(x,y)
+=
+x^2
++
+2xy
++
+y^2
+\]
+
+may be converted into a numerical evaluation routine.
+
+Before code generation, a symbolic system may perform:
+
+\[
+\boxed{
+\text{simplification},
+}
+\]
+
+\[
+\boxed{
+\text{common-subexpression elimination},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{algebraic optimization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic-Numeric Computation}
+\label{subsec:symbolic-numeric-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many practical algorithms combine symbolic and numerical methods.
+
+A typical workflow is:
+
+\[
+\boxed{
+\text{derive symbolically}
+\rightarrow
+\text{simplify}
+\rightarrow
+\text{evaluate numerically}.
+}
+\]
+
+For example, one may derive an exact Jacobian symbolically and then
+evaluate it numerically inside Newton's method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Preprocessing}
+\label{subsec:exact-preprocessing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic preprocessing can simplify a problem before numerical solution.
+
+Examples include:
+
+\[
+\boxed{
+\text{eliminating variables},
+}
+\]
+
+\[
+\boxed{
+\text{factoring expressions},
+}
+\]
+
+\[
+\boxed{
+\text{deriving exact gradients},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{nondimensionalization}.
+}
+\]
+
+This can improve numerical efficiency and reliability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numeric Evaluation of Symbolic Expressions}
+\label{subsec:numeric-evaluation-symbolic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After obtaining symbolic expression
+
+\[
+F(x),
+\]
+
+one may substitute
+
+\[
+x=x_0
+\]
+
+and evaluate numerically.
+
+Precision can be chosen independently of the original symbolic expression.
+
+For example,
+
+\[
+\sqrt{2}
+\]
+
+may be evaluated to:
+
+\[
+\boxed{
+10,
+\quad
+50,
+\quad
+100,
+}
+\]
+
+or more decimal digits.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Verification}
+\label{subsec:symbolic-verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic computation can verify identities by simplifying their
+difference.
+
+To test
+
+\[
+f(x)=g(x),
+\]
+
+form
+
+\[
+\boxed{
+h(x)
+=
+f(x)-g(x).
+}
+\]
+
+If symbolic simplification proves
+
+\[
+\boxed{
+h(x)=0
+}
+\]
+
+under stated assumptions, the identity is verified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Identity Verification}
+\label{subsec:worked-symbolic-identity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Verifying a Trigonometric Identity}
+
+Consider
+
+\[
+1-\cos^2x
+\]
+
+and
+
+\[
+\sin^2x.
+\]
+
+Subtract:
+
+\[
+1-\cos^2x-\sin^2x.
+\]
+
+Using
+
+\[
+\sin^2x+\cos^2x=1,
+\]
+
+the expression simplifies to
+
+\[
+0.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+1-\cos^2x
+=
+\sin^2x.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Proof Assistance}
+\label{subsec:symbolic-proof-assistance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic systems can assist mathematical proof by performing exact
+subcalculations.
+
+Examples include:
+
+\[
+\boxed{
+\text{polynomial identity checking},
+}
+\]
+
+\[
+\boxed{
+\text{factorization},
+}
+\]
+
+\[
+\boxed{
+\text{elimination},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{exact differentiation}.
+}
+\]
+
+However, a computational output is not automatically a human-readable
+proof.
+
+The mathematical assumptions and algorithmic guarantees still matter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Computation and Theorem Proving}
+\label{subsec:symbolic-computation-theorem-proving}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic algebra manipulates mathematical expressions.
+
+Automated theorem proving manipulates logical statements and proof rules.
+
+The two fields overlap when algebraic identities or inequalities are used
+inside formal proofs.
+
+However,
+
+\[
+\boxed{
+\text{computer algebra}
+\neq
+\text{formal proof system}.
+}
+\]
+
+A symbolic result may rely on algorithms rather than a proof object checked
+by a logical kernel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Complexity}
+\label{subsec:symbolic-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic algorithms can have dramatically different complexity from
+numerical algorithms.
+
+A symbolic expression may grow exponentially in size even when the final
+answer is short.
+
+Costs therefore depend on:
+
+\[
+\boxed{
+\text{number of terms},
+}
+\]
+
+\[
+\boxed{
+\text{integer digit length},
+}
+\]
+
+\[
+\boxed{
+\text{polynomial degree},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{number of variables}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bit Complexity}
+\label{subsec:symbolic-bit-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When integers become large, counting arithmetic operations alone is not
+enough.
+
+For example, multiplying two integers with millions of digits costs more
+than multiplying two machine-size integers.
+
+Bit complexity measures work in terms of the number of bits manipulated.
+
+This is especially important in exact arithmetic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coefficient Growth}
+\label{subsec:coefficient-growth-symbolic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Exact polynomial operations can produce coefficients much larger than
+those appearing in the input.
+
+This coefficient growth can cause substantial memory and runtime cost.
+
+Modular algorithms often reduce this problem by computing over smaller
+finite fields and reconstructing exact results afterward.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modular Computation Preview}
+\label{subsec:modular-computation-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of performing a difficult integer computation directly, reduce the
+problem modulo several primes:
+
+\[
+\boxed{
+p_1,
+p_2,
+\ldots,p_k.
+}
+\]
+
+Perform smaller calculations modulo each prime.
+
+Then reconstruct the integer result using tools such as the Chinese
+Remainder Theorem.
+
+This is a powerful strategy in computer algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Evaluation and Interpolation}
+\label{subsec:symbolic-evaluation-interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another symbolic strategy evaluates a polynomial or expression at selected
+points, performs easier computations on the values, and reconstructs the
+result by interpolation.
+
+Conceptually,
+
+\[
+\boxed{
+\text{symbolic object}
+\rightarrow
+\text{evaluations}
+\rightarrow
+\text{computation}
+\rightarrow
+\text{interpolation}.
+}
+\]
+
+This can avoid intermediate expression swell.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expression Hashing and Sharing}
+\label{subsec:expression-sharing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If identical subexpressions appear repeatedly, a symbolic system may store
+them once and let several expressions reference the same object.
+
+This creates a directed acyclic graph rather than a pure tree.
+
+Sharing reduces:
+
+\[
+\boxed{
+\text{memory duplication}
+}
+\]
+
+and sometimes
+
+\[
+\boxed{
+\text{repeated computation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lazy Evaluation}
+\label{subsec:symbolic-lazy-evaluation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some transformations are expensive and may never be needed.
+
+Lazy evaluation delays computation until the result is required.
+
+For example, a huge product may remain factored until coefficient access
+or expansion is requested.
+
+This can prevent unnecessary symbolic work.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplification Heuristics}
+\label{subsec:simplification-heuristics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because no single measure of expression simplicity works in all contexts,
+symbolic systems often use heuristics.
+
+Possible criteria include:
+
+\[
+\boxed{
+\text{number of operations},
+}
+\]
+
+\[
+\boxed{
+\text{number of terms},
+}
+\]
+
+\[
+\boxed{
+\text{expression depth},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{preferred mathematical functions}.
+}
+\]
+
+Different simplifiers may therefore return different but equivalent forms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Computation Workflow}
+\label{subsec:symbolic-computation-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item define symbols and their domains;
+    \item preserve exact constants whenever exactness matters;
+    \item construct the expression structurally;
+    \item choose the desired algebraic form;
+    \item expand, factor, collect, or cancel only when useful;
+    \item state assumptions explicitly;
+    \item perform differentiation, integration, solving, or elimination;
+    \item simplify the result;
+    \item check excluded domain points;
+    \item check branches of multivalued functions;
+    \item substitute the result back into the original equation when
+          possible;
+    \item compare derivatives to verify antiderivatives;
+    \item use numerical evaluation as an independent check;
+    \item avoid unnecessary expansion;
+    \item control expression swell;
+    \item convert symbolic expressions to numerical code when needed;
+    \item document assumptions and transformations.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing Symbolic or Numerical Methods}
+\label{subsec:choosing-symbolic-or-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Use symbolic methods when:
+
+\[
+\boxed{
+\text{exact structure matters},
+}
+\]
+
+\[
+\boxed{
+\text{parameters must remain symbolic},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{an exact identity is desired}.
+}
+\]
+
+Use numerical methods when:
+
+\[
+\boxed{
+\text{the exact form is unavailable},
+}
+\]
+
+\[
+\boxed{
+\text{expressions become too large},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{only approximate numerical values are needed}.
+}
+\]
+
+Often the best approach is hybrid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:symbolic-computation-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Treating Approximate Input as Exact}
+
+Entering
+
+\[
+0.333333
+\]
+
+instead of
+
+\[
+\frac13
+\]
+
+can change an exact symbolic calculation into an approximate one.
+
+Use exact quantities when exactness is intended.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Algebraic Cancellation Preserves the Original Domain}
+
+The simplification
+
+\[
+\frac{x^2-1}{x-1}
+=
+x+1
+\]
+
+is valid only for
+
+\[
+x\neq1.
+\]
+
+The simplified expression alone does not preserve the original excluded
+point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming \(\sqrt{x^2}=x\)}
+
+Over the real numbers,
+
+\[
+\boxed{
+\sqrt{x^2}=|x|.
+}
+\]
+
+Additional assumptions are required to replace this by \(x\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Complex Branches}
+
+Identities involving logarithms, powers, square roots, and inverse
+functions may change across branches in the complex plane.
+
+Do not apply real-variable simplifications blindly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Simplify Has One Unique Answer}
+
+An expanded expression, factored expression, and partial-fraction
+expression may all be equally valid.
+
+The useful form depends on the task.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Expanding Everything}
+
+Full expansion may create enormous intermediate expressions.
+
+Preserve factored or structured forms until expansion is needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Factoring Over the Wrong Domain}
+
+A polynomial irreducible over
+
+\[
+\mathbb{Q}
+\]
+
+may factor over
+
+\[
+\mathbb{R}
+\]
+
+or
+
+\[
+\mathbb{C}.
+\]
+
+Always specify or understand the coefficient domain.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Integral Has an Elementary Closed Form}
+
+Many elementary integrands do not possess elementary antiderivatives.
+
+A special function or unevaluated integral may be the correct symbolic
+answer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Polynomial Has a Radical Formula}
+
+General degree-five and higher polynomials may not be solvable by radicals.
+
+Exact implicit root representations remain possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Symbolic Equality With Numerical Agreement}
+
+Two expressions can agree numerically at many sampled points without being
+identically equal.
+
+Likewise, numerical disagreement can arise from singularities or branch
+choices rather than algebraic inequality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Assumptions in Inequality Solving}
+
+Multiplying an inequality by an expression of unknown sign can reverse the
+inequality.
+
+Symbolic solvers must reason about sign conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Expression Swell}
+
+An algorithm that is mathematically straightforward may be computationally
+impractical because intermediate expressions become too large.
+
+Representation matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Symbolic Matrix Inversion for Large Systems}
+
+Exact symbolic inversion can produce enormous expressions.
+
+Factorization, elimination, or numerical solving is usually preferable for
+large parameterized systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Symbolic Eigenvalue Formulas for Large General Matrices}
+
+Characteristic polynomials and radical expressions rapidly become
+impractical.
+
+Numerical eigenvalue methods are generally preferable for large matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Trusting a Symbolic Result Without Substitution or Differentiation Checks}
+
+Whenever practical:
+
+\[
+\boxed{
+\text{substitute solutions back},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{differentiate antiderivatives}.
+}
+\]
+
+Independent checking helps detect assumptions or branch issues.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Symbolic Computation With Formal Proof}
+
+A symbolic transformation may be mathematically correct without generating
+a proof object in a formal logical system.
+
+The distinction matters in theorem verification.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:symbolic-computation-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Algebra.}
+Symbolic systems expand, factor, simplify, solve polynomial equations, and
+perform exact elimination.
+
+\medskip
+
+\textbf{Calculus.}
+Differentiation, integration, limits, and series can often be manipulated
+exactly.
+
+\medskip
+
+\textbf{Differential Equations.}
+Exact solutions, transforms, recurrence relations, and operator
+manipulations can be automated for important equation classes.
+
+\medskip
+
+\textbf{Optimization.}
+Symbolic gradients, Hessians, Jacobians, and KKT equations can be derived
+before numerical solution.
+
+\medskip
+
+\textbf{Geometry.}
+Exact coordinate transformations, intersection equations, and polynomial
+constraints can be manipulated symbolically.
+
+\medskip
+
+\textbf{Number Theory.}
+Exact integer arithmetic, modular computation, polynomial factorization,
+and algebraic numbers are central symbolic tasks.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Symbolic preprocessing can derive efficient formulas that are later
+evaluated numerically.
+
+\medskip
+
+\textbf{Mathematical Research.}
+Computer algebra can assist conjecture formation, exact experimentation,
+identity checking, and derivation of complicated formulas.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:symbolic-computation-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define symbolic computation.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish symbolic and numerical computation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a canonical form.
+\end{exercise}
+
+\begin{exercise}[1]
+Define expression swell.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a rewrite rule.
+\end{exercise}
+
+\begin{exercise}[1]
+Define exact rational arithmetic.
+\end{exercise}
+
+\begin{exercise}[1]
+Define symbolic differentiation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define symbolic integration.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a polynomial gcd.
+\end{exercise}
+
+\begin{exercise}[1]
+Define common subexpression elimination.
+\end{exercise}
+
+\begin{exercise}[2]
+Expand
+
+\[
+(x+3)(x-4).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Factor
+
+\[
+x^2-7x+12.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Collect terms in
+
+\[
+ax^2+bx+cx^2+dx+e.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Reduce
+
+\[
+\frac{18}{24}
+\]
+
+to lowest terms.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why
+
+\[
+\frac{x^2-4}{x-2}
+\]
+
+and
+
+\[
+x+2
+\]
+
+do not have exactly the same domain.
+\end{exercise}
+
+\begin{exercise}[2]
+Add two polynomials using coefficient representations.
+\end{exercise}
+
+\begin{exercise}[2]
+Multiply two polynomials symbolically.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform polynomial long division.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the Euclidean algorithm to find a polynomial gcd.
+\end{exercise}
+
+\begin{exercise}[3]
+Use
+
+\[
+\gcd(f,f')
+\]
+
+to determine whether a polynomial has repeated roots.
+\end{exercise}
+
+\begin{exercise}[3]
+Factor a polynomial over
+
+\[
+\mathbb{Q},
+\]
+
+then discuss whether it factors further over
+
+\[
+\mathbb{R}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Simplify a rational function by canceling polynomial gcds.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform partial-fraction decomposition.
+\end{exercise}
+
+\begin{exercise}[2]
+Differentiate
+
+\[
+x^3e^x.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Differentiate
+
+\[
+\frac{\sin(x^2)}{1+x^2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the expression tree for
+
+\[
+x^2\sin(x+1).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Describe how recursive differentiation acts on the tree.
+\end{exercise}
+
+\begin{exercise}[2]
+Integrate
+
+\[
+x^4.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use substitution to integrate
+
+\[
+2xe^{x^2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use integration by parts to integrate
+
+\[
+x\cos x.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of a nonelementary antiderivative.
+\end{exercise}
+
+\begin{exercise}[2]
+Evaluate symbolically
+
+\[
+\lim_{x\to2}
+\frac{x^2-4}{x-2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Find the cubic Taylor polynomial of
+
+\[
+\sin x
+\]
+
+about \(0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Find a Laurent expansion of
+
+\[
+\frac{e^x}{x}
+\]
+
+near \(x=0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between a convergent series and an asymptotic
+series.
+\end{exercise}
+
+\begin{exercise}[2]
+Solve a quadratic equation symbolically.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a two-equation polynomial system by substitution.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why general quintics cannot always be solved by radicals.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how an exact root can be represented without radicals.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the purpose of a resultant.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain conceptually how a Gröbner basis aids elimination.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute symbolically the determinant of
+
+\[
+\begin{pmatrix}
+a&b\\
+c&d
+\end{pmatrix}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the symbolic inverse of a \(2\times2\) matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+State the condition under which that inverse exists.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the symbolic eigenvalues of a triangular matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of expression swell during symbolic elimination.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why full expansion can be computationally harmful.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform common subexpression elimination on an expression with repeated
+factors.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply rewrite rules to simplify
+
+\[
+(x+0)(1)+0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a pair of rewrite rules that creates a nonterminating loop.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the meaning of confluence.
+\end{exercise}
+
+\begin{exercise}[2]
+Simplify
+
+\[
+\sqrt{x^2}
+\]
+
+over the real numbers.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how the assumption
+
+\[
+x>0
+\]
+
+changes the simplification.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why
+
+\[
+\sqrt{ab}
+=
+\sqrt{a}\sqrt{b}
+\]
+
+requires care over complex numbers.
+\end{exercise}
+
+\begin{exercise}[3]
+Write
+
+\[
+|x-2|
+\]
+
+as a piecewise function.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve
+
+\[
+x^2-4x+3\leq0
+\]
+
+symbolically.
+\end{exercise}
+
+\begin{exercise}[2]
+Evaluate
+
+\[
+\sum_{k=1}^{n}k.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Evaluate a finite geometric series.
+\end{exercise}
+
+\begin{exercise}[3]
+Evaluate a telescoping sum.
+\end{exercise}
+
+\begin{exercise}[2]
+Evaluate
+
+\[
+\prod_{k=1}^{n}k.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Solve the recurrence
+
+\[
+a_{n+1}=3a_n.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a second-order constant-coefficient linear recurrence.
+\end{exercise}
+
+\begin{exercise}[2]
+Solve
+
+\[
+y'=ay
+\]
+
+symbolically.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a first-order separable ODE symbolically.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the integrating-factor formula for a first-order linear ODE.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a simple Laplace transform.
+\end{exercise}
+
+\begin{exercise}[3]
+Use symbolic differentiation to construct a Jacobian matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the Hessian of a quadratic function.
+\end{exercise}
+
+\begin{exercise}[3]
+Use symbolic derivatives to solve a one-variable optimization problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify a symbolic antiderivative by differentiation.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify a symbolic equation solution by substitution.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain symbolic-numeric computation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how exact preprocessing can improve a numerical computation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why expression-tree sharing can reduce memory use.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain lazy symbolic evaluation.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish arithmetic-operation complexity from bit complexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study fast integer multiplication algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study modular polynomial algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Chinese-remainder reconstruction in symbolic computation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study rational reconstruction.
+\end{exercise}
+
+\begin{exercise}[4]
+Study fast polynomial multiplication.
+\end{exercise}
+
+\begin{exercise}[4]
+Study subresultant polynomial remainder sequences.
+\end{exercise}
+
+\begin{exercise}[4]
+Study square-free factorization algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study polynomial factorization over finite fields.
+\end{exercise}
+
+\begin{exercise}[4]
+Study factorization over the rational numbers.
+\end{exercise}
+
+\begin{exercise}[4]
+Study algebraic-number arithmetic.
+\end{exercise}
+
+\begin{exercise}[4]
+Study exact real root isolation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study resultant computation using Sylvester matrices.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Buchberger's algorithm for Gröbner bases.
+\end{exercise}
+
+\begin{exercise}[4]
+Study monomial orderings and elimination theory.
+\end{exercise}
+
+\begin{exercise}[4]
+Study symbolic integration algorithms for rational functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Risch algorithm conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Study symbolic summation algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study recurrence solving using generating functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study symbolic asymptotic expansion algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study simplification under complex branch conventions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study term rewriting, termination, and confluence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study symbolic expression DAGs and hash-consing.
+\end{exercise}
+
+\begin{exercise}[4]
+Study common-subexpression elimination for automatic code generation.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate symbolic-numeric equation solving.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:symbolic-computation-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic computation manipulates exact mathematical expressions rather
+than immediately replacing them with numerical approximations.
+
+A symbolic expression has structural form that can be represented using an
+expression tree.
+
+Symbolic methods include
+
+\[
+\boxed{
+\text{simplification}
++
+\text{expansion}
++
+\text{factorization}
++
+\text{exact arithmetic}.
+}
+\]
+
+Polynomial computation includes:
+
+\[
+\boxed{
+\text{division}
++
+\text{gcd}
++
+\text{factorization}
++
+\text{elimination}.
+}
+\]
+
+Calculus operations include:
+
+\[
+\boxed{
+\text{differentiation}
++
+\text{integration}
++
+\text{limits}
++
+\text{series}.
+}
+\]
+
+Equation solving may combine:
+
+\[
+\boxed{
+\text{substitution}
++
+\text{resultants}
++
+\text{polynomial methods}.
+}
+\]
+
+Reliable symbolic manipulation requires attention to
+
+\[
+\boxed{
+\text{domains}
++
+\text{assumptions}
++
+\text{branches}
++
+\text{expression growth}.
+}
+\]
+
+Symbolic and numerical methods are complementary:
+
+\[
+\boxed{
+\text{symbolic structure}
++
+\text{numerical evaluation}
+=
+\text{symbolic-numeric computation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:symbolic-computation-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Symbolic Computation complements the approximate numerical methods of the
+earlier sections of Chapter~11 by preserving exact mathematical
+structure. It provides exact differentiation, algebraic simplification,
+polynomial manipulation, equation solving, series expansion, transform
+calculation, and symbolic preprocessing for numerical algorithms. These
+methods connect strongly with algebra, number theory, calculus,
+differential equations, optimization, and logic. The next section,
+Computer Algebra, develops the broader algorithmic systems used to
+implement exact algebraic computation, including polynomial arithmetic,
+factorization, algebraic extensions, Gröbner bases, elimination, and the
+architecture of computer algebra systems.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.8 Symbolic Computation
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard symbolic computation.
+%   - Standard exact algebraic manipulation.
+%   - Standard symbolic calculus and expression-rewriting concepts.
+%
+% Used for:
+%   - symbolic versus numerical computation;
+%   - expression structures and trees;
+%   - syntactic and mathematical equality;
+%   - canonical and normal forms;
+%   - simplification;
+%   - expansion;
+%   - collection and factorization;
+%   - exact integer and rational arithmetic;
+%   - polynomial representations;
+%   - polynomial arithmetic;
+%   - polynomial division and gcd;
+%   - square-free polynomials;
+%   - repeated roots;
+%   - polynomial factorization;
+%   - rational-function simplification;
+%   - partial fractions;
+%   - symbolic differentiation;
+%   - recursive differentiation;
+%   - symbolic integration;
+%   - substitution and integration by parts;
+%   - nonelementary integrals;
+%   - special functions;
+%   - symbolic limits;
+%   - Taylor, Laurent, and asymptotic series;
+%   - symbolic equation solving;
+%   - exact and numerical roots;
+%   - radical-solvability limitations;
+%   - root objects;
+%   - systems of equations;
+%   - substitution elimination;
+%   - resultants;
+%   - polynomial ideals and Gröbner-basis preview;
+%   - symbolic matrices;
+%   - determinants and inverses;
+%   - symbolic eigenvalues;
+%   - expression swell;
+%   - common subexpression elimination;
+%   - pattern matching;
+%   - rewrite rules;
+%   - termination and confluence;
+%   - assumptions and domains;
+%   - real and complex branches;
+%   - piecewise expressions;
+%   - symbolic inequalities;
+%   - symbolic summation and products;
+%   - recurrence relations;
+%   - symbolic differential equations;
+%   - symbolic Laplace and Fourier transforms;
+%   - symbolic optimization;
+%   - Jacobians and Hessians;
+%   - code generation;
+%   - symbolic-numeric computation;
+%   - exact preprocessing;
+%   - symbolic verification;
+%   - proof assistance;
+%   - computational and bit complexity;
+%   - modular computation preview;
+%   - evaluation-interpolation strategies;
+%   - expression sharing;
+%   - lazy evaluation;
+%   - applications and exercises.
+%
+% Notes:
+%   - Computer Algebra is developed next in Section 11.9.
+%   - Mathematical Simulation follows in Section 11.10.
+%   - High-Performance Mathematical Computing follows in Section 11.11.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

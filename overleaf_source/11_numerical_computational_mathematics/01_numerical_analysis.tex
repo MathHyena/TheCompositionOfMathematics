@@ -1,0 +1,4315 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.1 NUMERICAL ANALYSIS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Numerical Analysis}
+\label{sec:numerical-analysis}
+
+\prerequisite{
+Calculus, linear algebra, sequences and series, differential equations,
+Taylor expansions, optimization fundamentals, and basic programming
+concepts.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of numerical analysis;
+    \item distinguish exact and approximate computation;
+    \item identify sources of numerical error;
+    \item distinguish absolute and relative error;
+    \item understand significant digits and machine precision;
+    \item understand floating-point representation;
+    \item recognize overflow, underflow, and rounding error;
+    \item distinguish truncation error from roundoff error;
+    \item understand catastrophic cancellation;
+    \item define conditioning of a mathematical problem;
+    \item distinguish conditioning from numerical stability;
+    \item understand forward and backward error;
+    \item use Taylor expansions to derive numerical approximations;
+    \item define consistency, stability, and convergence;
+    \item understand convergence order;
+    \item solve nonlinear scalar equations numerically;
+    \item apply the bisection method;
+    \item apply fixed-point iteration;
+    \item apply Newton's method;
+    \item apply the secant method;
+    \item compare bracketing and open root-finding methods;
+    \item understand stopping criteria;
+    \item approximate derivatives using finite differences;
+    \item derive forward, backward, and centered differences;
+    \item understand finite-difference error order;
+    \item apply Richardson extrapolation;
+    \item approximate definite integrals numerically;
+    \item apply midpoint and trapezoidal rules;
+    \item apply Simpson's rule;
+    \item understand composite quadrature;
+    \item estimate numerical-integration error;
+    \item understand adaptive quadrature conceptually;
+    \item distinguish interpolation from approximation;
+    \item construct polynomial interpolants;
+    \item understand Lagrange interpolation;
+    \item understand Newton divided differences;
+    \item state the polynomial interpolation error formula;
+    \item recognize Runge's phenomenon;
+    \item understand piecewise polynomial interpolation;
+    \item understand cubic splines conceptually;
+    \item understand least-squares approximation;
+    \item distinguish interpolation from least-squares fitting;
+    \item recognize numerical conditioning in interpolation;
+    \item understand iterative refinement conceptually;
+    \item recognize residual-based error checks;
+    \item understand computational complexity in numerical methods;
+    \item understand verification and validation of numerical results;
+    \item connect numerical analysis with scientific computing,
+          differential equations, optimization, simulation, statistics,
+          and applied mathematics.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Numerical Analysis?}
+\label{subsec:what-is-numerical-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical analysis studies algorithms for approximating mathematical
+quantities that cannot be computed exactly or conveniently.
+
+Examples include:
+
+\[
+\boxed{
+\text{roots of nonlinear equations},
+}
+\]
+
+\[
+\boxed{
+\text{solutions of differential equations},
+}
+\]
+
+\[
+\boxed{
+\text{large systems of equations},
+}
+\]
+
+\[
+\boxed{
+\text{definite integrals},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{optimization problems}.
+}
+\]
+
+The central questions are not only:
+
+\[
+\boxed{
+\text{Does the algorithm produce an answer?}
+}
+\]
+
+but also:
+
+\[
+\boxed{
+\text{How accurate is it?}
+}
+\]
+
+\[
+\boxed{
+\text{How stable is it?}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{How much computation does it require?}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Versus Numerical Solutions}
+\label{subsec:exact-versus-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An exact solution may be represented symbolically.
+
+For example,
+
+\[
+x^2-2=0
+\]
+
+has exact positive solution
+
+\[
+\boxed{
+x=\sqrt{2}.
+}
+\]
+
+A numerical approximation might be
+
+\[
+\boxed{
+x\approx1.41421356.
+}
+\]
+
+Numerical methods replace exact symbolic expressions with approximations
+that can be computed to a desired accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sources of Numerical Error}
+\label{subsec:sources-numerical-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical error can arise from several sources:
+
+\[
+\boxed{
+\text{data error},
+}
+\]
+
+\[
+\boxed{
+\text{modeling error},
+}
+\]
+
+\[
+\boxed{
+\text{truncation error},
+}
+\]
+
+\[
+\boxed{
+\text{roundoff error},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{iteration error}.
+}
+\]
+
+These errors should not be treated as interchangeable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Absolute Error}
+\label{subsec:absolute-error-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(x\) is the exact value and \(\widehat{x}\) is an approximation, the
+absolute error is
+
+\[
+\boxed{
+E_{\mathrm{abs}}
+=
+|x-\widehat{x}|.
+}
+\]
+
+Absolute error measures the size of the error in the units of the
+quantity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relative Error}
+\label{subsec:relative-error-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For \(x\neq0\), the relative error is
+
+\[
+\boxed{
+E_{\mathrm{rel}}
+=
+\frac{
+|x-\widehat{x}|
+}{
+|x|
+}.
+}
+\]
+
+Relative error measures the error compared with the scale of the exact
+quantity.
+
+A percentage error is
+
+\[
+\boxed{
+100E_{\mathrm{rel}}\%.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Absolute and Relative Error}
+\label{subsec:worked-absolute-relative-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Approximating \(\pi\)}
+
+Suppose
+
+\[
+\widehat{\pi}=3.14.
+\]
+
+The absolute error is
+
+\[
+|\pi-3.14|
+\approx
+0.00159265.
+\]
+
+The relative error is
+
+\[
+\frac{
+|\pi-3.14|
+}{
+\pi
+}
+\approx
+0.00050696.
+\]
+
+Thus the percentage relative error is approximately
+
+\[
+0.0507\%.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+E_{\mathrm{abs}}
+\approx0.00159265
+}
+\]
+
+and
+
+\[
+\boxed{
+E_{\mathrm{rel}}
+\approx5.07\times10^{-4}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Significant Digits}
+\label{subsec:significant-digits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An approximation has \(p\) correct significant decimal digits when its
+relative error is sufficiently small compared with
+
+\[
+10^{-p}.
+\]
+
+In practice, significant digits describe how many leading digits of a
+numerical value are reliable.
+
+They are distinct from the number of digits merely displayed by software.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Floating-Point Representation}
+\label{subsec:floating-point-representation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computers store most real numbers approximately using floating-point
+representation.
+
+A simplified normalized form is
+
+\[
+\boxed{
+x
+=
+\pm
+m
+\beta^e,
+}
+\]
+
+where:
+
+\[
+m
+=
+\text{mantissa or significand},
+\]
+
+\[
+\beta
+=
+\text{base},
+\]
+
+and
+
+\[
+e
+=
+\text{exponent}.
+\]
+
+In modern computers,
+
+\[
+\boxed{
+\beta=2
+}
+\]
+
+is standard.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Precision}
+\label{subsec:finite-precision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Only finitely many bits are available to represent a floating-point
+number.
+
+Therefore most real numbers cannot be represented exactly.
+
+For example, just as
+
+\[
+\frac13
+=
+0.3333\ldots
+\]
+
+has no finite decimal expansion,
+
+many simple decimal fractions have no finite binary representation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rounding}
+\label{subsec:floating-point-rounding}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\operatorname{fl}(x)
+\]
+
+denote the floating-point representation of \(x\).
+
+A common model is
+
+\[
+\boxed{
+\operatorname{fl}(x)
+=
+x(1+\delta),
+}
+\]
+
+where
+
+\[
+\boxed{
+|\delta|
+\leq
+u.
+}
+\]
+
+The quantity \(u\) is the unit roundoff under the chosen floating-point
+system and rounding convention.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Machine Precision}
+\label{subsec:machine-precision}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Informally, machine precision describes the scale at which floating-point
+rounding prevents neighboring represented values near \(1\) from being
+distinguished.
+
+Terminology varies between sources.
+
+A common computational quantity is machine epsilon:
+
+\[
+\boxed{
+\varepsilon_{\mathrm{mach}}
+=
+\text{distance from }1
+\text{ to the next larger representable number}.
+}
+\]
+
+For IEEE double precision, this value is approximately
+
+\[
+\boxed{
+2.22\times10^{-16}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Roundoff Error}
+\label{subsec:roundoff-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Roundoff error occurs because arithmetic is performed with finite
+precision.
+
+Even if the mathematical operation is exact,
+
+\[
+x+y,
+\]
+
+the computer actually stores an approximation such as
+
+\[
+\boxed{
+\operatorname{fl}
+(
+\operatorname{fl}(x)
++
+\operatorname{fl}(y)
+).
+}
+\]
+
+Repeated arithmetic operations can accumulate rounding effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Overflow}
+\label{subsec:numerical-overflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Overflow occurs when a computed magnitude exceeds the largest
+representable floating-point number.
+
+Conceptually,
+
+\[
+\boxed{
+|x|
+>
+x_{\max}.
+}
+\]
+
+Depending on the system, the result may become an infinity value or raise
+an error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Underflow}
+\label{subsec:numerical-underflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Underflow occurs when a nonzero magnitude is too small for ordinary
+normalized representation.
+
+Modern floating-point systems use subnormal numbers to represent some
+values below the normal range.
+
+Extremely small values may eventually round to zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Catastrophic Cancellation}
+\label{subsec:catastrophic-cancellation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Catastrophic cancellation occurs when nearly equal floating-point numbers
+are subtracted.
+
+Suppose
+
+\[
+x
+\approx
+y.
+\]
+
+Then
+
+\[
+x-y
+\]
+
+may be much smaller than either input.
+
+Errors already present in the leading digits can then dominate the
+remaining result.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Stable Algebraic Reformulation}
+\label{subsec:worked-stable-reformulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Avoiding Cancellation}
+
+Consider
+
+\[
+f(x)
+=
+\sqrt{x+1}-\sqrt{x}
+\]
+
+for large \(x\).
+
+Direct subtraction involves two nearly equal quantities.
+
+Rationalize:
+
+\[
+f(x)
+=
+\frac{
+(\sqrt{x+1}-\sqrt{x})
+(\sqrt{x+1}+\sqrt{x})
+}{
+\sqrt{x+1}+\sqrt{x}
+}.
+\]
+
+Therefore,
+
+\[
+f(x)
+=
+\frac{
+1
+}{
+\sqrt{x+1}+\sqrt{x}
+}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\sqrt{x+1}-\sqrt{x}
+=
+\frac{
+1
+}{
+\sqrt{x+1}+\sqrt{x}
+}
+}
+\]
+
+and the second expression is usually numerically preferable for large
+\(x\).
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Truncation Error}
+\label{subsec:truncation-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Truncation error occurs when an infinite mathematical process is replaced
+by a finite approximation.
+
+For example,
+
+\[
+e^x
+=
+\sum_{k=0}^{\infty}
+\frac{x^k}{k!}.
+\]
+
+Approximating with
+
+\[
+\boxed{
+e^x
+\approx
+\sum_{k=0}^{n}
+\frac{x^k}{k!}
+}
+\]
+
+creates truncation error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Taylor's Theorem}
+\label{subsec:taylor-theorem-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sufficiently differentiable \(f\),
+
+\[
+f(x+h)
+=
+f(x)
++
+hf'(x)
++
+\frac{h^2}{2!}f''(x)
++
+\cdots
++
+\frac{h^n}{n!}f^{(n)}(x)
++
+R_{n+1}.
+\]
+
+A common remainder form is
+
+\[
+\boxed{
+R_{n+1}
+=
+\frac{
+f^{(n+1)}(\xi)
+}{
+(n+1)!
+}
+h^{n+1}
+}
+\]
+
+for some \(\xi\) between \(x\) and \(x+h\).
+
+Taylor expansions are one of the main tools for deriving and analyzing
+numerical methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Big-O Error Notation}
+\label{subsec:big-o-numerical-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If an error satisfies
+
+\[
+E(h)
+=
+O(h^p)
+\]
+
+as \(h\to0\), then there are constants \(C\) and \(h_0>0\) such that
+
+\[
+\boxed{
+|E(h)|
+\leq
+C|h|^p
+}
+\]
+
+for sufficiently small \(h\).
+
+The exponent \(p\) describes the asymptotic error order.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convergence Order}
+\label{subsec:convergence-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose approximations \(x_n\) converge to \(x^*\).
+
+If
+
+\[
+\boxed{
+|x_{n+1}-x^*|
+\approx
+C
+|x_n-x^*|^p,
+}
+\]
+
+then \(p\) is the order of convergence.
+
+Important cases include:
+
+\[
+\boxed{
+p=1
+\quad
+\text{linear convergence},
+}
+\]
+
+and
+
+\[
+\boxed{
+p=2
+\quad
+\text{quadratic convergence}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditioning}
+\label{subsec:numerical-conditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Conditioning describes sensitivity of the exact mathematical solution to
+small perturbations in the data.
+
+A problem is well conditioned when small input changes produce small
+output changes.
+
+A problem is ill conditioned when small input changes can produce large
+output changes.
+
+Conditioning is a property of the problem, not the algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relative Condition Number}
+\label{subsec:relative-condition-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a differentiable scalar function
+
+\[
+y=f(x),
+\]
+
+a relative condition number can be defined as
+
+\[
+\boxed{
+\kappa_f(x)
+=
+\left|
+\frac{
+xf'(x)
+}{
+f(x)
+}
+\right|
+}
+\]
+
+when the expression is defined.
+
+Approximately,
+
+\[
+\boxed{
+\frac{|\Delta y|}{|y|}
+\approx
+\kappa_f(x)
+\frac{|\Delta x|}{|x|}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Conditioning}
+\label{subsec:worked-conditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Conditioning of \(f(x)=x^n\)}
+
+Let
+
+\[
+f(x)=x^n.
+\]
+
+Then
+
+\[
+f'(x)=nx^{n-1}.
+\]
+
+Hence,
+
+\[
+\kappa_f(x)
+=
+\left|
+\frac{
+x(nx^{n-1})
+}{
+x^n
+}
+\right|
+=
+n.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\kappa_f=n.
+}
+\]
+\end{answerbox}
+
+A small relative perturbation in \(x\) is amplified approximately by a
+factor of \(n\) in the output.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Stability}
+\label{subsec:numerical-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Stability describes how an algorithm propagates computational errors.
+
+A numerically stable algorithm does not amplify errors unnecessarily.
+
+Thus:
+
+\[
+\boxed{
+\text{conditioning}
+=
+\text{property of the problem},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{stability}
+=
+\text{property of the algorithm}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward Error}
+\label{subsec:forward-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Forward error compares the computed solution
+
+\[
+\widehat{x}
+\]
+
+with the exact solution
+
+\[
+x^*.
+\]
+
+For example,
+
+\[
+\boxed{
+E_{\mathrm{forward}}
+=
+|\widehat{x}-x^*|.
+}
+\]
+
+This directly measures output accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Error}
+\label{subsec:backward-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Backward error asks:
+
+\[
+\boxed{
+\text{For what nearby input data is the computed answer exact?}
+}
+\]
+
+An algorithm is backward stable if its computed result is the exact
+solution of a problem with only a small perturbation of the original data.
+
+Backward stability is a powerful numerical-analysis concept.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual}
+\label{subsec:numerical-residual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an equation
+
+\[
+f(x)=0,
+\]
+
+the residual of approximation \(\widehat{x}\) is
+
+\[
+\boxed{
+r
+=
+f(\widehat{x}).
+}
+\]
+
+A small residual means the approximation nearly satisfies the equation.
+
+However, a small residual does not always imply small solution error if the
+problem is ill conditioned.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Root-Finding Problems}
+\label{subsec:root-finding-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonlinear root-finding problem seeks
+
+\[
+\boxed{
+x^*
+}
+\]
+
+such that
+
+\[
+\boxed{
+f(x^*)=0.
+}
+\]
+
+Many nonlinear equations cannot be solved symbolically.
+
+Numerical root-finding methods generate a sequence
+
+\[
+x_0,x_1,x_2,\ldots
+\]
+
+intended to converge to a root.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bisection Method}
+\label{subsec:bisection-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(f\) is continuous on
+
+\[
+[a,b]
+\]
+
+and
+
+\[
+\boxed{
+f(a)f(b)<0.
+}
+\]
+
+The Intermediate Value Theorem guarantees at least one root in
+
+\[
+(a,b).
+\]
+
+Bisection repeatedly halves the interval.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bisection Algorithm}
+\label{subsec:bisection-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At each iteration calculate
+
+\[
+\boxed{
+c
+=
+\frac{a+b}{2}.
+}
+\]
+
+If
+
+\[
+f(c)=0,
+\]
+
+stop.
+
+Otherwise retain whichever half interval contains a sign change.
+
+Thus the bracket width is halved at every iteration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bisection Error Bound}
+\label{subsec:bisection-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the initial interval has width
+
+\[
+b-a,
+\]
+
+then after \(n\) bisections the interval width is
+
+\[
+\boxed{
+\frac{
+b-a
+}{
+2^n
+}.
+}
+\]
+
+If the midpoint is used as the approximation, a corresponding error bound
+is
+
+\[
+\boxed{
+|x_n-x^*|
+\leq
+\frac{
+b-a
+}{
+2^{n+1}
+}
+}
+\]
+
+under the usual indexing convention.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bisection}
+\label{subsec:worked-bisection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Root of \(x^2-2\)}
+
+Let
+
+\[
+f(x)=x^2-2.
+\]
+
+On
+
+\[
+[1,2],
+\]
+
+\[
+f(1)=-1,
+\qquad
+f(2)=2.
+\]
+
+The first midpoint is
+
+\[
+c_1=1.5.
+\]
+
+Since
+
+\[
+f(1.5)=0.25>0,
+\]
+
+the root lies in
+
+\[
+[1,1.5].
+\]
+
+The next midpoint is
+
+\[
+c_2=1.25.
+\]
+
+Since
+
+\[
+f(1.25)<0,
+\]
+
+the root lies in
+
+\[
+[1.25,1.5].
+\]
+
+Continuing this procedure converges to
+
+\[
+\boxed{
+\sqrt{2}.
+}
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantages of Bisection}
+\label{subsec:bisection-advantages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bisection is attractive because it is:
+
+\[
+\boxed{
+\text{simple},
+}
+\]
+
+\[
+\boxed{
+\text{robust},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{guaranteed to converge}
+}
+\]
+
+when a continuous sign-changing bracket is maintained.
+
+Its main disadvantage is relatively slow convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed-Point Iteration}
+\label{subsec:fixed-point-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rewrite
+
+\[
+f(x)=0
+\]
+
+as
+
+\[
+\boxed{
+x=g(x).
+}
+\]
+
+Then iterate
+
+\[
+\boxed{
+x_{n+1}
+=
+g(x_n).
+}
+\]
+
+A solution satisfying
+
+\[
+x^*=g(x^*)
+\]
+
+is called a fixed point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Convergence of Fixed-Point Iteration}
+\label{subsec:fixed-point-local-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(g\) is differentiable near \(x^*\) and
+
+\[
+\boxed{
+|g'(x^*)|<1,
+}
+\]
+
+then fixed-point iteration is locally contractive and typically converges
+for sufficiently close initial guesses.
+
+If
+
+\[
+|g'(x^*)|>1,
+\]
+
+the fixed point is locally repelling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton's Method}
+\label{subsec:newtons-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Newton's method approximates \(f\) near \(x_n\) by its tangent line:
+
+\[
+f(x)
+\approx
+f(x_n)
++
+f'(x_n)(x-x_n).
+\]
+
+Setting the approximation equal to zero gives
+
+\[
+\boxed{
+x_{n+1}
+=
+x_n
+-
+\frac{
+f(x_n)
+}{
+f'(x_n)
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Interpretation of Newton's Method}
+\label{subsec:newton-geometric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At \(x_n\):
+
+\begin{enumerate}
+    \item draw the tangent line to \(y=f(x)\);
+    \item find where the tangent intersects the \(x\)-axis;
+    \item use that intercept as \(x_{n+1}\).
+\end{enumerate}
+
+Thus Newton's method repeatedly replaces the nonlinear equation with a
+local linear approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Newton's Method}
+\label{subsec:worked-newton}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Approximating \(\sqrt{2}\)}
+
+Let
+
+\[
+f(x)=x^2-2.
+\]
+
+Then
+
+\[
+f'(x)=2x.
+\]
+
+Newton's iteration is
+
+\[
+x_{n+1}
+=
+x_n
+-
+\frac{
+x_n^2-2
+}{
+2x_n
+}.
+\]
+
+Simplifying,
+
+\[
+\boxed{
+x_{n+1}
+=
+\frac12
+\left(
+x_n+\frac{2}{x_n}
+\right).
+}
+\]
+
+Starting with
+
+\[
+x_0=1.5,
+\]
+
+we obtain
+
+\[
+x_1
+=
+\frac12
+\left(
+1.5+\frac{2}{1.5}
+\right)
+\approx1.4166667.
+\]
+
+Then
+
+\[
+x_2
+\approx1.4142157.
+\]
+
+Then
+
+\[
+x_3
+\approx1.41421356.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+x\approx1.41421356.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Convergence of Newton's Method}
+\label{subsec:newton-quadratic-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Near a simple root \(x^*\), under suitable smoothness assumptions,
+
+\[
+\boxed{
+|e_{n+1}|
+\approx
+C|e_n|^2,
+}
+\]
+
+where
+
+\[
+e_n=x_n-x^*.
+\]
+
+Thus Newton's method has quadratic local convergence.
+
+Once sufficiently close to the root, the number of correct digits can
+increase very rapidly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Failure Modes of Newton's Method}
+\label{subsec:newton-failure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Newton's method can fail when:
+
+\[
+\boxed{
+f'(x_n)\approx0,
+}
+\]
+
+\[
+\boxed{
+\text{the initial guess is poor},
+}
+\]
+
+\[
+\boxed{
+\text{the iteration leaves the desired region},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{the function has complicated geometry}.
+}
+\]
+
+Unlike bisection, Newton's method does not automatically preserve a root
+bracket.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Roots}
+\label{subsec:newton-multiple-roots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(x^*\) is a root of multiplicity \(m>1\), ordinary Newton iteration may
+lose quadratic convergence.
+
+A modified iteration is
+
+\[
+\boxed{
+x_{n+1}
+=
+x_n
+-
+m
+\frac{
+f(x_n)
+}{
+f'(x_n)
+}.
+}
+\]
+
+When \(m\) is known, this can restore faster local convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Secant Method}
+\label{subsec:secant-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The secant method approximates the derivative using two previous points:
+
+\[
+f'(x_n)
+\approx
+\frac{
+f(x_n)-f(x_{n-1})
+}{
+x_n-x_{n-1}
+}.
+\]
+
+Substituting into Newton's formula gives
+
+\[
+\boxed{
+x_{n+1}
+=
+x_n
+-
+f(x_n)
+\frac{
+x_n-x_{n-1}
+}{
+f(x_n)-f(x_{n-1})
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantages of the Secant Method}
+\label{subsec:secant-advantages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The secant method does not require an explicit derivative.
+
+It generally converges faster than bisection but less rapidly than
+quadratically convergent Newton iteration.
+
+Its local convergence order for a simple root is approximately
+
+\[
+\boxed{
+\frac{
+1+\sqrt{5}
+}{
+2
+}
+\approx1.618.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bracketing Versus Open Methods}
+\label{subsec:bracketing-versus-open}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bisection is a bracketing method.
+
+It maintains an interval known to contain a root.
+
+Newton and secant methods are open methods.
+
+They may converge much faster, but they do not guarantee that the root
+remains bracketed.
+
+Hybrid algorithms often combine both ideas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stopping Criteria for Root Finding}
+\label{subsec:root-stopping-criteria}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Possible stopping rules include:
+
+\[
+\boxed{
+|x_{n+1}-x_n|
+<
+\varepsilon_x,
+}
+\]
+
+\[
+\boxed{
+|f(x_n)|
+<
+\varepsilon_f,
+}
+\]
+
+or a relative step test such as
+
+\[
+\boxed{
+\frac{
+|x_{n+1}-x_n|
+}{
+1+|x_{n+1}|
+}
+<
+\varepsilon.
+}
+\]
+
+A robust implementation often considers more than one criterion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Differentiation}
+\label{subsec:numerical-differentiation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The derivative is defined by
+
+\[
+f'(x)
+=
+\lim_{h\to0}
+\frac{
+f(x+h)-f(x)
+}{
+h
+}.
+\]
+
+For finite \(h\),
+
+\[
+\boxed{
+f'(x)
+\approx
+\frac{
+f(x+h)-f(x)
+}{
+h
+}.
+}
+\]
+
+This is the forward-difference approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward Difference}
+\label{subsec:forward-difference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Taylor expansion gives
+
+\[
+f(x+h)
+=
+f(x)
++
+hf'(x)
++
+\frac{h^2}{2}f''(\xi).
+\]
+
+Therefore,
+
+\[
+\frac{
+f(x+h)-f(x)
+}{
+h
+}
+=
+f'(x)
++
+O(h).
+\]
+
+Hence,
+
+\[
+\boxed{
+f'(x)
+=
+\frac{
+f(x+h)-f(x)
+}{
+h
+}
++
+O(h).
+}
+\]
+
+The forward difference is first-order accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Difference}
+\label{subsec:backward-difference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Similarly,
+
+\[
+\boxed{
+f'(x)
+=
+\frac{
+f(x)-f(x-h)
+}{
+h
+}
++
+O(h).
+}
+\]
+
+This is the backward-difference approximation.
+
+It is also first-order accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Centered Difference}
+\label{subsec:centered-difference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using Taylor expansions for \(f(x+h)\) and \(f(x-h)\),
+
+\[
+f(x+h)
+-
+f(x-h)
+=
+2hf'(x)
++
+O(h^3).
+\]
+
+Therefore,
+
+\[
+\boxed{
+f'(x)
+=
+\frac{
+f(x+h)-f(x-h)
+}{
+2h
+}
++
+O(h^2).
+}
+\]
+
+The centered difference is second-order accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second Derivative Difference Formula}
+\label{subsec:second-derivative-difference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adding Taylor expansions yields
+
+\[
+f(x+h)
+-
+2f(x)
++
+f(x-h)
+=
+h^2f''(x)
++
+O(h^4).
+\]
+
+Thus,
+
+\[
+\boxed{
+f''(x)
+=
+\frac{
+f(x+h)
+-
+2f(x)
++
+f(x-h)
+}{
+h^2
+}
++
+O(h^2).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Centered Difference}
+\label{subsec:worked-centered-difference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Approximating a Derivative}
+
+Let
+
+\[
+f(x)=e^x.
+\]
+
+Approximate
+
+\[
+f'(0)
+\]
+
+using centered difference with
+
+\[
+h=0.1.
+\]
+
+Then
+
+\[
+f'(0)
+\approx
+\frac{
+e^{0.1}-e^{-0.1}
+}{
+0.2
+}.
+\]
+
+Numerically,
+
+\[
+e^{0.1}\approx1.105170,
+\]
+
+\[
+e^{-0.1}\approx0.904837.
+\]
+
+Therefore,
+
+\[
+f'(0)
+\approx
+\frac{
+1.105170-0.904837
+}{
+0.2
+}
+\approx1.001665.
+\]
+
+The exact derivative is
+
+\[
+f'(0)=1.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+f'(0)\approx1.001665.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Roundoff Versus Truncation in Differentiation}
+\label{subsec:differentiation-roundoff-truncation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Decreasing \(h\) reduces truncation error.
+
+However, very small \(h\) makes
+
+\[
+f(x+h)-f(x)
+\]
+
+a subtraction of nearly equal floating-point numbers.
+
+This can amplify roundoff error.
+
+Therefore,
+
+\[
+\boxed{
+\text{smaller }h
+\text{ is not always better}.
+}
+\]
+
+An optimal step size balances truncation and roundoff effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Richardson Extrapolation}
+\label{subsec:richardson-extrapolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an approximation satisfies
+
+\[
+A(h)
+=
+A
++
+Ch^p
++
+O(h^{p+1}).
+\]
+
+Then
+
+\[
+A(h/2)
+=
+A
++
+C
+\frac{
+h^p
+}{
+2^p
+}
++
+O(h^{p+1}).
+\]
+
+Eliminating the leading error term gives
+
+\[
+\boxed{
+A_{\mathrm{rich}}
+=
+\frac{
+2^pA(h/2)-A(h)
+}{
+2^p-1
+}.
+}
+\]
+
+This is Richardson extrapolation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Integration}
+\label{subsec:numerical-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical integration approximates
+
+\[
+\boxed{
+\int_a^b
+f(x)\,dx.
+}
+\]
+
+Quadrature methods replace \(f\) with simpler approximations whose
+integrals can be computed exactly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Midpoint Rule}
+\label{subsec:midpoint-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The midpoint rule approximates
+
+\[
+\int_a^b
+f(x)\,dx
+\]
+
+by using the function value at the midpoint
+
+\[
+m
+=
+\frac{a+b}{2}.
+\]
+
+Thus,
+
+\[
+\boxed{
+\int_a^b
+f(x)\,dx
+\approx
+(b-a)
+f
+\left(
+\frac{a+b}{2}
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trapezoidal Rule}
+\label{subsec:trapezoidal-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximating \(f\) with the line connecting
+
+\[
+(a,f(a))
+\]
+
+and
+
+\[
+(b,f(b))
+\]
+
+gives
+
+\[
+\boxed{
+\int_a^b
+f(x)\,dx
+\approx
+\frac{
+b-a
+}{
+2
+}
+[
+f(a)+f(b)
+].
+}
+\]
+
+This is the trapezoidal rule.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Single-Interval Trapezoidal Error}
+\label{subsec:trapezoidal-error-single}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f''\) is continuous, then for some \(\xi\in(a,b)\),
+
+\[
+\boxed{
+E_T
+=
+-
+\frac{
+(b-a)^3
+}{
+12
+}
+f''(\xi).
+}
+\]
+
+Thus the local error depends on curvature.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simpson's Rule}
+\label{subsec:simpsons-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Simpson's rule uses a quadratic interpolant through
+
+\[
+a,
+\qquad
+\frac{a+b}{2},
+\qquad
+b.
+\]
+
+The approximation is
+
+\[
+\boxed{
+\int_a^b
+f(x)\,dx
+\approx
+\frac{
+b-a
+}{
+6
+}
+\left[
+f(a)
++
+4f
+\left(
+\frac{a+b}{2}
+\right)
++
+f(b)
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Simpson's Rule}
+\label{subsec:worked-simpson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Approximating \(\int_0^1 x^4\,dx\)}
+
+The exact integral is
+
+\[
+\int_0^1
+x^4\,dx
+=
+\frac15
+=
+0.2.
+\]
+
+Using Simpson's rule,
+
+\[
+S
+=
+\frac16
+\left[
+f(0)
++
+4f(1/2)
++
+f(1)
+\right].
+\]
+
+Since
+
+\[
+f(0)=0,
+\]
+
+\[
+f(1/2)=\frac1{16},
+\]
+
+and
+
+\[
+f(1)=1,
+\]
+
+we obtain
+
+\[
+S
+=
+\frac16
+\left[
+0
++
+\frac14
++
+1
+\right]
+=
+\frac{5}{24}.
+\]
+
+Thus,
+
+\[
+S
+\approx0.208333.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\int_0^1x^4\,dx
+\approx0.208333
+}
+\]
+
+using one Simpson panel.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composite Quadrature}
+\label{subsec:composite-quadrature}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Accuracy is improved by dividing
+
+\[
+[a,b]
+\]
+
+into smaller subintervals.
+
+Let
+
+\[
+x_i
+=
+a+ih,
+\]
+
+where
+
+\[
+\boxed{
+h
+=
+\frac{
+b-a
+}{
+n
+}.
+}
+\]
+
+Apply the quadrature rule on each subinterval and sum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composite Trapezoidal Rule}
+\label{subsec:composite-trapezoidal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The composite trapezoidal rule is
+
+\[
+\boxed{
+T_n
+=
+h
+\left[
+\frac12f(x_0)
++
+\sum_{i=1}^{n-1}
+f(x_i)
++
+\frac12f(x_n)
+\right].
+}
+\]
+
+For sufficiently smooth \(f\),
+
+\[
+\boxed{
+E_T
+=
+O(h^2).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composite Midpoint Rule}
+\label{subsec:composite-midpoint}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If each subinterval has width \(h\), let \(m_i\) be its midpoint.
+
+Then
+
+\[
+\boxed{
+M_n
+=
+h
+\sum_{i=1}^{n}
+f(m_i).
+}
+\]
+
+For sufficiently smooth \(f\),
+
+\[
+\boxed{
+E_M
+=
+O(h^2).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composite Simpson's Rule}
+\label{subsec:composite-simpson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assume \(n\) is even.
+
+Then
+
+\[
+\boxed{
+S_n
+=
+\frac{h}{3}
+\left[
+f(x_0)
++
+4
+\sum_{\substack{i=1\\i\text{ odd}}}^{n-1}
+f(x_i)
++
+2
+\sum_{\substack{i=2\\i\text{ even}}}^{n-2}
+f(x_i)
++
+f(x_n)
+\right].
+}
+\]
+
+For sufficiently smooth \(f\),
+
+\[
+\boxed{
+E_S
+=
+O(h^4).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composite Simpson Error Bound}
+\label{subsec:composite-simpson-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f^{(4)}\) is continuous,
+
+\[
+\boxed{
+E_S
+=
+-
+\frac{
+b-a
+}{
+180
+}
+h^4
+f^{(4)}(\xi)
+}
+\]
+
+for some \(\xi\in(a,b)\).
+
+Therefore,
+
+\[
+\boxed{
+|E_S|
+\leq
+\frac{
+b-a
+}{
+180
+}
+h^4
+\max_{x\in[a,b]}
+|f^{(4)}(x)|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adaptive Quadrature}
+\label{subsec:adaptive-quadrature}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Uniform subdivision may waste computation in smooth regions.
+
+Adaptive quadrature places more points where the integrand is difficult.
+
+A typical strategy:
+
+\begin{enumerate}
+    \item approximate the integral on an interval;
+    \item subdivide the interval;
+    \item compare coarse and refined approximations;
+    \item refine further if the estimated error is too large.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpolation}
+\label{subsec:numerical-interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose data are known at distinct nodes
+
+\[
+x_0,\ldots,x_n
+\]
+
+with values
+
+\[
+y_i=f(x_i).
+\]
+
+Polynomial interpolation seeks polynomial \(p_n\) of degree at most \(n\)
+such that
+
+\[
+\boxed{
+p_n(x_i)
+=
+y_i,
+\qquad
+i=0,\ldots,n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Existence and Uniqueness of Polynomial Interpolation}
+\label{subsec:interpolation-existence-uniqueness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For \(n+1\) distinct nodes
+
+\[
+x_0,\ldots,x_n,
+\]
+
+there exists a unique polynomial of degree at most \(n\) interpolating the
+corresponding data.
+
+The uniqueness follows because two such polynomials would have a
+difference with at least \(n+1\) distinct roots while having degree at most
+\(n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrange Basis Polynomials}
+\label{subsec:lagrange-basis-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+L_i(x)
+=
+\prod_{\substack{j=0\\j\neq i}}^{n}
+\frac{
+x-x_j
+}{
+x_i-x_j
+}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+L_i(x_j)
+=
+\begin{cases}
+1,
+&
+i=j,
+\\
+0,
+&
+i\neq j.
+\end{cases}
+}
+\]
+
+These are the Lagrange basis polynomials.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrange Interpolation Formula}
+\label{subsec:lagrange-interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The interpolation polynomial is
+
+\[
+\boxed{
+p_n(x)
+=
+\sum_{i=0}^{n}
+f(x_i)
+L_i(x).
+}
+\]
+
+The formula directly satisfies
+
+\[
+p_n(x_i)=f(x_i).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Linear Interpolation}
+\label{subsec:worked-linear-interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Interpolating Two Points}
+
+Suppose
+
+\[
+f(1)=3,
+\qquad
+f(4)=9.
+\]
+
+The Lagrange basis functions are
+
+\[
+L_0(x)
+=
+\frac{x-4}{1-4},
+\]
+
+and
+
+\[
+L_1(x)
+=
+\frac{x-1}{4-1}.
+\]
+
+Therefore,
+
+\[
+p_1(x)
+=
+3
+\frac{x-4}{-3}
++
+9
+\frac{x-1}{3}.
+\]
+
+Simplifying,
+
+\[
+p_1(x)
+=
+2x+1.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+p_1(x)=2x+1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpolation Error Formula}
+\label{subsec:interpolation-error-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(f\) is sufficiently differentiable.
+
+For each \(x\), there exists \(\xi\) in the relevant interval such that
+
+\[
+\boxed{
+f(x)-p_n(x)
+=
+\frac{
+f^{(n+1)}(\xi)
+}{
+(n+1)!
+}
+\prod_{i=0}^{n}
+(x-x_i).
+}
+\]
+
+The error depends on both:
+
+\[
+\boxed{
+\text{smoothness of }f
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{placement of interpolation nodes}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton Divided Differences}
+\label{subsec:newton-divided-differences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Newton interpolation form is
+
+\[
+\boxed{
+p_n(x)
+=
+f[x_0]
++
+f[x_0,x_1]
+(x-x_0)
++
+\cdots
+}
+\]
+
+\[
+\boxed{
+\phantom{p_n(x)={}}
++
+f[x_0,\ldots,x_n]
+\prod_{j=0}^{n-1}
+(x-x_j).
+}
+\]
+
+The quantities
+
+\[
+f[x_i,\ldots,x_j]
+\]
+
+are divided differences.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{First Divided Difference}
+\label{subsec:first-divided-difference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For distinct nodes,
+
+\[
+\boxed{
+f[x_i,x_j]
+=
+\frac{
+f(x_j)-f(x_i)
+}{
+x_j-x_i
+}.
+}
+\]
+
+This is the slope of the secant line between the two data points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Higher Divided Differences}
+\label{subsec:higher-divided-differences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Higher divided differences are defined recursively:
+
+\[
+\boxed{
+f[x_i,\ldots,x_{i+k}]
+=
+\frac{
+f[x_{i+1},\ldots,x_{i+k}]
+-
+f[x_i,\ldots,x_{i+k-1}]
+}{
+x_{i+k}-x_i
+}.
+}
+\]
+
+This creates a triangular divided-difference table.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantage of Newton Form}
+\label{subsec:newton-interpolation-advantage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a new interpolation node is added, the existing Newton coefficients do
+not need to be recomputed completely.
+
+One new divided-difference term can be appended.
+
+This makes Newton form convenient for incremental interpolation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Runge's Phenomenon}
+\label{subsec:runges-phenomenon}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+High-degree polynomial interpolation at equally spaced nodes can oscillate
+strongly near interval endpoints.
+
+This behavior is called Runge's phenomenon.
+
+Increasing the polynomial degree does not necessarily improve the
+approximation uniformly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chebyshev Nodes Preview}
+\label{subsec:chebyshev-nodes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One way to reduce large interpolation oscillations is to use nodes clustered
+near interval endpoints.
+
+Chebyshev-type nodes on \([-1,1]\) can be written as
+
+\[
+\boxed{
+x_k
+=
+\cos
+\left(
+\frac{
+(2k+1)\pi
+}{
+2(n+1)
+}
+\right),
+\qquad
+k=0,\ldots,n.
+}
+\]
+
+These nodes reduce the maximum growth of the interpolation-node product.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Piecewise Polynomial Interpolation}
+\label{subsec:piecewise-polynomial-interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of fitting one high-degree polynomial over the entire interval,
+one can fit low-degree polynomials over subintervals.
+
+This gives:
+
+\[
+\boxed{
+\text{better local control}
+}
+\]
+
+and often
+
+\[
+\boxed{
+\text{better numerical behavior}.
+}
+\]
+
+Piecewise linear interpolation is the simplest example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Splines}
+\label{subsec:numerical-splines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spline is a piecewise polynomial with smoothness conditions at internal
+knots.
+
+Cubic splines use polynomials of degree at most \(3\) on each interval.
+
+A standard cubic spline is typically required to have continuous:
+
+\[
+\boxed{
+S(x),
+}
+\]
+
+\[
+\boxed{
+S'(x),
+}
+\]
+
+and
+
+\[
+\boxed{
+S''(x).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Natural Cubic Spline}
+\label{subsec:natural-cubic-spline}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A natural cubic spline imposes boundary conditions
+
+\[
+\boxed{
+S''(x_0)=0,
+}
+\]
+
+and
+
+\[
+\boxed{
+S''(x_n)=0.
+}
+\]
+
+These conditions complete the system needed to determine the spline.
+
+Other endpoint conditions are also possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpolation Versus Approximation}
+\label{subsec:interpolation-versus-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interpolation requires
+
+\[
+\boxed{
+p(x_i)=y_i
+}
+\]
+
+at every data point.
+
+Approximation does not.
+
+For noisy data, passing exactly through every observation may be
+undesirable.
+
+Least-squares fitting instead seeks a function that minimizes aggregate
+error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Least-Squares Approximation}
+\label{subsec:numerical-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a model
+
+\[
+p(x;\theta)
+\]
+
+depends on parameters \(\theta\).
+
+Given data
+
+\[
+(x_i,y_i),
+\]
+
+least squares minimizes
+
+\[
+\boxed{
+S(\theta)
+=
+\sum_{i=1}^{m}
+[
+y_i-p(x_i;\theta)
+]^2.
+}
+\]
+
+Unlike interpolation, the residuals generally do not vanish individually.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Least Squares}
+\label{subsec:linear-least-squares-review}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+A\mathbf{x}
+\approx
+\mathbf{b},
+\]
+
+least squares minimizes
+
+\[
+\boxed{
+\|A\mathbf{x}-\mathbf{b}\|_2^2.
+}
+\]
+
+The normal equations are
+
+\[
+\boxed{
+A^TA\mathbf{x}
+=
+A^T\mathbf{b}.
+}
+\]
+
+However, numerical linear algebra often prefers QR or SVD-based methods
+because explicitly forming \(A^TA\) can worsen conditioning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Vector}
+\label{subsec:least-squares-residual-vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The residual vector is
+
+\[
+\boxed{
+r
+=
+\mathbf{b}
+-
+A\widehat{\mathbf{x}}.
+}
+\]
+
+At a linear least-squares solution,
+
+\[
+\boxed{
+A^Tr=0.
+}
+\]
+
+Thus the residual is orthogonal to the column space of \(A\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency}
+\label{subsec:numerical-consistency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discretization is consistent if the discrete equations approach the
+original mathematical equations as the discretization parameter tends to
+zero.
+
+Informally,
+
+\[
+\boxed{
+\text{discrete model}
+\to
+\text{continuous model}
+}
+\]
+
+as
+
+\[
+\boxed{
+h\to0.
+}
+\]
+
+Consistency alone does not guarantee a useful numerical solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stability}
+\label{subsec:numerical-method-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical scheme is stable when perturbations such as rounding,
+discretization, or initial errors do not grow uncontrollably through the
+algorithm.
+
+The precise definition depends on the numerical problem.
+
+For differential-equation methods, stability often describes the
+propagation of perturbations across time steps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convergence}
+\label{subsec:numerical-method-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical method is convergent if the computed approximation approaches
+the exact mathematical solution as the discretization is refined.
+
+Symbolically,
+
+\[
+\boxed{
+u_h
+\to
+u
+\qquad
+\text{as}
+\qquad
+h\to0.
+}
+\]
+
+Convergence is the ultimate approximation property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency, Stability, and Convergence}
+\label{subsec:consistency-stability-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+These concepts play distinct roles:
+
+\[
+\boxed{
+\text{consistency}
+\rightarrow
+\text{correct limiting equations},
+}
+\]
+
+\[
+\boxed{
+\text{stability}
+\rightarrow
+\text{controlled error propagation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{convergence}
+\rightarrow
+\text{approach to the true solution}.
+}
+\]
+
+Their exact relationship depends on the numerical setting.
+
+For linear well-posed initial-value discretizations, important theorems
+connect stability and consistency with convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Priori Error Analysis}
+\label{subsec:a-priori-error-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An a priori error estimate predicts error using mathematical properties
+before the numerical solution is known.
+
+For example,
+
+\[
+\boxed{
+|E_h|
+\leq
+Ch^p.
+}
+\]
+
+This helps choose a mesh size or step size before computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Posteriori Error Analysis}
+\label{subsec:a-posteriori-error-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An a posteriori error estimate uses the computed solution itself.
+
+Examples include:
+
+\[
+\boxed{
+\text{residual estimates},
+}
+\]
+
+\[
+\boxed{
+\text{comparison of coarse and fine meshes},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{embedded methods}.
+}
+\]
+
+A posteriori estimates are important for adaptive algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empirical Convergence Rate}
+\label{subsec:empirical-convergence-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+E(h)
+\approx
+Ch^p.
+\]
+
+Then
+
+\[
+E(h/2)
+\approx
+C
+\left(
+\frac{h}{2}
+\right)^p.
+\]
+
+Hence,
+
+\[
+\frac{
+E(h)
+}{
+E(h/2)
+}
+\approx
+2^p.
+\]
+
+Therefore,
+
+\[
+\boxed{
+p
+\approx
+\log_2
+\left(
+\frac{
+E(h)
+}{
+E(h/2)
+}
+\right).
+}
+\]
+
+This can estimate convergence order numerically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Experimental Order}
+\label{subsec:worked-experimental-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Estimating Convergence Rate}
+
+Suppose the numerical errors are
+
+\[
+E(h)=0.008,
+\]
+
+and
+
+\[
+E(h/2)=0.002.
+\]
+
+Then
+
+\[
+\frac{
+E(h)
+}{
+E(h/2)
+}
+=
+4.
+\]
+
+Thus,
+
+\[
+p
+\approx
+\log_2(4)
+=
+2.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+p\approx2.
+}
+\]
+\end{answerbox}
+
+The observed method is approximately second-order accurate over these mesh
+sizes.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algorithmic Complexity}
+\label{subsec:numerical-algorithmic-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical methods must be evaluated not only by accuracy but also by
+computational cost.
+
+Possible cost measures include:
+
+\[
+\boxed{
+\text{arithmetic operations},
+}
+\]
+
+\[
+\boxed{
+\text{memory usage},
+}
+\]
+
+\[
+\boxed{
+\text{iterations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{communication cost}.
+}
+\]
+
+A more accurate method is not always preferable if it is prohibitively
+expensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Accuracy Versus Cost}
+\label{subsec:accuracy-versus-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a method has error
+
+\[
+E(h)
+=
+O(h^p).
+\]
+
+A smaller \(h\) improves accuracy but usually increases the number of
+computational points.
+
+Thus numerical analysis seeks a balance between:
+
+\[
+\boxed{
+\text{accuracy}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{computational effort}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Verification}
+\label{subsec:numerical-verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Verification asks:
+
+\[
+\boxed{
+\text{Are we solving the mathematical model correctly?}
+}
+\]
+
+Verification methods include:
+
+\[
+\boxed{
+\text{mesh refinement},
+}
+\]
+
+\[
+\boxed{
+\text{convergence studies},
+}
+\]
+
+\[
+\boxed{
+\text{comparison with exact benchmark solutions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{residual checks}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Validation}
+\label{subsec:numerical-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Validation asks:
+
+\[
+\boxed{
+\text{Is the mathematical model an adequate representation of the real
+system?}
+}
+\]
+
+A numerical algorithm may solve a model accurately even if the model
+itself poorly represents reality.
+
+Thus:
+
+\[
+\boxed{
+\text{verification}
+\neq
+\text{validation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reproducibility}
+\label{subsec:numerical-reproducibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical result should ideally document:
+
+\[
+\boxed{
+\text{model equations},
+}
+\]
+
+\[
+\boxed{
+\text{parameter values},
+}
+\]
+
+\[
+\boxed{
+\text{initial and boundary conditions},
+}
+\]
+
+\[
+\boxed{
+\text{algorithm},
+}
+\]
+
+\[
+\boxed{
+\text{tolerances},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{software or precision assumptions}.
+}
+\]
+
+This allows results to be independently checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Analysis Workflow}
+\label{subsec:numerical-analysis-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the mathematical problem;
+    \item determine whether an exact solution is available;
+    \item identify the desired numerical quantity;
+    \item analyze conditioning;
+    \item choose an appropriate numerical method;
+    \item derive or understand its truncation error;
+    \item select tolerances and discretization parameters;
+    \item compute the approximation;
+    \item monitor residuals and iteration progress;
+    \item refine the discretization;
+    \item estimate convergence order;
+    \item compare independent methods when possible;
+    \item check sensitivity to data and parameters;
+    \item inspect possible roundoff or cancellation;
+    \item verify the numerical solution;
+    \item validate the underlying mathematical model when appropriate.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Numerical Method}
+\label{subsec:choosing-numerical-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a continuous scalar root with a reliable sign-changing interval,
+consider:
+
+\[
+\boxed{
+\text{bisection}.
+}
+\]
+
+For rapid local root convergence with a derivative, consider:
+
+\[
+\boxed{
+\text{Newton's method}.
+}
+\]
+
+Without derivatives, consider:
+
+\[
+\boxed{
+\text{secant methods}.
+}
+\]
+
+For derivative approximation, centered differences often improve on
+one-sided first-order formulas.
+
+For smooth numerical integration, consider:
+
+\[
+\boxed{
+\text{composite quadrature or adaptive quadrature}.
+}
+\]
+
+For exact fitting of smooth tabulated data, consider:
+
+\[
+\boxed{
+\text{interpolation or splines}.
+}
+\]
+
+For noisy or overdetermined data, consider:
+
+\[
+\boxed{
+\text{least squares}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:numerical-analysis-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Treating a Displayed Decimal as Exact}
+
+A printed number such as
+
+\[
+1.41421356
+\]
+
+may only be an approximation.
+
+Displayed digits should not automatically be interpreted as exact data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Absolute and Relative Error}
+
+An absolute error of \(1\) is enormous if the true value is \(10^{-3}\),
+but tiny if the true value is \(10^{12}\).
+
+Scale matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Decimal Places Means More Accuracy}
+
+Software can display digits that are not mathematically reliable.
+
+Accuracy depends on the computation, conditioning, and input data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Floating-Point Representation}
+
+Real-number algebra and floating-point arithmetic are not identical.
+
+Operations such as
+
+\[
+(a+b)+c
+\]
+
+and
+
+\[
+a+(b+c)
+\]
+
+can produce slightly different floating-point results.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Subtracting Nearly Equal Numbers Unnecessarily}
+
+This can cause catastrophic cancellation.
+
+Algebraic reformulation may produce a more stable expression.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Conditioning and Stability}
+
+An excellent algorithm cannot completely eliminate sensitivity inherent in
+an ill-conditioned problem.
+
+Likewise, a well-conditioned problem can still be solved badly by an
+unstable algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Small Residual Means Small Error}
+
+A small residual may correspond to a large forward error when the problem
+is ill conditioned.
+
+Residual and conditioning should be interpreted together.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Bisection Without a Valid Bracket}
+
+Classical bisection requires a continuous function and a sign-changing
+interval:
+
+\[
+\boxed{
+f(a)f(b)<0.
+}
+\]
+
+Without these conditions, the usual root guarantee is lost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Newton's Method Without Checking the Derivative}
+
+If
+
+\[
+f'(x_n)
+\approx0,
+\]
+
+the Newton step can become extremely large or undefined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Newton's Method Always Converges}
+
+Newton's method is locally powerful but not globally guaranteed.
+
+Initial guesses matter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Extremely Small Finite-Difference Step}
+
+Truncation error decreases with \(h\), but roundoff and cancellation can
+increase.
+
+The best step is not always the smallest representable step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Simpson's Rule With an Odd Number of Composite Subintervals}
+
+The standard composite Simpson rule requires
+
+\[
+\boxed{
+n
+\text{ even}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using One High-Degree Polynomial Automatically}
+
+High-degree interpolation at equally spaced points can exhibit severe
+oscillations.
+
+Splines or better node placement may be preferable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Interpolation and Regression}
+
+Interpolation passes exactly through the supplied data.
+
+Least-squares regression generally does not.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Convergence Studies}
+
+A numerical answer at one grid size or tolerance gives limited evidence of
+accuracy.
+
+Refinement studies help confirm convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Verification and Validation}
+
+A numerically accurate solution to the wrong model is still the wrong
+modeling result.
+
+Both questions should be considered separately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:numerical-analysis-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Engineering.}
+Numerical methods solve nonlinear design equations, structural models,
+fluid models, and control problems.
+
+\medskip
+
+\textbf{Physics.}
+Many physical systems require numerical solutions of differential and
+integral equations.
+
+\medskip
+
+\textbf{Statistics.}
+Likelihood maximization, regression, Bayesian computation, and simulation
+depend heavily on numerical algorithms.
+
+\medskip
+
+\textbf{Optimization.}
+Modern optimization relies on numerical linear algebra, derivative
+approximations, line searches, and iterative solution methods.
+
+\medskip
+
+\textbf{Differential Equations.}
+ODE and PDE solutions are frequently available only through numerical
+discretization.
+
+\medskip
+
+\textbf{Finance.}
+Pricing, risk estimation, portfolio optimization, and stochastic models
+require numerical integration, simulation, and equation solving.
+
+\medskip
+
+\textbf{Data Science.}
+Large-scale fitting and machine-learning algorithms are fundamentally
+numerical optimization procedures.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Numerical analysis provides the mathematical foundation for reliable
+computational science.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:numerical-analysis-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define absolute error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define relative error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define roundoff error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define truncation error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define conditioning.
+\end{exercise}
+
+\begin{exercise}[1]
+Define numerical stability.
+\end{exercise}
+
+\begin{exercise}[1]
+Define forward error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define backward error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a residual.
+\end{exercise}
+
+\begin{exercise}[1]
+Define convergence order.
+\end{exercise}
+
+\begin{exercise}[2]
+For exact value
+
+\[
+x=2.718281828
+\]
+
+and approximation
+
+\[
+\widehat{x}=2.718,
+\]
+
+compute absolute and relative error.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the difference between overflow and underflow.
+\end{exercise}
+
+\begin{exercise}[2]
+Give an example of catastrophic cancellation.
+\end{exercise}
+
+\begin{exercise}[2]
+Use algebraic reformulation to avoid cancellation in
+
+\[
+\sqrt{x+1}-\sqrt{x}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the relative condition number of
+
+\[
+f(x)=x^5.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the relative condition number of
+
+\[
+f(x)=\ln x.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Compare forward error and residual for an approximate root.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply one iteration of bisection to a given sign-changing interval.
+\end{exercise}
+
+\begin{exercise}[3]
+Use bisection to approximate a root of
+
+\[
+x^3-x-2=0
+\]
+
+to a specified tolerance.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine the number of bisection iterations needed to guarantee a
+specified interval width.
+\end{exercise}
+
+\begin{exercise}[2]
+Rewrite
+
+\[
+x^2-3=0
+\]
+
+as a fixed-point problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether a given fixed-point iteration is locally convergent by
+examining \(g'(x^*)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Write Newton's iteration for
+
+\[
+f(x)=x^3-5.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use Newton's method to approximate
+
+\[
+\sqrt[3]{5}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that Newton's method for
+
+\[
+x^2-a=0
+\]
+
+gives
+
+\[
+x_{n+1}
+=
+\frac12
+\left(
+x_n+\frac{a}{x_n}
+\right).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Apply the secant method to a nonlinear equation using two initial points.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the iteration counts of bisection, Newton, and secant methods on
+the same root problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a stopping rule using both step size and residual.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the forward-difference approximation using Taylor expansion.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the backward-difference approximation.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the centered-difference formula.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the centered second-derivative formula.
+\end{exercise}
+
+\begin{exercise}[3]
+Use forward and centered differences to approximate
+
+\[
+\frac{d}{dx}\sin x
+\]
+
+at a specified point.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare their errors for several values of \(h\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the error eventually increases when \(h\) becomes extremely
+small in floating-point arithmetic.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply Richardson extrapolation to two derivative approximations.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply the midpoint rule to a definite integral.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply the trapezoidal rule to the same integral.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply Simpson's rule to the same integral.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the composite trapezoidal rule with four subintervals.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the composite Simpson rule with four subintervals.
+\end{exercise}
+
+\begin{exercise}[3]
+Use a derivative bound to estimate composite trapezoidal error.
+\end{exercise}
+
+\begin{exercise}[3]
+Use a fourth-derivative bound to estimate composite Simpson error.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how adaptive quadrature decides where to refine.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct the linear interpolating polynomial through two points.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a quadratic Lagrange interpolant through three points.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify that each Lagrange basis polynomial has the required nodal values.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a divided-difference table.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the corresponding Newton interpolation polynomial.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the interpolation-error formula to bound the error at a specified
+point.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Runge's phenomenon.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare equally spaced nodes with Chebyshev-type nodes conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a piecewise linear interpolant.
+\end{exercise}
+
+\begin{exercise}[3]
+State the continuity requirements of a cubic spline.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the natural cubic-spline boundary conditions.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between interpolation and least squares.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the normal equations for a linear least-squares problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why QR factorization can be numerically preferable to normal
+equations.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate an empirical convergence rate from errors at \(h\) and \(h/2\).
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish a priori and a posteriori error estimates.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a simple numerical convergence study.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between verification and validation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive a rigorous error bound for bisection.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove local quadratic convergence of Newton's method for a simple root.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Newton convergence for multiple roots.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the secant-method convergence order.
+\end{exercise}
+
+\begin{exercise}[4]
+Study safeguarded Newton methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Brent-type hybrid root solvers.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive optimal finite-difference step-size scaling under roundoff error.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive high-order finite-difference formulas using Taylor expansions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Richardson extrapolation systematically.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Romberg integration from trapezoidal extrapolation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Gaussian quadrature.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Gauss--Legendre quadrature nodes and weights for low orders.
+\end{exercise}
+
+\begin{exercise}[4]
+Study adaptive quadrature error estimation.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove uniqueness of polynomial interpolation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the interpolation-error formula.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Lebesgue constants and interpolation conditioning.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Chebyshev interpolation and near-minimax approximation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive cubic-spline equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study best approximation in normed spaces.
+\end{exercise}
+
+\begin{exercise}[4]
+Study backward stability of numerical algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate mixed forward-backward error analysis.
+\end{exercise}
+
+\begin{exercise}[4]
+Study interval arithmetic for verified numerical computation.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:numerical-analysis-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical analysis studies reliable approximation of mathematical
+problems.
+
+Approximation error may be measured using
+
+\[
+\boxed{
+E_{\mathrm{abs}}
+=
+|x-\widehat{x}|
+}
+\]
+
+and
+
+\[
+\boxed{
+E_{\mathrm{rel}}
+=
+\frac{
+|x-\widehat{x}|
+}{
+|x|
+}.
+}
+\]
+
+Important error sources include
+
+\[
+\boxed{
+\text{roundoff}
++
+\text{truncation}
++
+\text{data error}.
+}
+\]
+
+A problem's sensitivity is described by
+
+\[
+\boxed{
+\text{conditioning},
+}
+\]
+
+while an algorithm's error behavior is described by
+
+\[
+\boxed{
+\text{stability}.
+}
+\]
+
+Root-finding methods include
+
+\[
+\boxed{
+\text{bisection},
+}
+\]
+
+\[
+\boxed{
+\text{Newton},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{secant}.
+}
+\]
+
+Numerical differentiation uses formulas such as
+
+\[
+\boxed{
+f'(x)
+\approx
+\frac{
+f(x+h)-f(x-h)
+}{
+2h
+}.
+}
+\]
+
+Numerical integration includes
+
+\[
+\boxed{
+\text{midpoint},
+}
+\]
+
+\[
+\boxed{
+\text{trapezoidal},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Simpson}
+}
+\]
+
+rules.
+
+Polynomial interpolation can be written as
+
+\[
+\boxed{
+p_n(x)
+=
+\sum_{i=0}^{n}
+f(x_i)L_i(x).
+}
+\]
+
+Reliable numerical computation requires consideration of
+
+\[
+\boxed{
+\text{accuracy}
++
+\text{conditioning}
++
+\text{stability}
++
+\text{convergence}
++
+\text{computational cost}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:numerical-analysis-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Numerical Analysis begins Chapter~11 by establishing the mathematical
+principles required for reliable computation: error measurement,
+floating-point arithmetic, conditioning, stability, convergence,
+root finding, numerical differentiation, quadrature, and interpolation.
+These concepts underlie nearly every later computational topic. The next
+section, Numerical Linear Algebra, develops stable and efficient methods
+for solving linear systems, matrix factorizations, least-squares problems,
+eigenvalue problems, and large sparse matrix computations.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.1 Numerical Analysis
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard introductory and advanced numerical-analysis theory.
+%   - Standard floating-point, approximation, root-finding,
+%     differentiation, quadrature, and interpolation methods.
+%
+% Used for:
+%   - numerical approximation;
+%   - absolute and relative error;
+%   - significant digits;
+%   - floating-point representation;
+%   - finite precision;
+%   - machine epsilon and unit roundoff;
+%   - overflow and underflow;
+%   - roundoff and truncation errors;
+%   - catastrophic cancellation;
+%   - Taylor-series analysis;
+%   - Big-O error notation;
+%   - conditioning;
+%   - forward and backward error;
+%   - numerical stability;
+%   - residuals;
+%   - bisection;
+%   - fixed-point iteration;
+%   - Newton's method;
+%   - secant method;
+%   - convergence order;
+%   - root-finding stopping criteria;
+%   - finite differences;
+%   - forward, backward, and centered derivatives;
+%   - second-derivative approximation;
+%   - Richardson extrapolation;
+%   - midpoint, trapezoidal, and Simpson quadrature;
+%   - composite quadrature;
+%   - adaptive quadrature;
+%   - polynomial interpolation;
+%   - Lagrange interpolation;
+%   - Newton divided differences;
+%   - interpolation error;
+%   - Runge's phenomenon;
+%   - Chebyshev-node preview;
+%   - splines;
+%   - least-squares approximation;
+%   - consistency, stability, and convergence;
+%   - a priori and a posteriori error estimates;
+%   - empirical convergence rates;
+%   - algorithmic complexity;
+%   - verification and validation;
+%   - reproducibility;
+%   - applications and exercises.
+%
+% Notes:
+%   - Numerical Linear Algebra is developed next in Section 11.2.
+%   - Numerical Optimization follows in Section 11.3.
+%   - Numerical ODEs and PDEs are developed in Sections 11.4 and 11.5.
+%   - Monte Carlo Methods are developed in Section 11.6.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,3472 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 7.14 STOCHASTIC DIFFERENTIAL EQUATIONS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Stochastic Differential Equations}
+\label{sec:stochastic-differential-equations}
+
+\prerequisite{
+Ordinary differential equations, stochastic processes, Brownian motion,
+filtrations, martingales, It\^o integration, It\^o's formula,
+conditional expectation, and numerical approximation.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a stochastic differential equation;
+    \item distinguish drift and diffusion coefficients;
+    \item interpret an SDE in integral form;
+    \item understand strong and weak solutions;
+    \item state standard existence and uniqueness conditions;
+    \item solve elementary linear SDEs;
+    \item derive arithmetic Brownian motion;
+    \item derive geometric Brownian motion;
+    \item derive the Ornstein--Uhlenbeck process;
+    \item use integrating factors for linear SDEs;
+    \item apply It\^o's formula to transform SDEs;
+    \item compute means and variances of common SDE solutions;
+    \item identify stationary distributions in basic diffusion models;
+    \item understand infinitesimal generators;
+    \item connect SDEs with Kolmogorov equations;
+    \item recognize the Fokker--Planck equation;
+    \item understand the Feynman--Kac connection;
+    \item define multidimensional SDEs;
+    \item understand correlated Brownian drivers;
+    \item approximate SDEs using Euler--Maruyama;
+    \item recognize the Milstein method;
+    \item distinguish strong and weak numerical convergence;
+    \item understand stability issues in numerical SDEs;
+    \item recognize hitting-time and boundary-value problems;
+    \item understand stochastic population and finance models;
+    \item connect SDEs with diffusion processes, control theory,
+          mathematical biology, physics, and finance.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{From ODEs to SDEs}
+\label{subsec:from-odes-to-sdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ordinary differential equation may be written
+
+\[
+\boxed{
+\frac{dx}{dt}
+=
+b(t,x).
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+dx_t
+=
+b(t,x_t)\,dt.
+}
+\]
+
+A stochastic differential equation adds a random forcing term.
+
+The basic It\^o form is
+
+\[
+\boxed{
+dX_t
+=
+b(t,X_t)\,dt
++
+\sigma(t,X_t)\,dB_t.
+}
+\]
+
+Here:
+
+\[
+b
+=
+\text{drift coefficient},
+\]
+
+and
+
+\[
+\sigma
+=
+\text{diffusion coefficient}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of an SDE}
+\label{subsec:sde-definition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Stochastic Differential Equation}
+A stochastic differential equation driven by Brownian motion is an
+equation of the form
+
+\[
+\boxed{
+dX_t
+=
+b(t,X_t)\,dt
++
+\sigma(t,X_t)\,dB_t,
+}
+\]
+
+together with an initial condition
+
+\[
+\boxed{
+X_0=x_0.
+}
+\]
+\end{definitionbox}
+
+The process \(X_t\) is unknown.
+
+The Brownian motion \(B_t\) provides random forcing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integral Form of an SDE}
+\label{subsec:sde-integral-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The differential notation is shorthand.
+
+The precise meaning is the integral equation
+
+\[
+\boxed{
+X_t
+=
+X_0
++
+\int_0^t
+b(s,X_s)\,ds
++
+\int_0^t
+\sigma(s,X_s)\,dB_s.
+}
+\]
+
+The first integral is an ordinary time integral.
+
+The second is an It\^o stochastic integral.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Drift and Diffusion}
+\label{subsec:sde-drift-diffusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In
+
+\[
+dX_t
+=
+b(t,X_t)\,dt
++
+\sigma(t,X_t)\,dB_t,
+\]
+
+the term
+
+\[
+b(t,X_t)\,dt
+\]
+
+describes local deterministic tendency.
+
+The term
+
+\[
+\sigma(t,X_t)\,dB_t
+\]
+
+describes local random fluctuation.
+
+Thus,
+
+\[
+\boxed{
+\text{SDE}
+=
+\text{deterministic dynamics}
++
+\text{random forcing}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infinitesimal Mean and Variance}
+\label{subsec:sde-infinitesimal-mean-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a small time interval \(\Delta t\),
+
+\[
+\Delta X
+\approx
+b(t,X_t)\Delta t
++
+\sigma(t,X_t)\Delta B.
+\]
+
+Since
+
+\[
+\mathbb{E}[\Delta B]=0,
+\]
+
+the conditional mean increment is approximately
+
+\[
+\boxed{
+\mathbb{E}[\Delta X\mid X_t]
+\approx
+b(t,X_t)\Delta t.
+}
+\]
+
+Because
+
+\[
+\operatorname{Var}(\Delta B)
+=
+\Delta t,
+\]
+
+the conditional variance is approximately
+
+\[
+\boxed{
+\operatorname{Var}(\Delta X\mid X_t)
+\approx
+\sigma(t,X_t)^2\Delta t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Solutions}
+\label{subsec:strong-solutions-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A strong solution is constructed using a specified Brownian motion and
+filtration.
+
+Informally, \(X_t\) is built pathwise from:
+
+\[
+\boxed{
+X_0
+}
+\]
+
+and
+
+\[
+\boxed{
+(B_s)_{0\leq s\leq t}.
+}
+\]
+
+The solution must be adapted and satisfy the integral equation almost
+surely.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Solutions}
+\label{subsec:weak-solutions-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A weak solution permits the probability space and Brownian motion to be
+part of the construction.
+
+The primary concern is the probability law of the resulting process
+rather than a pathwise construction from a preassigned Brownian motion.
+
+Thus:
+
+\[
+\boxed{
+\text{strong solution}
+=
+\text{pathwise construction},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{weak solution}
+=
+\text{distributional construction}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pathwise Uniqueness}
+\label{subsec:pathwise-uniqueness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(X_t\) and \(Y_t\) solve the same SDE on the same probability
+space, driven by the same Brownian motion, with the same initial value.
+
+Pathwise uniqueness means
+
+\[
+\boxed{
+P
+\left(
+X_t=Y_t
+\text{ for all }t
+\right)
+=
+1.
+}
+\]
+
+This is stronger than uniqueness only in distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Existence and Uniqueness Conditions}
+\label{subsec:sde-existence-uniqueness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A standard theorem assumes Lipschitz and linear-growth conditions.
+
+Suppose there exists \(K>0\) such that
+
+\[
+\boxed{
+|b(t,x)-b(t,y)|
++
+|\sigma(t,x)-\sigma(t,y)|
+\leq
+K|x-y|
+}
+\]
+
+for all relevant \(t,x,y\).
+
+Also suppose
+
+\[
+\boxed{
+|b(t,x)|^2
++
+|\sigma(t,x)|^2
+\leq
+K^2(1+|x|^2).
+}
+\]
+
+Under standard hypotheses, the SDE has a unique strong solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Lipschitz Conditions Matter}
+\label{subsec:why-lipschitz-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Lipschitz condition limits how rapidly the coefficients can separate
+nearby states.
+
+This prevents two solutions starting from the same point from diverging
+too rapidly.
+
+It is the stochastic analogue of classical uniqueness conditions for
+ordinary differential equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arithmetic Brownian Motion}
+\label{subsec:arithmetic-brownian-motion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+dX_t
+=
+\mu\,dt
++
+\sigma\,dB_t,
+}
+\]
+
+with constants \(\mu\) and \(\sigma\).
+
+Integrating directly,
+
+\[
+X_t
+=
+X_0
++
+\mu t
++
+\sigma B_t.
+\]
+
+Therefore,
+
+\[
+\boxed{
+X_t
+=
+X_0+\mu t+\sigma B_t.
+}
+\]
+
+This is arithmetic Brownian motion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distribution of Arithmetic Brownian Motion}
+\label{subsec:arithmetic-brownian-distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since
+
+\[
+B_t\sim N(0,t),
+\]
+
+we obtain
+
+\[
+\boxed{
+X_t
+\sim
+N
+\left(
+X_0+\mu t,
+\sigma^2t
+\right).
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\mathbb{E}[X_t]
+=
+X_0+\mu t,
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Var}(X_t)
+=
+\sigma^2t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Arithmetic Brownian Motion}
+\label{subsec:worked-arithmetic-brownian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Constant Drift and Diffusion}
+
+Suppose
+
+\[
+dX_t
+=
+3\,dt
++
+2\,dB_t,
+\qquad
+X_0=5.
+\]
+
+Integrating gives
+
+\[
+X_t
+=
+5+3t+2B_t.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+X_t
+\sim
+N(5+3t,4t).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Brownian Motion}
+\label{subsec:geometric-brownian-motion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider the multiplicative SDE
+
+\[
+\boxed{
+dS_t
+=
+\mu S_t\,dt
++
+\sigma S_t\,dB_t,
+}
+\]
+
+with
+
+\[
+S_0>0.
+\]
+
+This is geometric Brownian motion.
+
+It is one of the most important explicitly solvable SDEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Solving Geometric Brownian Motion}
+\label{subsec:solve-geometric-brownian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Apply It\^o's formula to
+
+\[
+f(S_t)
+=
+\ln S_t.
+\]
+
+From the previous section,
+
+\[
+d(\ln S_t)
+=
+\left(
+\mu-\frac12\sigma^2
+\right)dt
++
+\sigma\,dB_t.
+\]
+
+Integrating,
+
+\[
+\ln S_t
+=
+\ln S_0
++
+\left(
+\mu-\frac12\sigma^2
+\right)t
++
+\sigma B_t.
+\]
+
+Exponentiating,
+
+\[
+\boxed{
+S_t
+=
+S_0
+\exp
+\left[
+\left(
+\mu-\frac12\sigma^2
+\right)t
++
+\sigma B_t
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distribution of Geometric Brownian Motion}
+\label{subsec:gbm-distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because
+
+\[
+\ln S_t
+\]
+
+is normal,
+
+\[
+S_t
+\]
+
+is lognormal.
+
+Specifically,
+
+\[
+\boxed{
+\ln S_t
+\sim
+N
+\left(
+\ln S_0
++
+\left(
+\mu-\frac12\sigma^2
+\right)t,
+\sigma^2t
+\right).
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+S_t>0
+}
+\]
+
+almost surely whenever \(S_0>0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean of Geometric Brownian Motion}
+\label{subsec:gbm-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using the lognormal moment formula,
+
+\[
+\mathbb{E}[S_t]
+=
+S_0
+e^{(\mu-\sigma^2/2)t}
+e^{\sigma^2t/2}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mathbb{E}[S_t]
+=
+S_0e^{\mu t}.
+}
+\]
+
+The It\^o correction disappears from the final mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of Geometric Brownian Motion}
+\label{subsec:gbm-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The variance is
+
+\[
+\boxed{
+\operatorname{Var}(S_t)
+=
+S_0^2
+e^{2\mu t}
+\left(
+e^{\sigma^2t}-1
+\right).
+}
+\]
+
+Thus uncertainty increases with both time and volatility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Geometric Brownian Motion}
+\label{subsec:worked-gbm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Explicit GBM Solution}
+
+Suppose
+
+\[
+dS_t
+=
+0.08S_t\,dt
++
+0.20S_t\,dB_t,
+\qquad
+S_0=100.
+\]
+
+Then
+
+\[
+S_t
+=
+100
+\exp
+\left[
+\left(
+0.08-\frac12(0.20)^2
+\right)t
++
+0.20B_t
+\right].
+\]
+
+Since
+
+\[
+\frac12(0.20)^2=0.02,
+\]
+
+we obtain
+
+\begin{answerbox}
+\[
+\boxed{
+S_t
+=
+100
+\exp
+\left(
+0.06t+0.20B_t
+\right).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear SDEs}
+\label{subsec:linear-sdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A general scalar linear SDE may be written
+
+\[
+\boxed{
+dX_t
+=
+(a_tX_t+c_t)\,dt
++
+(b_tX_t+d_t)\,dB_t.
+}
+\]
+
+Some linear SDEs can be solved using stochastic integrating factors.
+
+A particularly important additive-noise example is
+
+\[
+\boxed{
+dX_t
+=
+(aX_t+c)\,dt
++
+\sigma\,dB_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ornstein--Uhlenbeck Process}
+\label{subsec:ornstein-uhlenbeck-process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Ornstein--Uhlenbeck process satisfies
+
+\[
+\boxed{
+dX_t
+=
+\theta(\mu-X_t)\,dt
++
+\sigma\,dB_t,
+}
+\]
+
+where
+
+\[
+\theta>0.
+\]
+
+The drift pulls \(X_t\) toward the level \(\mu\).
+
+Thus the process is mean-reverting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of Mean Reversion}
+\label{subsec:mean-reversion-ou}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+X_t>\mu,
+\]
+
+then
+
+\[
+\theta(\mu-X_t)<0,
+\]
+
+so the drift points downward.
+
+If
+
+\[
+X_t<\mu,
+\]
+
+then
+
+\[
+\theta(\mu-X_t)>0,
+\]
+
+so the drift points upward.
+
+Therefore,
+
+\[
+\boxed{
+\mu
+=
+\text{long-run equilibrium level},
+}
+\]
+
+while
+
+\[
+\boxed{
+\theta
+=
+\text{mean-reversion speed}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Solving the Ornstein--Uhlenbeck SDE}
+\label{subsec:solve-ou}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rewrite
+
+\[
+dX_t
++
+\theta X_t\,dt
+=
+\theta\mu\,dt
++
+\sigma\,dB_t.
+\]
+
+Use the integrating factor
+
+\[
+e^{\theta t}.
+\]
+
+Then
+
+\[
+d
+\left(
+e^{\theta t}X_t
+\right)
+=
+\theta\mu e^{\theta t}\,dt
++
+\sigma e^{\theta t}\,dB_t.
+\]
+
+Integrating and simplifying,
+
+\[
+\boxed{
+X_t
+=
+\mu
++
+(X_0-\mu)e^{-\theta t}
++
+\sigma
+\int_0^t
+e^{-\theta(t-s)}
+\,dB_s.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean of the Ornstein--Uhlenbeck Process}
+\label{subsec:ou-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The stochastic integral has mean zero.
+
+Therefore,
+
+\[
+\boxed{
+\mathbb{E}[X_t]
+=
+\mu
++
+(X_0-\mu)e^{-\theta t}.
+}
+\]
+
+As
+
+\[
+t\to\infty,
+\]
+
+\[
+\boxed{
+\mathbb{E}[X_t]
+\to
+\mu.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of the Ornstein--Uhlenbeck Process}
+\label{subsec:ou-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By the It\^o isometry,
+
+\[
+\operatorname{Var}(X_t)
+=
+\sigma^2
+\int_0^t
+e^{-2\theta(t-s)}
+\,ds.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Var}(X_t)
+=
+\frac{
+\sigma^2
+}{
+2\theta
+}
+\left(
+1-e^{-2\theta t}
+\right).
+}
+\]
+
+As \(t\to\infty\),
+
+\[
+\boxed{
+\operatorname{Var}(X_t)
+\to
+\frac{\sigma^2}{2\theta}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stationary Ornstein--Uhlenbeck Distribution}
+\label{subsec:ou-stationary-distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The limiting distribution is Gaussian:
+
+\[
+\boxed{
+X_\infty
+\sim
+N
+\left(
+\mu,
+\frac{\sigma^2}{2\theta}
+\right).
+}
+\]
+
+Thus the Ornstein--Uhlenbeck process is one of the basic continuous-time
+stationary Gaussian models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Ornstein--Uhlenbeck Process}
+\label{subsec:worked-ou}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Long-Run Distribution}
+
+Suppose
+
+\[
+dX_t
+=
+2(10-X_t)\,dt
++
+3\,dB_t.
+\]
+
+Then
+
+\[
+\theta=2,
+\qquad
+\mu=10,
+\qquad
+\sigma=3.
+\]
+
+The stationary variance is
+
+\[
+\frac{9}{4}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+X_\infty
+\sim
+N
+\left(
+10,
+\frac94
+\right).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General Additive Linear SDE}
+\label{subsec:general-additive-linear-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+dX_t
+=
+(a(t)X_t+c(t))\,dt
++
+\sigma(t)\,dB_t.
+}
+\]
+
+An integrating factor is
+
+\[
+\boxed{
+I(t)
+=
+\exp
+\left(
+-\int_0^t
+a(s)\,ds
+\right).
+}
+\]
+
+This transforms the SDE into an equation whose drift no longer contains
+the unknown process multiplicatively.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transforming SDEs with It\^o's Formula}
+\label{subsec:transform-sdes-ito}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+dX_t
+=
+b(X_t)\,dt
++
+\sigma(X_t)\,dB_t
+\]
+
+and define
+
+\[
+Y_t=g(X_t).
+\]
+
+Then It\^o's formula gives
+
+\[
+\boxed{
+dY_t
+=
+\left[
+b(X_t)g'(X_t)
++
+\frac12
+\sigma(X_t)^2g''(X_t)
+\right]dt
++
+\sigma(X_t)g'(X_t)\,dB_t.
+}
+\]
+
+This is the stochastic analogue of change of variables in an ODE.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Exponential Transformation}
+\label{subsec:worked-sde-exponential-transform}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Transforming Arithmetic Brownian Motion}
+
+Suppose
+
+\[
+dX_t
+=
+\mu\,dt
++
+\sigma\,dB_t
+\]
+
+and define
+
+\[
+Y_t=e^{X_t}.
+\]
+
+Then
+
+\[
+g'(x)=e^x,
+\qquad
+g''(x)=e^x.
+\]
+
+Therefore,
+
+\[
+dY_t
+=
+Y_t
+\left(
+\mu+\frac12\sigma^2
+\right)dt
++
+\sigma Y_t\,dB_t.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+dY_t
+=
+\left(
+\mu+\frac12\sigma^2
+\right)Y_t\,dt
++
+\sigma Y_t\,dB_t.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diffusion Processes}
+\label{subsec:diffusion-processes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A diffusion is commonly modeled by an SDE of the form
+
+\[
+\boxed{
+dX_t
+=
+b(t,X_t)\,dt
++
+\sigma(t,X_t)\,dB_t.
+}
+\]
+
+Under standard assumptions, such processes have continuous sample paths.
+
+They represent systems with continuous random motion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infinitesimal Generator}
+\label{subsec:sde-generator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a time-homogeneous diffusion
+
+\[
+dX_t
+=
+b(X_t)\,dt
++
+\sigma(X_t)\,dB_t,
+\]
+
+the infinitesimal generator is
+
+\[
+\boxed{
+\mathcal{L}f(x)
+=
+b(x)f'(x)
++
+\frac12
+\sigma(x)^2f''(x).
+}
+\]
+
+This operator describes the local evolution of expected functions of
+the process.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generator from It\^o's Formula}
+\label{subsec:generator-from-ito}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+It\^o's formula gives
+
+\[
+df(X_t)
+=
+\mathcal{L}f(X_t)\,dt
++
+\sigma(X_t)f'(X_t)\,dB_t.
+\]
+
+Taking conditional expectations over a small time interval yields
+
+\[
+\boxed{
+\mathbb{E}
+[
+f(X_{t+\Delta t})-f(X_t)
+\mid
+X_t=x
+]
+\approx
+\mathcal{L}f(x)\Delta t.
+}
+\]
+
+This explains the term ``generator.''
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kolmogorov Backward Equation}
+\label{subsec:kolmogorov-backward-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+u(t,x)
+=
+\mathbb{E}_x
+[
+g(X_t)
+].
+\]
+
+Under appropriate smoothness assumptions,
+
+\[
+u
+\]
+
+satisfies the backward equation
+
+\[
+\boxed{
+\frac{\partial u}{\partial t}
+=
+\mathcal{L}u.
+}
+\]
+
+For the diffusion generator,
+
+\[
+\boxed{
+u_t
+=
+b(x)u_x
++
+\frac12
+\sigma(x)^2u_{xx}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fokker--Planck Equation}
+\label{subsec:fokker-planck}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The probability density of a diffusion evolves according to a forward
+equation.
+
+Suppose
+
+\[
+p(t,x)
+\]
+
+is the density of \(X_t\).
+
+For
+
+\[
+dX_t
+=
+b(X_t)\,dt
++
+\sigma(X_t)\,dB_t,
+\]
+
+the Fokker--Planck equation is formally
+
+\[
+\boxed{
+\frac{\partial p}{\partial t}
+=
+-
+\frac{\partial}{\partial x}
+\left(
+b(x)p
+\right)
++
+\frac12
+\frac{\partial^2}{\partial x^2}
+\left(
+\sigma(x)^2p
+\right).
+}
+\]
+
+It is also called the Kolmogorov forward equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pure Brownian Fokker--Planck Equation}
+\label{subsec:brownian-fokker-planck}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+dX_t=dB_t,
+\]
+
+we have
+
+\[
+b=0,
+\qquad
+\sigma=1.
+\]
+
+Therefore,
+
+\[
+\boxed{
+p_t
+=
+\frac12p_{xx}.
+}
+\]
+
+This is the heat equation.
+
+Thus Brownian probability densities evolve according to diffusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stationary Densities}
+\label{subsec:stationary-densities-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stationary density
+
+\[
+p_\infty(x)
+\]
+
+does not change with time.
+
+Therefore it solves the stationary Fokker--Planck equation
+
+\[
+\boxed{
+0
+=
+-
+\frac{d}{dx}
+(bp_\infty)
++
+\frac12
+\frac{d^2}{dx^2}
+(\sigma^2p_\infty).
+}
+\]
+
+Solving this equation can reveal long-run distributions of diffusions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feynman--Kac Formula}
+\label{subsec:feynman-kac-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic Feynman--Kac principle connects diffusion expectations with PDEs.
+
+Suppose
+
+\[
+u(t,x)
+=
+\mathbb{E}_{t,x}
+\left[
+g(X_T)
+\right].
+\]
+
+Under suitable conditions,
+
+\[
+u
+\]
+
+solves a backward PDE of the form
+
+\[
+\boxed{
+u_t
++
+\mathcal{L}u
+=
+0
+}
+\]
+
+with terminal condition
+
+\[
+\boxed{
+u(T,x)=g(x).
+}
+\]
+
+More general versions include discounting and source terms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hitting Probabilities}
+\label{subsec:sde-hitting-probabilities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\tau_A
+=
+\inf
+\{
+t\geq0:X_t\in A
+\}.
+\]
+
+One may seek probabilities such as
+
+\[
+\boxed{
+P_x
+(
+\tau_b<\tau_a
+).
+}
+\]
+
+For one-dimensional diffusions, such probabilities can often be found
+from boundary-value problems involving the generator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generator Equation for Hitting Probabilities}
+\label{subsec:generator-hitting-probabilities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+h(x)
+=
+P_x
+(
+\tau_b<\tau_a
+)
+\]
+
+for \(a<x<b\).
+
+Under standard assumptions,
+
+\[
+\boxed{
+\mathcal{L}h(x)=0
+}
+\]
+
+with boundary conditions
+
+\[
+\boxed{
+h(a)=0,
+\qquad
+h(b)=1.
+}
+\]
+
+This converts a stochastic hitting problem into a differential-equation
+problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Hitting Times}
+\label{subsec:expected-hitting-times-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+u(x)
+=
+\mathbb{E}_x[\tau]
+\]
+
+for an exit time \(\tau\).
+
+A common boundary-value problem is
+
+\[
+\boxed{
+\mathcal{L}u=-1
+}
+\]
+
+inside the domain, with
+
+\[
+\boxed{
+u=0
+}
+\]
+
+on the exit boundary.
+
+This is another important stochastic/PDE connection.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multidimensional SDEs}
+\label{subsec:multidimensional-sdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\mathbf{X}_t
+\in
+\mathbb{R}^d
+\]
+
+and let
+
+\[
+\mathbf{B}_t
+\in
+\mathbb{R}^m
+\]
+
+be multidimensional Brownian motion.
+
+A general SDE is
+
+\[
+\boxed{
+d\mathbf{X}_t
+=
+\mathbf{b}(t,\mathbf{X}_t)\,dt
++
+\Sigma(t,\mathbf{X}_t)\,d\mathbf{B}_t.
+}
+\]
+
+Here
+
+\[
+\mathbf{b}
+\]
+
+is a drift vector and
+
+\[
+\Sigma
+\]
+
+is a diffusion matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariance Matrix of Multidimensional Noise}
+\label{subsec:multidimensional-sde-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a small interval,
+
+\[
+d\mathbf{X}_t
+\]
+
+has instantaneous covariance matrix approximately
+
+\[
+\boxed{
+\Sigma\Sigma^T\,dt.
+}
+\]
+
+Thus the matrix
+
+\[
+\boxed{
+A
+=
+\Sigma\Sigma^T
+}
+\]
+
+is the diffusion covariance matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multidimensional Generator}
+\label{subsec:multidimensional-generator-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a smooth function
+
+\[
+f:\mathbb{R}^d\to\mathbb{R},
+\]
+
+the generator is
+
+\[
+\boxed{
+\mathcal{L}f
+=
+\sum_{i=1}^{d}
+b_i
+\frac{\partial f}{\partial x_i}
++
+\frac12
+\sum_{i,j=1}^{d}
+A_{ij}
+\frac{\partial^2 f}
+{\partial x_i\partial x_j}.
+}
+\]
+
+Here
+
+\[
+A
+=
+\Sigma\Sigma^T.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Correlated Brownian Drivers}
+\label{subsec:correlated-brownian-drivers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+dB_t^{(1)}dB_t^{(2)}
+=
+\rho\,dt.
+\]
+
+Then the two sources of randomness are correlated.
+
+Such models are common when multiple stochastic quantities are driven by
+shared economic, physical, or environmental effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Logistic Growth}
+\label{subsec:stochastic-logistic-growth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The deterministic logistic equation is
+
+\[
+\frac{dx}{dt}
+=
+rx
+\left(
+1-\frac{x}{K}
+\right).
+\]
+
+A stochastic version is
+
+\[
+\boxed{
+dX_t
+=
+rX_t
+\left(
+1-\frac{X_t}{K}
+\right)dt
++
+\sigma X_t\,dB_t.
+}
+\]
+
+Here:
+
+\[
+r
+=
+\text{growth rate},
+\]
+
+\[
+K
+=
+\text{carrying capacity},
+\]
+
+and
+
+\[
+\sigma
+=
+\text{environmental-noise intensity}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean-Reverting Finance Models}
+\label{subsec:mean-reverting-finance-sdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Short-term interest rates and other economic quantities are often
+modeled as mean-reverting diffusions.
+
+The Vasicek model is an Ornstein--Uhlenbeck-type SDE:
+
+\[
+\boxed{
+dr_t
+=
+\kappa(\theta-r_t)\,dt
++
+\sigma\,dB_t.
+}
+\]
+
+The parameter \(\theta\) is the long-run level and \(\kappa\) controls
+the reversion speed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cox--Ingersoll--Ross Model Preview}
+\label{subsec:cir-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A positive mean-reverting model is
+
+\[
+\boxed{
+dX_t
+=
+\kappa(\theta-X_t)\,dt
++
+\sigma\sqrt{X_t}\,dB_t.
+}
+\]
+
+This is the Cox--Ingersoll--Ross, or CIR, process.
+
+The state-dependent diffusion
+
+\[
+\sqrt{X_t}
+\]
+
+reduces volatility near zero.
+
+Under suitable parameter conditions, positivity is preserved.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Langevin Equations}
+\label{subsec:langevin-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In physics, stochastic forcing is often represented through a Langevin
+equation.
+
+A simple model is
+
+\[
+\boxed{
+dV_t
+=
+-\gamma V_t\,dt
++
+\sigma\,dB_t.
+}
+\]
+
+This is an Ornstein--Uhlenbeck equation for velocity.
+
+The term
+
+\[
+-\gamma V_t
+\]
+
+represents friction, while Brownian forcing represents thermal noise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler--Maruyama Method}
+\label{subsec:euler-maruyama}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many SDEs do not have closed-form solutions.
+
+The simplest numerical method is Euler--Maruyama.
+
+For
+
+\[
+dX_t
+=
+b(t,X_t)\,dt
++
+\sigma(t,X_t)\,dB_t,
+\]
+
+use a grid
+
+\[
+t_n=n\Delta t.
+\]
+
+Then
+
+\[
+\boxed{
+X_{n+1}
+=
+X_n
++
+b(t_n,X_n)\Delta t
++
+\sigma(t_n,X_n)\Delta B_n,
+}
+\]
+
+where
+
+\[
+\boxed{
+\Delta B_n
+\sim
+N(0,\Delta t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simulating Brownian Increments}
+\label{subsec:simulate-brownian-increments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since
+
+\[
+B_{t_{n+1}}-B_{t_n}
+\sim
+N(0,\Delta t),
+\]
+
+one may generate
+
+\[
+Z_n\sim N(0,1)
+\]
+
+and set
+
+\[
+\boxed{
+\Delta B_n
+=
+\sqrt{\Delta t}\,Z_n.
+}
+\]
+
+Therefore Euler--Maruyama becomes
+
+\[
+\boxed{
+X_{n+1}
+=
+X_n
++
+b(t_n,X_n)\Delta t
++
+\sigma(t_n,X_n)\sqrt{\Delta t}\,Z_n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Euler--Maruyama}
+\label{subsec:worked-euler-maruyama}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One Euler--Maruyama Step}
+
+Consider
+
+\[
+dX_t
+=
+2X_t\,dt
++
+3X_t\,dB_t.
+\]
+
+Suppose
+
+\[
+X_n=4
+\]
+
+and
+
+\[
+\Delta t=0.01.
+\]
+
+Then
+
+\[
+\Delta B_n
+=
+0.1Z_n.
+\]
+
+The next approximation is
+
+\[
+X_{n+1}
+=
+4
++
+2(4)(0.01)
++
+3(4)(0.1Z_n).
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+X_{n+1}
+=
+4.08
++
+1.2Z_n.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler--Maruyama for Geometric Brownian Motion}
+\label{subsec:euler-maruyama-gbm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+dS_t
+=
+\mu S_t\,dt
++
+\sigma S_t\,dB_t,
+\]
+
+Euler--Maruyama gives
+
+\[
+\boxed{
+S_{n+1}
+=
+S_n
+\left[
+1
++
+\mu\Delta t
++
+\sigma\sqrt{\Delta t}\,Z_n
+\right].
+}
+\]
+
+This approximates the exact geometric Brownian motion solution.
+
+For sufficiently large time steps, however, the numerical approximation
+can become negative even though the true solution remains positive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Milstein Method}
+\label{subsec:milstein-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a scalar SDE
+
+\[
+dX_t
+=
+b(X_t)\,dt
++
+\sigma(X_t)\,dB_t,
+\]
+
+the Milstein method improves Euler--Maruyama by including an It\^o
+correction:
+
+\[
+\boxed{
+\begin{aligned}
+X_{n+1}
+={}&
+X_n
++
+b(X_n)\Delta t
++
+\sigma(X_n)\Delta B_n
+\\
+&+
+\frac12
+\sigma(X_n)\sigma'(X_n)
+\left[
+(\Delta B_n)^2-\Delta t
+\right].
+\end{aligned}
+}
+\]
+
+The extra term reflects Brownian quadratic variation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Additive Noise and Milstein}
+\label{subsec:additive-noise-milstein}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\sigma(X_t)=\sigma
+\]
+
+is constant, then
+
+\[
+\sigma'(x)=0.
+\]
+
+Therefore the Milstein correction vanishes.
+
+In this case,
+
+\[
+\boxed{
+\text{Milstein}
+=
+\text{Euler--Maruyama}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Numerical Convergence}
+\label{subsec:strong-numerical-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical approximation \(X_T^{(\Delta)}\) converges strongly if it
+approximates the actual sample path.
+
+A typical error measure is
+
+\[
+\boxed{
+\mathbb{E}
+\left[
+|X_T-X_T^{(\Delta)}|
+\right].
+}
+\]
+
+If this behaves like
+
+\[
+C(\Delta t)^p,
+\]
+
+the method has strong order \(p\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Numerical Convergence}
+\label{subsec:weak-numerical-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Weak convergence concerns expectations of functions of the numerical
+solution.
+
+For suitable \(f\), one studies
+
+\[
+\boxed{
+\left|
+\mathbb{E}[f(X_T)]
+-
+\mathbb{E}
+[
+f(X_T^{(\Delta)})
+]
+\right|.
+}
+\]
+
+Weak convergence is important when the goal is estimating distributions
+or expected payoffs rather than reproducing individual paths.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler--Maruyama Convergence Orders}
+\label{subsec:euler-maruyama-orders}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under standard regularity conditions, Euler--Maruyama typically has:
+
+\[
+\boxed{
+\text{strong order } \frac12
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{weak order }1.
+}
+\]
+
+Milstein typically improves the scalar strong order to
+
+\[
+\boxed{
+1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why SDE Numerical Accuracy Differs from ODE Accuracy}
+\label{subsec:sde-vs-ode-numerics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For ordinary differential equations, Euler's method has deterministic
+first-order behavior.
+
+For Brownian-driven SDEs, increments scale like
+
+\[
+\sqrt{\Delta t}.
+\]
+
+This rough stochastic forcing changes numerical error accumulation.
+
+Therefore numerical SDE methods require a separate convergence theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stability of Numerical SDEs}
+\label{subsec:sde-numerical-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A method may converge as
+
+\[
+\Delta t\to0
+\]
+
+yet behave poorly for practical finite time steps.
+
+Stability asks whether numerical trajectories reproduce qualitative
+features such as:
+
+\[
+\text{mean reversion},
+\]
+
+\[
+\text{bounded moments},
+\]
+
+or
+
+\[
+\text{long-run distributions}.
+\]
+
+This is especially important for stiff SDEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Stability Test SDE}
+\label{subsec:linear-stability-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common stochastic test equation is
+
+\[
+\boxed{
+dX_t
+=
+\lambda X_t\,dt
++
+\mu X_t\,dB_t.
+}
+\]
+
+Its exact solution is geometric Brownian motion:
+
+\[
+\boxed{
+X_t
+=
+X_0
+\exp
+\left[
+\left(
+\lambda-\frac12\mu^2
+\right)t
++
+\mu B_t
+\right].
+}
+\]
+
+This model is used to study mean-square and almost-sure numerical
+stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean-Square Stability}
+\label{subsec:mean-square-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A process is mean-square stable toward zero if
+
+\[
+\boxed{
+\mathbb{E}[|X_t|^2]
+\to0.
+}
+\]
+
+For numerical methods, one asks whether the discrete approximation has
+the same long-run decay property.
+
+This is a stochastic analogue of stability analysis for ODE solvers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary Behavior}
+\label{subsec:sde-boundary-behavior}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The diffusion coefficient may strongly affect whether a process can
+reach a boundary.
+
+For example,
+
+\[
+\sigma(x)
+\]
+
+may vanish at \(x=0\).
+
+Then the process may:
+
+\[
+\text{remain positive},
+\]
+
+\[
+\text{hit zero},
+\]
+
+or
+
+\[
+\text{be absorbed or reflected},
+\]
+
+depending on the model.
+
+Boundary classification is an important topic in one-dimensional
+diffusion theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Absorbing Boundaries}
+\label{subsec:absorbing-boundaries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A boundary is absorbing if once the process reaches it, the process
+remains there.
+
+For example, in a population model,
+
+\[
+X_t=0
+\]
+
+may represent extinction.
+
+An absorbing model may satisfy
+
+\[
+\boxed{
+X_t=0
+\Longrightarrow
+X_s=0
+\quad
+\text{for all }s\geq t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reflecting Boundaries}
+\label{subsec:reflecting-boundaries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A reflecting boundary prevents a process from leaving a permitted
+region.
+
+For instance, one may constrain a diffusion to
+
+\[
+[0,\infty).
+\]
+
+Reflected diffusions often require local-time terms such as
+
+\[
+\boxed{
+dX_t
+=
+b(X_t)\,dt
++
+\sigma(X_t)\,dB_t
++
+dL_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stratonovich SDEs}
+\label{subsec:stratonovich-sdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An SDE may also be written in Stratonovich form:
+
+\[
+\boxed{
+dX_t
+=
+a(X_t)\,dt
++
+b(X_t)\circ dB_t.
+}
+\]
+
+The equivalent It\^o equation is
+
+\[
+\boxed{
+dX_t
+=
+\left[
+a(X_t)
++
+\frac12
+b(X_t)b'(X_t)
+\right]dt
++
+b(X_t)\,dB_t.
+}
+\]
+
+Thus the interpretation of the stochastic integral affects the drift.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Stratonovich SDEs Appear in Physics}
+\label{subsec:stratonovich-physics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Stratonovich equations transform under smooth coordinate changes using
+the ordinary chain rule.
+
+They also arise naturally as limits of systems driven by rapidly
+fluctuating smooth noise.
+
+For these reasons, Stratonovich notation is common in physical and
+geometric models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Differential Equations and Control}
+\label{subsec:sde-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A controlled diffusion may be written
+
+\[
+\boxed{
+dX_t
+=
+b(t,X_t,u_t)\,dt
++
+\sigma(t,X_t,u_t)\,dB_t,
+}
+\]
+
+where
+
+\[
+u_t
+\]
+
+is a control process.
+
+The goal may be to minimize an expected cost such as
+
+\[
+\boxed{
+\mathbb{E}
+\left[
+\int_0^T
+c(t,X_t,u_t)\,dt
++
+g(X_T)
+\right].
+}
+\]
+
+This leads to stochastic optimal control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hamilton--Jacobi--Bellman Equation Preview}
+\label{subsec:hjb-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The value function of a stochastic control problem often satisfies a
+Hamilton--Jacobi--Bellman equation of the form
+
+\[
+\boxed{
+V_t
++
+\inf_u
+\left\{
+c
++
+bV_x
++
+\frac12\sigma^2V_{xx}
+\right\}
+=
+0.
+}
+\]
+
+Thus stochastic control connects optimization with second-order PDEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Risk-Neutral Dynamics Preview}
+\label{subsec:risk-neutral-dynamics-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In mathematical finance, a change of probability measure can alter the
+drift of an asset-price SDE.
+
+Under a risk-neutral measure, a stylized asset may satisfy
+
+\[
+\boxed{
+dS_t
+=
+rS_t\,dt
++
+\sigma S_t\,dW_t,
+}
+\]
+
+where \(r\) is the risk-free rate.
+
+This idea relies on Girsanov's theorem and martingale pricing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Black--Scholes PDE Preview}
+\label{subsec:black-scholes-pde-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If an asset satisfies geometric Brownian motion under a risk-neutral
+measure, It\^o calculus and hedging lead to the Black--Scholes PDE:
+
+\[
+\boxed{
+V_t
++
+\frac12
+\sigma^2S^2V_{SS}
++
+rSV_S
+-
+rV
+=
+0.
+}
+\]
+
+This is one of the classic applications of SDEs.
+
+A full treatment belongs to mathematical finance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Volatility Preview}
+\label{subsec:stochastic-volatility-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of assuming constant volatility, one may model volatility itself
+as a stochastic process.
+
+A generic model is
+
+\[
+\boxed{
+dS_t
+=
+\mu S_t\,dt
++
+\sqrt{V_t}S_t\,dB_t^{(1)},
+}
+\]
+
+together with
+
+\[
+\boxed{
+dV_t
+=
+a(V_t)\,dt
++
+b(V_t)\,dB_t^{(2)}.
+}
+\]
+
+The Brownian motions may be correlated.
+
+This produces a multidimensional SDE system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Epidemic Models Preview}
+\label{subsec:stochastic-epidemic-sdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A deterministic epidemic model may be perturbed by random fluctuations.
+
+For example,
+
+\[
+dS_t
+=
+-\beta S_tI_t\,dt
++
+\sigma_S(S_t,I_t)\,dB_t^{(1)},
+\]
+
+\[
+dI_t
+=
+(\beta S_tI_t-\gamma I_t)\,dt
++
+\sigma_I(S_t,I_t)\,dB_t^{(2)}.
+\]
+
+Such models represent environmental or demographic uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chemical Langevin Equation Preview}
+\label{subsec:chemical-langevin-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Chemical reaction systems with large but finite molecular counts can be
+approximated by SDEs.
+
+A generic chemical Langevin equation has the form
+
+\[
+\boxed{
+d\mathbf{X}_t
+=
+\sum_{j}
+\boldsymbol{\nu}_j
+a_j(\mathbf{X}_t)\,dt
++
+\sum_j
+\boldsymbol{\nu}_j
+\sqrt{
+a_j(\mathbf{X}_t)
+}
+\,dB_t^{(j)}.
+}
+\]
+
+Here:
+
+\[
+\boldsymbol{\nu}_j
+\]
+
+is the stoichiometric change vector and
+
+\[
+a_j
+\]
+
+is the reaction propensity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SDE Modeling Workflow}
+\label{subsec:sde-modeling-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When constructing an SDE model:
+
+\begin{enumerate}
+    \item identify the state variable;
+    \item identify deterministic dynamics;
+    \item choose the source of randomness;
+    \item determine whether noise should be additive or multiplicative;
+    \item specify the drift \(b\);
+    \item specify the diffusion coefficient \(\sigma\);
+    \item determine the initial condition;
+    \item check state-space constraints;
+    \item determine whether boundaries should be absorbing or reflecting;
+    \item verify existence and uniqueness assumptions when possible;
+    \item search for an exact transformation or explicit solution;
+    \item otherwise select an appropriate numerical method;
+    \item validate the model against qualitative and statistical behavior.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:sde-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Treating an SDE as an Ordinary Differential Equation}
+
+The term
+
+\[
+dB_t
+\]
+
+cannot be manipulated as if Brownian motion were differentiable.
+
+The SDE must be interpreted through stochastic integration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting the It\^o Correction}
+
+When transforming an SDE, ordinary chain rule is insufficient.
+
+The second-order term
+
+\[
+\frac12
+\sigma^2f_{xx}\,dt
+\]
+
+must be included.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Drift with Mean Path}
+
+The drift coefficient describes local conditional mean change.
+
+It does not generally equal the derivative of
+
+\[
+\mathbb{E}[X_t]
+\]
+
+without further calculation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Diffusion with Variance}
+
+The diffusion coefficient is \(\sigma\).
+
+The instantaneous variance rate is
+
+\[
+\boxed{
+\sigma^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every SDE Has a Unique Solution}
+
+Existence and uniqueness require conditions.
+
+Irregular coefficients may produce no solution or multiple solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Strong and Weak Solutions}
+
+Strong and weak refer to the type of probabilistic construction, not to
+whether the solution is more or less accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting the \(-\sigma^2/2\) Term in GBM}
+
+For
+
+\[
+dS_t
+=
+\mu S_t\,dt
++
+\sigma S_t\,dB_t,
+\]
+
+the exact exponent is
+
+\[
+\boxed{
+\left(
+\mu-\frac12\sigma^2
+\right)t
++
+\sigma B_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing OU Drift Parameters}
+
+In
+
+\[
+dX_t
+=
+\theta(\mu-X_t)\,dt+\sigma\,dB_t,
+\]
+
+\(\mu\) is the long-run level and \(\theta\) is the speed of mean
+reversion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Simulating \(dB_t\) as \(N(0,1)\)}
+
+For a numerical step of length \(\Delta t\),
+
+\[
+\boxed{
+\Delta B
+\sim
+N(0,\Delta t),
+}
+\]
+
+so one must use
+
+\[
+\boxed{
+\sqrt{\Delta t}\,Z.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Numerical Positivity}
+
+Euler--Maruyama may violate positivity even when the true SDE remains
+positive.
+
+This matters in population, variance, and financial models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Strong and Weak Numerical Convergence}
+
+Strong convergence approximates sample paths.
+
+Weak convergence approximates distributions or expectations of
+functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Too Large a Time Step}
+
+An SDE discretization may become unstable or inaccurate if
+
+\[
+\Delta t
+\]
+
+is too large.
+
+Convergence theory concerns the limit as
+
+\[
+\Delta t\to0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:sde-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Finance.}
+SDEs model asset prices, interest rates, volatility, credit risk, and
+derivative-pricing dynamics.
+
+\medskip
+
+\textbf{Physics.}
+Langevin equations model diffusion, friction, thermal noise, and random
+forcing.
+
+\medskip
+
+\textbf{Biology.}
+Population growth, epidemics, ecological systems, and biochemical
+networks can be modeled with stochastic differential equations.
+
+\medskip
+
+\textbf{Engineering.}
+Noisy mechanical, electrical, and control systems are naturally
+represented by SDEs.
+
+\medskip
+
+\textbf{Stochastic Control.}
+Controlled diffusions lead to Hamilton--Jacobi--Bellman equations.
+
+\medskip
+
+\textbf{Chemistry.}
+Chemical Langevin equations approximate random reaction networks.
+
+\medskip
+
+\textbf{Environmental Science.}
+Random forcing can represent uncertain climate, transport, or ecological
+effects.
+
+\medskip
+
+\textbf{Numerical Mathematics.}
+Euler--Maruyama, Milstein, and higher-order schemes approximate SDEs that
+cannot be solved analytically.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:sde-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a stochastic differential equation.
+\end{exercise}
+
+\begin{exercise}[1]
+State the integral form of
+
+\[
+dX_t
+=
+b(t,X_t)\,dt
++
+\sigma(t,X_t)\,dB_t.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Identify the drift and diffusion coefficients in
+
+\[
+dX_t
+=
+(2-X_t)\,dt
++
+3\,dB_t.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish strong and weak solutions.
+\end{exercise}
+
+\begin{exercise}[1]
+State standard Lipschitz and linear-growth conditions for strong
+existence and uniqueness.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Euler--Maruyama method.
+\end{exercise}
+
+\begin{exercise}[1]
+How is a Brownian increment simulated over a time step \(\Delta t\)?
+\end{exercise}
+
+\begin{exercise}[1]
+Define strong numerical convergence.
+\end{exercise}
+
+\begin{exercise}[1]
+Define weak numerical convergence.
+\end{exercise}
+
+\begin{exercise}[2]
+Solve
+
+\[
+dX_t
+=
+4\,dt
++
+2\,dB_t,
+\qquad
+X_0=3.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the distribution of \(X_t\) in the previous exercise.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+dX_t
+=
+\mu\,dt+\sigma\,dB_t,
+\]
+
+find
+
+\[
+\mathbb{E}[X_t]
+\]
+
+and
+
+\[
+\operatorname{Var}(X_t).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Solve geometric Brownian motion
+
+\[
+dS_t
+=
+\mu S_t\,dt
++
+\sigma S_t\,dB_t.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Show that geometric Brownian motion remains positive if
+
+\[
+S_0>0.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the distribution of
+
+\[
+\ln S_t
+\]
+
+for geometric Brownian motion.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+dX_t
+=
+3(5-X_t)\,dt
++
+2\,dB_t,
+\]
+
+identify the long-run mean and stationary variance.
+\end{exercise}
+
+\begin{exercise}[2]
+Write one Euler--Maruyama step for
+
+\[
+dX_t
+=
+-X_t\,dt
++
+X_t\,dB_t.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Write one Milstein step for the same equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Use It\^o's formula to derive the exact solution of geometric Brownian
+motion.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+\mathbb{E}[S_t]
+=
+S_0e^{\mu t}
+\]
+
+for geometric Brownian motion.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the variance of geometric Brownian motion.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve the Ornstein--Uhlenbeck equation using an integrating factor.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the mean of the Ornstein--Uhlenbeck process.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive its variance using the It\^o isometry.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the stationary Ornstein--Uhlenbeck distribution.
+\end{exercise}
+
+\begin{exercise}[3]
+For
+
+\[
+dX_t
+=
+b(X_t)\,dt
++
+\sigma(X_t)\,dB_t,
+\]
+
+derive the generator using It\^o's formula.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Fokker--Planck equation formally for a one-dimensional
+diffusion.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the Fokker--Planck equation for Brownian motion reduces to
+
+\[
+p_t
+=
+\frac12p_{xx}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+For a diffusion on \((a,b)\), derive the generator equation for the
+probability of reaching \(b\) before \(a\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the boundary-value problem for an expected exit time.
+\end{exercise}
+
+\begin{exercise}[3]
+For the stochastic logistic model, identify drift and diffusion
+coefficients.
+\end{exercise}
+
+\begin{exercise}[3]
+Convert
+
+\[
+dX_t
+=
+a(X_t)\,dt
++
+b(X_t)\circ dB_t
+\]
+
+to It\^o form.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Euler--Maruyama may produce negative approximations for
+geometric Brownian motion.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between strong order \(1/2\) and weak order \(1\).
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Picard-iteration proof of strong existence and uniqueness for
+globally Lipschitz SDEs.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the Yamada--Watanabe theorem relating strong solutions,
+weak solutions, and pathwise uniqueness.
+\end{exercise}
+
+\begin{exercise}[4]
+Study one-dimensional diffusion boundary classification.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate scale functions and speed measures for one-dimensional
+diffusions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Feller property of diffusion semigroups.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove a Feynman--Kac representation for a simple diffusion.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Black--Scholes PDE from geometric Brownian motion and a
+self-financing hedge.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the CIR process and conditions for strict positivity.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate stochastic volatility models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study multidimensional Euler--Maruyama and correlated Brownian
+increments.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate higher-order stochastic numerical methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study mean-square stability of Euler--Maruyama.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate stochastic Runge--Kutta methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study reflected SDEs and Skorokhod problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate stochastic control and Hamilton--Jacobi--Bellman equations.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:sde-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stochastic differential equation has the form
+
+\[
+\boxed{
+dX_t
+=
+b(t,X_t)\,dt
++
+\sigma(t,X_t)\,dB_t.
+}
+\]
+
+Its precise meaning is
+
+\[
+\boxed{
+X_t
+=
+X_0
++
+\int_0^t
+b(s,X_s)\,ds
++
+\int_0^t
+\sigma(s,X_s)\,dB_s.
+}
+\]
+
+The drift coefficient controls local conditional mean behavior.
+
+The diffusion coefficient controls local variance.
+
+Arithmetic Brownian motion satisfies
+
+\[
+\boxed{
+X_t
+=
+X_0+\mu t+\sigma B_t.
+}
+\]
+
+Geometric Brownian motion satisfies
+
+\[
+\boxed{
+S_t
+=
+S_0
+\exp
+\left[
+\left(
+\mu-\frac12\sigma^2
+\right)t
++
+\sigma B_t
+\right].
+}
+\]
+
+The Ornstein--Uhlenbeck process satisfies
+
+\[
+\boxed{
+dX_t
+=
+\theta(\mu-X_t)\,dt
++
+\sigma\,dB_t,
+}
+\]
+
+with stationary law
+
+\[
+\boxed{
+N
+\left(
+\mu,
+\frac{\sigma^2}{2\theta}
+\right).
+}
+\]
+
+For a diffusion,
+
+\[
+\boxed{
+\mathcal{L}f
+=
+bf'
++
+\frac12\sigma^2f''.
+}
+\]
+
+Its density formally satisfies
+
+\[
+\boxed{
+p_t
+=
+-
+(bp)_x
++
+\frac12
+(\sigma^2p)_{xx}.
+}
+\]
+
+Euler--Maruyama approximates an SDE by
+
+\[
+\boxed{
+X_{n+1}
+=
+X_n
++
+b(t_n,X_n)\Delta t
++
+\sigma(t_n,X_n)
+\sqrt{\Delta t}\,Z_n.
+}
+\]
+
+Stochastic differential equations therefore combine
+
+\[
+\boxed{
+\text{differential equations}
++
+\text{Brownian motion}
++
+\text{It\^o calculus}
++
+\text{probability}
++
+\text{numerical analysis}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:sde-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Stochastic Differential Equations apply the stochastic integration and
+It\^o calculus developed in Section~\ref{sec:stochastic-calculus} to
+random dynamical systems. Stochastic Processes provide Brownian motion,
+Markov processes, martingales, and long-run behavior, while
+Measure-Theoretic Probability supplies the rigorous probability-space
+framework. The infinitesimal generator and Fokker--Planck equations
+connect SDEs with partial differential equations, while numerical SDE
+methods connect directly with computational mathematics. The next
+section, Random Matrix Theory, shifts from time-evolving random systems
+to random linear-algebraic structures and their eigenvalue behavior.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 7.14 Stochastic Differential Equations
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard Itô SDE theory.
+%   - Standard diffusion-process theory.
+%   - Standard numerical stochastic differential-equation methods.
+%
+% Used for:
+%   - SDE definitions;
+%   - integral formulation;
+%   - drift and diffusion;
+%   - infinitesimal mean and variance;
+%   - strong and weak solutions;
+%   - pathwise uniqueness;
+%   - Lipschitz existence and uniqueness conditions;
+%   - arithmetic Brownian motion;
+%   - geometric Brownian motion;
+%   - lognormal solutions;
+%   - linear SDEs;
+%   - Ornstein--Uhlenbeck processes;
+%   - stationary Gaussian distributions;
+%   - Itô transformations of SDEs;
+%   - diffusion processes;
+%   - infinitesimal generators;
+%   - Kolmogorov backward equations;
+%   - Fokker--Planck equations;
+%   - stationary densities;
+%   - Feynman--Kac connections;
+%   - hitting probabilities;
+%   - expected hitting times;
+%   - multidimensional SDEs;
+%   - correlated Brownian drivers;
+%   - stochastic logistic growth;
+%   - Vasicek and CIR previews;
+%   - Langevin equations;
+%   - Euler--Maruyama method;
+%   - Brownian increment simulation;
+%   - Milstein method;
+%   - strong and weak numerical convergence;
+%   - numerical stability;
+%   - boundary behavior;
+%   - absorbing and reflecting boundaries;
+%   - Stratonovich SDEs;
+%   - stochastic control preview;
+%   - Hamilton--Jacobi--Bellman equations;
+%   - risk-neutral dynamics;
+%   - Black--Scholes preview;
+%   - stochastic volatility;
+%   - stochastic epidemic models;
+%   - chemical Langevin equations;
+%   - applications and exercises.
+%
+% Notes:
+%   - Random Matrix Theory is developed next in Section 7.15.
+%   - Numerical SDE methods are revisited in Chapter 11.
+%   - Stochastic control is developed more fully in Chapter 10.
+%   - Mathematical finance applications are revisited in Chapter 13.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

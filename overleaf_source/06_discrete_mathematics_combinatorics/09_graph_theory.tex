@@ -1,0 +1,3300 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 6.9 GRAPH THEORY
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Graph Theory}
+\label{sec:graph-theory}
+
+\prerequisite{
+Sets, relations, functions, basic counting, discrete structures,
+recurrence relations, matrices, and elementary proof techniques.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define graphs, vertices, edges, and adjacency;
+    \item distinguish simple graphs, multigraphs, pseudographs,
+          directed graphs, and weighted graphs;
+    \item compute vertex degrees and apply the handshaking lemma;
+    \item work with paths, walks, trails, circuits, and cycles;
+    \item determine connectedness and connected components;
+    \item identify complete, bipartite, multipartite, regular, and
+          planar graphs;
+    \item work with graph complements and graph isomorphisms;
+    \item represent graphs using adjacency and incidence matrices;
+    \item understand subgraphs and induced subgraphs;
+    \item identify trees, forests, and spanning trees;
+    \item apply basic tree properties;
+    \item understand Euler trails and Euler circuits;
+    \item understand Hamiltonian paths and cycles;
+    \item work with graph colorings and chromatic number;
+    \item understand matchings and vertex covers;
+    \item state Hall's Marriage Theorem;
+    \item recognize graph connectivity parameters;
+    \item understand planar embeddings and Euler's planar formula;
+    \item recognize graph algorithms such as BFS and DFS;
+    \item connect graph theory with networks, optimization, probability,
+          algebra, and combinatorics.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is a Graph?}
+\label{subsec:what-is-a-graph}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph is a mathematical structure used to represent pairwise
+relationships among objects.
+
+\begin{definitionbox}{Graph}
+A graph is an ordered pair
+
+\[
+\boxed{
+G=(V,E),
+}
+\]
+
+where \(V\) is a set of vertices and \(E\) is a collection of edges
+joining pairs of vertices.
+\end{definitionbox}
+
+The set \(V\) is called the \emph{vertex set}.
+
+The set \(E\) is called the \emph{edge set}.
+
+The symbols
+
+\[
+|V|
+\]
+
+and
+
+\[
+|E|
+\]
+
+denote the number of vertices and edges.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vertices and Edges}
+\label{subsec:vertices-and-edges}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A vertex represents an object.
+
+An edge represents a relationship between two objects.
+
+For example, if
+
+\[
+V=\{A,B,C,D\},
+\]
+
+and
+
+\[
+E=
+\{
+\{A,B\},
+\{A,C\},
+\{B,D\}
+\},
+\]
+
+then the graph contains four vertices and three edges.
+
+Two vertices joined by an edge are called adjacent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Graphs}
+\label{subsec:simple-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Simple Graph}
+A simple graph is an undirected graph with:
+\begin{itemize}
+    \item no loops;
+    \item no multiple edges between the same pair of vertices.
+\end{itemize}
+\end{definitionbox}
+
+Thus every edge in a simple graph is an unordered pair
+
+\[
+\{u,v\}
+\]
+
+with
+
+\[
+u\neq v.
+\]
+
+Most of this section focuses on finite simple graphs unless otherwise
+stated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multigraphs and Pseudographs}
+\label{subsec:multigraphs-pseudographs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multigraph may contain multiple edges joining the same pair of
+vertices.
+
+A pseudograph may additionally contain loops.
+
+A loop is an edge joining a vertex to itself.
+
+These generalized graph models are useful when pairwise relationships
+may occur more than once.
+
+Examples include:
+
+\begin{itemize}
+    \item transportation systems with several routes between cities;
+    \item electrical networks with parallel connections;
+    \item communication systems with multiple channels.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directed Graphs}
+\label{subsec:directed-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A directed graph, or digraph, assigns an orientation to each edge.
+
+A directed edge is an ordered pair
+
+\[
+(u,v).
+\]
+
+It is commonly written
+
+\[
+\boxed{
+u\longrightarrow v.
+}
+\]
+
+The direction matters.
+
+Thus,
+
+\[
+(u,v)\neq(v,u)
+\]
+
+in general.
+
+Directed graphs model asymmetric relationships such as:
+
+\begin{itemize}
+    \item web links;
+    \item prerequisite structures;
+    \item one-way roads;
+    \item information flow;
+    \item dominance relations.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Graphs}
+\label{subsec:weighted-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A weighted graph assigns a numerical value to each edge.
+
+A weight function may be written
+
+\[
+\boxed{
+w:E\to\mathbb{R}.
+}
+\]
+
+The value \(w(e)\) may represent:
+
+\begin{itemize}
+    \item distance;
+    \item travel time;
+    \item cost;
+    \item capacity;
+    \item reliability;
+    \item energy.
+\end{itemize}
+
+Weighted graphs are fundamental in optimization and network analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Drawings}
+\label{subsec:graph-drawings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph may be drawn by representing vertices as points and edges as
+curves joining them.
+
+The drawing is not the graph itself.
+
+Two very different drawings may represent the same abstract graph.
+
+For example, crossing edges in a drawing do not automatically create a
+new vertex.
+
+\begin{importantbox}
+A graph is determined by its vertex-edge relationships, not by the
+specific geometric placement used in a drawing.
+\end{importantbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Degree of a Vertex}
+\label{subsec:degree-of-vertex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Degree}
+The degree of a vertex \(v\), written
+
+\[
+\boxed{
+\deg(v),
+}
+\]
+
+is the number of edges incident with \(v\).
+\end{definitionbox}
+
+In a simple graph, this is also the number of neighbors of \(v\).
+
+A vertex of degree \(0\) is called isolated.
+
+A vertex of degree \(1\) is often called a leaf or pendant vertex,
+especially in a tree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neighborhood}
+\label{subsec:graph-neighborhood}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The open neighborhood of \(v\) is
+
+\[
+\boxed{
+N(v)
+=
+\{u\in V:\{u,v\}\in E\}.
+}
+\]
+
+The closed neighborhood is
+
+\[
+\boxed{
+N[v]
+=
+N(v)\cup\{v\}.
+}
+\]
+
+For a simple graph,
+
+\[
+\boxed{
+\deg(v)=|N(v)|.
+}
+\]
+
+Neighborhoods are central in local graph analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Handshaking Lemma}
+\label{subsec:handshaking-lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Handshaking Lemma]
+For every finite undirected graph,
+
+\[
+\boxed{
+\sum_{v\in V}\deg(v)
+=
+2|E|.
+}
+\]
+\end{theorem}
+
+Every edge contributes exactly \(2\) to the total degree sum because it
+has two endpoints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Handshaking Lemma}
+\label{subsec:worked-handshaking-lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Finding the Number of Edges}
+
+Suppose a graph has vertex degrees
+
+\[
+4,3,3,2,2,2.
+\]
+
+The total degree is
+
+\[
+4+3+3+2+2+2=16.
+\]
+
+By the handshaking lemma,
+
+\[
+2|E|=16.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+|E|=8.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Odd-Degree Vertices}
+\label{subsec:odd-degree-vertices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A direct consequence of the handshaking lemma is:
+
+\begin{theorem}
+Every finite undirected graph has an even number of vertices of odd
+degree.
+\end{theorem}
+
+Since
+
+\[
+\sum_{v\in V}\deg(v)
+\]
+
+is even, the number of odd summands must be even.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regular Graphs}
+\label{subsec:regular-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Regular Graph}
+A graph is \(r\)-regular if
+
+\[
+\boxed{
+\deg(v)=r
+}
+\]
+
+for every vertex \(v\).
+\end{definitionbox}
+
+If \(G\) is \(r\)-regular on \(n\) vertices, then
+
+\[
+nr=2|E|.
+\]
+
+Therefore,
+
+\[
+\boxed{
+|E|=\frac{nr}{2}.
+}
+\]
+
+In particular, \(nr\) must be even.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete Graphs}
+\label{subsec:complete-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The complete graph on \(n\) vertices is denoted
+
+\[
+\boxed{
+K_n.
+}
+\]
+
+Every pair of distinct vertices is adjacent.
+
+Therefore,
+
+\[
+\deg(v)=n-1
+\]
+
+for every vertex.
+
+The number of edges is
+
+\[
+\boxed{
+|E(K_n)|
+=
+\binom{n}{2}
+=
+\frac{n(n-1)}{2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bipartite Graphs}
+\label{subsec:bipartite-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Bipartite Graph}
+A graph is bipartite if its vertex set can be partitioned into two
+disjoint sets
+
+\[
+V=X\cup Y
+\]
+
+such that every edge has one endpoint in \(X\) and one endpoint in
+\(Y\).
+\end{definitionbox}
+
+There are no edges joining two vertices within the same part.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete Bipartite Graphs}
+\label{subsec:complete-bipartite-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The complete bipartite graph with part sizes \(m\) and \(n\) is denoted
+
+\[
+\boxed{
+K_{m,n}.
+}
+\]
+
+Every vertex in the first part is joined to every vertex in the second.
+
+Therefore,
+
+\[
+\boxed{
+|E(K_{m,n})|=mn.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characterization of Bipartite Graphs}
+\label{subsec:bipartite-characterization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+A graph is bipartite if and only if it contains no odd cycle.
+\end{theorem}
+
+Thus the existence of an odd cycle is exactly the obstruction to
+bipartiteness.
+
+This theorem connects local cycle structure with a global vertex
+partition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multipartite Graphs}
+\label{subsec:multipartite-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph is \(r\)-partite if its vertex set can be divided into \(r\)
+parts so that no edge joins two vertices in the same part.
+
+A complete \(r\)-partite graph contains every possible edge between
+different parts.
+
+Tur\'an graphs introduced in
+Section~\ref{sec:extremal-combinatorics}
+are balanced complete multipartite graphs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subgraphs}
+\label{subsec:subgraphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Subgraph}
+A graph \(H\) is a subgraph of \(G\) if
+
+\[
+V(H)\subseteq V(G)
+\]
+
+and
+
+\[
+E(H)\subseteq E(G).
+\]
+\end{definitionbox}
+
+A subgraph may omit vertices, edges, or both.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Induced Subgraphs}
+\label{subsec:induced-subgraphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+S\subseteq V(G),
+\]
+
+the induced subgraph
+
+\[
+\boxed{
+G[S]
+}
+\]
+
+contains vertex set \(S\) and every edge of \(G\) whose endpoints both
+lie in \(S\).
+
+Thus an induced subgraph is determined entirely by its chosen vertex
+set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spanning Subgraphs}
+\label{subsec:spanning-subgraphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spanning subgraph has the same vertex set as the original graph:
+
+\[
+V(H)=V(G).
+\]
+
+It may contain only some of the edges.
+
+Spanning trees are especially important examples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Complement}
+\label{subsec:graph-complement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a simple graph \(G\), its complement is denoted
+
+\[
+\boxed{
+\overline{G}.
+}
+\]
+
+Two distinct vertices are adjacent in \(\overline{G}\) exactly when
+they are not adjacent in \(G\).
+
+Thus,
+
+\[
+\boxed{
+E(G)\cap E(\overline{G})=\varnothing.
+}
+\]
+
+Also,
+
+\[
+\boxed{
+|E(G)|+|E(\overline{G})|
+=
+\binom{|V|}{2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Isomorphism}
+\label{subsec:graph-isomorphism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Graph Isomorphism}
+Graphs \(G\) and \(H\) are isomorphic if there exists a bijection
+
+\[
+f:V(G)\to V(H)
+\]
+
+such that
+
+\[
+\boxed{
+\{u,v\}\in E(G)
+\iff
+\{f(u),f(v)\}\in E(H).
+}
+\]
+\end{definitionbox}
+
+An isomorphism preserves adjacency.
+
+Isomorphic graphs have the same abstract structure even if they are
+drawn differently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Invariants}
+\label{subsec:graph-invariants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph invariant is a property preserved under isomorphism.
+
+Examples include:
+
+\begin{itemize}
+    \item number of vertices;
+    \item number of edges;
+    \item degree sequence;
+    \item number of connected components;
+    \item cycle lengths;
+    \item chromatic number;
+    \item adjacency spectrum.
+\end{itemize}
+
+Different values of an invariant prove non-isomorphism.
+
+Matching invariants do not necessarily prove isomorphism.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Degree Sequences}
+\label{subsec:degree-sequences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The degree sequence of a graph is the list of vertex degrees, typically
+written in nonincreasing order.
+
+For example,
+
+\[
+\boxed{
+(4,3,3,2,2,0)
+}
+\]
+
+is a possible degree sequence.
+
+A natural question is whether a given integer sequence is
+\emph{graphical}, meaning that some simple graph has exactly that
+degree sequence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Havel--Hakimi Principle}
+\label{subsec:havel-hakimi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Havel--Hakimi procedure tests graphical degree sequences.
+
+Suppose
+
+\[
+d_1\geq d_2\geq\cdots\geq d_n.
+\]
+
+Remove \(d_1\) and subtract \(1\) from the next \(d_1\) entries.
+
+The original sequence is graphical if and only if the resulting
+sequence is graphical, provided the reduction remains valid.
+
+This gives a recursive algorithmic test.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Walks}
+\label{subsec:graph-walks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A walk is a sequence
+
+\[
+v_0,v_1,\ldots,v_k
+\]
+
+such that consecutive vertices are adjacent.
+
+The length of the walk is
+
+\[
+k.
+\]
+
+Vertices and edges may repeat.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trails}
+\label{subsec:graph-trails}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A trail is a walk in which no edge is repeated.
+
+Vertices may still repeat.
+
+Thus,
+
+\[
+\boxed{
+\text{trail}
+\Longrightarrow
+\text{walk}.
+}
+\]
+
+The converse need not hold.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Paths}
+\label{subsec:graph-paths}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A path is a walk in which no vertex is repeated.
+
+A path with \(k\) edges has \(k+1\) vertices.
+
+If a path begins at \(u\) and ends at \(v\), it is called a
+\(u\)-\(v\) path.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closed Walks and Circuits}
+\label{subsec:closed-walks-circuits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A closed walk begins and ends at the same vertex.
+
+A circuit is a closed trail.
+
+A cycle is a closed path except that the first and last vertex are the
+same.
+
+Thus a cycle contains no repeated vertices other than its initial/final
+vertex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cycles}
+\label{subsec:graph-cycles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The cycle graph on \(n\) vertices is denoted
+
+\[
+\boxed{
+C_n.
+}
+\]
+
+Every vertex in \(C_n\) has degree \(2\).
+
+The graph contains exactly one cycle using all \(n\) vertices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distance}
+\label{subsec:graph-distance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The distance between vertices \(u\) and \(v\), written
+
+\[
+\boxed{
+d(u,v),
+}
+\]
+
+is the length of a shortest \(u\)-\(v\) path.
+
+For vertices in the same connected component, graph distance defines a
+metric.
+
+Thus,
+
+\[
+d(u,v)\geq0,
+\]
+
+\[
+d(u,v)=d(v,u),
+\]
+
+and
+
+\[
+d(u,w)\leq d(u,v)+d(v,w).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Eccentricity}
+\label{subsec:graph-eccentricity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a connected graph, the eccentricity of \(v\) is
+
+\[
+\boxed{
+\operatorname{ecc}(v)
+=
+\max_{u\in V}d(u,v).
+}
+\]
+
+This measures the greatest distance from \(v\) to any other vertex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diameter and Radius}
+\label{subsec:diameter-radius}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The diameter of a connected graph is
+
+\[
+\boxed{
+\operatorname{diam}(G)
+=
+\max_{u,v\in V}d(u,v).
+}
+\]
+
+The radius is
+
+\[
+\boxed{
+\operatorname{rad}(G)
+=
+\min_{v\in V}\operatorname{ecc}(v).
+}
+\]
+
+Vertices attaining the radius form the center of the graph.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Connected Graphs}
+\label{subsec:connected-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Connected Graph}
+A graph is connected if every pair of vertices is joined by a path.
+\end{definitionbox}
+
+If no such path exists for some pair, the graph is disconnected.
+
+Connectivity is one of the most fundamental structural properties of a
+graph.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Connected Components}
+\label{subsec:connected-components}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A connected component is a maximal connected subgraph.
+
+Every graph decomposes uniquely into connected components.
+
+Thus,
+
+\[
+\boxed{
+G
+=
+G_1\cup G_2\cup\cdots\cup G_k
+}
+\]
+
+where each \(G_i\) is connected and the components have disjoint vertex
+sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cut Vertices}
+\label{subsec:cut-vertices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A cut vertex is a vertex whose removal increases the number of connected
+components.
+
+Cut vertices represent structurally critical points in a network.
+
+They are also called articulation vertices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bridges}
+\label{subsec:bridges}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A bridge is an edge whose removal increases the number of connected
+components.
+
+Equivalently, an edge is a bridge if and only if it lies on no cycle.
+
+Thus cycles provide alternate routes around edges.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vertex and Edge Connectivity}
+\label{subsec:vertex-edge-connectivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The vertex connectivity of a graph is denoted
+
+\[
+\boxed{
+\kappa(G).
+}
+\]
+
+It is the minimum number of vertices whose removal disconnects the graph
+or reduces it to a trivial graph.
+
+The edge connectivity is denoted
+
+\[
+\boxed{
+\lambda(G).
+}
+\]
+
+It is the minimum number of edges whose removal disconnects the graph.
+
+For many nontrivial connected graphs,
+
+\[
+\boxed{
+\kappa(G)\leq\lambda(G)\leq\delta(G),
+}
+\]
+
+where
+
+\[
+\delta(G)
+\]
+
+is the minimum degree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adjacency Matrices}
+\label{subsec:adjacency-matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+V=\{v_1,\ldots,v_n\}.
+\]
+
+The adjacency matrix of a simple graph is
+
+\[
+A=(a_{ij}),
+\]
+
+where
+
+\[
+\boxed{
+a_{ij}
+=
+\begin{cases}
+1,&v_i\sim v_j,\\
+0,&\text{otherwise}.
+\end{cases}
+}
+\]
+
+Here,
+
+\[
+v_i\sim v_j
+\]
+
+means \(v_i\) is adjacent to \(v_j\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Properties of Adjacency Matrices}
+\label{subsec:adjacency-matrix-properties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a finite simple undirected graph:
+
+\begin{itemize}
+    \item \(A\) is symmetric;
+    \item diagonal entries are \(0\);
+    \item row sums equal vertex degrees.
+\end{itemize}
+
+Thus,
+
+\[
+\boxed{
+\deg(v_i)
+=
+\sum_{j=1}^{n}a_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Powers of the Adjacency Matrix}
+\label{subsec:powers-adjacency-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fundamental fact is:
+
+\[
+\boxed{
+(A^k)_{ij}
+=
+\text{number of walks of length }k
+\text{ from }v_i\text{ to }v_j.
+}
+\]
+
+This creates a powerful connection between graph theory and linear
+algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Adjacency Matrix}
+\label{subsec:worked-adjacency-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Three-Vertex Path}
+
+Consider
+
+\[
+P_3:
+\qquad
+v_1-v_2-v_3.
+\]
+
+Its adjacency matrix is
+
+\[
+A=
+\begin{pmatrix}
+0&1&0\\
+1&0&1\\
+0&1&0
+\end{pmatrix}.
+\]
+
+Then
+
+\[
+A^2=
+\begin{pmatrix}
+1&0&1\\
+0&2&0\\
+1&0&1
+\end{pmatrix}.
+\]
+
+The entry
+
+\[
+(A^2)_{13}=1
+\]
+
+shows there is exactly one walk of length \(2\) from \(v_1\) to \(v_3\).
+
+\begin{answerbox}
+\[
+\boxed{
+v_1\to v_2\to v_3
+}
+\]
+
+is the unique length-\(2\) walk from \(v_1\) to \(v_3\).
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incidence Matrices}
+\label{subsec:graph-incidence-matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+V=\{v_1,\ldots,v_n\}
+\]
+
+and
+
+\[
+E=\{e_1,\ldots,e_m\}.
+\]
+
+The incidence matrix
+
+\[
+B=(b_{ij})
+\]
+
+has
+
+\[
+\boxed{
+b_{ij}
+=
+\begin{cases}
+1,&v_i\text{ is incident with }e_j,\\
+0,&\text{otherwise}.
+\end{cases}
+}
+\]
+
+For a simple undirected graph, each column contains exactly two \(1\)'s.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trees}
+\label{subsec:trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Tree}
+A tree is a connected graph containing no cycles.
+\end{definitionbox}
+
+Trees are among the most important graph structures.
+
+They describe hierarchy, branching, and minimal connectivity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equivalent Characterizations of Trees}
+\label{subsec:tree-characterizations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a finite graph \(T\) with \(n\) vertices, the following are
+equivalent:
+
+\begin{itemize}
+    \item \(T\) is a tree;
+    \item \(T\) is connected and acyclic;
+    \item \(T\) is connected and has \(n-1\) edges;
+    \item \(T\) is acyclic and has \(n-1\) edges;
+    \item there is exactly one path between every pair of vertices;
+    \item every edge is a bridge.
+\end{itemize}
+
+These equivalent descriptions make trees unusually flexible to study.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Number of Edges in a Tree}
+\label{subsec:tree-edge-count}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+Every tree with \(n\) vertices has exactly
+
+\[
+\boxed{
+n-1
+}
+\]
+
+edges.
+\end{theorem}
+
+This may be proved by induction using the existence of leaves.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Leaves in Trees}
+\label{subsec:tree-leaves}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every finite tree with at least two vertices has at least two leaves.
+
+Removing a leaf and its incident edge from a tree produces another
+tree.
+
+This property makes induction particularly natural for tree proofs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forests}
+\label{subsec:forests}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A forest is an acyclic graph.
+
+Each connected component of a forest is a tree.
+
+If a forest has \(n\) vertices and \(c\) connected components, then
+
+\[
+\boxed{
+|E|
+=
+n-c.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spanning Trees}
+\label{subsec:spanning-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Spanning Tree}
+A spanning tree of a connected graph \(G\) is a subgraph \(T\) such that:
+\begin{itemize}
+    \item \(V(T)=V(G)\);
+    \item \(T\) is a tree.
+\end{itemize}
+\end{definitionbox}
+
+A spanning tree preserves connectivity while using the minimum possible
+number of edges.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Every Connected Graph Has a Spanning Tree}
+\label{subsec:connected-spanning-tree}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Take a connected graph.
+
+If it contains a cycle, remove one edge from that cycle.
+
+Connectivity is preserved.
+
+Repeat until no cycles remain.
+
+The resulting spanning subgraph is connected and acyclic.
+
+Therefore it is a spanning tree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cayley's Formula}
+\label{subsec:cayleys-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Cayley's Formula]
+The number of labeled trees on \(n\) vertices is
+
+\[
+\boxed{
+n^{n-2}.
+}
+\]
+\end{theorem}
+
+For example, the number of labeled trees on \(4\) vertices is
+
+\[
+4^{4-2}=16.
+\]
+
+One classical proof uses Prüfer codes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Prüfer Codes}
+\label{subsec:prufer-codes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A labeled tree on vertex set
+
+\[
+[n]
+\]
+
+can be encoded by a sequence of length
+
+\[
+n-2.
+\]
+
+Each sequence entry belongs to \([n]\).
+
+Thus there are
+
+\[
+n^{n-2}
+\]
+
+possible Prüfer sequences.
+
+The Prüfer correspondence is bijective, giving Cayley's formula.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rooted Trees}
+\label{subsec:rooted-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rooted tree has one distinguished vertex called the root.
+
+This creates hierarchical language such as:
+
+\begin{itemize}
+    \item parent;
+    \item child;
+    \item ancestor;
+    \item descendant;
+    \item depth;
+    \item subtree.
+\end{itemize}
+
+Rooted trees are fundamental in computer science and recursive
+combinatorics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler Trails}
+\label{subsec:euler-trails}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An Euler trail uses every edge exactly once.
+
+An Euler circuit is an Euler trail that begins and ends at the same
+vertex.
+
+These questions were historically central to the origins of graph
+theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler Circuit Criterion}
+\label{subsec:euler-circuit-criterion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Euler Circuit Criterion]
+A connected graph has an Euler circuit if and only if every vertex has
+even degree.
+\end{theorem}
+
+Thus,
+
+\[
+\boxed{
+\text{Euler circuit}
+\iff
+\text{all degrees even}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler Trail Criterion}
+\label{subsec:euler-trail-criterion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Euler Trail Criterion]
+A connected graph has an Euler trail but no Euler circuit if and only if
+exactly two vertices have odd degree.
+\end{theorem}
+
+The trail begins at one odd-degree vertex and ends at the other.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Euler Trail}
+\label{subsec:worked-euler-trail}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Checking Euler Structure}
+
+Suppose a connected graph has degrees
+
+\[
+4,4,2,2,3,3.
+\]
+
+Exactly two vertices have odd degree.
+
+Therefore the graph has an Euler trail.
+
+Because not every degree is even, it does not have an Euler circuit.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{Euler trail: yes}
+\qquad
+\text{Euler circuit: no}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hamiltonian Paths and Cycles}
+\label{subsec:hamiltonian-paths-cycles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Hamiltonian path visits every vertex exactly once.
+
+A Hamiltonian cycle visits every vertex exactly once and returns to the
+starting vertex.
+
+Unlike Euler problems, Hamiltonian problems concern vertices rather than
+edges.
+
+There is no simple degree characterization comparable to Euler's
+criterion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dirac's Theorem}
+\label{subsec:diracs-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Dirac's Theorem]
+Let \(G\) be a simple graph on \(n\geq3\) vertices.
+
+If
+
+\[
+\boxed{
+\deg(v)\geq\frac n2
+}
+\]
+
+for every vertex \(v\), then \(G\) contains a Hamiltonian cycle.
+\end{theorem}
+
+This condition is sufficient but not necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ore's Theorem}
+\label{subsec:ores-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Ore's Theorem]
+Let \(G\) be a simple graph on \(n\geq3\) vertices.
+
+If every pair of nonadjacent vertices \(u,v\) satisfies
+
+\[
+\boxed{
+\deg(u)+\deg(v)\geq n,
+}
+\]
+
+then \(G\) is Hamiltonian.
+\end{theorem}
+
+Dirac's theorem follows as a special case.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Coloring}
+\label{subsec:graph-coloring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A proper vertex coloring assigns colors to vertices so that adjacent
+vertices receive different colors.
+
+A \(k\)-coloring uses at most \(k\) colors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chromatic Number}
+\label{subsec:chromatic-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Chromatic Number}
+The chromatic number of a graph \(G\), denoted
+
+\[
+\boxed{
+\chi(G),
+}
+\]
+
+is the minimum number of colors required for a proper vertex coloring.
+\end{definitionbox}
+
+Examples include
+
+\[
+\chi(K_n)=n
+\]
+
+and
+
+\[
+\chi(C_{2m})=2.
+\]
+
+For odd cycles,
+
+\[
+\boxed{
+\chi(C_{2m+1})=3.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bipartite Graphs and Coloring}
+\label{subsec:bipartite-coloring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonempty graph is bipartite if and only if
+
+\[
+\boxed{
+\chi(G)\leq2.
+}
+\]
+
+Thus bipartiteness may be interpreted either structurally through a
+vertex partition or algorithmically through two-colorability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greedy Coloring}
+\label{subsec:greedy-coloring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Choose an ordering of the vertices.
+
+Color them one at a time, always assigning the lowest available color.
+
+If the maximum degree is
+
+\[
+\Delta(G),
+\]
+
+then each vertex has at most \(\Delta(G)\) colored neighbors.
+
+Therefore,
+
+\[
+\boxed{
+\chi(G)\leq\Delta(G)+1.
+}
+\]
+
+This is the basic greedy coloring bound.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chromatic Polynomial}
+\label{subsec:chromatic-polynomial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The chromatic polynomial
+
+\[
+\boxed{
+P_G(k)
+}
+\]
+
+counts proper colorings of \(G\) using \(k\) available colors.
+
+For a tree \(T\) with \(n\) vertices,
+
+\[
+\boxed{
+P_T(k)
+=
+k(k-1)^{n-1}.
+}
+\]
+
+For the complete graph,
+
+\[
+\boxed{
+P_{K_n}(k)
+=
+k(k-1)\cdots(k-n+1).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deletion--Contraction}
+\label{subsec:graph-deletion-contraction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an edge \(e\),
+
+\[
+\boxed{
+P_G(k)
+=
+P_{G-e}(k)
+-
+P_{G/e}(k).
+}
+\]
+
+Here \(G-e\) deletes \(e\), while \(G/e\) contracts \(e\).
+
+This recurrence connects graph coloring with algebraic combinatorics and
+matroid theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Edge Coloring}
+\label{subsec:edge-coloring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An edge coloring assigns colors to edges so that adjacent edges receive
+different colors.
+
+The edge chromatic number is denoted
+
+\[
+\boxed{
+\chi'(G).
+}
+\]
+
+It is the minimum number of colors needed for a proper edge coloring.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vizing's Theorem}
+\label{subsec:vizing-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Vizing's Theorem]
+For every finite simple graph,
+
+\[
+\boxed{
+\Delta(G)
+\leq
+\chi'(G)
+\leq
+\Delta(G)+1.
+}
+\]
+\end{theorem}
+
+Thus every simple graph belongs to one of two edge-coloring classes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matchings}
+\label{subsec:matchings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Matching}
+A matching is a set of edges no two of which share a vertex.
+\end{definitionbox}
+
+A maximum matching is a matching having the largest possible number of
+edges.
+
+The matching number is often denoted
+
+\[
+\boxed{
+\nu(G).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Perfect Matchings}
+\label{subsec:perfect-matchings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A perfect matching covers every vertex exactly once.
+
+Thus a graph with a perfect matching must have an even number of
+vertices.
+
+Perfect matchings model complete pairings and assignments.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bipartite Matching}
+\label{subsec:bipartite-matching}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+G=(X\cup Y,E)
+\]
+
+is bipartite.
+
+A matching pairs vertices from \(X\) with vertices from \(Y\).
+
+Such problems model:
+
+\begin{itemize}
+    \item workers to jobs;
+    \item students to projects;
+    \item machines to tasks;
+    \item flights to gates.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hall's Marriage Theorem}
+\label{subsec:halls-marriage-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Hall's Marriage Theorem]
+Let
+
+\[
+G=(X\cup Y,E)
+\]
+
+be bipartite.
+
+There exists a matching saturating every vertex of \(X\) if and only if
+
+\[
+\boxed{
+|N(S)|\geq|S|
+}
+\]
+
+for every subset
+
+\[
+S\subseteq X.
+\]
+\end{theorem}
+
+Here,
+
+\[
+N(S)
+\]
+
+is the set of neighbors in \(Y\) adjacent to at least one vertex of
+\(S\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Hall's Condition}
+\label{subsec:worked-hall}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Checking a Matching Condition}
+
+Suppose a bipartite graph has left part
+
+\[
+X=\{a,b,c\}
+\]
+
+and right part
+
+\[
+Y=\{1,2,3,4\}.
+\]
+
+Assume
+
+\[
+N(\{a\})=\{1,2\},
+\]
+
+\[
+N(\{b\})=\{2,3\},
+\]
+
+\[
+N(\{c\})=\{3,4\},
+\]
+
+and every larger subset has at least as many neighbors as vertices.
+
+Then Hall's condition holds.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{There exists a matching saturating }X.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vertex Covers}
+\label{subsec:vertex-covers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Vertex Cover}
+A vertex cover is a set
+
+\[
+C\subseteq V
+\]
+
+such that every edge has at least one endpoint in \(C\).
+\end{definitionbox}
+
+The minimum size of a vertex cover is denoted
+
+\[
+\boxed{
+\tau(G).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent Sets}
+\label{subsec:independent-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An independent set is a set of vertices containing no adjacent pair.
+
+The maximum size of an independent set is denoted
+
+\[
+\boxed{
+\alpha(G).
+}
+\]
+
+A set \(C\) is a vertex cover if and only if
+
+\[
+V\setminus C
+\]
+
+is independent.
+
+Therefore,
+
+\[
+\boxed{
+\alpha(G)+\tau(G)=|V|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{K\H{o}nig's Theorem}
+\label{subsec:konigs-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[K\H{o}nig's Theorem]
+For every bipartite graph,
+
+\[
+\boxed{
+\nu(G)=\tau(G).
+}
+\]
+\end{theorem}
+
+Thus the maximum size of a matching equals the minimum size of a vertex
+cover.
+
+This is a fundamental min-max theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Planar Graphs}
+\label{subsec:planar-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph is planar if it can be drawn in the plane with no edge
+crossings except at common endpoints.
+
+A particular crossing-free drawing is called a planar embedding.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Faces of a Planar Graph}
+\label{subsec:planar-faces}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A planar embedding divides the plane into regions called faces.
+
+One face is unbounded and is called the outer face.
+
+If
+
+\[
+f
+\]
+
+denotes the number of faces, Euler's formula relates \(f\) to the
+numbers of vertices and edges.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler's Planar Formula}
+\label{subsec:eulers-planar-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Euler's Formula]
+For a connected planar graph,
+
+\[
+\boxed{
+|V|-|E|+|F|=2.
+}
+\]
+\end{theorem}
+
+Here,
+
+\[
+|F|
+\]
+
+denotes the number of faces in a planar embedding.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Euler's Formula}
+\label{subsec:worked-euler-planar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Finding the Number of Faces}
+
+Suppose a connected planar graph has
+
+\[
+|V|=8
+\]
+
+and
+
+\[
+|E|=12.
+\]
+
+Euler's formula gives
+
+\[
+8-12+|F|=2.
+\]
+
+Therefore,
+
+\[
+|F|=6.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+|F|=6.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Edge Bound for Planar Graphs}
+\label{subsec:planar-edge-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a simple connected planar graph with
+
+\[
+|V|\geq3,
+\]
+
+every face has boundary length at least \(3\).
+
+Counting edge-face incidences gives
+
+\[
+3|F|\leq2|E|.
+\]
+
+Using Euler's formula leads to
+
+\[
+\boxed{
+|E|
+\leq
+3|V|-6.
+}
+\]
+
+This provides a necessary condition for planarity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Planar Bipartite Edge Bound}
+\label{subsec:planar-bipartite-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A bipartite graph contains no triangle.
+
+Thus every face of a simple planar bipartite graph has boundary length
+at least \(4\).
+
+Therefore,
+
+\[
+4|F|\leq2|E|.
+\]
+
+Combining with Euler's formula yields
+
+\[
+\boxed{
+|E|
+\leq
+2|V|-4.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonplanarity of \(K_5\)}
+\label{subsec:k5-nonplanar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The complete graph \(K_5\) has
+
+\[
+|V|=5
+\]
+
+and
+
+\[
+|E|=10.
+\]
+
+If \(K_5\) were planar, the planar edge bound would require
+
+\[
+10\leq3(5)-6=9,
+\]
+
+which is false.
+
+Therefore,
+
+\[
+\boxed{
+K_5\text{ is nonplanar}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonplanarity of \(K_{3,3}\)}
+\label{subsec:k33-nonplanar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The graph \(K_{3,3}\) is bipartite with
+
+\[
+|V|=6
+\]
+
+and
+
+\[
+|E|=9.
+\]
+
+If it were planar, the bipartite edge bound would require
+
+\[
+9\leq2(6)-4=8,
+\]
+
+which is impossible.
+
+Therefore,
+
+\[
+\boxed{
+K_{3,3}\text{ is nonplanar}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kuratowski's Theorem}
+\label{subsec:kuratowskis-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Kuratowski's Theorem]
+A finite graph is planar if and only if it contains no subdivision of
+
+\[
+\boxed{
+K_5
+}
+\]
+
+or
+
+\[
+\boxed{
+K_{3,3}.
+}
+\]
+\end{theorem}
+
+Thus two graphs characterize all obstructions to planarity through
+subdivision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Traversal}
+\label{subsec:graph-traversal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Graph traversal systematically visits vertices and edges.
+
+Two fundamental algorithms are:
+
+\[
+\boxed{
+\text{Breadth-First Search}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Depth-First Search}.
+}
+\]
+
+They form the foundation of many graph algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Breadth-First Search}
+\label{subsec:breadth-first-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Breadth-First Search, abbreviated BFS, explores vertices by increasing
+distance from a starting vertex.
+
+It uses a queue.
+
+BFS can determine:
+
+\begin{itemize}
+    \item connected components;
+    \item shortest paths in unweighted graphs;
+    \item vertex distances;
+    \item bipartiteness.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{BFS Layers}
+\label{subsec:bfs-layers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Starting from \(s\), define
+
+\[
+L_0=\{s\},
+\]
+
+and
+
+\[
+\boxed{
+L_k
+=
+\{v:d(s,v)=k\}.
+}
+\]
+
+BFS discovers these layers sequentially.
+
+Thus the BFS tree records shortest-path distances from \(s\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Depth-First Search}
+\label{subsec:depth-first-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Depth-First Search, abbreviated DFS, follows one branch as deeply as
+possible before backtracking.
+
+It uses a stack or recursion.
+
+DFS can help identify:
+
+\begin{itemize}
+    \item connected components;
+    \item cycles;
+    \item articulation points;
+    \item bridges;
+    \item topological orderings in directed acyclic graphs.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directed Acyclic Graphs}
+\label{subsec:directed-acyclic-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A directed acyclic graph, abbreviated DAG, is a directed graph containing
+no directed cycle.
+
+DAGs naturally represent precedence structures.
+
+Examples include:
+
+\begin{itemize}
+    \item prerequisite networks;
+    \item task dependencies;
+    \item build systems;
+    \item scheduling constraints.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Topological Ordering}
+\label{subsec:topological-ordering}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A topological ordering of a DAG is a linear ordering of its vertices
+such that every directed edge
+
+\[
+u\to v
+\]
+
+places \(u\) before \(v\).
+
+\begin{theorem}
+A finite directed graph has a topological ordering if and only if it is
+acyclic.
+\end{theorem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest Paths}
+\label{subsec:shortest-paths}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In an unweighted graph, BFS finds shortest paths.
+
+In a weighted graph with nonnegative edge weights, Dijkstra's algorithm
+finds shortest paths from one source.
+
+The path length is
+
+\[
+\boxed{
+\sum_{e\in P}w(e).
+}
+\]
+
+Shortest-path problems are fundamental in transportation and network
+optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum Spanning Trees}
+\label{subsec:minimum-spanning-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a connected graph has weighted edges.
+
+A minimum spanning tree is a spanning tree minimizing
+
+\[
+\boxed{
+\sum_{e\in T}w(e).
+}
+\]
+
+Two classical algorithms are:
+
+\begin{itemize}
+    \item Kruskal's algorithm;
+    \item Prim's algorithm.
+\end{itemize}
+
+Minimum spanning trees connect graph theory with greedy optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kruskal's Algorithm}
+\label{subsec:kruskals-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kruskal's algorithm repeatedly selects the currently cheapest edge that
+does not create a cycle.
+
+The process stops after selecting
+
+\[
+|V|-1
+\]
+
+edges.
+
+The result is a minimum spanning tree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Prim's Algorithm}
+\label{subsec:prims-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Prim's algorithm grows one connected tree.
+
+Starting from one vertex, repeatedly add the cheapest edge joining the
+current tree to a new vertex.
+
+When all vertices are included, the resulting tree is minimum-weight.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Laplacian}
+\label{subsec:graph-laplacian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(A\) be the adjacency matrix and \(D\) the diagonal degree matrix:
+
+\[
+D_{ii}=\deg(v_i).
+\]
+
+The graph Laplacian is
+
+\[
+\boxed{
+L=D-A.
+}
+\]
+
+The Laplacian connects graph structure with linear algebra,
+probability, geometry, and spectral theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Laplacian and Connectivity}
+\label{subsec:laplacian-connectivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The vector
+
+\[
+\mathbf{1}
+=
+(1,\ldots,1)^T
+\]
+
+satisfies
+
+\[
+L\mathbf{1}=0.
+\]
+
+The multiplicity of the eigenvalue \(0\) equals the number of connected
+components.
+
+Thus,
+
+\[
+\boxed{
+G\text{ connected}
+\iff
+0\text{ is a simple Laplacian eigenvalue}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix--Tree Theorem}
+\label{subsec:matrix-tree-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Matrix--Tree Theorem]
+The number of spanning trees of a finite graph \(G\) equals any cofactor
+of its Laplacian matrix.
+\end{theorem}
+
+That is, delete one row and the corresponding column from \(L\).
+
+The determinant of the resulting matrix is
+
+\[
+\boxed{
+\tau(G),
+}
+\]
+
+the number of spanning trees.
+
+This provides a striking connection between determinants and
+combinatorial enumeration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Flow Preview}
+\label{subsec:network-flow-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A flow network is a directed graph in which edges have capacities.
+
+One seeks to send as much flow as possible from a source \(s\) to a
+sink \(t\).
+
+The central result is the max-flow min-cut theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Max-Flow Min-Cut Theorem}
+\label{subsec:max-flow-min-cut-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Max-Flow Min-Cut Theorem]
+In a finite capacitated network,
+
+\[
+\boxed{
+\text{maximum }s\text{-}t\text{ flow}
+=
+\text{minimum }s\text{-}t\text{ cut capacity}.
+}
+\]
+\end{theorem}
+
+This is another fundamental min-max principle.
+
+Network flow is developed more fully in optimization and operations
+research.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Products Preview}
+\label{subsec:graph-products-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Graphs may be combined through several product constructions.
+
+Examples include:
+
+\begin{itemize}
+    \item Cartesian product;
+    \item direct product;
+    \item strong product;
+    \item lexicographic product.
+\end{itemize}
+
+For example, the \(n\)-dimensional hypercube satisfies
+
+\[
+\boxed{
+Q_n
+=
+K_2\square K_2\square\cdots\square K_2.
+}
+\]
+
+The symbol
+
+\[
+\square
+\]
+
+denotes the Cartesian graph product.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hypercube Graphs}
+\label{subsec:hypercube-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The hypercube graph \(Q_n\) has vertex set
+
+\[
+\{0,1\}^n.
+\]
+
+Two binary strings are adjacent when they differ in exactly one
+coordinate.
+
+Thus adjacency corresponds to Hamming distance \(1\).
+
+The graph has
+
+\[
+\boxed{
+2^n
+}
+\]
+
+vertices.
+
+Every vertex has degree
+
+\[
+n.
+\]
+
+Hence,
+
+\[
+\boxed{
+|E(Q_n)|
+=
+n2^{n-1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Homomorphisms}
+\label{subsec:graph-homomorphisms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph homomorphism from \(G\) to \(H\) is a map
+
+\[
+f:V(G)\to V(H)
+\]
+
+such that adjacency is preserved:
+
+\[
+\boxed{
+uv\in E(G)
+\Longrightarrow
+f(u)f(v)\in E(H).
+}
+\]
+
+Proper \(k\)-colorings are exactly graph homomorphisms
+
+\[
+G\to K_k.
+\]
+
+Thus coloring may be viewed as a structure-preserving map problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:graph-theory-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Transportation.}
+Roads, airline routes, shipping lanes, and transit systems are modeled
+as graphs.
+
+\medskip
+
+\textbf{Computer Networks.}
+Routers, devices, and communication links form graph structures.
+
+\medskip
+
+\textbf{Social Networks.}
+People or organizations form vertices while relationships form edges.
+
+\medskip
+
+\textbf{Biology.}
+Protein interactions, food webs, neural networks, and phylogenetic
+relationships use graph models.
+
+\medskip
+
+\textbf{Chemistry.}
+Molecules can be represented as graphs with atoms as vertices and bonds
+as edges.
+
+\medskip
+
+\textbf{Scheduling.}
+Precedence constraints form DAGs, while incompatibility constraints can
+form coloring graphs.
+
+\medskip
+
+\textbf{Optimization.}
+Shortest paths, spanning trees, matchings, flows, cuts, and routing are
+graph optimization problems.
+
+\medskip
+
+\textbf{Data Science.}
+Graph models describe relational, networked, and non-Euclidean data.
+
+\medskip
+
+\textbf{Probability.}
+Random graph theory studies typical network structure and threshold
+phenomena.
+
+\medskip
+
+\textbf{Algebra.}
+Spectral graph theory uses matrices, eigenvalues, and algebraic
+invariants to study graphs.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:graph-theory-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing a Graph with Its Drawing}
+
+Different drawings may represent the same graph.
+
+Edge crossings in a drawing do not create vertices unless explicitly
+declared.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Walks, Trails, and Paths}
+
+A walk may repeat vertices and edges.
+
+A trail cannot repeat edges.
+
+A path cannot repeat vertices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Euler and Hamiltonian Problems}
+
+Euler problems concern using every edge.
+
+Hamiltonian problems concern visiting every vertex.
+
+These are fundamentally different conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Degree Sum Without Dividing by Two}
+
+Because each edge contributes to two vertex degrees,
+
+\[
+|E|
+=
+\frac12
+\sum_{v\in V}\deg(v).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Degree Sequence Is Graphical}
+
+A list of nonnegative integers may fail to represent any simple graph.
+
+For example, degree values may violate structural constraints even when
+their total sum is even.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Connected and Complete}
+
+Connected means every pair is joined by some path.
+
+Complete means every pair is joined directly by an edge.
+
+Every complete graph is connected, but most connected graphs are not
+complete.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Connected Graph Is a Tree}
+
+A tree must be connected and acyclic.
+
+Connected graphs may contain many cycles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Euler's Planar Formula for a Nonplanar Drawing}
+
+Euler's formula applies to a planar embedding.
+
+A drawing with crossings is not automatically a planar embedding.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming the Planar Edge Bound Proves Planarity}
+
+The inequality
+
+\[
+|E|\leq3|V|-6
+\]
+
+is necessary for simple planar graphs, but it is not sufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Matching and Vertex Cover}
+
+A matching is a set of pairwise disjoint edges.
+
+A vertex cover is a set of vertices touching every edge.
+
+Their relationship is especially strong in bipartite graphs through
+K\H{o}nig's theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:graph-theory-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a simple graph.
+\end{exercise}
+
+\begin{exercise}[1]
+What is the maximum number of edges in a simple graph on \(8\)
+vertices?
+\end{exercise}
+
+\begin{exercise}[1]
+Find the number of edges in
+
+\[
+K_7.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Find the number of edges in
+
+\[
+K_{4,6}.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+A graph has degree sequence
+
+\[
+4,4,3,3,2,2.
+\]
+
+Find the number of edges.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain why a graph cannot have exactly three odd-degree vertices.
+\end{exercise}
+
+\begin{exercise}[1]
+Find the degree of every vertex in
+
+\[
+C_8.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Find the number of edges in the \(5\)-dimensional hypercube \(Q_5\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define a connected graph.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a tree.
+\end{exercise}
+
+\begin{exercise}[1]
+How many edges does a tree on \(20\) vertices have?
+\end{exercise}
+
+\begin{exercise}[1]
+How many edges does a forest with \(20\) vertices and \(4\) components
+have?
+\end{exercise}
+
+\begin{exercise}[1]
+State the Euler circuit criterion.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Euler trail criterion.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the chromatic number.
+\end{exercise}
+
+\begin{exercise}[1]
+Find
+
+\[
+\chi(K_6).
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Find
+
+\[
+\chi(C_8).
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Find
+
+\[
+\chi(C_7).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Prove the handshaking lemma by double counting incidences.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that every graph has an even number of odd-degree vertices.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether
+
+\[
+(3,3,2,2,2,2)
+\]
+
+is graphical.
+\end{exercise}
+
+\begin{exercise}[2]
+Use Havel--Hakimi to test
+
+\[
+(4,4,3,2,2,1).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that every tree with at least two vertices has at least two
+leaves.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that every tree on \(n\) vertices has \(n-1\) edges.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that every connected graph contains a spanning tree.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the number of labeled trees on \(5\) vertices using Cayley's
+formula.
+\end{exercise}
+
+\begin{exercise}[2]
+List all Prüfer sequences for labeled trees on \(3\) vertices.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether a connected graph with degrees
+
+\[
+4,4,2,2,2,2
+\]
+
+has an Euler circuit.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether a connected graph with degrees
+
+\[
+3,3,2,2,2,2
+\]
+
+has an Euler trail.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that every bipartite graph contains no odd cycle.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that every tree is bipartite.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the adjacency matrix of the path graph \(P_4\).
+\end{exercise}
+
+\begin{exercise}[2]
+Square the adjacency matrix of \(P_4\) and interpret one nonzero entry.
+\end{exercise}
+
+\begin{exercise}[2]
+Use Euler's planar formula to determine the number of faces in a
+connected planar graph with \(10\) vertices and \(15\) edges.
+\end{exercise}
+
+\begin{exercise}[2]
+Use the planar edge bound to prove that \(K_5\) is nonplanar.
+\end{exercise}
+
+\begin{exercise}[2]
+Use the bipartite planar edge bound to prove that \(K_{3,3}\) is
+nonplanar.
+\end{exercise}
+
+\begin{exercise}[2]
+State Hall's Marriage Theorem.
+\end{exercise}
+
+\begin{exercise}[2]
+Give a bipartite graph satisfying Hall's condition and construct a
+matching saturating the left part.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that a connected graph with \(n\) vertices and \(n-1\) edges is a
+tree.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that an acyclic graph with \(n\) vertices and \(n-1\) edges is
+connected.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that an edge is a bridge if and only if it belongs to no cycle.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that a graph is bipartite if and only if it contains no odd
+cycle.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the formula
+
+\[
+|E(Q_n)|=n2^{n-1}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that
+
+\[
+P_T(k)=k(k-1)^{n-1}
+\]
+
+for every tree \(T\) on \(n\) vertices.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify deletion--contraction for the chromatic polynomial of \(C_3\).
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that
+
+\[
+\chi(G)\leq\Delta(G)+1
+\]
+
+using greedy coloring.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that
+
+\[
+\alpha(G)+\tau(G)=|V|.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Apply Hall's theorem to determine whether a perfect assignment exists
+in a bipartite graph of your own construction.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the planar edge bound
+
+\[
+|E|\leq3|V|-6.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the bipartite planar edge bound
+
+\[
+|E|\leq2|V|-4.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the multiplicity of the Laplacian eigenvalue \(0\) equals the
+number of connected components for a small example.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the Matrix--Tree Theorem to compute the number of spanning trees of
+\(K_4\).
+\end{exercise}
+
+\begin{exercise}[3]
+Use BFS to determine shortest-path distances from a chosen vertex in a
+graph of your own construction.
+\end{exercise}
+
+\begin{exercise}[3]
+Use DFS to identify the connected components of a disconnected graph.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Erd\H{o}s--Gallai theorem for graphical degree sequences.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Menger's theorem and its relationship to vertex and edge
+connectivity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Matrix--Tree Theorem and prove it using Laplacian
+determinants.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate spectral graph theory and the relationship between adjacency
+eigenvalues and graph structure.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Brooks' theorem as a refinement of the greedy coloring bound.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the Four Color Theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Tutte's theorem characterizing graphs with perfect matchings.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate K\H{o}nig's theorem and prove it using augmenting paths.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the max-flow min-cut theorem and its relationship to bipartite
+matching.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Kuratowski's theorem and Wagner's theorem on planarity.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:graph-theory-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph is a pair
+
+\[
+\boxed{
+G=(V,E)
+}
+\]
+
+representing vertices and pairwise relationships.
+
+The degree of a vertex satisfies the handshaking identity
+
+\[
+\boxed{
+\sum_{v\in V}\deg(v)=2|E|.
+}
+\]
+
+Important graph classes include
+
+\[
+\boxed{
+K_n,
+\quad
+K_{m,n},
+\quad
+C_n,
+\quad
+P_n,
+\quad
+Q_n.
+}
+\]
+
+A graph is connected when every pair of vertices is joined by a path.
+
+A tree is a connected acyclic graph and satisfies
+
+\[
+\boxed{
+|E|=|V|-1.
+}
+\]
+
+A forest with \(c\) components satisfies
+
+\[
+\boxed{
+|E|=|V|-c.
+}
+\]
+
+Euler circuits are characterized by even vertex degrees.
+
+Hamiltonian cycles visit every vertex exactly once.
+
+The chromatic number
+
+\[
+\boxed{
+\chi(G)
+}
+\]
+
+measures the minimum number of colors needed for a proper coloring.
+
+Matchings pair vertices without overlap.
+
+Hall's theorem characterizes when a bipartite matching can saturate one
+part.
+
+For bipartite graphs,
+
+\[
+\boxed{
+\nu(G)=\tau(G)
+}
+\]
+
+by K\H{o}nig's theorem.
+
+Planar graphs satisfy Euler's relation
+
+\[
+\boxed{
+|V|-|E|+|F|=2.
+}
+\]
+
+Simple planar graphs satisfy
+
+\[
+\boxed{
+|E|\leq3|V|-6.
+}
+\]
+
+Adjacency matrices encode edges, and
+
+\[
+\boxed{
+(A^k)_{ij}
+}
+\]
+
+counts length-\(k\) walks.
+
+The Laplacian
+
+\[
+\boxed{
+L=D-A
+}
+\]
+
+encodes connectivity and spanning-tree information.
+
+Graph theory therefore provides a unified mathematical language for
+
+\[
+\boxed{
+\text{networks}
++
+\text{paths}
++
+\text{connectivity}
++
+\text{coloring}
++
+\text{matching}
++
+\text{optimization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:graph-theory-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Graph Theory builds on the discrete structures introduced in
+Section~\ref{sec:discrete-structures} and uses the counting,
+enumerative, extremal, algebraic, and probabilistic methods developed
+throughout Chapter 6. Extremal Combinatorics studies edge bounds under
+forbidden-subgraph conditions. Algebraic Combinatorics contributes
+chromatic polynomials, spectra, group actions, and the Tutte polynomial.
+Probabilistic Combinatorics studies random graphs and typical graph
+behavior. The next section, Ramsey Theory, asks when large graphs or
+edge colorings must contain unavoidable configurations. Design Theory
+uses highly regular incidence graphs, while Matroid Theory generalizes
+trees, independence, rank, circuits, and deletion--contraction.
+Optimization and Operations Research develops shortest paths, flows,
+matchings, network optimization, and spanning-tree methods in greater
+algorithmic depth.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 6.9 Graph Theory
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard introductory graph theory.
+%   - Standard algebraic and algorithmic graph theory.
+%   - Standard network and connectivity theory.
+%
+% Used for:
+%   - graphs and graph types;
+%   - vertices and edges;
+%   - simple graphs;
+%   - multigraphs and pseudographs;
+%   - directed and weighted graphs;
+%   - degree and neighborhoods;
+%   - handshaking lemma;
+%   - regular graphs;
+%   - complete and bipartite graphs;
+%   - multipartite graphs;
+%   - subgraphs and induced subgraphs;
+%   - complements;
+%   - graph isomorphism;
+%   - invariants and degree sequences;
+%   - Havel--Hakimi method;
+%   - walks, trails, paths, circuits, and cycles;
+%   - distance, diameter, radius, and eccentricity;
+%   - connectivity and components;
+%   - cut vertices and bridges;
+%   - vertex and edge connectivity;
+%   - adjacency and incidence matrices;
+%   - adjacency-matrix walk counting;
+%   - trees and forests;
+%   - spanning trees;
+%   - Cayley's formula;
+%   - Prüfer codes;
+%   - rooted trees;
+%   - Euler trails and circuits;
+%   - Hamiltonian paths and cycles;
+%   - Dirac's theorem;
+%   - Ore's theorem;
+%   - vertex and edge coloring;
+%   - chromatic number;
+%   - greedy coloring;
+%   - chromatic polynomial;
+%   - deletion--contraction;
+%   - matchings;
+%   - Hall's theorem;
+%   - vertex covers and independent sets;
+%   - König's theorem;
+%   - planar graphs;
+%   - Euler's planar formula;
+%   - planar edge bounds;
+%   - K5 and K3,3 nonplanarity;
+%   - Kuratowski's theorem;
+%   - BFS and DFS;
+%   - DAGs and topological ordering;
+%   - shortest paths;
+%   - minimum spanning trees;
+%   - Kruskal and Prim algorithms;
+%   - graph Laplacian;
+%   - Matrix--Tree Theorem;
+%   - network flow preview;
+%   - graph products;
+%   - hypercube graphs;
+%   - graph homomorphisms;
+%   - applications and exercises.
+%
+% Notes:
+%   - Random graph theory is introduced in Section 6.8.
+%   - Ramsey Theory follows this section and studies unavoidable
+%     monochromatic and structural configurations.
+%   - Design Theory and Matroid Theory reuse incidence, matching,
+%     independence, rank, and graph-structural ideas.
+%   - Network optimization algorithms are developed further in
+%     Chapter 10.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,4668 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.18 STATISTICAL LEARNING
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Statistical Learning}
+\label{sec:statistical-learning}
+
+\prerequisite{
+Probability, statistics, regression, classification, multivariate
+statistics, optimization, linear algebra, likelihood, estimation,
+cross-validation, and basic computational methods.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item distinguish supervised and unsupervised learning;
+    \item distinguish regression and classification tasks;
+    \item define training, validation, and test data;
+    \item understand prediction error and generalization error;
+    \item explain the bias--variance tradeoff;
+    \item recognize underfitting and overfitting;
+    \item understand empirical risk minimization;
+    \item understand regularization;
+    \item derive ridge-regression estimators;
+    \item understand lasso regression;
+    \item understand elastic-net regularization;
+    \item understand feature selection;
+    \item distinguish training error from test error;
+    \item understand cross-validation;
+    \item understand \(k\)-fold and leave-one-out cross-validation;
+    \item understand bootstrap-based model assessment conceptually;
+    \item understand classification loss functions;
+    \item understand logistic regression as a classification model;
+    \item understand linear and quadratic discriminant analysis;
+    \item understand \(k\)-nearest-neighbor methods;
+    \item understand decision trees;
+    \item understand regression trees;
+    \item understand classification trees;
+    \item understand impurity measures;
+    \item understand pruning;
+    \item understand bagging;
+    \item understand random forests;
+    \item understand boosting conceptually;
+    \item understand gradient boosting conceptually;
+    \item recognize support-vector machines;
+    \item understand margins and kernels conceptually;
+    \item understand kernel methods;
+    \item understand principal components regression;
+    \item understand partial least squares conceptually;
+    \item recognize clustering methods;
+    \item understand \(k\)-means clustering;
+    \item understand hierarchical clustering;
+    \item understand distance and similarity measures;
+    \item understand model complexity and tuning parameters;
+    \item understand hyperparameter selection;
+    \item understand calibration and discrimination;
+    \item understand common performance metrics;
+    \item understand imbalanced classification;
+    \item understand feature preprocessing and data leakage;
+    \item recognize high-dimensional statistical problems;
+    \item understand sparsity;
+    \item recognize ensemble learning;
+    \item understand interpretability and variable importance;
+    \item understand fairness and distribution shift conceptually;
+    \item connect statistical learning with regression, multivariate
+          statistics, optimization, and computational statistics.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Statistical Learning?}
+\label{subsec:what-is-statistical-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Statistical learning develops methods for discovering patterns,
+estimating relationships, and making predictions from data.
+
+A typical dataset consists of predictors
+
+\[
+\boxed{
+X_1,\ldots,X_p
+}
+\]
+
+and possibly a response
+
+\[
+\boxed{
+Y.
+}
+\]
+
+The goal may be:
+
+\[
+\boxed{
+\text{prediction},
+}
+\]
+
+\[
+\boxed{
+\text{classification},
+}
+\]
+
+\[
+\boxed{
+\text{dimension reduction},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{structure discovery}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Supervised Learning}
+\label{subsec:supervised-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In supervised learning, each training observation includes predictors and
+a response:
+
+\[
+\boxed{
+(\mathbf{x}_i,y_i).
+}
+\]
+
+The objective is to learn a function
+
+\[
+\boxed{
+\widehat{f}(\mathbf{x})
+}
+\]
+
+that predicts \(Y\) from \(\mathbf{X}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unsupervised Learning}
+\label{subsec:unsupervised-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In unsupervised learning, no response variable is specified.
+
+The observations are
+
+\[
+\boxed{
+\mathbf{x}_1,\ldots,\mathbf{x}_n.
+}
+\]
+
+The goal is to discover structure such as:
+
+\[
+\boxed{
+\text{clusters},
+}
+\]
+
+\[
+\boxed{
+\text{latent directions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{low-dimensional representations}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression Problems}
+\label{subsec:statistical-learning-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Regression predicts a quantitative response.
+
+Examples include:
+
+\[
+\boxed{
+\text{income},
+}
+\]
+
+\[
+\boxed{
+\text{temperature},
+}
+\]
+
+\[
+\boxed{
+\text{sales},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{disease duration}.
+}
+\]
+
+A regression model aims to estimate
+
+\[
+\boxed{
+f(\mathbf{x})
+=
+\mathbb{E}
+[
+Y\mid\mathbf{X}=\mathbf{x}
+].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classification Problems}
+\label{subsec:statistical-learning-classification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Classification predicts a categorical response.
+
+For binary classification,
+
+\[
+\boxed{
+Y\in\{0,1\}.
+}
+\]
+
+A probabilistic classifier may estimate
+
+\[
+\boxed{
+P
+(
+Y=1
+\mid
+\mathbf{X}=\mathbf{x}
+).
+}
+\]
+
+A class label is then chosen using a decision rule.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Prediction Versus Explanation}
+\label{subsec:prediction-versus-explanation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A model that predicts well does not necessarily provide a correct causal
+or scientific explanation.
+
+Prediction focuses on future accuracy.
+
+Scientific inference may instead focus on:
+
+\[
+\boxed{
+\text{effect estimation},
+}
+\]
+
+\[
+\boxed{
+\text{uncertainty},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{causal interpretation}.
+}
+\]
+
+These goals can require different methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Training Data}
+\label{subsec:training-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The training set is used to estimate model parameters.
+
+Write
+
+\[
+\boxed{
+\mathcal{D}_{train}.
+}
+\]
+
+For supervised learning,
+
+\[
+\mathcal{D}_{train}
+=
+\{
+(\mathbf{x}_i,y_i)
+\}_{i=1}^{n}.
+\]
+
+The fitted model is determined from these observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Validation Data}
+\label{subsec:validation-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A validation set is used to compare model settings or tuning parameters.
+
+For example, validation data may determine:
+
+\[
+\boxed{
+\lambda
+}
+\]
+
+in ridge regression or
+
+\[
+\boxed{
+k
+}
+\]
+
+in \(k\)-nearest-neighbor classification.
+
+Validation data should not be repeatedly reused as if they were unseen
+test data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Test Data}
+\label{subsec:test-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The test set is reserved for final evaluation.
+
+It should represent observations not used to:
+
+\[
+\boxed{
+\text{fit the model},
+}
+\]
+
+\[
+\boxed{
+\text{choose predictors},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{tune hyperparameters}.
+}
+\]
+
+The test error estimates generalization performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generalization}
+\label{subsec:generalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Generalization refers to how well a learned model performs on new data
+from the target population.
+
+A model with excellent training performance may generalize poorly.
+
+Thus the key quantity is not merely
+
+\[
+\boxed{
+\text{training error},
+}
+\]
+
+but
+
+\[
+\boxed{
+\text{future prediction error}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Loss Functions}
+\label{subsec:learning-loss-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A loss function measures the cost of a prediction.
+
+For regression, squared-error loss is
+
+\[
+\boxed{
+L
+(
+y,\widehat{y}
+)
+=
+(
+y-\widehat{y}
+)^2.
+}
+\]
+
+Absolute-error loss is
+
+\[
+\boxed{
+L
+(
+y,\widehat{y}
+)
+=
+|
+y-\widehat{y}
+|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classification Loss}
+\label{subsec:classification-loss}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For classification, zero-one loss is
+
+\[
+\boxed{
+L
+(
+y,\widehat{y}
+)
+=
+\mathbf{1}_{\{y\neq\widehat{y}\}}.
+}
+\]
+
+The average zero-one loss is the misclassification rate.
+
+Other losses may reflect unequal costs of different mistakes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Risk}
+\label{subsec:learning-risk}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The population prediction risk is
+
+\[
+\boxed{
+R(f)
+=
+\mathbb{E}
+[
+L
+(
+Y,f(\mathbf{X})
+)
+].
+}
+\]
+
+The expectation is taken over future predictor-response pairs.
+
+The ideal predictor minimizes population risk.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empirical Risk}
+\label{subsec:empirical-risk}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The empirical risk is the average training loss:
+
+\[
+\boxed{
+\widehat{R}_n(f)
+=
+\frac1n
+\sum_{i=1}^{n}
+L
+(
+Y_i,
+f(\mathbf{X}_i)
+).
+}
+\]
+
+Many learning algorithms choose a model that minimizes empirical risk or
+a penalized version of it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empirical Risk Minimization}
+\label{subsec:empirical-risk-minimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given a model class
+
+\[
+\mathcal{F},
+\]
+
+empirical risk minimization chooses
+
+\[
+\boxed{
+\widehat{f}
+=
+\arg\min_{f\in\mathcal{F}}
+\widehat{R}_n(f).
+}
+\]
+
+A highly flexible class can reduce training error dramatically.
+
+However, minimizing training error alone can cause overfitting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Irreducible Error}
+\label{subsec:irreducible-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+Y
+=
+f(\mathbf{X})
++
+\varepsilon,
+}
+\]
+
+with
+
+\[
+\mathbb{E}
+[
+\varepsilon\mid\mathbf{X}
+]
+=
+0.
+\]
+
+Even if \(f\) were known exactly, future observations still contain
+random noise.
+
+This is irreducible error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Error}
+\label{subsec:model-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Prediction error above irreducible noise may arise from:
+
+\[
+\boxed{
+\text{bias},
+}
+\]
+
+\[
+\boxed{
+\text{variance},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{model misspecification}.
+}
+\]
+
+The goal of statistical learning is to control these sources of error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bias--Variance Tradeoff}
+\label{subsec:bias-variance-tradeoff-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For squared-error prediction at a fixed point \(\mathbf{x}_0\), a
+classical decomposition is
+
+\[
+\boxed{
+\mathbb{E}
+\left[
+(
+Y_0
+-
+\widehat{f}(\mathbf{x}_0)
+)^2
+\right]
+=
+\sigma^2
++
+\operatorname{Bias}
+[
+\widehat{f}(\mathbf{x}_0)
+]^2
++
+\operatorname{Var}
+[
+\widehat{f}(\mathbf{x}_0)
+].
+}
+\]
+
+The first term is irreducible noise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flexible Versus Rigid Models}
+\label{subsec:flexible-versus-rigid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A highly rigid model may have:
+
+\[
+\boxed{
+\text{high bias}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{low variance}.
+}
+\]
+
+A highly flexible model may have:
+
+\[
+\boxed{
+\text{low bias}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{high variance}.
+}
+\]
+
+Good predictive performance requires balancing these effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Underfitting}
+\label{subsec:underfitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Underfitting occurs when the model is too simple to capture important
+structure.
+
+Typical symptoms include:
+
+\[
+\boxed{
+\text{high training error}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{high test error}.
+}
+\]
+
+Adding relevant flexibility may improve performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Overfitting}
+\label{subsec:overfitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Overfitting occurs when a model adapts too strongly to random noise or
+peculiarities of the training data.
+
+Typical symptoms include:
+
+\[
+\boxed{
+\text{very low training error}
+}
+\]
+
+but
+
+\[
+\boxed{
+\text{high test error}.
+}
+\]
+
+Regularization and validation are major defenses against overfitting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Complexity}
+\label{subsec:model-complexity-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Model complexity can be controlled through:
+
+\[
+\boxed{
+\text{number of predictors},
+}
+\]
+
+\[
+\boxed{
+\text{tree depth},
+}
+\]
+
+\[
+\boxed{
+\text{polynomial degree},
+}
+\]
+
+\[
+\boxed{
+\text{regularization strength},
+}
+\]
+
+or other hyperparameters.
+
+The best complexity is generally determined using out-of-sample
+performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Training and Test Error Curves}
+\label{subsec:training-test-error-curves}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As flexibility increases, training error generally decreases.
+
+Test error often follows a U-shaped pattern:
+
+\[
+\boxed{
+\text{underfitting}
+\rightarrow
+\text{optimal complexity}
+\rightarrow
+\text{overfitting}.
+}
+\]
+
+The minimum test or validation error determines a useful model complexity
+for prediction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regularization}
+\label{subsec:regularization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Regularization modifies the fitting objective by penalizing model
+complexity.
+
+A generic penalized objective is
+
+\[
+\boxed{
+\text{Loss}
++
+\lambda
+\cdot
+\text{Penalty}.
+}
+\]
+
+The tuning parameter
+
+\[
+\boxed{
+\lambda\geq0
+}
+\]
+
+controls the strength of regularization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ridge Regression}
+\label{subsec:ridge-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ridge regression minimizes
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+(
+y_i
+-
+\beta_0
+-
+\mathbf{x}_i^T
+\boldsymbol{\beta}
+)^2
++
+\lambda
+\sum_{j=1}^{p}
+\beta_j^2.
+}
+\]
+
+The intercept is usually not penalized.
+
+The penalty shrinks coefficients toward zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix Form of Ridge Regression}
+\label{subsec:ridge-matrix-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After centering the response and predictors so an intercept is not
+required, ridge minimizes
+
+\[
+\boxed{
+\|
+\mathbf{y}
+-
+X\boldsymbol{\beta}
+\|_2^2
++
+\lambda
+\|
+\boldsymbol{\beta}
+\|_2^2.
+}
+\]
+
+Differentiate with respect to \(\boldsymbol{\beta}\):
+
+\[
+-2X^T
+(
+\mathbf{y}
+-
+X\boldsymbol{\beta}
+)
++
+2\lambda
+\boldsymbol{\beta}
+=
+0.
+\]
+
+Therefore,
+
+\[
+\boxed{
+(
+X^TX+\lambda I
+)
+\widehat{\boldsymbol{\beta}}_{ridge}
+=
+X^T\mathbf{y}.
+}
+\]
+
+Hence,
+
+\[
+\boxed{
+\widehat{\boldsymbol{\beta}}_{ridge}
+=
+(
+X^TX+\lambda I
+)^{-1}
+X^T\mathbf{y}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Ridge Helps}
+\label{subsec:why-ridge-helps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary least squares can have high variance when predictors are highly
+correlated or when
+
+\[
+p
+\]
+
+is large relative to \(n\).
+
+Adding
+
+\[
+\lambda I
+\]
+
+stabilizes the matrix inversion.
+
+Ridge accepts some bias in exchange for lower variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ridge and Multicollinearity}
+\label{subsec:ridge-multicollinearity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+X^TX
+\]
+
+has very small eigenvalues, ordinary least-squares coefficients may be
+unstable.
+
+Ridge replaces an eigenvalue
+
+\[
+d_j
+\]
+
+conceptually with
+
+\[
+\boxed{
+d_j+\lambda.
+}
+\]
+
+This reduces amplification along poorly identified directions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Ridge Shrinkage}
+\label{subsec:worked-ridge-shrinkage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Effect of the Penalty}
+
+Suppose a centered one-predictor problem has
+
+\[
+X^TX=10
+\]
+
+and
+
+\[
+X^Ty=20.
+\]
+
+The ordinary least-squares coefficient is
+
+\[
+\widehat{\beta}_{OLS}
+=
+\frac{20}{10}
+=
+2.
+\]
+
+If
+
+\[
+\lambda=5,
+\]
+
+then
+
+\[
+\widehat{\beta}_{ridge}
+=
+\frac{
+20
+}{
+10+5
+}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\beta}_{ridge}
+=
+\frac43
+\approx
+1.333.
+}
+\]
+
+The coefficient is shrunk toward zero.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Standardization Before Regularization}
+\label{subsec:standardization-regularization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Regularization depends on coefficient magnitude.
+
+If predictors have very different units, the penalty can affect them
+unequally.
+
+Therefore predictors are often standardized:
+
+\[
+\boxed{
+Z_j
+=
+\frac{
+X_j-\overline{X}_j
+}{
+s_j
+}.
+}
+\]
+
+This places predictors on comparable scales before penalization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lasso Regression}
+\label{subsec:lasso-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The lasso minimizes
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+(
+y_i
+-
+\beta_0
+-
+\mathbf{x}_i^T
+\boldsymbol{\beta}
+)^2
++
+\lambda
+\sum_{j=1}^{p}
+|\beta_j|.
+}
+\]
+
+The penalty is the
+
+\[
+\ell_1
+\]
+
+norm of the coefficient vector.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lasso Sparsity}
+\label{subsec:lasso-sparsity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Unlike ridge regression, the lasso can set coefficients exactly equal to
+zero:
+
+\[
+\boxed{
+\widehat{\beta}_j=0.
+}
+\]
+
+Thus the lasso performs both:
+
+\[
+\boxed{
+\text{shrinkage}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{variable selection}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ridge Versus Lasso}
+\label{subsec:ridge-versus-lasso}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ridge uses
+
+\[
+\boxed{
+\sum_j\beta_j^2.
+}
+\]
+
+Lasso uses
+
+\[
+\boxed{
+\sum_j|\beta_j|.
+}
+\]
+
+Ridge usually retains all predictors with reduced coefficients.
+
+Lasso can produce sparse models with some coefficients exactly zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constraint Form of Ridge}
+\label{subsec:ridge-constraint-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ridge can also be written as
+
+\[
+\boxed{
+\min_{\boldsymbol{\beta}}
+\|
+\mathbf{y}
+-
+X\boldsymbol{\beta}
+\|_2^2
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\sum_j
+\beta_j^2
+\leq
+t.
+}
+\]
+
+The tuning parameter \(t\) corresponds to a penalty value \(\lambda\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constraint Form of Lasso}
+\label{subsec:lasso-constraint-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Similarly, lasso can be written
+
+\[
+\boxed{
+\min_{\boldsymbol{\beta}}
+\|
+\mathbf{y}
+-
+X\boldsymbol{\beta}
+\|_2^2
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\sum_j
+|\beta_j|
+\leq
+t.
+}
+\]
+
+The geometry of the \(\ell_1\) constraint helps explain why sparse
+solutions arise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Elastic Net}
+\label{subsec:elastic-net}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Elastic net combines ridge and lasso penalties:
+
+\[
+\boxed{
+\text{Loss}
++
+\lambda
+\left[
+\alpha
+\sum_j|\beta_j|
++
+(1-\alpha)
+\sum_j\beta_j^2
+\right].
+}
+\]
+
+Here,
+
+\[
+\boxed{
+0\leq\alpha\leq1.
+}
+\]
+
+When
+
+\[
+\alpha=1,
+\]
+
+the penalty is lasso-like.
+
+When
+
+\[
+\alpha=0,
+\]
+
+it is ridge-like.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Elastic Net?}
+\label{subsec:why-elastic-net}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Elastic net can be useful when:
+
+\[
+\boxed{
+\text{many predictors are correlated},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{sparse solutions are still desired}.
+}
+\]
+
+It combines grouping behavior from ridge with sparsity from lasso.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feature Selection}
+\label{subsec:feature-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Feature selection chooses a subset of predictors.
+
+Possible goals include:
+
+\[
+\boxed{
+\text{better prediction},
+}
+\]
+
+\[
+\boxed{
+\text{reduced variance},
+}
+\]
+
+\[
+\boxed{
+\text{lower computational cost},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{improved interpretability}.
+}
+\]
+
+Selection itself creates additional uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Best Subset Selection}
+\label{subsec:best-subset-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Best subset selection compares predictor subsets and chooses the best
+according to a criterion.
+
+With \(p\) predictors, there are
+
+\[
+\boxed{
+2^p
+}
+\]
+
+possible subsets.
+
+Thus exhaustive search becomes computationally difficult as \(p\)
+grows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward Selection}
+\label{subsec:forward-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Forward selection begins with a small model and repeatedly adds the
+predictor producing the greatest improvement according to a chosen
+criterion.
+
+It is computationally cheaper than exhaustive subset search.
+
+However, an early poor choice may not be corrected later.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Elimination}
+\label{subsec:backward-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Backward elimination begins with a large model and repeatedly removes
+predictors.
+
+It requires that the initial model be estimable.
+
+Thus it can be problematic when
+
+\[
+p\geq n.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cross-Validation}
+\label{subsec:cross-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Cross-validation estimates prediction performance by repeatedly fitting a
+model on part of the data and evaluating it on held-out observations.
+
+This approximates the error the model may experience on future data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(k\)-Fold Cross-Validation}
+\label{subsec:k-fold-cross-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Partition the data into \(k\) folds:
+
+\[
+\boxed{
+F_1,\ldots,F_k.
+}
+\]
+
+For each fold:
+
+\begin{enumerate}
+    \item fit the model using the other \(k-1\) folds;
+    \item predict the held-out fold;
+    \item calculate loss.
+\end{enumerate}
+
+The cross-validation estimate is the average held-out loss.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(k\)-Fold CV Estimate}
+\label{subsec:kfold-cv-estimate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\widehat{f}^{(-j)}
+\]
+
+denotes the model fitted without fold \(j\), then
+
+\[
+\boxed{
+CV_k
+=
+\frac1n
+\sum_{j=1}^{k}
+\sum_{i\in F_j}
+L
+\left(
+y_i,
+\widehat{f}^{(-j)}(\mathbf{x}_i)
+\right).
+}
+\]
+
+This can be calculated for different model complexities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Leave-One-Out Cross-Validation}
+\label{subsec:loocv}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Leave-one-out cross-validation, abbreviated LOOCV, uses
+
+\[
+\boxed{
+k=n.
+}
+\]
+
+Each observation is held out once.
+
+The model is fitted on the remaining
+
+\[
+n-1
+\]
+
+observations.
+
+LOOCV has low training-set bias but may have high variance as an error
+estimator and can be computationally expensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cross-Validation for Tuning}
+\label{subsec:cv-for-tuning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a model depends on hyperparameter
+
+\[
+\lambda.
+\]
+
+Compute
+
+\[
+CV(\lambda)
+\]
+
+for several values.
+
+Then choose
+
+\[
+\boxed{
+\widehat{\lambda}
+=
+\arg\min_\lambda
+CV(\lambda).
+}
+\]
+
+The model is then refit using the chosen value.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nested Cross-Validation}
+\label{subsec:nested-cross-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If cross-validation is used both for tuning and reporting final
+performance, optimistic bias can arise.
+
+Nested cross-validation uses:
+
+\[
+\boxed{
+\text{inner folds for tuning}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{outer folds for evaluation}.
+}
+\]
+
+This better separates model selection from model assessment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Data Leakage}
+\label{subsec:data-leakage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Data leakage occurs when information from validation or test observations
+influences model training.
+
+Examples include:
+
+\[
+\boxed{
+\text{standardizing using all observations},
+}
+\]
+
+\[
+\boxed{
+\text{feature selection before splitting},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{imputing using test-set statistics}.
+}
+\]
+
+Leakage produces overly optimistic estimates of performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preprocessing Within Resampling}
+\label{subsec:preprocessing-within-resampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Any data-dependent preprocessing should be estimated using only the
+training portion of each resampling iteration.
+
+This includes:
+
+\[
+\boxed{
+\text{scaling},
+}
+\]
+
+\[
+\boxed{
+\text{imputation},
+}
+\]
+
+\[
+\boxed{
+\text{feature selection},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{dimension reduction}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classification Accuracy}
+\label{subsec:classification-accuracy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For predicted classes
+
+\[
+\widehat{Y}_i,
+\]
+
+accuracy is
+
+\[
+\boxed{
+\text{Accuracy}
+=
+\frac{
+\#\{\widehat{Y}_i=Y_i\}
+}{
+n
+}.
+}
+\]
+
+Misclassification rate is
+
+\[
+\boxed{
+1-\text{Accuracy}.
+}
+\]
+
+Accuracy can be misleading when class frequencies are highly imbalanced.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confusion Matrix}
+\label{subsec:confusion-matrix-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For binary classification:
+
+\[
+\begin{array}{c|cc}
+&
+\text{Predicted }1
+&
+\text{Predicted }0
+\\
+\hline
+\text{Actual }1
+&
+TP
+&
+FN
+\\
+\text{Actual }0
+&
+FP
+&
+TN
+\end{array}
+\]
+
+where:
+
+\[
+TP
+=
+\text{true positives},
+\]
+
+\[
+TN
+=
+\text{true negatives},
+\]
+
+\[
+FP
+=
+\text{false positives},
+\]
+
+and
+
+\[
+FN
+=
+\text{false negatives}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity}
+\label{subsec:sensitivity-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sensitivity, also called recall or true-positive rate, is
+
+\[
+\boxed{
+\text{Sensitivity}
+=
+\frac{
+TP
+}{
+TP+FN
+}.
+}
+\]
+
+It measures the proportion of actual positive observations correctly
+identified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Specificity}
+\label{subsec:specificity-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Specificity is
+
+\[
+\boxed{
+\text{Specificity}
+=
+\frac{
+TN
+}{
+TN+FP
+}.
+}
+\]
+
+It measures the proportion of actual negative observations correctly
+identified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Precision}
+\label{subsec:precision-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Precision, also called positive predictive value, is
+
+\[
+\boxed{
+\text{Precision}
+=
+\frac{
+TP
+}{
+TP+FP
+}.
+}
+\]
+
+It measures the proportion of predicted positives that are actually
+positive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(F_1\) Score}
+\label{subsec:f1-score}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(F_1\) score is the harmonic mean of precision and recall:
+
+\[
+\boxed{
+F_1
+=
+2
+\frac{
+\text{Precision}
+\cdot
+\text{Recall}
+}{
+\text{Precision}
++
+\text{Recall}
+}.
+}
+\]
+
+It is useful when both false positives and false negatives matter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classification Threshold}
+\label{subsec:classification-threshold}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a model estimates
+
+\[
+\widehat{p}(\mathbf{x})
+=
+P
+(
+Y=1
+\mid
+\mathbf{X}=\mathbf{x}
+).
+\]
+
+A default rule may classify as \(1\) when
+
+\[
+\widehat{p}(\mathbf{x})>0.5.
+\]
+
+However, \(0.5\) is not universally optimal.
+
+The threshold should reflect:
+
+\[
+\boxed{
+\text{class prevalence},
+}
+\]
+
+\[
+\boxed{
+\text{error costs},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{decision goals}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ROC Curve}
+\label{subsec:roc-curve}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A receiver operating characteristic, or ROC, curve plots
+
+\[
+\boxed{
+\text{true-positive rate}
+}
+\]
+
+against
+
+\[
+\boxed{
+\text{false-positive rate}
+=
+1-\text{specificity}
+}
+\]
+
+as the classification threshold varies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Area Under the ROC Curve}
+\label{subsec:auc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The area under the ROC curve is abbreviated AUC.
+
+A probabilistic interpretation is approximately
+
+\[
+\boxed{
+P
+(
+\text{a randomly chosen positive receives a larger score than a
+randomly chosen negative}
+).
+}
+\]
+
+AUC evaluates ranking discrimination, not probability calibration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Calibration}
+\label{subsec:classification-calibration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A probabilistic classifier is calibrated if predicted probabilities agree
+with observed frequencies.
+
+For example, among observations assigned probability approximately
+
+\[
+0.8,
+\]
+
+roughly
+
+\[
+80\%
+\]
+
+should belong to the positive class.
+
+A model can have strong discrimination and poor calibration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logarithmic Loss}
+\label{subsec:log-loss}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For binary response \(Y\in\{0,1\}\) and predicted probability \(p\),
+
+\[
+\boxed{
+L
+=
+-
+[
+Y\log p
++
+(1-Y)\log(1-p)
+].
+}
+\]
+
+This is binary log loss.
+
+It heavily penalizes confident incorrect predictions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Brier Score}
+\label{subsec:brier-score-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For binary classification, the Brier score is
+
+\[
+\boxed{
+\frac1n
+\sum_{i=1}^{n}
+(
+Y_i-\widehat{p}_i
+)^2.
+}
+\]
+
+It evaluates probabilistic prediction and is sensitive to both calibration
+and discrimination.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logistic Regression for Classification}
+\label{subsec:logistic-regression-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Logistic regression models
+
+\[
+\boxed{
+P
+(
+Y=1
+\mid
+\mathbf{X}
+)
+=
+p(\mathbf{X}),
+}
+\]
+
+with
+
+\[
+\boxed{
+\log
+\left(
+\frac{
+p(\mathbf{X})
+}{
+1-p(\mathbf{X})
+}
+\right)
+=
+\beta_0
++
+\mathbf{X}^T
+\boldsymbol{\beta}.
+}
+\]
+
+It is both an inferential model and a predictive classifier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logistic Decision Boundary}
+\label{subsec:logistic-decision-boundary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using threshold \(0.5\), classify as \(1\) when
+
+\[
+p(\mathbf{x})>0.5.
+\]
+
+Since
+
+\[
+\operatorname{logit}(0.5)=0,
+\]
+
+the boundary is
+
+\[
+\boxed{
+\beta_0
++
+\mathbf{x}^T
+\boldsymbol{\beta}
+=
+0.
+}
+\]
+
+Thus ordinary logistic regression produces a linear decision boundary in
+predictor space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(k\)-Nearest Neighbors}
+\label{subsec:k-nearest-neighbors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(k\)-nearest-neighbor method, abbreviated KNN, predicts using nearby
+training observations.
+
+For regression,
+
+\[
+\boxed{
+\widehat{f}(\mathbf{x}_0)
+=
+\frac1k
+\sum_{i\in N_k(\mathbf{x}_0)}
+y_i,
+}
+\]
+
+where
+
+\[
+N_k(\mathbf{x}_0)
+\]
+
+is the set of \(k\) nearest training observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KNN Classification}
+\label{subsec:knn-classification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For classification, KNN predicts the majority class among the nearest
+neighbors.
+
+For binary data, an estimated probability is
+
+\[
+\boxed{
+\widehat{p}(\mathbf{x}_0)
+=
+\frac{
+\#\{
+i\in N_k(\mathbf{x}_0):
+Y_i=1
+\}
+}{
+k
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing \(k\) in KNN}
+\label{subsec:choosing-k-knn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Small \(k\):
+
+\[
+\boxed{
+\text{high flexibility},
+}
+\]
+
+\[
+\boxed{
+\text{low bias},
+}
+\]
+
+\[
+\boxed{
+\text{high variance}.
+}
+\]
+
+Large \(k\):
+
+\[
+\boxed{
+\text{greater smoothing},
+}
+\]
+
+\[
+\boxed{
+\text{higher bias},
+}
+\]
+
+\[
+\boxed{
+\text{lower variance}.
+}
+\]
+
+Cross-validation is commonly used to choose \(k\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaling for Distance-Based Methods}
+\label{subsec:scaling-distance-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+KNN and clustering rely on distances.
+
+If one predictor has much larger numerical scale than others, it can
+dominate the distance calculation.
+
+Standardization is therefore often essential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Curse of Dimensionality}
+\label{subsec:curse-dimensionality-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In high-dimensional spaces, observations become sparse.
+
+Local neighborhoods contain less information unless sample size grows
+rapidly.
+
+Consequences include:
+
+\[
+\boxed{
+\text{unstable nearest neighbors},
+}
+\]
+
+\[
+\boxed{
+\text{high variance},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{distance concentration}.
+}
+\]
+
+This is one aspect of the curse of dimensionality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decision Trees}
+\label{subsec:decision-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Decision trees partition predictor space into regions.
+
+A tree makes recursive binary splits such as
+
+\[
+\boxed{
+X_j<c.
+}
+\]
+
+Each terminal region receives a prediction.
+
+Trees can model nonlinearities and interactions automatically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression Trees}
+\label{subsec:regression-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a regression tree, each terminal node predicts the mean response of
+training observations in that region.
+
+Suppose terminal region \(R_m\) contains observations \(i\in R_m\).
+
+Then
+
+\[
+\boxed{
+\widehat{c}_m
+=
+\frac1{|R_m|}
+\sum_{i\in R_m}
+y_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression Tree Split Criterion}
+\label{subsec:regression-tree-split}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A split is often chosen to minimize residual sum of squares:
+
+\[
+\boxed{
+\sum_{i\in R_1}
+(
+y_i-\overline{y}_{R_1}
+)^2
++
+\sum_{i\in R_2}
+(
+y_i-\overline{y}_{R_2}
+)^2.
+}
+\]
+
+The best predictor and split point are selected greedily.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classification Trees}
+\label{subsec:classification-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A classification tree assigns a class to each terminal region.
+
+If
+
+\[
+\widehat{p}_{mk}
+\]
+
+is the proportion of observations in region \(m\) belonging to class
+\(k\), the predicted class is commonly
+
+\[
+\boxed{
+\arg\max_k
+\widehat{p}_{mk}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gini Impurity}
+\label{subsec:gini-impurity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For node \(m\), Gini impurity is
+
+\[
+\boxed{
+G_m
+=
+\sum_{k=1}^{K}
+\widehat{p}_{mk}
+(
+1-\widehat{p}_{mk}
+).
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+G_m
+=
+1
+-
+\sum_{k=1}^{K}
+\widehat{p}_{mk}^2.
+}
+\]
+
+It is small when one class dominates the node.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classification Entropy}
+\label{subsec:classification-entropy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another impurity measure is entropy:
+
+\[
+\boxed{
+H_m
+=
+-
+\sum_{k=1}^{K}
+\widehat{p}_{mk}
+\log
+\widehat{p}_{mk}.
+}
+\]
+
+Entropy is zero when the node contains observations from only one class.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tree Overfitting}
+\label{subsec:tree-overfitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fully grown tree can create very small terminal nodes and fit training
+noise.
+
+Thus trees can have high variance.
+
+Restricting tree complexity or pruning can improve generalization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cost-Complexity Pruning}
+\label{subsec:cost-complexity-pruning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A pruned regression tree may minimize an objective such as
+
+\[
+\boxed{
+RSS(T)
++
+\alpha
+|T|,
+}
+\]
+
+where
+
+\[
+|T|
+\]
+
+is the number of terminal nodes.
+
+The parameter \(\alpha\) controls the penalty on tree size.
+
+Cross-validation can choose \(\alpha\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantages of Trees}
+\label{subsec:advantages-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Trees are attractive because they:
+
+\[
+\boxed{
+\text{handle nonlinearities},
+}
+\]
+
+\[
+\boxed{
+\text{capture interactions},
+}
+\]
+
+\[
+\boxed{
+\text{require little functional-form specification},
+}
+\]
+
+and can be
+
+\[
+\boxed{
+\text{visually interpretable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limitations of Single Trees}
+\label{subsec:limitations-single-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Single trees can be:
+
+\[
+\boxed{
+\text{unstable},
+}
+\]
+
+\[
+\boxed{
+\text{high variance},
+}
+\]
+
+and less accurate than ensemble methods.
+
+Small changes in training data can produce very different tree
+structures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Aggregation}
+\label{subsec:bagging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bootstrap aggregation, or bagging, reduces variance by averaging models
+fit to bootstrap samples.
+
+For \(B\) bootstrap models,
+
+\[
+\widehat{f}^{(1)},
+\ldots,
+\widehat{f}^{(B)},
+\]
+
+the bagged regression predictor is
+
+\[
+\boxed{
+\widehat{f}_{bag}(\mathbf{x})
+=
+\frac1B
+\sum_{b=1}^{B}
+\widehat{f}^{(b)}(\mathbf{x}).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Bagging Reduces Variance}
+\label{subsec:why-bagging-reduces-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(B\) predictors have common variance \(\sigma^2\) and pairwise
+correlation \(\rho\).
+
+The variance of their average is approximately
+
+\[
+\boxed{
+\rho\sigma^2
++
+\frac{
+1-\rho
+}{
+B
+}
+\sigma^2.
+}
+\]
+
+Averaging is most effective when individual predictions are not too
+strongly correlated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Forests}
+\label{subsec:random-forests}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Random forests extend bagging by randomly restricting candidate
+predictors at each tree split.
+
+This decorrelates the trees.
+
+The final prediction averages many trees.
+
+For regression,
+
+\[
+\boxed{
+\widehat{f}_{RF}(\mathbf{x})
+=
+\frac1B
+\sum_{b=1}^{B}
+\widehat{f}_b(\mathbf{x}).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random-Forest Classification}
+\label{subsec:random-forest-classification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For classification, each tree votes for a class.
+
+The forest may predict using:
+
+\[
+\boxed{
+\text{majority vote},
+}
+\]
+
+or average estimated class probabilities across trees.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Out-of-Bag Observations}
+\label{subsec:out-of-bag}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A bootstrap sample leaves out some training observations.
+
+These are called out-of-bag, or OOB, observations.
+
+For each observation, predictions can be made using only trees whose
+bootstrap samples did not contain that observation.
+
+This provides an internal estimate of prediction error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variable Importance}
+\label{subsec:variable-importance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ensemble methods often report variable-importance measures.
+
+Examples include:
+
+\[
+\boxed{
+\text{split-improvement importance},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{permutation importance}.
+}
+\]
+
+Importance measures quantify predictive contribution under a fitted model
+but do not automatically imply causality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Importance}
+\label{subsec:permutation-importance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Permutation importance randomly permutes one predictor in validation data
+and measures the resulting increase in prediction error.
+
+If permuting \(X_j\) greatly harms performance, the model relies strongly
+on \(X_j\).
+
+Correlated predictors can complicate interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boosting}
+\label{subsec:boosting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Boosting builds models sequentially.
+
+Each new learner attempts to improve upon the current ensemble.
+
+A generic additive model is
+
+\[
+\boxed{
+F_M(\mathbf{x})
+=
+\sum_{m=1}^{M}
+\nu_m
+g_m(\mathbf{x}),
+}
+\]
+
+where the \(g_m\) are weak learners.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient Boosting}
+\label{subsec:gradient-boosting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gradient boosting interprets boosting as numerical optimization in
+function space.
+
+At each step, a new learner is fit approximately to the negative gradient
+of the loss with respect to current predictions.
+
+For squared-error loss, this corresponds to fitting residuals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Learning Rate}
+\label{subsec:boosting-learning-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A learning rate
+
+\[
+\boxed{
+0<\nu\leq1
+}
+\]
+
+controls how much each new learner contributes.
+
+Small learning rates generally require more boosting iterations but can
+improve generalization.
+
+The number of iterations and learning rate should be tuned jointly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bagging Versus Boosting}
+\label{subsec:bagging-versus-boosting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bagging builds many models largely in parallel and averages them.
+
+Boosting builds models sequentially, with each learner responding to the
+current ensemble's errors.
+
+Thus:
+
+\[
+\boxed{
+\text{bagging}
+\rightarrow
+\text{variance reduction},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{boosting}
+\rightarrow
+\text{iterative bias and error reduction}.
+}
+\]
+
+This distinction is conceptual rather than absolute.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Support-Vector Classifiers}
+\label{subsec:support-vector-classifiers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two classes are linearly separable.
+
+A separating hyperplane has form
+
+\[
+\boxed{
+\beta_0
++
+\boldsymbol{\beta}^T
+\mathbf{x}
+=
+0.
+}
+\]
+
+A support-vector classifier seeks a separating boundary with a large
+margin between the classes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Margin}
+\label{subsec:svm-margin}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The margin is the distance between the decision boundary and the nearest
+training observations.
+
+The observations determining the margin are called support vectors.
+
+A larger margin can improve robustness to small perturbations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Soft-Margin Classification}
+\label{subsec:soft-margin}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Perfect separation may be impossible or undesirable.
+
+Soft-margin methods allow some violations through slack variables
+
+\[
+\xi_i\geq0.
+\]
+
+A typical optimization has the form
+
+\[
+\boxed{
+\min_{\boldsymbol{\beta},\xi}
+\frac12
+\|
+\boldsymbol{\beta}
+\|_2^2
++
+C
+\sum_i
+\xi_i.
+}
+\]
+
+The parameter \(C\) controls the penalty for violations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kernel Trick}
+\label{subsec:kernel-trick}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some algorithms depend only on inner products
+
+\[
+\mathbf{x}_i^T
+\mathbf{x}_j.
+\]
+
+A kernel replaces these with
+
+\[
+\boxed{
+K
+(
+\mathbf{x}_i,
+\mathbf{x}_j
+)
+=
+\langle
+\phi(\mathbf{x}_i),
+\phi(\mathbf{x}_j)
+\rangle,
+}
+\]
+
+where \(\phi\) maps inputs to a possibly high-dimensional feature space.
+
+The mapping need not be computed explicitly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Kernels}
+\label{subsec:common-kernels}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A linear kernel is
+
+\[
+\boxed{
+K(\mathbf{x},\mathbf{z})
+=
+\mathbf{x}^T\mathbf{z}.
+}
+\]
+
+A polynomial kernel is
+
+\[
+\boxed{
+K(\mathbf{x},\mathbf{z})
+=
+(
+c+\mathbf{x}^T\mathbf{z}
+)^d.
+}
+\]
+
+A radial basis function kernel is
+
+\[
+\boxed{
+K(\mathbf{x},\mathbf{z})
+=
+\exp
+\left[
+-\gamma
+\|
+\mathbf{x}-\mathbf{z}
+\|_2^2
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kernel Validity}
+\label{subsec:kernel-validity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A valid kernel must generate a positive semidefinite Gram matrix.
+
+For training observations,
+
+\[
+\boxed{
+K_{ij}
+=
+K
+(
+\mathbf{x}_i,
+\mathbf{x}_j
+).
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbf{a}^TK\mathbf{a}
+\geq0
+}
+\]
+
+for every vector \(\mathbf{a}\).
+
+This connects kernel methods to positive semidefinite matrix theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Support-Vector Machines}
+\label{subsec:support-vector-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A support-vector machine combines margin-based classification with a
+kernel.
+
+The resulting decision function has a form such as
+
+\[
+\boxed{
+f(\mathbf{x})
+=
+\beta_0
++
+\sum_{i=1}^{n}
+\alpha_i
+K
+(
+\mathbf{x}_i,
+\mathbf{x}
+).
+}
+\]
+
+Only training observations with nonzero \(\alpha_i\) act as support
+vectors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Principal Components Regression}
+\label{subsec:principal-components-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Principal components regression, abbreviated PCR, first performs PCA on
+the predictors.
+
+Then the response is regressed on the first \(m\) principal-component
+scores.
+
+Thus
+
+\[
+\boxed{
+X
+\longrightarrow
+\text{PCA scores}
+\longrightarrow
+\text{regression}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limitation of PCR}
+\label{subsec:pcr-limitation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+PCA chooses directions with large predictor variance.
+
+It does not use \(Y\).
+
+Therefore a low-variance predictor direction may be highly predictive yet
+discarded by PCR.
+
+This is why unsupervised dimension reduction is not always optimal for
+prediction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partial Least Squares Preview}
+\label{subsec:partial-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Partial least squares, abbreviated PLS, constructs components using both:
+
+\[
+\boxed{
+\text{predictor variation}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{association with the response}.
+}
+\]
+
+Thus PLS is a supervised dimension-reduction method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{High-Dimensional Learning}
+\label{subsec:high-dimensional-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+High-dimensional settings occur when
+
+\[
+\boxed{
+p
+\text{ is large relative to }
+n,
+}
+\]
+
+or even
+
+\[
+\boxed{
+p>n.
+}
+\]
+
+Ordinary least squares may then be unstable or nonunique.
+
+Regularization and dimension reduction become essential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparsity}
+\label{subsec:sparsity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sparse model assumes only a relatively small number of predictors have
+substantial effects.
+
+If
+
+\[
+\boldsymbol{\beta}
+=
+(
+\beta_1,\ldots,\beta_p
+),
+\]
+
+sparsity means many
+
+\[
+\boxed{
+\beta_j=0.
+}
+\]
+
+Lasso and related methods explicitly encourage sparsity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unsupervised Clustering}
+\label{subsec:unsupervised-clustering}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Clustering attempts to divide observations into groups with:
+
+\[
+\boxed{
+\text{high within-group similarity}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{high between-group dissimilarity}.
+}
+\]
+
+Unlike classification, true class labels are not supplied.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(k\)-Means Clustering}
+\label{subsec:kmeans-clustering}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given \(K\) clusters
+
+\[
+C_1,\ldots,C_K,
+\]
+
+\(k\)-means minimizes
+
+\[
+\boxed{
+\sum_{k=1}^{K}
+\sum_{i\in C_k}
+\|
+\mathbf{x}_i
+-
+\boldsymbol{\mu}_k
+\|_2^2,
+}
+\]
+
+where
+
+\[
+\boldsymbol{\mu}_k
+\]
+
+is the mean vector of cluster \(k\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(k\)-Means Algorithm}
+\label{subsec:kmeans-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common iterative algorithm is:
+
+\begin{enumerate}
+    \item choose \(K\) initial cluster centers;
+    \item assign each observation to its nearest center;
+    \item recompute each cluster center;
+    \item reassign observations;
+    \item repeat until assignments stabilize or the objective stops
+          improving.
+\end{enumerate}
+
+The algorithm decreases the within-cluster objective at each iteration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(k\)-Means Local Optima}
+\label{subsec:kmeans-local-optima}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(k\)-means objective is not generally convex in cluster assignments
+and centers jointly.
+
+Different initializations may produce different solutions.
+
+Therefore multiple random starts are commonly used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing the Number of Clusters}
+\label{subsec:choosing-number-clusters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Possible approaches include:
+
+\[
+\boxed{
+\text{within-cluster variation},
+}
+\]
+
+\[
+\boxed{
+\text{silhouette measures},
+}
+\]
+
+\[
+\boxed{
+\text{stability},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{scientific interpretability}.
+}
+\]
+
+No universal rule identifies the true number of clusters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Silhouette Concept}
+\label{subsec:silhouette}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For observation \(i\), let
+
+\[
+a(i)
+\]
+
+be its average distance to points in its own cluster.
+
+Let
+
+\[
+b(i)
+\]
+
+be the smallest average distance to another cluster.
+
+The silhouette value is
+
+\[
+\boxed{
+s(i)
+=
+\frac{
+b(i)-a(i)
+}{
+\max\{a(i),b(i)\}
+}.
+}
+\]
+
+Values near \(1\) indicate stronger separation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hierarchical Clustering}
+\label{subsec:hierarchical-clustering}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Hierarchical clustering creates a nested sequence of clusters.
+
+Agglomerative clustering begins with each observation as its own cluster
+and repeatedly merges groups.
+
+The result is represented by a dendrogram.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linkage Criteria}
+\label{subsec:linkage-criteria}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To merge clusters, a distance between clusters must be defined.
+
+Common choices include:
+
+\[
+\boxed{
+\text{single linkage},
+}
+\]
+
+\[
+\boxed{
+\text{complete linkage},
+}
+\]
+
+\[
+\boxed{
+\text{average linkage},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Ward-type criteria}.
+}
+\]
+
+Different linkage choices can produce substantially different clusters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Single Linkage}
+\label{subsec:single-linkage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Single linkage defines cluster distance using the closest pair:
+
+\[
+\boxed{
+d(A,B)
+=
+\min_{
+i\in A,
+j\in B
+}
+d(i,j).
+}
+\]
+
+It can identify elongated clusters but may produce chaining.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete Linkage}
+\label{subsec:complete-linkage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Complete linkage uses the farthest pair:
+
+\[
+\boxed{
+d(A,B)
+=
+\max_{
+i\in A,
+j\in B
+}
+d(i,j).
+}
+\]
+
+It tends to favor more compact clusters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Average Linkage}
+\label{subsec:average-linkage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Average linkage uses the average pairwise distance:
+
+\[
+\boxed{
+d(A,B)
+=
+\frac1{
+|A||B|
+}
+\sum_{i\in A}
+\sum_{j\in B}
+d(i,j).
+}
+\]
+
+It balances characteristics of single and complete linkage.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distance Measures}
+\label{subsec:distance-measures-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Euclidean distance is
+
+\[
+\boxed{
+d(\mathbf{x},\mathbf{z})
+=
+\sqrt{
+\sum_{j=1}^{p}
+(
+x_j-z_j
+)^2
+}.
+}
+\]
+
+Manhattan distance is
+
+\[
+\boxed{
+d_1
+(
+\mathbf{x},
+\mathbf{z}
+)
+=
+\sum_{j=1}^{p}
+|
+x_j-z_j
+|.
+}
+\]
+
+The chosen distance defines what ``similar'' means.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mahalanobis Distance in Learning}
+\label{subsec:mahalanobis-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mahalanobis distance is
+
+\[
+\boxed{
+d_M
+(
+\mathbf{x},
+\mathbf{z}
+)^2
+=
+(
+\mathbf{x}-\mathbf{z}
+)^T
+\Sigma^{-1}
+(
+\mathbf{x}-\mathbf{z}
+).
+}
+\]
+
+It accounts for:
+
+\[
+\boxed{
+\text{predictor scale}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{correlation}.
+}
+\]
+
+A stable covariance estimate is required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ensemble Learning}
+\label{subsec:ensemble-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ensemble combines several models.
+
+The objective is to obtain better prediction than a typical individual
+model.
+
+Examples include:
+
+\[
+\boxed{
+\text{bagging},
+}
+\]
+
+\[
+\boxed{
+\text{random forests},
+}
+\]
+
+\[
+\boxed{
+\text{boosting},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stacking}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stacking Preview}
+\label{subsec:stacking-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Stacking combines predictions from several base models.
+
+Suppose
+
+\[
+\widehat{f}_1,\ldots,\widehat{f}_M
+\]
+
+are base predictors.
+
+A meta-model learns how to combine
+
+\[
+\boxed{
+\widehat{f}_1(\mathbf{x}),
+\ldots,
+\widehat{f}_M(\mathbf{x})
+}
+\]
+
+using out-of-fold predictions.
+
+This can adaptively combine models with different strengths.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hyperparameters}
+\label{subsec:hyperparameters-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A hyperparameter controls model complexity or fitting behavior but is not
+typically estimated directly by ordinary likelihood fitting.
+
+Examples include:
+
+\[
+\boxed{
+\lambda
+\text{ in ridge regression},
+}
+\]
+
+\[
+\boxed{
+k
+\text{ in KNN},
+}
+\]
+
+\[
+\boxed{
+\text{tree depth},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{learning rate}.
+}
+\]
+
+Hyperparameters are commonly selected through validation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Grid Search}
+\label{subsec:grid-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Grid search evaluates a predetermined set of hyperparameter combinations.
+
+For example,
+
+\[
+\lambda
+\in
+\{
+0.001,
+0.01,
+0.1,
+1,
+10
+\}.
+\]
+
+The combination with best validation performance is selected.
+
+Grid search becomes expensive when many hyperparameters are tuned.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Search Preview}
+\label{subsec:random-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Random search samples hyperparameter combinations from specified
+distributions.
+
+It can explore high-dimensional tuning spaces more efficiently than a
+dense Cartesian grid when only a few hyperparameters strongly affect
+performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Selection Versus Model Assessment}
+\label{subsec:model-selection-versus-assessment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Model selection chooses among candidate procedures.
+
+Model assessment estimates the performance of the selected procedure.
+
+Using the same data repeatedly for both purposes creates optimistic bias.
+
+This is why independent test sets or nested resampling are important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Learning Curves}
+\label{subsec:learning-curves}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A learning curve plots prediction performance against training-set size.
+
+It can help diagnose whether additional data may improve performance.
+
+For example:
+
+\[
+\boxed{
+\text{large train-test gap}
+\rightarrow
+\text{possible high variance},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{both errors high}
+\rightarrow
+\text{possible high bias}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Imbalanced Classification}
+\label{subsec:imbalanced-classification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose only
+
+\[
+1\%
+\]
+
+of observations belong to the positive class.
+
+A classifier predicting the negative class for everyone achieves
+
+\[
+99\%
+\]
+
+accuracy but has no ability to detect positives.
+
+Thus accuracy alone can be misleading.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metrics for Imbalanced Data}
+\label{subsec:imbalanced-metrics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Useful metrics include:
+
+\[
+\boxed{
+\text{precision},
+}
+\]
+
+\[
+\boxed{
+\text{recall},
+}
+\]
+
+\[
+\boxed{
+F_1,
+}
+\]
+
+\[
+\boxed{
+\text{precision--recall curves},
+}
+\]
+
+and cost-sensitive measures.
+
+The best metric depends on the decision problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Class Weighting}
+\label{subsec:class-weighting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A classification loss can give different weights to observations from
+different classes.
+
+For example,
+
+\[
+\boxed{
+L
+=
+w_1L_1
++
+w_0L_0.
+}
+\]
+
+Larger positive-class weight can make false negatives more costly.
+
+Weights should reflect the intended objective rather than merely forcing
+balanced predictions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resampling for Class Imbalance}
+\label{subsec:resampling-class-imbalance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Training data may be rebalanced through:
+
+\[
+\boxed{
+\text{oversampling},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{undersampling}.
+}
+\]
+
+Any such resampling must occur inside training folds to avoid leakage.
+
+The final predicted probabilities may require calibration to the true
+class prevalence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretability}
+\label{subsec:model-interpretability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interpretability concerns the ability to understand how a model produces
+predictions.
+
+Highly interpretable models may include:
+
+\[
+\boxed{
+\text{small linear models},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{small decision trees}.
+}
+\]
+
+More complex ensembles can be harder to summarize directly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partial Dependence Preview}
+\label{subsec:partial-dependence-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Partial dependence summarizes average model predictions as one or more
+features vary.
+
+For feature \(X_j\),
+
+\[
+\boxed{
+PD_j(x)
+=
+\mathbb{E}_{\mathbf{X}_{-j}}
+[
+\widehat{f}
+(
+x,\mathbf{X}_{-j}
+)
+].
+}
+\]
+
+The expectation is approximated using observed predictor values.
+
+Strongly correlated predictors can complicate interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Individual Conditional Expectation Preview}
+\label{subsec:ice-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Individual conditional expectation, or ICE, plots show how a model's
+prediction changes with one predictor for each individual observation.
+
+Unlike partial dependence, ICE displays heterogeneous prediction
+responses rather than only their average.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feature Importance Is Not Causality}
+\label{subsec:importance-not-causality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A variable may be highly predictive because it:
+
+\[
+\boxed{
+\text{causes the response},
+}
+\]
+
+\[
+\boxed{
+\text{is caused by the response},
+}
+\]
+
+\[
+\boxed{
+\text{shares a common cause},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{acts as a proxy for another variable}.
+}
+\]
+
+Therefore predictive importance does not establish causal importance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distribution Shift}
+\label{subsec:distribution-shift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A model is trained under one data distribution but may later be applied
+under another.
+
+This is distribution shift.
+
+Examples include:
+
+\[
+\boxed{
+\text{changing populations},
+}
+\]
+
+\[
+\boxed{
+\text{new geographic regions},
+}
+\]
+
+\[
+\boxed{
+\text{changing technology},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{changing economic conditions}.
+}
+\]
+
+Performance can deteriorate even when the original model was well
+validated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariate Shift}
+\label{subsec:covariate-shift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Covariate shift occurs when
+
+\[
+\boxed{
+P_{train}(\mathbf{X})
+\neq
+P_{test}(\mathbf{X})
+}
+\]
+
+while the conditional relation
+
+\[
+P(Y\mid\mathbf{X})
+\]
+
+is approximately unchanged.
+
+Reweighting or domain-adaptation methods may be useful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Concept Drift}
+\label{subsec:concept-drift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Concept drift occurs when the conditional relationship itself changes:
+
+\[
+\boxed{
+P_{train}(Y\mid\mathbf{X})
+\neq
+P_{future}(Y\mid\mathbf{X}).
+}
+\]
+
+This is especially important in systems operating over time.
+
+Models may require monitoring and updating.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fairness Preview}
+\label{subsec:fairness-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Prediction quality can differ across groups.
+
+Possible fairness criteria involve:
+
+\[
+\boxed{
+\text{error rates},
+}
+\]
+
+\[
+\boxed{
+\text{calibration},
+}
+\]
+
+\[
+\boxed{
+\text{selection rates},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{decision consequences}.
+}
+\]
+
+Different fairness definitions may conflict mathematically.
+
+The appropriate criterion depends on the application and ethical
+context.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Statistical Learning Workflow}
+\label{subsec:statistical-learning-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item define the prediction or discovery objective;
+    \item identify the observational unit;
+    \item identify the response and predictors;
+    \item create an appropriate train-validation-test strategy;
+    \item inspect missing values and measurement quality;
+    \item preprocess predictors using training data only;
+    \item establish a simple baseline model;
+    \item choose candidate model families;
+    \item define evaluation metrics before tuning;
+    \item tune hyperparameters through cross-validation;
+    \item compare models using held-out performance;
+    \item inspect calibration and error structure;
+    \item examine interpretability and variable importance when useful;
+    \item check performance across relevant subgroups;
+    \item assess sensitivity to distribution shift;
+    \item evaluate once on the untouched test set;
+    \item document the entire modeling pipeline.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:statistical-learning-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Evaluating Only Training Error}
+
+Training performance measures how well the model fits observations it has
+already seen.
+
+It does not estimate future generalization reliably.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Tuning on the Test Set}
+
+Repeatedly choosing models according to test performance converts the
+test set into validation data.
+
+The reported test performance then becomes optimistically biased.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Preprocessing Before Splitting}
+
+Scaling, imputation, feature selection, or dimension reduction using all
+data leaks information from validation or test observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Selecting Features Before Cross-Validation}
+
+Feature selection must occur inside each training fold.
+
+Otherwise the held-out fold indirectly influences the selected predictor
+set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Complex Means Better}
+
+Greater flexibility reduces training error but may increase test error.
+
+Model complexity must be justified by out-of-sample performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Predictors Always Improve Prediction}
+
+Irrelevant predictors can increase variance, computation, and
+overfitting.
+
+High-dimensional models often require regularization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Predictor Scale}
+
+Distance-based methods and coefficient penalties depend on scale.
+
+Unstandardized predictors can dominate the model arbitrarily.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Lasso Selection as Certain Scientific Relevance}
+
+Lasso-selected variables can change across samples, especially under
+strong predictor correlation.
+
+Selection does not establish causality or stable scientific importance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Accuracy for Highly Imbalanced Data}
+
+High accuracy can occur even when the minority class is never correctly
+identified.
+
+Use metrics matched to the decision problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting AUC as Calibration}
+
+AUC measures ranking discrimination.
+
+It does not establish that predicted probabilities are numerically
+accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Choosing a Probability Threshold Automatically at \(0.5\)}
+
+The optimal decision threshold depends on prevalence and consequences of
+errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Feature Importance as Causal Effect}
+
+Importance reflects predictive dependence under the fitted algorithm.
+
+It does not identify intervention effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Random Cross-Validation for Dependent Data}
+
+Time series, clustered data, repeated measures, and spatial data require
+resampling that respects the dependence structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Distribution Shift}
+
+A model validated on one population may fail in another.
+
+Generalization claims must match the deployment population.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reporting Only the Best Cross-Validation Score}
+
+Model comparison should account for variability across folds or repeated
+resamples.
+
+Tiny performance differences may not be practically meaningful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Unsupervised Clusters Are True Natural Groups}
+
+Clustering always produces structure according to the chosen algorithm,
+distance, scaling, and number of clusters.
+
+The resulting groups require external validation and scientific
+interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Random Initialization}
+
+Algorithms such as \(k\)-means can converge to different local optima.
+
+Multiple starts should be considered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:statistical-learning-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Environmental Science.}
+Statistical learning can predict environmental measurements, classify
+ecosystem conditions, identify spatial patterns, and model complex sensor
+data.
+
+\medskip
+
+\textbf{Medicine.}
+Classification and survival-learning models can predict diagnosis,
+treatment response, recurrence, and clinical risk.
+
+\medskip
+
+\textbf{Business.}
+Models predict customer churn, demand, sales, fraud, and purchasing
+behavior.
+
+\medskip
+
+\textbf{Finance.}
+Regularization, trees, ensembles, and classification methods are used for
+credit risk, return prediction, and fraud detection.
+
+\medskip
+
+\textbf{Engineering.}
+Statistical learning predicts component failure, identifies anomalies,
+models sensor signals, and supports predictive maintenance.
+
+\medskip
+
+\textbf{Education.}
+Models can predict student outcomes, identify risk patterns, and analyze
+program engagement.
+
+\medskip
+
+\textbf{Biology.}
+High-dimensional methods analyze genomic, ecological, and biomedical
+measurements.
+
+\medskip
+
+\textbf{Operations.}
+Predictive models support forecasting, scheduling, maintenance, routing,
+inventory, and resource allocation.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:statistical-learning-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define supervised learning.
+\end{exercise}
+
+\begin{exercise}[1]
+Define unsupervised learning.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish regression and classification.
+\end{exercise}
+
+\begin{exercise}[1]
+Define training error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define generalization error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define overfitting.
+\end{exercise}
+
+\begin{exercise}[1]
+Define regularization.
+\end{exercise}
+
+\begin{exercise}[1]
+Define cross-validation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define data leakage.
+\end{exercise}
+
+\begin{exercise}[1]
+Define ridge regression.
+\end{exercise}
+
+\begin{exercise}[1]
+Define lasso regression.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a decision tree.
+\end{exercise}
+
+\begin{exercise}[1]
+Define bagging.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a random forest.
+\end{exercise}
+
+\begin{exercise}[1]
+Define boosting.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a support vector.
+\end{exercise}
+
+\begin{exercise}[1]
+Define \(k\)-means clustering.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a model has training MSE \(2\) and test MSE \(15\). What problem
+might this indicate?
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose both training and test errors are very high. What problem might
+this indicate?
+\end{exercise}
+
+\begin{exercise}[2]
+For centered one-variable ridge regression with
+
+\[
+X^TX=8,
+\qquad
+X^Ty=12,
+\qquad
+\lambda=4,
+\]
+
+compute the ridge coefficient.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain what happens to ridge coefficients as
+
+\[
+\lambda\to\infty.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Explain what happens to ridge regression as
+
+\[
+\lambda\to0.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+State one major difference between ridge and lasso regression.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a binary classifier has
+
+\[
+TP=80,
+\quad
+FN=20.
+\]
+
+Compute sensitivity.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+TN=90,
+\quad
+FP=10.
+\]
+
+Compute specificity.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+TP=40,
+\quad
+FP=10.
+\]
+
+Compute precision.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the \(F_1\) score when precision and recall are both \(0.8\).
+\end{exercise}
+
+\begin{exercise}[2]
+A \(k\)-means problem has points
+
+\[
+1,\ 2,\ 10,\ 11
+\]
+
+in one dimension and \(K=2\). Identify an obvious two-cluster solution
+and its cluster means.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why KNN should usually use standardized predictors when units
+differ substantially.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the squared-error bias--variance decomposition.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the ridge-regression estimator
+
+\[
+\widehat{\boldsymbol{\beta}}
+=
+(
+X^TX+\lambda I
+)^{-1}
+X^T\mathbf{y}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why ridge regression is useful under multicollinearity.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain geometrically why lasso can produce exact zeros.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare ridge, lasso, and elastic net.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why feature selection must occur inside cross-validation folds.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare \(k\)-fold cross-validation and LOOCV.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why nested cross-validation may be needed for unbiased model
+assessment.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why AUC and calibration measure different properties.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a threshold of \(0.5\) may be inappropriate in an imbalanced
+classification problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the majority-vote rule for KNN classification.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the bias--variance effect of increasing \(k\) in KNN.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how the curse of dimensionality affects nearest-neighbor methods.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the optimal terminal-node prediction in a regression tree under
+squared-error loss.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare Gini impurity and entropy.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why single trees have high variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how bagging reduces tree variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why random forests decorrelate trees.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the variance formula for an average of correlated predictors.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how out-of-bag error is constructed.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how gradient boosting fits residuals under squared-error loss.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare bagging and boosting.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the margin concept in support-vector classification.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of the kernel trick.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that a linear kernel reproduces the ordinary inner product.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare PCA and principal-components regression.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why PCR can discard a low-variance but highly predictive
+direction.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how PLS differs conceptually from PCR.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the \(k\)-means update for a cluster centroid.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare single, complete, and average linkage.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why different cluster scaling choices can produce different
+results.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why variable importance does not imply causality.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between covariate shift and concept drift.
+\end{exercise}
+
+\begin{exercise}[4]
+Study theoretical generalization bounds for empirical risk minimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study VC dimension and classification complexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate structural risk minimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive ridge regression through singular-value decomposition.
+\end{exercise}
+
+\begin{exercise}[4]
+Study lasso optimality using subgradient conditions.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive coordinate descent for lasso regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Study elastic-net solution paths.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate post-selection inference.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stability selection.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive analytic LOOCV formulas for ordinary least squares.
+\end{exercise}
+
+\begin{exercise}[4]
+Study bootstrap estimates of prediction error.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate random-forest consistency.
+\end{exercise}
+
+\begin{exercise}[4]
+Study boosting as functional gradient descent.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the dual optimization problem for support-vector machines.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Mercer's theorem for kernel methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate kernel ridge regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Study reproducing-kernel Hilbert spaces.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate nonlinear dimension-reduction methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study spectral clustering.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Gaussian-mixture clustering.
+\end{exercise}
+
+\begin{exercise}[4]
+Study model-based clustering.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate calibration methods for probabilistic classifiers.
+\end{exercise}
+
+\begin{exercise}[4]
+Study conformal prediction.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate learning under distribution shift.
+\end{exercise}
+
+\begin{exercise}[4]
+Study mathematical tradeoffs among competing fairness criteria.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:statistical-learning-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Statistical learning seeks a function
+
+\[
+\boxed{
+\widehat{f}
+}
+\]
+
+that performs well on future observations.
+
+The population risk is
+
+\[
+\boxed{
+R(f)
+=
+\mathbb{E}
+[
+L
+(
+Y,f(\mathbf{X})
+)
+].
+}
+\]
+
+The empirical risk is
+
+\[
+\boxed{
+\widehat{R}_n(f)
+=
+\frac1n
+\sum_{i=1}^{n}
+L
+(
+Y_i,f(\mathbf{X}_i)
+).
+}
+\]
+
+Generalization requires controlling the tradeoff between
+
+\[
+\boxed{
+\text{bias}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{variance}.
+}
+\]
+
+Regularization modifies the fitting objective through
+
+\[
+\boxed{
+\text{Loss}
++
+\lambda
+\cdot
+\text{Penalty}.
+}
+\]
+
+Ridge regression uses
+
+\[
+\boxed{
+\sum_j\beta_j^2,
+}
+\]
+
+while lasso uses
+
+\[
+\boxed{
+\sum_j|\beta_j|.
+}
+\]
+
+Cross-validation estimates out-of-sample performance and selects tuning
+parameters.
+
+Tree-based methods partition predictor space.
+
+Bagging and random forests average many trees.
+
+Boosting builds learners sequentially.
+
+Support-vector machines use margins and kernels.
+
+Unsupervised methods such as PCA and clustering discover structure
+without response labels.
+
+Statistical learning therefore combines
+
+\[
+\boxed{
+\text{statistics}
++
+\text{optimization}
++
+\text{prediction}
++
+\text{regularization}
++
+\text{computation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:statistical-learning-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Statistical Learning extends regression, classification, multivariate
+statistics, and decision theory toward predictive modeling and
+high-dimensional data. Ridge, lasso, and elastic net extend the
+regularization ideas introduced in Section~\ref{sec:regression};
+principal-components regression connects directly with
+Section~\ref{sec:multivariate-statistics}; and cross-validation provides
+a general framework for tuning predictive models. Trees, random forests,
+boosting, support-vector machines, clustering, and kernel methods broaden
+the class of available models beyond traditional parametric forms. The
+next section, Computational Statistics, develops the numerical,
+simulation, resampling, optimization, and Monte Carlo methods required to
+implement modern statistical inference and learning at scale.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.18 Statistical Learning
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard statistical-learning theory.
+%   - Standard predictive modeling and regularization.
+%   - Standard classification, tree, ensemble, kernel, and clustering
+%     methods.
+%
+% Used for:
+%   - supervised and unsupervised learning;
+%   - regression and classification;
+%   - training, validation, and test data;
+%   - prediction and generalization;
+%   - loss and risk;
+%   - empirical risk minimization;
+%   - irreducible error;
+%   - bias--variance tradeoff;
+%   - underfitting and overfitting;
+%   - model complexity;
+%   - regularization;
+%   - ridge regression;
+%   - lasso regression;
+%   - elastic net;
+%   - feature selection;
+%   - cross-validation;
+%   - LOOCV;
+%   - nested cross-validation;
+%   - data leakage;
+%   - classification metrics;
+%   - ROC and AUC;
+%   - calibration;
+%   - logistic classification;
+%   - k-nearest neighbors;
+%   - curse of dimensionality;
+%   - decision trees;
+%   - regression and classification trees;
+%   - Gini impurity;
+%   - entropy;
+%   - pruning;
+%   - bagging;
+%   - random forests;
+%   - out-of-bag estimation;
+%   - variable importance;
+%   - boosting;
+%   - gradient boosting;
+%   - support-vector classification;
+%   - kernel methods;
+%   - principal-components regression;
+%   - partial least squares preview;
+%   - high-dimensional learning;
+%   - sparsity;
+%   - k-means clustering;
+%   - hierarchical clustering;
+%   - linkage criteria;
+%   - distance measures;
+%   - ensembles;
+%   - stacking preview;
+%   - hyperparameter tuning;
+%   - learning curves;
+%   - imbalanced classification;
+%   - interpretability;
+%   - partial dependence and ICE previews;
+%   - distribution shift;
+%   - covariate shift;
+%   - concept drift;
+%   - fairness preview;
+%   - applications and exercises.
+%
+% Notes:
+%   - Computational Statistics is developed next in Section 8.19.
+%   - Optimization theory is developed more deeply in Chapter 10.
+%   - Numerical and computational implementation is developed more deeply
+%     in Chapter 11.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

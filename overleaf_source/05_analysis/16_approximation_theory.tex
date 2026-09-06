@@ -1,0 +1,2596 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 5.16 APPROXIMATION THEORY
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Approximation Theory}
+\label{sec:approximation-theory}
+
+\prerequisite{
+Real analysis, linear algebra, calculus, functional analysis, Fourier
+analysis, and basic numerical methods.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the fundamental goals of approximation theory;
+    \item distinguish interpolation from approximation;
+    \item understand approximation in different norms;
+    \item apply the Weierstrass approximation theorem;
+    \item understand the Stone--Weierstrass theorem;
+    \item work with polynomial approximation;
+    \item construct Bernstein polynomial approximations;
+    \item understand best approximation in normed spaces;
+    \item use orthogonal projection for least-squares approximation;
+    \item work with orthogonal polynomials;
+    \item distinguish uniform, least-squares, and minimax approximation;
+    \item understand Chebyshev polynomials and equioscillation;
+    \item recognize approximation rates and smoothness relationships;
+    \item understand Jackson-type approximation estimates;
+    \item work with piecewise polynomial and spline approximation;
+    \item understand rational approximation and Pad\'e approximation;
+    \item connect Fourier approximation with general approximation theory;
+    \item recognize approximation by positive linear operators;
+    \item understand density of approximation spaces;
+    \item connect approximation theory with numerical analysis,
+          optimization, data fitting, and scientific computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Approximation Theory?}
+\label{subsec:what-is-approximation-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximation theory studies how complicated mathematical objects can be
+replaced by simpler ones while controlling the resulting error.
+
+A typical problem begins with a function \(f\) and an approximation
+family
+
+\[
+\mathcal{A}.
+\]
+
+The goal is to find
+
+\[
+g\in\mathcal{A}
+\]
+
+such that
+
+\[
+\boxed{
+f\approx g.
+}
+\]
+
+The approximation family might consist of
+
+\[
+\boxed{
+\text{polynomials},
+\quad
+\text{trigonometric polynomials},
+\quad
+\text{splines},
+\quad
+\text{rational functions},
+\quad
+\text{finite-dimensional subspaces}.
+}
+\]
+
+The quality of the approximation depends on how error is measured.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation Error}
+\label{subsec:approximation-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given a norm \(\|\cdot\|\), the approximation error is
+
+\[
+\boxed{
+\|f-g\|.
+}
+\]
+
+Different norms measure different aspects of the error.
+
+For continuous functions on a compact interval, the uniform norm is
+
+\[
+\boxed{
+\|f\|_\infty
+=
+\max_{x\in[a,b]}|f(x)|.
+}
+\]
+
+The corresponding approximation error is
+
+\[
+\boxed{
+\|f-g\|_\infty
+=
+\max_{x\in[a,b]}|f(x)-g(x)|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation in \(L^p\)}
+\label{subsec:approximation-lp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+1\leq p<\infty,
+\]
+
+the \(L^p\) error is
+
+\[
+\boxed{
+\|f-g\|_p
+=
+\left(
+\int_\Omega
+|f(x)-g(x)|^p\,dx
+\right)^{1/p}.
+}
+\]
+
+In particular,
+
+\[
+\boxed{
+\|f-g\|_2^2
+=
+\int_\Omega
+|f-g|^2\,dx
+}
+\]
+
+measures mean-square error.
+
+Approximation in \(L^2\) is especially important because \(L^2\) is a
+Hilbert space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpolation Versus Approximation}
+\label{subsec:interpolation-versus-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interpolation requires exact agreement at selected points:
+
+\[
+\boxed{
+p(x_j)=f(x_j).
+}
+\]
+
+Approximation generally does not require exact agreement anywhere.
+
+Instead, it seeks to make an overall error small:
+
+\[
+\boxed{
+\|f-p\|
+\text{ small}.
+}
+\]
+
+Thus
+
+\[
+\boxed{
+\text{interpolation}
+=
+\text{exact at specified nodes},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{approximation}
+=
+\text{globally close according to a criterion}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Best Approximation}
+\label{subsec:best-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(X\) be a normed vector space and let \(M\subseteq X\).
+
+\begin{definitionbox}{Best Approximation}
+An element \(g^\ast\in M\) is a best approximation to \(f\in X\) from
+\(M\) if
+
+\[
+\boxed{
+\|f-g^\ast\|
+=
+\inf_{g\in M}\|f-g\|.
+}
+\]
+\end{definitionbox}
+
+The quantity
+
+\[
+\boxed{
+E(f,M)
+=
+\inf_{g\in M}\|f-g\|
+}
+\]
+
+is the distance from \(f\) to the approximation set \(M\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Existence and Uniqueness}
+\label{subsec:best-approximation-existence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A best approximation does not automatically exist for every subset of
+every normed space.
+
+However, important existence results hold when the approximation set has
+additional structure.
+
+For example, in a Hilbert space, every nonempty closed convex set has a
+unique nearest point.
+
+In particular, if \(M\) is a closed linear subspace of a Hilbert space,
+then every \(f\) has a unique best approximation in \(M\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Orthogonal Projection}
+\label{subsec:approximation-orthogonal-projection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(H\) be a Hilbert space and let \(M\subseteq H\) be a closed
+subspace.
+
+The best approximation \(P_Mf\) is characterized by
+
+\[
+\boxed{
+f-P_Mf
+\perp
+M.
+}
+\]
+
+Thus
+
+\[
+\boxed{
+\langle
+f-P_Mf,
+g
+\rangle
+=
+0
+}
+\]
+
+for every
+
+\[
+g\in M.
+\]
+
+This is the projection theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Dimensional Least Squares}
+\label{subsec:finite-dimensional-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+M
+=
+\operatorname{span}
+\{
+\phi_1,\ldots,\phi_m
+\}.
+\]
+
+Seek
+
+\[
+p
+=
+\sum_{j=1}^{m}
+c_j\phi_j.
+\]
+
+The orthogonality conditions are
+
+\[
+\left\langle
+f-
+\sum_{j=1}^{m}c_j\phi_j,
+\phi_k
+\right\rangle
+=
+0.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\sum_{j=1}^{m}
+c_j
+\langle\phi_j,\phi_k\rangle
+=
+\langle f,\phi_k\rangle.
+}
+\]
+
+These are the normal equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Orthogonal Bases}
+\label{subsec:approximation-orthogonal-bases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\phi_1,\ldots,\phi_m
+\]
+
+are orthogonal, then the coefficients simplify to
+
+\[
+\boxed{
+c_j
+=
+\frac{\langle f,\phi_j\rangle}
+{\langle\phi_j,\phi_j\rangle}.
+}
+\]
+
+If the basis is orthonormal,
+
+\[
+\boxed{
+c_j
+=
+\langle f,\phi_j\rangle.
+}
+\]
+
+This is the same projection principle underlying Fourier series.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Approximation}
+\label{subsec:polynomial-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One of the most important approximation families is
+
+\[
+\boxed{
+\mathcal{P}_n
+=
+\{
+p:
+p\text{ is a polynomial of degree at most }n
+\}.
+}
+\]
+
+The basic question is:
+
+\[
+\boxed{
+\text{How well can a function be approximated by polynomials?}
+}
+\]
+
+The answer begins with the Weierstrass approximation theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weierstrass Approximation Theorem}
+\label{subsec:weierstrass-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Weierstrass Approximation Theorem]
+Let
+
+\[
+f\in C([a,b]).
+\]
+
+For every
+
+\[
+\varepsilon>0,
+\]
+
+there exists a polynomial \(p\) such that
+
+\[
+\boxed{
+\|f-p\|_\infty<\varepsilon.
+}
+\]
+\end{theorem}
+
+Equivalently, the polynomials are dense in
+
+\[
+\boxed{
+C([a,b])
+}
+\]
+
+with respect to the uniform norm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Meaning of Density}
+\label{subsec:approximation-density}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A subset \(A\) of a normed space \(X\) is dense in \(X\) if every element
+of \(X\) can be approximated arbitrarily closely by elements of \(A\).
+
+Symbolically,
+
+\[
+\boxed{
+\overline{A}=X.
+}
+\]
+
+Thus the Weierstrass theorem states
+
+\[
+\boxed{
+\overline{
+\bigcup_{n=0}^{\infty}\mathcal{P}_n
+}^{\,\|\cdot\|_\infty}
+=
+C([a,b]).
+}
+\]
+
+This is an existence theorem.
+
+It does not by itself identify the best approximating polynomial or the
+rate of convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bernstein Polynomials}
+\label{subsec:bernstein-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bernstein polynomials provide a constructive proof of the Weierstrass
+theorem on \([0,1]\).
+
+For
+
+\[
+f\in C([0,1]),
+\]
+
+define
+
+\[
+\boxed{
+B_nf(x)
+=
+\sum_{k=0}^{n}
+f\left(\frac{k}{n}\right)
+\binom{n}{k}
+x^k(1-x)^{n-k}.
+}
+\]
+
+Then \(B_nf\) is a polynomial of degree at most \(n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bernstein Convergence}
+\label{subsec:bernstein-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Bernstein Approximation]
+For every
+
+\[
+f\in C([0,1]),
+\]
+
+the Bernstein polynomials satisfy
+
+\[
+\boxed{
+\|B_nf-f\|_\infty\to0.
+}
+\]
+\end{theorem}
+
+Thus Bernstein polynomials give an explicit sequence of polynomial
+approximations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Probabilistic Interpretation of Bernstein Polynomials}
+\label{subsec:bernstein-probabilistic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+X_n
+\sim
+\operatorname{Binomial}(n,x).
+\]
+
+Then
+
+\[
+\boxed{
+B_nf(x)
+=
+\mathbb{E}
+\left[
+f\left(\frac{X_n}{n}\right)
+\right].
+}
+\]
+
+Since
+
+\[
+\frac{X_n}{n}
+\]
+
+concentrates near \(x\) for large \(n\), continuity suggests
+
+\[
+f\left(\frac{X_n}{n}\right)
+\approx
+f(x).
+\]
+
+This gives an intuitive probabilistic explanation for Bernstein
+approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bernstein Approximation}
+\label{subsec:worked-bernstein}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Bernstein Polynomial for \(f(x)=x^2\)}
+
+For \(n=2\),
+
+\[
+B_2f(x)
+=
+\sum_{k=0}^{2}
+f\left(\frac{k}{2}\right)
+\binom{2}{k}
+x^k(1-x)^{2-k}.
+\]
+
+Since
+
+\[
+f(0)=0,
+\qquad
+f\left(\frac12\right)=\frac14,
+\qquad
+f(1)=1,
+\]
+
+we obtain
+
+\[
+B_2f(x)
+=
+\frac14
+\binom21
+x(1-x)
++
+x^2.
+\]
+
+Therefore,
+
+\[
+B_2f(x)
+=
+\frac12x(1-x)+x^2.
+\]
+
+Hence
+
+\begin{answerbox}
+\[
+\boxed{
+B_2f(x)
+=
+\frac12x+\frac12x^2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Positive Linear Operators}
+\label{subsec:positive-linear-operators}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bernstein approximation is an example of approximation by positive
+linear operators.
+
+An operator \(L\) is positive if
+
+\[
+f\geq0
+\]
+
+implies
+
+\[
+\boxed{
+Lf\geq0.
+}
+\]
+
+The Bernstein operator satisfies
+
+\[
+\boxed{
+B_n(af+bg)
+=
+aB_nf+bB_ng
+}
+\]
+
+and preserves nonnegativity.
+
+Positive operators play an important role in constructive approximation
+theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Korovkin-Type Principle}
+\label{subsec:korovkin-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A remarkable feature of positive approximation operators is that their
+convergence can sometimes be checked on only a few simple functions.
+
+For positive linear operators on \(C([a,b])\), a classical
+Korovkin-type theorem reduces uniform convergence to checking suitable
+test functions corresponding to
+
+\[
+\boxed{
+1,
+\qquad
+x,
+\qquad
+x^2.
+}
+\]
+
+This greatly simplifies convergence proofs for many approximation
+schemes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stone--Weierstrass Theorem}
+\label{subsec:stone-weierstrass}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Weierstrass theorem extends far beyond intervals.
+
+A standard real form is the following.
+
+\begin{theorem}[Stone--Weierstrass Theorem]
+Let \(K\) be a compact Hausdorff space and let \(A\) be a subalgebra of
+\(C(K,\R)\).
+
+If \(A\) contains the constant functions and separates points of \(K\),
+then \(A\) is dense in \(C(K,\R)\) in the uniform norm.
+\end{theorem}
+
+To separate points means that for any distinct \(x,y\in K\), there exists
+
+\[
+f\in A
+\]
+
+such that
+
+\[
+\boxed{
+f(x)\neq f(y).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Stone--Weierstrass Matters}
+\label{subsec:why-stone-weierstrass}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Stone--Weierstrass gives a general recipe for proving density.
+
+Rather than explicitly constructing approximations, one checks
+algebraic properties.
+
+It explains why many familiar approximation systems are dense, including
+appropriate families of
+
+\[
+\boxed{
+\text{polynomials},
+\quad
+\text{trigonometric polynomials},
+\quad
+\text{algebra-generated function families}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trigonometric Approximation}
+\label{subsec:trigonometric-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A trigonometric polynomial has the form
+
+\[
+\boxed{
+T_n(x)
+=
+a_0
++
+\sum_{k=1}^{n}
+\left(
+a_k\cos(kx)
++
+b_k\sin(kx)
+\right).
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+T_n(x)
+=
+\sum_{k=-n}^{n}
+c_ke^{ikx}.
+}
+\]
+
+Trigonometric polynomials form the natural approximation family for
+periodic functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fourier Approximation}
+\label{subsec:fourier-as-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In \(L^2\), the Fourier partial sum is an orthogonal projection onto a
+finite-dimensional trigonometric subspace.
+
+Therefore,
+
+\[
+\boxed{
+S_nf
+}
+\]
+
+is the best \(L^2\) approximation to \(f\) from that subspace.
+
+This gives a geometric interpretation of Fourier series:
+
+\[
+\boxed{
+\text{Fourier approximation}
+=
+\text{Hilbert-space projection}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Orthogonal Polynomials}
+\label{subsec:orthogonal-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(w(x)\geq0\) be a weight function on an interval \(I\).
+
+Define
+
+\[
+\boxed{
+\langle f,g\rangle_w
+=
+\int_I
+f(x)g(x)w(x)\,dx.
+}
+\]
+
+A sequence of polynomials
+
+\[
+p_0,p_1,p_2,\ldots
+\]
+
+is orthogonal if
+
+\[
+\boxed{
+\langle p_j,p_k\rangle_w=0
+\qquad
+(j\neq k).
+}
+\]
+
+Orthogonal polynomial systems provide efficient bases for polynomial
+approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Important Orthogonal Polynomial Families}
+\label{subsec:orthogonal-polynomial-families}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Classical examples include
+
+\[
+\boxed{
+\text{Legendre polynomials}
+}
+\]
+
+on \([-1,1]\) with weight \(1\),
+
+\[
+\boxed{
+\text{Chebyshev polynomials}
+}
+\]
+
+with weight
+
+\[
+\frac{1}{\sqrt{1-x^2}},
+\]
+
+\[
+\boxed{
+\text{Hermite polynomials}
+}
+\]
+
+on \(\R\) with Gaussian-type weight, and
+
+\[
+\boxed{
+\text{Laguerre polynomials}
+}
+\]
+
+on \([0,\infty)\) with exponential-type weight.
+
+These systems appear throughout approximation theory, numerical analysis,
+differential equations, and mathematical physics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Legendre Approximation}
+\label{subsec:legendre-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Legendre polynomials \(P_n\) satisfy
+
+\[
+\boxed{
+\int_{-1}^{1}
+P_m(x)P_n(x)\,dx
+=
+0
+\qquad
+(m\neq n).
+}
+\]
+
+A function may be approximated by
+
+\[
+\boxed{
+f(x)
+\approx
+\sum_{k=0}^{N}
+c_kP_k(x).
+}
+\]
+
+The coefficients are obtained by orthogonal projection:
+
+\[
+\boxed{
+c_k
+=
+\frac{
+\int_{-1}^{1}
+f(x)P_k(x)\,dx
+}{
+\int_{-1}^{1}
+P_k(x)^2\,dx
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chebyshev Polynomials}
+\label{subsec:chebyshev-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Chebyshev polynomial of the first kind is defined by
+
+\[
+\boxed{
+T_n(x)
+=
+\cos(n\arccos x),
+\qquad
+-1\leq x\leq1.
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+T_n(\cos\theta)
+=
+\cos(n\theta).
+}
+\]
+
+The first few are
+
+\[
+\boxed{
+T_0(x)=1,
+}
+\]
+
+\[
+\boxed{
+T_1(x)=x,
+}
+\]
+
+\[
+\boxed{
+T_2(x)=2x^2-1,
+}
+\]
+
+and
+
+\[
+\boxed{
+T_3(x)=4x^3-3x.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chebyshev Recurrence}
+\label{subsec:chebyshev-recurrence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Chebyshev polynomials satisfy
+
+\[
+\boxed{
+T_{n+1}(x)
+=
+2xT_n(x)-T_{n-1}(x).
+}
+\]
+
+They also satisfy
+
+\[
+\boxed{
+|T_n(x)|\leq1
+}
+\]
+
+for
+
+\[
+x\in[-1,1].
+\]
+
+Their oscillatory structure makes them central to uniform approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chebyshev Nodes}
+\label{subsec:chebyshev-nodes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The zeros of \(T_n\) are
+
+\[
+\boxed{
+x_k
+=
+\cos
+\left(
+\frac{(2k-1)\pi}{2n}
+\right),
+\qquad
+k=1,\ldots,n.
+}
+\]
+
+These are called Chebyshev nodes.
+
+They cluster near the endpoints of \([-1,1]\), which helps control large
+interpolation errors near the boundaries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Runge Phenomenon}
+\label{subsec:runge-phenomenon}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+High-degree polynomial interpolation at equally spaced points can behave
+poorly near interval endpoints.
+
+This is called the Runge phenomenon.
+
+Increasing the number of equally spaced interpolation points can
+therefore make the approximation worse.
+
+Chebyshev nodes dramatically reduce this instability.
+
+This illustrates an important distinction:
+
+\[
+\boxed{
+\text{high polynomial degree}
+\not\Rightarrow
+\text{good approximation automatically}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uniform Best Approximation}
+\label{subsec:uniform-best-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f\in C([a,b]),
+\]
+
+define the degree-\(n\) best uniform approximation error by
+
+\[
+\boxed{
+E_n(f)_\infty
+=
+\inf_{p\in\mathcal{P}_n}
+\|f-p\|_\infty.
+}
+\]
+
+A polynomial attaining this infimum is called a minimax or best uniform
+approximating polynomial.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimax Approximation}
+\label{subsec:minimax-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Minimax approximation minimizes the largest absolute error:
+
+\[
+\boxed{
+\min_{p\in\mathcal{P}_n}
+\max_{x\in[a,b]}
+|f(x)-p(x)|.
+}
+\]
+
+This differs from least-squares approximation, which minimizes an
+integrated squared error.
+
+Thus
+
+\[
+\boxed{
+\text{least squares}
+\longrightarrow
+L^2,
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{minimax}
+\longrightarrow
+L^\infty.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equioscillation Principle}
+\label{subsec:equioscillation-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A central characterization of best uniform polynomial approximation is
+the alternation theorem.
+
+\begin{theorem}[Chebyshev Equioscillation Theorem]
+Let \(f\in C([a,b])\), and let \(p^\ast\in\mathcal{P}_n\).
+
+Then \(p^\ast\) is the unique best uniform approximation to \(f\) from
+\(\mathcal{P}_n\) if and only if there exist at least \(n+2\) points
+
+\[
+a\leq x_0<x_1<\cdots<x_{n+1}\leq b
+\]
+
+such that
+
+\[
+\boxed{
+f(x_j)-p^\ast(x_j)
+=
+(-1)^j\sigma E
+}
+\]
+
+for some \(\sigma\in\{-1,1\}\), where
+
+\[
+E=\|f-p^\ast\|_\infty.
+\]
+\end{theorem}
+
+Thus the optimal error alternates between equal positive and negative
+extremes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Best Constant Approximation}
+\label{subsec:worked-best-constant}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Best Constant Approximation to \(f(x)=x^2\) on \([-1,1]\)}
+
+Seek a constant \(c\) minimizing
+
+\[
+\|x^2-c\|_\infty.
+\]
+
+Since
+
+\[
+0\leq x^2\leq1,
+\]
+
+the maximum error is minimized by placing \(c\) halfway between the
+minimum and maximum values.
+
+Thus
+
+\[
+c=\frac12.
+\]
+
+The errors at \(x=0\) and \(x=\pm1\) are
+
+\[
+-\frac12
+\]
+
+and
+
+\[
+\frac12,
+\]
+
+respectively.
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+p^\ast(x)=\frac12,
+\qquad
+E_0(f)_\infty=\frac12.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation Rate}
+\label{subsec:approximation-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Density answers whether approximation is possible.
+
+A deeper question asks
+
+\[
+\boxed{
+\text{How fast does the error decrease?}
+}
+\]
+
+For polynomial approximation, one studies quantities such as
+
+\[
+\boxed{
+E_n(f)_\infty
+=
+\inf_{p\in\mathcal{P}_n}
+\|f-p\|_\infty.
+}
+\]
+
+The behavior of \(E_n(f)_\infty\) as
+
+\[
+n\to\infty
+\]
+
+is closely related to the smoothness of \(f\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Smoothness and Approximation}
+\label{subsec:smoothness-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As a general principle,
+
+\[
+\boxed{
+\text{greater smoothness}
+\Longrightarrow
+\text{faster approximation}.
+}
+\]
+
+Functions with only limited regularity generally have slower polynomial
+or Fourier approximation rates.
+
+Functions possessing many derivatives typically have faster algebraic
+decay of approximation error.
+
+Analytic functions may exhibit geometric or exponential-type convergence
+under suitable approximation schemes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modulus of Continuity}
+\label{subsec:modulus-of-continuity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Modulus of Continuity}
+For a continuous function \(f\), define
+
+\[
+\boxed{
+\omega(f,\delta)
+=
+\sup_{\substack{x,y\in[a,b]\\|x-y|\leq\delta}}
+|f(x)-f(y)|.
+}
+\]
+\end{definitionbox}
+
+The modulus of continuity measures how much \(f\) can change over
+distances no greater than \(\delta\).
+
+For a uniformly continuous function,
+
+\[
+\boxed{
+\omega(f,\delta)\to0
+\qquad
+\text{as }\delta\to0^+.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jackson-Type Estimates}
+\label{subsec:jackson-estimates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Jackson-type theorems connect smoothness directly with best approximation
+error.
+
+A representative form is
+
+\[
+\boxed{
+E_n(f)_\infty
+\leq
+C\,
+\omega
+\left(
+f,\frac{1}{n}
+\right),
+}
+\]
+
+where \(C\) is independent of \(f\) and \(n\).
+
+More refined versions involve higher derivatives and higher-order moduli
+of smoothness.
+
+These are called direct approximation theorems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse Approximation Theorems}
+\label{subsec:inverse-approximation-theorems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Direct theorems say
+
+\[
+\boxed{
+\text{smoothness}
+\Longrightarrow
+\text{fast approximation}.
+}
+\]
+
+Inverse theorems ask whether
+
+\[
+\boxed{
+\text{fast approximation}
+\Longrightarrow
+\text{smoothness}.
+}
+\]
+
+Under suitable hypotheses, the answer is yes.
+
+Together, direct and inverse theorems establish deep equivalences between
+regularity and approximability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Piecewise Polynomial Approximation}
+\label{subsec:piecewise-polynomial-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of using one high-degree polynomial on an entire interval, one
+can divide the interval into smaller pieces and use low-degree
+polynomials locally.
+
+Let
+
+\[
+a=x_0<x_1<\cdots<x_N=b.
+\]
+
+On each subinterval
+
+\[
+[x_{j-1},x_j],
+\]
+
+one approximates \(f\) by a polynomial.
+
+This leads to piecewise polynomial approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Splines}
+\label{subsec:splines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Spline}
+A spline is a piecewise polynomial function whose polynomial pieces are
+joined with prescribed smoothness conditions at specified points called
+knots.
+\end{definitionbox}
+
+If the knots are
+
+\[
+x_0<x_1<\cdots<x_N,
+\]
+
+then a spline is polynomial on each interval
+
+\[
+[x_{j-1},x_j].
+\]
+
+The degree and continuity conditions determine the spline class.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cubic Splines}
+\label{subsec:cubic-splines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A cubic spline is piecewise cubic and typically satisfies
+
+\[
+\boxed{
+S\in C^2([a,b]).
+}
+\]
+
+Thus
+
+\[
+S,
+\qquad
+S',
+\qquad
+S''
+\]
+
+are continuous across the interior knots.
+
+Cubic splines are widely used because they provide a strong balance
+between
+
+\[
+\boxed{
+\text{smoothness},
+\quad
+\text{accuracy},
+\quad
+\text{computational simplicity}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Splines Work Well}
+\label{subsec:why-splines-work}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A single high-degree polynomial has global behavior: changing one
+coefficient affects the entire interval.
+
+Splines are local.
+
+Changing data in one region primarily affects nearby pieces.
+
+This gives splines improved stability and flexibility.
+
+It also avoids many difficulties associated with very high-degree global
+polynomial interpolation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{B-Splines}
+\label{subsec:b-splines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+B-splines provide a particularly useful basis for spline spaces.
+
+Their important properties include
+
+\[
+\boxed{
+\text{local support},
+}
+\]
+
+\[
+\boxed{
+\text{nonnegativity},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stable numerical evaluation}.
+}
+\]
+
+Because each basis function is supported only on a small number of knot
+intervals, B-spline representations are computationally efficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rational Approximation}
+\label{subsec:rational-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of approximating by a polynomial, one may use a rational function
+
+\[
+\boxed{
+R(x)
+=
+\frac{p(x)}{q(x)}.
+}
+\]
+
+Rational functions can approximate functions with poles, sharp
+transitions, or other difficult behavior much more efficiently than
+polynomials in many settings.
+
+A rational approximation problem may seek
+
+\[
+\boxed{
+\min_{R}
+\|f-R\|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pad\'e Approximation}
+\label{subsec:pade-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Pad\'e approximant is a rational function
+
+\[
+\boxed{
+R_{m,n}(x)
+=
+\frac{P_m(x)}{Q_n(x)}
+}
+\]
+
+chosen so that its power-series expansion agrees with that of \(f\) to
+as high an order as possible near a specified point.
+
+Unlike Taylor polynomials, Pad\'e approximants can represent pole-like
+behavior.
+
+This often gives much better approximation outside a small neighborhood
+of the expansion point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Taylor Approximation Versus Best Approximation}
+\label{subsec:taylor-versus-best-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Taylor polynomial is determined by matching derivatives at one point:
+
+\[
+\boxed{
+p^{(k)}(a)=f^{(k)}(a).
+}
+\]
+
+A best approximation is determined by minimizing an error over an entire
+domain.
+
+Therefore a Taylor polynomial need not be the best approximation in
+either
+
+\[
+L^2
+\]
+
+or
+
+\[
+L^\infty.
+\]
+
+The two methods solve different problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation by Convolution}
+\label{subsec:approximation-convolution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximate identities provide another major approximation mechanism.
+
+Let
+
+\[
+\phi_\varepsilon(x)
+=
+\varepsilon^{-n}
+\phi(x/\varepsilon),
+\]
+
+where
+
+\[
+\int_{\R^n}\phi(x)\,dx=1.
+\]
+
+Then
+
+\[
+\boxed{
+f_\varepsilon
+=
+f*\phi_\varepsilon
+}
+\]
+
+often satisfies
+
+\[
+\boxed{
+f_\varepsilon\to f
+}
+\]
+
+in an appropriate norm or pointwise sense.
+
+If \(\phi\) is smooth, then \(f_\varepsilon\) is smoother than \(f\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mollification}
+\label{subsec:approximation-mollification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When
+
+\[
+\phi\in C_c^\infty(\R^n),
+\]
+
+the functions
+
+\[
+f_\varepsilon=f*\phi_\varepsilon
+\]
+
+are called mollifications of \(f\).
+
+Mollification is used to approximate rough functions by smooth ones.
+
+For example, under standard conditions,
+
+\[
+\boxed{
+f_\varepsilon\to f
+\quad
+\text{in }L^p.
+}
+\]
+
+This technique is fundamental in real analysis, distribution theory, and
+PDEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation in Sobolev Spaces}
+\label{subsec:approximation-sobolev}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximation may involve both functions and their derivatives.
+
+For example, convergence in
+
+\[
+W^{1,p}(\Omega)
+\]
+
+requires
+
+\[
+\boxed{
+\|f_n-f\|_{L^p}
++
+\|\nabla f_n-\nabla f\|_{L^p}
+\to0.
+}
+\]
+
+Under appropriate conditions, smooth functions are dense in Sobolev
+spaces.
+
+This density is essential for weak formulations of differential
+equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation in Hilbert Spaces}
+\label{subsec:approximation-hilbert-spaces}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+V_1\subseteq V_2\subseteq\cdots
+\]
+
+be finite-dimensional subspaces of a Hilbert space \(H\).
+
+If
+
+\[
+\boxed{
+\overline{
+\bigcup_{n=1}^{\infty}V_n
+}
+=
+H,
+}
+\]
+
+then orthogonal projections
+
+\[
+P_{V_n}f
+\]
+
+approximate every \(f\in H\):
+
+\[
+\boxed{
+\|f-P_{V_n}f\|\to0.
+}
+\]
+
+This abstract principle underlies many numerical approximation methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Galerkin Approximation}
+\label{subsec:galerkin-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an equation is written abstractly as
+
+\[
+Au=f.
+\]
+
+Choose a finite-dimensional space
+
+\[
+V_n
+=
+\operatorname{span}
+\{
+\phi_1,\ldots,\phi_n
+\}.
+\]
+
+Seek
+
+\[
+u_n\in V_n
+\]
+
+such that the residual is orthogonal to the approximation space.
+
+Schematically,
+
+\[
+\boxed{
+\langle Au_n-f,v\rangle=0
+\qquad
+\text{for all }v\in V_n.
+}
+\]
+
+This is the Galerkin principle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Element Connection}
+\label{subsec:finite-element-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite element methods approximate solutions of differential equations
+using finite-dimensional spaces of piecewise polynomial functions.
+
+Thus they combine
+
+\[
+\boxed{
+\text{approximation theory},
+\quad
+\text{variational methods},
+\quad
+\text{linear algebra},
+\quad
+\text{numerical analysis}.
+}
+\]
+
+Approximation theory provides the estimates needed to determine how the
+numerical solution approaches the true solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation and Compactness}
+\label{subsec:approximation-compactness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite-dimensional approximation is closely connected with compactness.
+
+A compact operator can often be approximated in operator norm by
+finite-rank operators under suitable hypotheses.
+
+Approximation numbers and related quantities measure how effectively an
+operator can be replaced by low-dimensional operators.
+
+This connects Approximation Theory with Functional Analysis and Operator
+Theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Approximation}
+\label{subsec:nonlinear-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Not all approximation families are linear spaces.
+
+In nonlinear approximation, the allowed approximants may depend on
+parameters nonlinearly.
+
+Examples include
+
+\[
+\boxed{
+\text{rational functions},
+\quad
+\text{adaptive splines},
+\quad
+\text{sparse expansions},
+\quad
+\text{neural-network approximation}.
+}
+\]
+
+The approximation problem becomes an optimization problem over a
+nonlinear family.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Approximation}
+\label{subsec:sparse-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a function has an expansion
+
+\[
+f
+=
+\sum_{k}
+c_k\phi_k.
+\]
+
+Instead of retaining every coefficient, sparse approximation seeks a
+small subset of important terms.
+
+An \(m\)-term approximation has the form
+
+\[
+\boxed{
+f_m
+=
+\sum_{k\in\Lambda_m}
+c_k\phi_k,
+}
+\]
+
+where
+
+\[
+|\Lambda_m|=m.
+\]
+
+Wavelet approximation is a major setting in which sparse representations
+are effective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation and Wavelets}
+\label{subsec:approximation-wavelets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Wavelets provide localized basis functions across multiple scales.
+
+A function may be approximated by retaining only the most significant
+wavelet coefficients.
+
+For functions with localized irregularities, this can be much more
+efficient than global Fourier approximation.
+
+This is important in
+
+\[
+\boxed{
+\text{compression},
+\quad
+\text{denoising},
+\quad
+\text{adaptive numerical methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universal Approximation Perspective}
+\label{subsec:universal-approximation-perspective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many approximation theorems have the same structural form:
+
+\[
+\boxed{
+\overline{\mathcal{A}}=X.
+}
+\]
+
+This says that a relatively simple family \(\mathcal{A}\) is rich enough
+to approximate every element of a larger function space \(X\).
+
+Polynomial density, trigonometric approximation, spline density, and
+certain neural-network approximation results all fit this broad
+perspective.
+
+Density, however, says only that approximation is possible.
+
+It does not automatically provide
+
+\[
+\boxed{
+\text{efficient computation},
+\quad
+\text{stability},
+\quad
+\text{fast convergence}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stability}
+\label{subsec:approximation-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A useful approximation method should not amplify small perturbations
+dramatically.
+
+Suppose data \(f\) are replaced by
+
+\[
+f+\delta f.
+\]
+
+A stable approximation procedure should produce a controlled change in
+the approximant.
+
+Thus practical approximation requires balancing
+
+\[
+\boxed{
+\text{accuracy}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stability}.
+}
+\]
+
+This becomes particularly important in numerical computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditioning and Approximation}
+\label{subsec:conditioning-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Even if an approximation problem is mathematically well posed, a poor
+basis can make its numerical computation unstable.
+
+For example, high-degree monomial bases
+
+\[
+1,x,x^2,\ldots,x^n
+\]
+
+may lead to badly conditioned systems.
+
+Orthogonal polynomial bases often improve numerical behavior.
+
+Thus the choice of representation is part of the approximation problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:approximation-theory-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing Approximation with Interpolation}
+
+Interpolation requires exact matching at selected points.
+
+Approximation minimizes or controls an error criterion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming the Taylor Polynomial Is the Best Polynomial}
+
+Taylor polynomials optimize local derivative matching, not global
+\(L^2\) or uniform error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Norm}
+
+The phrase ``best approximation'' is incomplete unless the error measure
+is specified.
+
+The best \(L^2\) approximation can differ from the best \(L^\infty\)
+approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Density Gives a Convergence Rate}
+
+A density theorem proves that arbitrarily accurate approximations exist.
+
+It does not specify how rapidly the error decreases with dimension or
+degree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming High Degree Always Improves Numerical Results}
+
+High-degree polynomial interpolation at poorly chosen nodes can become
+unstable.
+
+The Runge phenomenon is a standard example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Orthogonality with Orthonormality}
+
+Orthogonality means
+
+\[
+\langle\phi_j,\phi_k\rangle=0
+\]
+
+for \(j\neq k\).
+
+Orthonormality additionally requires
+
+\[
+\boxed{
+\|\phi_j\|=1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Least Squares Minimizes Maximum Error}
+
+Least squares minimizes an \(L^2\)-type quantity.
+
+Minimax approximation minimizes the largest error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Smoothness}
+
+Approximation rates depend strongly on regularity.
+
+A nonsmooth function should not generally be expected to converge as
+rapidly as an analytic function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Global Polynomial Approximation Is Always Best}
+
+Piecewise polynomials and splines can be more stable and efficient,
+especially for complicated local behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Approximation Error with Numerical Error}
+
+Approximation error comes from restricting the solution to a simpler
+family.
+
+Numerical error can additionally include
+
+\[
+\boxed{
+\text{roundoff},
+\quad
+\text{discretization},
+\quad
+\text{iteration error}.
+}
+\]
+
+These should be distinguished.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:approximation-theory-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+\textbf{Numerical Analysis.}
+Complicated functions and solutions are replaced by finite-dimensional
+approximations suitable for computation.
+
+\medskip
+
+\textbf{Data Fitting.}
+Least-squares approximation constructs models from noisy observations.
+
+\medskip
+
+\textbf{Differential Equations.}
+Galerkin, spectral, and finite element methods approximate solutions of
+ODEs and PDEs.
+
+\medskip
+
+\textbf{Signal Processing.}
+Fourier and wavelet approximations represent signals using a manageable
+number of coefficients.
+
+\medskip
+
+\textbf{Computer Graphics.}
+Splines and piecewise polynomial curves are used to model smooth shapes.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Orthogonal polynomial expansions provide efficient high-order numerical
+representations.
+
+\medskip
+
+\textbf{Optimization.}
+Best approximation is itself an optimization problem over a function
+class.
+
+\medskip
+
+\textbf{Probability and Statistics.}
+Orthogonal expansions and least-squares projections appear in regression
+and stochastic approximation.
+
+\medskip
+
+\textbf{Functional Analysis.}
+Density, projection, compactness, and finite-rank approximation are
+fundamental functional-analytic concepts.
+
+\medskip
+
+\textbf{Machine Learning.}
+Function classes are studied according to their ability to approximate
+target mappings from data.
+
+\medskip
+
+\textbf{Compression.}
+Sparse Fourier and wavelet representations reduce storage while
+controlling reconstruction error.
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:approximation-theory-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Explain the difference between interpolation and approximation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the best approximation to \(f\) from a subset \(M\) of a normed
+space.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Weierstrass approximation theorem.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain what it means for the polynomials to be dense in
+\(C([a,b])\).
+\end{exercise}
+
+\begin{exercise}[1]
+Write the Bernstein polynomial \(B_nf\) for a continuous function on
+\([0,1]\).
+\end{exercise}
+
+\begin{exercise}[1]
+Compute \(B_1f\) for
+
+\[
+f(x)=x^2.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Compute \(B_2f\) for
+
+\[
+f(x)=x.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Show that Bernstein operators preserve constants.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that
+
+\[
+B_nx=x.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Compute
+
+\[
+B_n(x^2)
+\]
+
+and show that it converges uniformly to \(x^2\).
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the normal equations for least-squares approximation from a
+finite-dimensional subspace.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that the orthogonal projection is the best approximation in a
+Hilbert space.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the best constant \(L^2\) approximation to \(f(x)=x\) on
+\([0,1]\).
+\end{exercise}
+
+\begin{exercise}[2]
+Find the best constant uniform approximation to \(f(x)=x\) on
+\([0,1]\).
+\end{exercise}
+
+\begin{exercise}[2]
+Compare the answers to the previous two exercises.
+\end{exercise}
+
+\begin{exercise}[2]
+Verify the recurrence
+
+\[
+T_{n+1}(x)
+=
+2xT_n(x)-T_{n-1}(x)
+\]
+
+for Chebyshev polynomials.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the zeros of \(T_3(x)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Show that
+
+\[
+|T_n(x)|\leq1
+\]
+
+on \([-1,1]\).
+\end{exercise}
+
+\begin{exercise}[2]
+Find the best constant uniform approximation to
+
+\[
+f(x)=x^2
+\]
+
+on \([-1,1]\).
+\end{exercise}
+
+\begin{exercise}[2]
+Find the least-squares constant approximation to
+
+\[
+f(x)=x^2
+\]
+
+on \([-1,1]\).
+\end{exercise}
+
+\begin{exercise}[3]
+Use Gram--Schmidt to construct the first three orthogonal polynomials on
+\([-1,1]\) with weight \(1\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the first three Legendre polynomials up to normalization.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the degree-one least-squares polynomial approximation to
+\(f(x)=x^2\) on \([0,1]\).
+\end{exercise}
+
+\begin{exercise}[3]
+Use the equioscillation principle to characterize the best degree-one
+uniform approximation to a suitable continuous function.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the modulus of continuity of
+
+\[
+f(x)=x
+\]
+
+on \([0,1]\).
+\end{exercise}
+
+\begin{exercise}[3]
+Show that if \(f\) is Lipschitz with constant \(L\), then
+
+\[
+\omega(f,\delta)\leq L\delta.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Compare equally spaced interpolation nodes with Chebyshev nodes for a
+high-degree polynomial interpolation problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a piecewise linear approximation to a smooth function and
+estimate its error.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a cubic spline is typically required to have continuous
+first and second derivatives.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Pad\'e approximant for a simple power series.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that mollification approximates a continuous function uniformly on
+compact sets under suitable hypotheses.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret a Fourier partial sum as an \(L^2\) best approximation.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the Weierstrass approximation theorem using Bernstein polynomials.
+\end{exercise}
+
+\begin{exercise}[4]
+Study a proof of the Stone--Weierstrass theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove an appropriate form of the Chebyshev equioscillation theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Jackson's theorem and derive an approximation-rate estimate from
+the modulus of continuity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study an inverse theorem connecting polynomial approximation rates with
+smoothness.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate spline approximation error as the maximum knot spacing tends
+to zero.
+\end{exercise}
+
+\begin{exercise}[4]
+Study best \(m\)-term wavelet approximation for functions with localized
+singularities.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the relationship between finite element approximation and
+best approximation in Sobolev spaces.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:approximation-theory-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximation theory studies how well an object \(f\) can be represented
+by simpler objects \(g\) from an approximation family.
+
+The central quantity is
+
+\[
+\boxed{
+\|f-g\|.
+}
+\]
+
+A best approximation satisfies
+
+\[
+\boxed{
+\|f-g^\ast\|
+=
+\inf_{g\in M}\|f-g\|.
+}
+\]
+
+In Hilbert spaces, best approximation from a closed subspace is obtained
+by orthogonal projection.
+
+The Weierstrass theorem states that polynomials are uniformly dense in
+
+\[
+\boxed{
+C([a,b]).
+}
+\]
+
+Bernstein polynomials provide a constructive approximation:
+
+\[
+\boxed{
+B_nf\to f.
+}
+\]
+
+Stone--Weierstrass generalizes polynomial density to broad classes of
+functions on compact spaces.
+
+Least-squares approximation minimizes
+
+\[
+\boxed{
+L^2\text{ error},
+}
+\]
+
+while minimax approximation minimizes
+
+\[
+\boxed{
+L^\infty\text{ error}.
+}
+\]
+
+Chebyshev polynomials and equioscillation characterize important uniform
+approximation problems.
+
+Approximation rates depend strongly on smoothness:
+
+\[
+\boxed{
+\text{more regularity}
+\Longrightarrow
+\text{typically faster convergence}.
+}
+\]
+
+Splines replace high-degree global polynomials with stable local
+piecewise polynomials.
+
+Rational functions, Fourier expansions, wavelets, mollifiers, and
+finite-dimensional projection methods provide additional approximation
+frameworks.
+
+Thus approximation theory connects the infinite-dimensional mathematical
+world with finite and computational representations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:approximation-theory-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Approximation Theory provides the bridge between exact mathematical
+objects and simpler finite representations. Real Analysis supplies
+uniform convergence, continuity, smoothness, and compactness. Functional
+Analysis provides density, Hilbert-space projection, best approximation,
+and finite-dimensional subspaces. Fourier Analysis interprets Fourier
+series as orthogonal approximations and provides trigonometric
+approximation. Harmonic Analysis adds localized frequency decompositions
+and wavelet-type methods. Distribution Theory and Sobolev theory use
+mollification to approximate rough functions by smooth functions.
+Calculus of Variations and PDE theory lead to Galerkin and finite element
+approximations. Optimization appears through least-squares and minimax
+problems. Numerical Analysis develops stable algorithms for interpolation,
+splines, spectral methods, and computational approximation. The next
+section, Asymptotic Analysis, studies a related but distinct question:
+how mathematical quantities can be approximated systematically in
+limiting regimes.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 5.16 Approximation Theory
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard classical approximation theory.
+%   - Standard functional analytic best-approximation theory.
+%   - Standard polynomial, spline, Fourier, and rational approximation.
+%
+% Used for:
+%   - approximation errors and norms;
+%   - interpolation versus approximation;
+%   - best approximation;
+%   - orthogonal projection;
+%   - least-squares approximation;
+%   - polynomial approximation;
+%   - Weierstrass approximation theorem;
+%   - Bernstein polynomials;
+%   - positive linear operators;
+%   - Korovkin-type approximation;
+%   - Stone--Weierstrass theorem;
+%   - trigonometric approximation;
+%   - Fourier approximation;
+%   - orthogonal polynomials;
+%   - Legendre and Chebyshev polynomials;
+%   - Chebyshev nodes;
+%   - Runge phenomenon;
+%   - minimax approximation;
+%   - equioscillation;
+%   - approximation rates;
+%   - modulus of continuity;
+%   - Jackson-type estimates;
+%   - inverse approximation theorems;
+%   - piecewise polynomial approximation;
+%   - splines and B-splines;
+%   - rational and Pade approximation;
+%   - convolution and mollification;
+%   - Sobolev approximation;
+%   - Galerkin approximation;
+%   - finite element connections;
+%   - nonlinear and sparse approximation;
+%   - wavelet approximation;
+%   - stability and conditioning.
+%
+% Notes:
+%   - Numerical and Computational Mathematics develops interpolation,
+%     numerical approximation, finite elements, and implementation in
+%     greater computational detail.
+%   - Fourier Analysis develops trigonometric approximation and
+%     orthogonal expansions.
+%   - Functional Analysis supplies the abstract projection and density
+%     framework.
+%   - Distribution Theory supplies mollification and smooth
+%     approximation of generalized functions.
+%   - Asymptotic Analysis next studies approximations arising from
+%     limiting parameters and scale separation.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

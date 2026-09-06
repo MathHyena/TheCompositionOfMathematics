@@ -1,0 +1,4396 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.16 OPTIMAL CONTROL
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Optimal Control}
+\label{sec:optimal-control}
+
+\prerequisite{
+Optimization fundamentals, multivariable calculus, differential equations,
+dynamical systems, linear algebra, calculus of variations, dynamic
+programming, and basic probability for stochastic extensions.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define an optimal-control problem;
+    \item distinguish states, controls, trajectories, and parameters;
+    \item formulate continuous-time dynamical constraints;
+    \item distinguish running and terminal costs;
+    \item recognize fixed and free terminal conditions;
+    \item understand admissible controls;
+    \item distinguish open-loop and feedback control;
+    \item connect optimal control with calculus of variations;
+    \item formulate the Hamiltonian;
+    \item state Pontryagin's Maximum Principle under a consistent sign
+          convention;
+    \item derive costate equations;
+    \item interpret transversality conditions;
+    \item understand pointwise Hamiltonian minimization;
+    \item identify bang-bang controls;
+    \item recognize switching functions;
+    \item understand singular controls conceptually;
+    \item formulate linear-quadratic optimal-control problems;
+    \item derive the finite-horizon Riccati differential equation;
+    \item understand linear-quadratic regulation;
+    \item recognize infinite-horizon algebraic Riccati equations;
+    \item formulate discrete-time optimal-control problems;
+    \item derive Bellman equations;
+    \item understand value functions;
+    \item state the Hamilton--Jacobi--Bellman equation;
+    \item connect the HJB equation with feedback control;
+    \item distinguish PMP and dynamic-programming approaches;
+    \item formulate state and control constraints;
+    \item understand endpoint constraints;
+    \item recognize minimum-time control;
+    \item recognize minimum-energy control;
+    \item understand controllability as a feasibility issue conceptually;
+    \item understand terminal penalties and tracking objectives;
+    \item formulate trajectory-tracking problems;
+    \item recognize model predictive control;
+    \item distinguish direct and indirect numerical methods;
+    \item understand control parameterization and direct transcription;
+    \item recognize shooting methods;
+    \item understand collocation conceptually;
+    \item recognize stochastic optimal-control problems;
+    \item understand stochastic HJB equations conceptually;
+    \item recognize connections with reinforcement learning;
+    \item connect optimal control with robotics, aerospace, engineering,
+          economics, energy systems, biological systems, and finance.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Optimal Control?}
+\label{subsec:what-is-optimal-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Optimal control studies how a dynamical system should be influenced over
+time in order to optimize a performance criterion.
+
+A typical system is described by
+
+\[
+\boxed{
+\dot{x}(t)
+=
+f
+(
+x(t),
+u(t),
+t
+),
+}
+\]
+
+where
+
+\[
+x(t)
+=
+\text{state},
+\]
+
+and
+
+\[
+u(t)
+=
+\text{control}.
+\]
+
+The control is selected to optimize an objective while the state must obey
+the differential equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Variables}
+\label{subsec:optimal-control-state}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The state vector
+
+\[
+\boxed{
+x(t)
+\in
+\mathbb{R}^n
+}
+\]
+
+contains the information needed to describe the system at time \(t\).
+
+Examples include:
+
+\[
+\boxed{
+\text{position and velocity},
+}
+\]
+
+\[
+\boxed{
+\text{inventory levels},
+}
+\]
+
+\[
+\boxed{
+\text{population sizes},
+}
+\]
+
+\[
+\boxed{
+\text{temperature},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{capital stock}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Variables}
+\label{subsec:optimal-control-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The control
+
+\[
+\boxed{
+u(t)
+\in
+\mathbb{R}^m
+}
+\]
+
+represents quantities the decision maker can manipulate.
+
+Examples include:
+
+\[
+\boxed{
+\text{thrust},
+}
+\]
+
+\[
+\boxed{
+\text{steering input},
+}
+\]
+
+\[
+\boxed{
+\text{production rate},
+}
+\]
+
+\[
+\boxed{
+\text{drug dosage},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{investment rate}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Dynamics}
+\label{subsec:optimal-control-dynamics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The state evolves according to
+
+\[
+\boxed{
+\dot{x}
+=
+f(x,u,t).
+}
+\]
+
+Given an initial condition
+
+\[
+\boxed{
+x(t_0)
+=
+x_0,
+}
+\]
+
+and an admissible control \(u(t)\), the differential equation determines a
+state trajectory.
+
+Thus control decisions cannot choose states independently at each time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Admissible Controls}
+\label{subsec:admissible-controls}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A control is admissible if it satisfies all required conditions.
+
+For example,
+
+\[
+\boxed{
+u(t)\in U
+}
+\]
+
+for almost every \(t\), where \(U\) is the control constraint set.
+
+A simple bound is
+
+\[
+\boxed{
+u_{\min}
+\leq
+u(t)
+\leq
+u_{\max}.
+}
+\]
+
+Admissibility may also require measurability, integrability, or additional
+regularity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Bolza Problem}
+\label{subsec:bolza-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A standard finite-horizon optimal-control problem is
+
+\[
+\boxed{
+\min_{u(\cdot)}
+J[u]
+=
+\Phi
+(
+x(T),
+T
+)
++
+\int_{t_0}^{T}
+L
+(
+x(t),
+u(t),
+t
+)
+\,dt
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\dot{x}(t)
+=
+f
+(
+x(t),
+u(t),
+t
+),
+}
+\]
+
+and
+
+\[
+\boxed{
+x(t_0)=x_0.
+}
+\]
+
+This is called the Bolza form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Running Cost}
+\label{subsec:running-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The function
+
+\[
+\boxed{
+L(x,u,t)
+}
+\]
+
+is the running cost or stage cost.
+
+It accumulates cost continuously over time.
+
+Examples include:
+
+\[
+\boxed{
+\text{fuel consumption},
+}
+\]
+
+\[
+\boxed{
+\text{tracking error},
+}
+\]
+
+\[
+\boxed{
+\text{energy use},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{operating cost}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Terminal Cost}
+\label{subsec:terminal-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The function
+
+\[
+\boxed{
+\Phi(x(T),T)
+}
+\]
+
+is the terminal cost.
+
+It may penalize:
+
+\[
+\boxed{
+\text{final position error},
+}
+\]
+
+\[
+\boxed{
+\text{remaining inventory},
+}
+\]
+
+\[
+\boxed{
+\text{terminal wealth},
+}
+\]
+
+or other final-state outcomes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrange and Mayer Forms}
+\label{subsec:lagrange-mayer-forms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\Phi=0,
+\]
+
+the problem is in Lagrange form:
+
+\[
+\boxed{
+J
+=
+\int_{t_0}^{T}
+L(x,u,t)\,dt.
+}
+\]
+
+If
+
+\[
+L=0,
+\]
+
+the problem is in Mayer form:
+
+\[
+\boxed{
+J
+=
+\Phi(x(T),T).
+}
+\]
+
+Bolza form contains both.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed and Free Terminal State}
+\label{subsec:fixed-free-terminal-state}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A terminal state may be fixed:
+
+\[
+\boxed{
+x(T)=x_T.
+}
+\]
+
+Alternatively, \(x(T)\) may be free and penalized through
+
+\[
+\Phi(x(T),T).
+\]
+
+Different terminal conditions lead to different transversality conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed and Free Terminal Time}
+\label{subsec:fixed-free-terminal-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The final time \(T\) may also be fixed or optimized.
+
+If \(T\) is free, then time itself becomes part of the optimization
+problem.
+
+Minimum-time control is an important example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Open-Loop Control}
+\label{subsec:open-loop-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An open-loop control is specified as a function of time:
+
+\[
+\boxed{
+u=u(t).
+}
+\]
+
+Once the control trajectory is determined, it does not explicitly respond
+to deviations in the observed state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feedback Control}
+\label{subsec:feedback-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A feedback control uses the current state:
+
+\[
+\boxed{
+u(t)
+=
+\pi
+(
+x(t),
+t
+).
+}
+\]
+
+The function
+
+\[
+\pi
+\]
+
+is called a feedback policy.
+
+Feedback can react to disturbances or modeling errors because the control
+depends on the observed state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Open Loop Versus Feedback}
+\label{subsec:open-loop-versus-feedback}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Open-loop control specifies:
+
+\[
+\boxed{
+\text{what to do as a function of time}.
+}
+\]
+
+Feedback control specifies:
+
+\[
+\boxed{
+\text{what to do as a function of the current state}.
+}
+\]
+
+Dynamic programming naturally produces feedback policies.
+
+Pontryagin-based boundary-value methods often produce open-loop optimal
+trajectories.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Simple Optimal-Control Problem}
+\label{subsec:simple-optimal-control-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+\dot{x}=u,
+}
+\]
+
+with
+
+\[
+x(0)=x_0.
+\]
+
+Suppose the objective is
+
+\[
+\boxed{
+J
+=
+\frac12
+x(T)^2
++
+\frac12
+\int_0^T
+u(t)^2\,dt.
+}
+\]
+
+The control balances:
+
+\[
+\boxed{
+\text{terminal state error}
+}
+\]
+
+against
+
+\[
+\boxed{
+\text{control effort}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control and Calculus of Variations}
+\label{subsec:optimal-control-calculus-variations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Calculus of variations optimizes functionals such as
+
+\[
+\boxed{
+J[y]
+=
+\int
+F
+(
+t,
+y,
+\dot y
+)
+\,dt.
+}
+\]
+
+Optimal control extends this framework by introducing:
+
+\[
+\boxed{
+\text{state equations}
+}
+\]
+
+and explicit
+
+\[
+\boxed{
+\text{control variables}.
+}
+\]
+
+The state dynamics act as differential constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hamiltonian}
+\label{subsec:optimal-control-hamiltonian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the minimization convention used in this section, define the
+Hamiltonian
+
+\[
+\boxed{
+H(x,u,\lambda,t)
+=
+L(x,u,t)
++
+\lambda^T
+f(x,u,t),
+}
+\]
+
+where
+
+\[
+\boxed{
+\lambda(t)
+\in
+\mathbb{R}^n
+}
+\]
+
+is the costate or adjoint vector.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Costate Variables}
+\label{subsec:costate-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The costate variable acts as a time-dependent multiplier for the state
+equation.
+
+It measures, in a local sensitivity sense, the marginal value of changing
+the state along an optimal trajectory.
+
+Costates are analogous to Lagrange multipliers in finite-dimensional
+optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pontryagin's Principle: Minimization Convention}
+\label{subsec:pontryagin-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\min
+\left[
+\Phi(x(T))
++
+\int_{t_0}^{T}
+L(x,u,t)\,dt
+\right]
+\]
+
+subject to
+
+\[
+\dot{x}=f(x,u,t).
+\]
+
+Under appropriate regularity and optimality assumptions, an optimal
+trajectory satisfies necessary conditions involving
+
+\[
+H
+=
+L+\lambda^Tf.
+\]
+
+The principal equations are
+
+\[
+\boxed{
+\dot{x}
+=
+\frac{\partial H}{\partial\lambda}
+=
+f(x,u,t),
+}
+\]
+
+\[
+\boxed{
+\dot{\lambda}
+=
+-
+\frac{\partial H}{\partial x},
+}
+\]
+
+and, for an interior control,
+
+\[
+\boxed{
+\frac{\partial H}{\partial u}
+=
+0.
+}
+\]
+
+More generally,
+
+\[
+\boxed{
+u^*(t)
+\in
+\operatorname*{arg\,min}_{u\in U}
+H
+(
+x^*(t),
+u,
+\lambda^*(t),
+t
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sign Conventions}
+\label{subsec:optimal-control-sign-conventions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Different texts define the Hamiltonian differently.
+
+This section uses
+
+\[
+\boxed{
+H
+=
+L+\lambda^Tf
+}
+\]
+
+for a minimization problem and therefore minimizes \(H\) with respect to
+the control.
+
+Another common convention uses
+
+\[
+H
+=
+-L+\lambda^Tf
+\]
+
+and maximizes the Hamiltonian.
+
+Both conventions are valid when used consistently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Equation From the Hamiltonian}
+\label{subsec:hamiltonian-state-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because
+
+\[
+H
+=
+L+\lambda^Tf,
+\]
+
+we have
+
+\[
+\frac{\partial H}{\partial\lambda}
+=
+f.
+\]
+
+Thus the state equation is recovered as
+
+\[
+\boxed{
+\dot{x}
+=
+H_{\lambda}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Costate Equation}
+\label{subsec:costate-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The costate equation is
+
+\[
+\boxed{
+\dot{\lambda}
+=
+-
+H_x.
+}
+\]
+
+In components,
+
+\[
+\boxed{
+\dot{\lambda}_i
+=
+-
+\frac{\partial H}{\partial x_i}.
+}
+\]
+
+This differential equation is typically solved backward from a terminal
+condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Terminal Transversality Condition}
+\label{subsec:terminal-transversality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If terminal state \(x(T)\) is free and terminal time \(T\) is fixed, then
+
+\[
+\boxed{
+\lambda(T)
+=
+\nabla_x
+\Phi
+(
+x(T)
+).
+}
+\]
+
+If the terminal state is fixed, this costate terminal condition is replaced
+by the corresponding endpoint restriction and multiplier structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interior Control Condition}
+\label{subsec:interior-control-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the optimal control lies in the interior of the admissible set and the
+Hamiltonian is differentiable with respect to \(u\), then
+
+\[
+\boxed{
+H_u
+=
+0.
+}
+\]
+
+This is analogous to a stationarity condition in ordinary optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Constraints}
+\label{subsec:optimal-control-control-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+u_{\min}
+\leq
+u(t)
+\leq
+u_{\max}.
+}
+\]
+
+Then the stationarity equation
+
+\[
+H_u=0
+\]
+
+may produce an inadmissible value.
+
+The correct condition is
+
+\[
+\boxed{
+u^*(t)
+\in
+\operatorname*{arg\,min}_{
+u_{\min}\leq u\leq u_{\max}
+}
+H.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Quadratic Control Effort}
+\label{subsec:worked-quadratic-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Hamiltonian Stationarity}
+
+Suppose
+
+\[
+\dot{x}=u,
+\]
+
+and
+
+\[
+J
+=
+\frac12x(T)^2
++
+\frac12
+\int_0^T
+u^2\,dt.
+\]
+
+The Hamiltonian is
+
+\[
+H
+=
+\frac12u^2
++
+\lambda u.
+\]
+
+The stationarity condition is
+
+\[
+\frac{\partial H}{\partial u}
+=
+u+\lambda
+=
+0.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+u^*
+=
+-\lambda.
+}
+\]
+\end{answerbox}
+
+Because \(H\) does not depend explicitly on \(x\),
+
+\[
+\dot{\lambda}=0.
+\]
+
+Therefore the costate is constant.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Solving the Previous Example}
+\label{subsec:solving-quadratic-control-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since
+
+\[
+\dot{\lambda}=0,
+\]
+
+write
+
+\[
+\lambda(t)=c.
+\]
+
+Then
+
+\[
+u^*=-c.
+\]
+
+The state satisfies
+
+\[
+\dot{x}=-c,
+\]
+
+so
+
+\[
+x(t)
+=
+x_0-ct.
+\]
+
+The terminal condition is
+
+\[
+\lambda(T)
+=
+x(T).
+\]
+
+Therefore,
+
+\[
+c
+=
+x_0-cT.
+\]
+
+Thus,
+
+\[
+c(1+T)
+=
+x_0,
+\]
+
+so
+
+\[
+\boxed{
+c
+=
+\frac{x_0}{1+T}.
+}
+\]
+
+Hence,
+
+\[
+\boxed{
+u^*(t)
+=
+-
+\frac{x_0}{1+T}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal State Trajectory}
+\label{subsec:optimal-state-trajectory-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Substituting the optimal control,
+
+\[
+\dot{x}
+=
+-
+\frac{x_0}{1+T}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+x^*(t)
+=
+x_0
+-
+\frac{x_0}{1+T}t.
+}
+\]
+
+At the final time,
+
+\[
+\boxed{
+x^*(T)
+=
+\frac{x_0}{1+T}.
+}
+\]
+
+The terminal state is not forced exactly to zero because doing so would
+require additional control effort.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Point Boundary-Value Problem}
+\label{subsec:two-point-boundary-value}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pontryagin conditions frequently create differential equations with
+boundary conditions at both ends of the time interval:
+
+\[
+\boxed{
+x(t_0)=x_0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\lambda(T)
+=
+\nabla\Phi(x(T)).
+}
+\]
+
+Such systems are called two-point boundary-value problems.
+
+They are generally more difficult than ordinary initial-value problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hamiltonian Conservation}
+\label{subsec:hamiltonian-conservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sufficiently smooth autonomous optimal-control problems, where the
+Hamiltonian has no explicit time dependence,
+
+\[
+\boxed{
+\frac{\partial H}{\partial t}=0,
+}
+\]
+
+the Hamiltonian is constant along suitable unconstrained extremals.
+
+This property depends on the precise optimal-control setting and
+regularity assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Free Final Time}
+\label{subsec:free-final-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If terminal time \(T\) is free, an additional transversality condition
+appears.
+
+For the convention
+
+\[
+H=L+\lambda^Tf
+\]
+
+and terminal cost
+
+\[
+\Phi(x(T),T),
+\]
+
+a standard condition is
+
+\[
+\boxed{
+H(T)
++
+\frac{\partial\Phi}{\partial T}
+=
+0,
+}
+\]
+
+subject to the assumptions of the specific endpoint problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum-Time Control}
+\label{subsec:minimum-time-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A minimum-time problem seeks
+
+\[
+\boxed{
+\min T
+}
+\]
+
+subject to dynamical constraints and a target condition.
+
+It can be written with running cost
+
+\[
+\boxed{
+L=1,
+}
+\]
+
+so that
+
+\[
+\boxed{
+J
+=
+\int_0^T1\,dt
+=
+T.
+}
+\]
+
+Control bounds are often essential in minimum-time problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bang-Bang Control}
+\label{subsec:bang-bang-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the Hamiltonian is linear in a bounded scalar control:
+
+\[
+\boxed{
+H
+=
+H_0(x,\lambda,t)
++
+\psi(t)u,
+}
+\]
+
+with
+
+\[
+u_{\min}
+\leq
+u
+\leq
+u_{\max}.
+\]
+
+To minimize \(H\),
+
+\[
+\boxed{
+u^*
+=
+u_{\min}
+}
+\]
+
+when
+
+\[
+\psi(t)>0,
+\]
+
+and
+
+\[
+\boxed{
+u^*
+=
+u_{\max}
+}
+\]
+
+when
+
+\[
+\psi(t)<0.
+\]
+
+Thus the control switches between its extreme values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Switching Function}
+\label{subsec:switching-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The coefficient
+
+\[
+\boxed{
+\psi(t)
+=
+\frac{\partial H}{\partial u}
+}
+\]
+
+for a Hamiltonian affine in \(u\) is called a switching function.
+
+Its sign determines which boundary control minimizes the Hamiltonian.
+
+A switching time occurs when the sign changes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Singular Arcs}
+\label{subsec:singular-arcs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\boxed{
+\psi(t)=0
+}
+\]
+
+over an interval, the first-order Hamiltonian condition does not determine
+the control directly.
+
+Such an interval may be a singular arc.
+
+Higher derivatives of the switching condition and additional optimality
+conditions may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bang-Bang Decision}
+\label{subsec:worked-bang-bang}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Bounded Linear Hamiltonian}
+
+Suppose
+
+\[
+H
+=
+5
++
+3u,
+\]
+
+with
+
+\[
+-2
+\leq
+u
+\leq
+2.
+\]
+
+Because the coefficient of \(u\) is positive, minimizing \(H\) requires
+the smallest admissible control.
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+u^*=-2.
+}
+\]
+\end{answerbox}
+
+If instead the coefficient were negative, the minimizing control would be
+the upper bound.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum-Energy Control}
+\label{subsec:minimum-energy-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common objective is
+
+\[
+\boxed{
+J
+=
+\frac12
+\int_0^T
+u(t)^Tu(t)
+\,dt.
+}
+\]
+
+This minimizes control energy or effort.
+
+Such objectives strongly favor smooth moderate controls rather than
+bang-bang inputs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tracking Problems}
+\label{subsec:optimal-control-tracking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a desired state trajectory is
+
+\[
+x_r(t).
+\]
+
+A quadratic tracking objective is
+
+\[
+\boxed{
+J
+=
+\frac12
+(
+x(T)-x_r(T)
+)^T
+F
+(
+x(T)-x_r(T)
+)
+}
+\]
+
+\[
+\boxed{
+\phantom{J={}}
++
+\frac12
+\int_0^T
+\left[
+(
+x-x_r
+)^T
+Q
+(
+x-x_r
+)
++
+u^TRu
+\right]dt.
+}
+\]
+
+This balances tracking accuracy and control effort.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear-Quadratic Regulator}
+\label{subsec:linear-quadratic-regulator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider the linear system
+
+\[
+\boxed{
+\dot{x}
+=
+Ax+Bu,
+}
+\]
+
+with quadratic objective
+
+\[
+\boxed{
+J
+=
+\frac12x(T)^TFx(T)
++
+\frac12
+\int_0^T
+\left(
+x^TQx
++
+u^TRu
+\right)dt.
+}
+\]
+
+Assume typically
+
+\[
+\boxed{
+Q\succeq0,
+\qquad
+F\succeq0,
+\qquad
+R\succ0.
+}
+\]
+
+This is the finite-horizon Linear-Quadratic Regulator, abbreviated LQR.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LQR Hamiltonian}
+\label{subsec:lqr-hamiltonian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Hamiltonian is
+
+\[
+\boxed{
+H
+=
+\frac12x^TQx
++
+\frac12u^TRu
++
+\lambda^T
+(
+Ax+Bu
+).
+}
+\]
+
+Stationarity with respect to \(u\) gives
+
+\[
+Ru
++
+B^T\lambda
+=
+0.
+\]
+
+Therefore,
+
+\[
+\boxed{
+u^*
+=
+-
+R^{-1}B^T\lambda.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LQR Costate Equation}
+\label{subsec:lqr-costate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The costate equation is
+
+\[
+\dot{\lambda}
+=
+-
+Qx
+-
+A^T\lambda.
+\]
+
+The terminal condition is
+
+\[
+\boxed{
+\lambda(T)
+=
+Fx(T).
+}
+\]
+
+This suggests a relationship of the form
+
+\[
+\boxed{
+\lambda(t)
+=
+P(t)x(t).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Riccati Differential Equation}
+\label{subsec:riccati-differential-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Substituting
+
+\[
+\lambda=Px
+\]
+
+into the LQR conditions yields
+
+\[
+\boxed{
+-\dot{P}
+=
+A^TP
++
+PA
+-
+PBR^{-1}B^TP
++
+Q,
+}
+\]
+
+with terminal condition
+
+\[
+\boxed{
+P(T)=F.
+}
+\]
+
+This is the continuous-time Riccati differential equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LQR Feedback Law}
+\label{subsec:lqr-feedback-law}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The optimal control becomes
+
+\[
+\boxed{
+u^*(t)
+=
+-
+R^{-1}
+B^T
+P(t)
+x(t).
+}
+\]
+
+Define
+
+\[
+\boxed{
+K(t)
+=
+R^{-1}B^TP(t).
+}
+\]
+
+Then
+
+\[
+\boxed{
+u^*(t)
+=
+-K(t)x(t).
+}
+\]
+
+Thus finite-horizon LQR naturally produces linear state feedback.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of LQR Weights}
+\label{subsec:lqr-weight-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The matrix
+
+\[
+Q
+\]
+
+penalizes state deviation.
+
+The matrix
+
+\[
+R
+\]
+
+penalizes control effort.
+
+Larger state penalties encourage more aggressive correction.
+
+Larger control penalties discourage large inputs.
+
+Thus LQR explicitly models a performance-effort tradeoff.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scalar LQR Example}
+\label{subsec:scalar-lqr-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\dot{x}
+=
+ax+bu,
+\]
+
+and
+
+\[
+J
+=
+\frac12Fx(T)^2
++
+\frac12
+\int_0^T
+\left(
+qx^2+ru^2
+\right)dt.
+\]
+
+The Riccati equation becomes
+
+\[
+\boxed{
+-\dot{P}
+=
+2aP
+-
+\frac{b^2}{r}P^2
++
+q,
+}
+\]
+
+with
+
+\[
+\boxed{
+P(T)=F.
+}
+\]
+
+The feedback law is
+
+\[
+\boxed{
+u^*
+=
+-
+\frac{b}{r}
+Px.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infinite-Horizon LQR}
+\label{subsec:infinite-horizon-lqr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+J
+=
+\frac12
+\int_0^\infty
+\left(
+x^TQx
++
+u^TRu
+\right)dt.
+}
+\]
+
+Under appropriate stabilizability and detectability assumptions, the
+steady-state matrix \(P\) satisfies the algebraic Riccati equation
+
+\[
+\boxed{
+A^TP
++
+PA
+-
+PBR^{-1}B^TP
++
+Q
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infinite-Horizon Feedback}
+\label{subsec:infinite-horizon-feedback}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The resulting feedback law is
+
+\[
+\boxed{
+u^*
+=
+-Kx,
+}
+\]
+
+where
+
+\[
+\boxed{
+K
+=
+R^{-1}B^TP.
+}
+\]
+
+Unlike finite-horizon LQR, \(K\) is constant when the system and objective
+are time invariant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Controllability}
+\label{subsec:optimal-control-controllability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Before optimizing a control problem, one must determine whether the desired
+state can be reached at all.
+
+For the linear system
+
+\[
+\dot{x}=Ax+Bu,
+\]
+
+define the controllability matrix
+
+\[
+\boxed{
+\mathcal{C}
+=
+\begin{bmatrix}
+B
+&
+AB
+&
+A^2B
+&
+\cdots
+&
+A^{n-1}B
+\end{bmatrix}.
+}
+\]
+
+The pair \((A,B)\) is controllable if
+
+\[
+\boxed{
+\operatorname{rank}
+(
+\mathcal{C}
+)
+=
+n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feasibility Before Optimality}
+\label{subsec:feasibility-before-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An optimal-control objective cannot overcome impossible dynamics.
+
+Thus the logical order is:
+
+\[
+\boxed{
+\text{Can the system reach the required state?}
+}
+\]
+
+before asking:
+
+\[
+\boxed{
+\text{What is the best way to reach it?}
+}
+\]
+
+Controllability is therefore fundamentally a feasibility concept.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete-Time Optimal Control}
+\label{subsec:discrete-time-optimal-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrete-time system has dynamics
+
+\[
+\boxed{
+x_{k+1}
+=
+f_k
+(
+x_k,
+u_k
+).
+}
+\]
+
+A finite-horizon objective may be
+
+\[
+\boxed{
+J
+=
+\Phi(x_N)
++
+\sum_{k=0}^{N-1}
+L_k
+(
+x_k,
+u_k
+).
+}
+\]
+
+This form connects directly with dynamic programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bellman Principle}
+\label{subsec:optimal-control-bellman-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bellman's principle of optimality states that the remaining decisions of an
+optimal policy must themselves be optimal for the state reached after the
+first decision.
+
+This produces recursive optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete-Time Value Function}
+\label{subsec:discrete-value-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+V_k(x)
+=
+\text{minimum future cost starting from state }x\text{ at stage }k.
+}
+\]
+
+Then
+
+\[
+\boxed{
+V_N(x)
+=
+\Phi(x).
+}
+\]
+
+The Bellman recursion is
+
+\[
+\boxed{
+V_k(x)
+=
+\min_{u\in U_k(x)}
+\left[
+L_k(x,u)
++
+V_{k+1}
+(
+f_k(x,u)
+)
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feedback Policy From Bellman Recursion}
+\label{subsec:feedback-from-bellman}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The minimizing control is
+
+\[
+\boxed{
+u_k^*(x)
+\in
+\operatorname*{arg\,min}_{u}
+\left[
+L_k(x,u)
++
+V_{k+1}
+(
+f_k(x,u)
+)
+\right].
+}
+\]
+
+Thus dynamic programming gives a feedback policy directly:
+
+\[
+\boxed{
+u_k^*
+=
+\pi_k(x_k).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continuous-Time Value Function}
+\label{subsec:continuous-value-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For continuous time, define
+
+\[
+\boxed{
+V(x,t)
+=
+\inf_{u(\cdot)}
+\left[
+\Phi(x(T))
++
+\int_t^T
+L
+(
+x(s),
+u(s),
+s
+)
+\,ds
+\right],
+}
+\]
+
+where the trajectory starts from state \(x\) at time \(t\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hamilton--Jacobi--Bellman Equation}
+\label{subsec:hjb-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under appropriate smoothness assumptions, the value function satisfies the
+Hamilton--Jacobi--Bellman equation
+
+\[
+\boxed{
+-
+V_t(x,t)
+=
+\min_{u\in U}
+\left\{
+L(x,u,t)
++
+\nabla_xV(x,t)^T
+f(x,u,t)
+\right\}.
+}
+\]
+
+The terminal condition is
+
+\[
+\boxed{
+V(x,T)
+=
+\Phi(x).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{HJB as an Optimization Equation}
+\label{subsec:hjb-optimization-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The expression
+
+\[
+L
++
+\nabla V^Tf
+\]
+
+has the same structure as the Hamiltonian
+
+\[
+H
+=
+L+\lambda^Tf.
+\]
+
+Indeed, when the value function is sufficiently smooth,
+
+\[
+\boxed{
+\lambda
+=
+\nabla_xV
+}
+\]
+
+along an optimal trajectory under standard conditions.
+
+Thus PMP and HJB are closely related.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Feedback From HJB}
+\label{subsec:optimal-feedback-hjb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the minimizer is unique,
+
+\[
+\boxed{
+u^*(x,t)
+=
+\operatorname*{arg\,min}_{u\in U}
+\left\{
+L(x,u,t)
++
+\nabla V(x,t)^Tf(x,u,t)
+\right\}.
+}
+\]
+
+Therefore HJB produces an optimal control as a function of the state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: HJB for an Integrator}
+\label{subsec:worked-hjb-integrator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Quadratic Control of an Integrator}
+
+Consider
+
+\[
+\dot{x}=u,
+\]
+
+with
+
+\[
+J
+=
+\frac12x(T)^2
++
+\frac12
+\int_t^T
+u^2\,ds.
+\]
+
+The HJB equation is
+
+\[
+-V_t
+=
+\min_u
+\left\{
+\frac12u^2
++
+V_xu
+\right\}.
+\]
+
+Differentiate with respect to \(u\):
+
+\[
+u+V_x=0.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+u^*
+=
+-V_x.
+}
+\]
+\end{answerbox}
+
+Substitution gives
+
+\[
+\boxed{
+-V_t
+=
+-\frac12V_x^2.
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+V_t
+=
+\frac12V_x^2.
+}
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PMP Versus HJB}
+\label{subsec:pmp-versus-hjb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pontryagin's principle gives necessary conditions along candidate optimal
+trajectories.
+
+The HJB equation characterizes the optimal value function under suitable
+conditions and produces state-feedback policies.
+
+Thus:
+
+\[
+\boxed{
+\text{PMP}
+\rightarrow
+\text{trajectory-based necessary conditions},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{HJB}
+\rightarrow
+\text{value-function dynamic programming}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Curse of Dimensionality}
+\label{subsec:optimal-control-curse-dimensionality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the state has dimension \(n\), numerically approximating
+
+\[
+V(x,t)
+\]
+
+on a grid can require exponentially many state points.
+
+This is the curse of dimensionality.
+
+It makes classical HJB methods difficult for high-dimensional systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Constraints}
+\label{subsec:optimal-control-state-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A state may be required to satisfy
+
+\[
+\boxed{
+g(x(t),t)
+\leq
+0.
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{altitude limits},
+}
+\]
+
+\[
+\boxed{
+\text{temperature limits},
+}
+\]
+
+\[
+\boxed{
+\text{inventory bounds},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{safety regions}.
+}
+\]
+
+State constraints introduce additional multiplier and boundary conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Path Constraints}
+\label{subsec:path-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A general path constraint has form
+
+\[
+\boxed{
+g
+(
+x(t),
+u(t),
+t
+)
+\leq
+0.
+}
+\]
+
+Unlike endpoint constraints, it must hold throughout the entire time
+interval.
+
+Examples include actuator limits and safety constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Endpoint Constraints}
+\label{subsec:endpoint-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An endpoint constraint may have form
+
+\[
+\boxed{
+\Psi
+(
+x(t_0),
+x(T),
+T
+)
+=
+0.
+}
+\]
+
+Endpoint multipliers then modify the transversality conditions.
+
+Optimal-control boundary conditions must therefore be derived from the
+specific endpoint structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Path-Constrained Hamiltonian}
+\label{subsec:path-constrained-hamiltonian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For inequality path constraint
+
+\[
+g(x,u,t)\leq0,
+\]
+
+one may introduce multiplier
+
+\[
+\mu(t)\geq0.
+\]
+
+An augmented Hamiltonian has form
+
+\[
+\boxed{
+\mathcal{H}
+=
+L
++
+\lambda^Tf
++
+\mu^Tg.
+}
+\]
+
+Complementarity conditions resemble finite-dimensional KKT conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complementarity Along a Trajectory}
+\label{subsec:path-complementarity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For suitable path inequality constraints,
+
+\[
+\boxed{
+\mu_i(t)\geq0,
+}
+\]
+
+\[
+\boxed{
+g_i(x,u,t)\leq0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\mu_i(t)
+g_i(x,u,t)
+=
+0.
+}
+\]
+
+Thus inactive constraints have zero multipliers, while active constraints
+may influence the optimal control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Terminal-State Penalties}
+\label{subsec:terminal-state-penalties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of requiring
+
+\[
+x(T)=x_T
+\]
+
+exactly, one may penalize terminal error:
+
+\[
+\boxed{
+\Phi(x(T))
+=
+\frac12
+(
+x(T)-x_T
+)^T
+F
+(
+x(T)-x_T
+).
+}
+\]
+
+This permits a tradeoff between final accuracy and control effort.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hard Versus Soft Constraints}
+\label{subsec:hard-versus-soft-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A hard constraint must be satisfied:
+
+\[
+\boxed{
+g(x,u,t)\leq0.
+}
+\]
+
+A soft constraint can be violated at a penalty.
+
+For example,
+
+\[
+\boxed{
+J
+=
+J_0
++
+\rho
+\int
+[g(x,u,t)]_+^2dt.
+}
+\]
+
+Soft constraints can improve numerical feasibility but no longer guarantee
+exact satisfaction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discounted Infinite-Horizon Control}
+\label{subsec:discounted-infinite-horizon-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In economics and other applications, future costs may be discounted:
+
+\[
+\boxed{
+J
+=
+\int_0^\infty
+e^{-\rho t}
+L(x(t),u(t))
+\,dt,
+}
+\]
+
+where
+
+\[
+\boxed{
+\rho>0
+}
+\]
+
+is a discount rate.
+
+Future costs receive less weight than immediate costs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control in Economics}
+\label{subsec:optimal-control-economics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An economic state might be capital
+
+\[
+K(t),
+\]
+
+with dynamics
+
+\[
+\boxed{
+\dot{K}
+=
+F(K)
+-
+C
+-
+\delta K,
+}
+\]
+
+where
+
+\[
+C(t)
+\]
+
+is consumption.
+
+An objective may maximize discounted utility:
+
+\[
+\boxed{
+\max
+\int_0^\infty
+e^{-\rho t}
+U(C(t))
+\,dt.
+}
+\]
+
+Optimal-control methods then determine the consumption path.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Current-Value Hamiltonian Preview}
+\label{subsec:current-value-hamiltonian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For discounted economic problems, one may transform the costate and define
+a current-value Hamiltonian.
+
+This removes the explicit discount factor from some first-order
+conditions.
+
+Care is required because the current-value costate equation differs from
+the ordinary present-value equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control in Biological Systems}
+\label{subsec:optimal-control-biological}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Optimal control can model interventions in systems such as:
+
+\[
+\boxed{
+\text{epidemics},
+}
+\]
+
+\[
+\boxed{
+\text{harvesting},
+}
+\]
+
+\[
+\boxed{
+\text{drug treatment},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{population management}.
+}
+\]
+
+The state equations are often nonlinear differential equations.
+
+Controls represent intervention intensity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Epidemic-Control Example}
+\label{subsec:epidemic-control-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose infection level is \(I(t)\) and intervention intensity is \(u(t)\).
+
+A schematic objective could be
+
+\[
+\boxed{
+J
+=
+\int_0^T
+\left[
+aI(t)^2
++
+bu(t)^2
+\right]dt.
+}
+\]
+
+The first term penalizes infection.
+
+The second penalizes intervention cost.
+
+The state equations constrain how intervention changes epidemic dynamics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trajectory Optimization}
+\label{subsec:trajectory-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Trajectory optimization is optimal control applied to motion planning.
+
+The state may contain
+
+\[
+\boxed{
+\text{position}
++
+\text{velocity}
++
+\text{orientation}.
+}
+\]
+
+Controls may include forces, torques, steering, or thrust.
+
+Constraints may enforce:
+
+\[
+\boxed{
+\text{dynamics},
+}
+\]
+
+\[
+\boxed{
+\text{obstacle avoidance},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{actuator limits}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Predictive Control}
+\label{subsec:model-predictive-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Model Predictive Control, abbreviated MPC, repeatedly solves a finite-
+horizon optimal-control problem.
+
+At each update:
+
+\begin{enumerate}
+    \item measure or estimate the current state;
+    \item solve a finite-horizon control problem;
+    \item apply only the first control action;
+    \item advance the system;
+    \item measure the new state;
+    \item solve again.
+\end{enumerate}
+
+This is also called receding-horizon control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why MPC Uses Feedback}
+\label{subsec:why-mpc-feedback}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Although each finite-horizon optimization produces an open-loop sequence,
+MPC repeatedly resolves the problem using the current measured state.
+
+Thus the overall implementation creates feedback.
+
+It can respond to:
+
+\[
+\boxed{
+\text{disturbances},
+}
+\]
+
+\[
+\boxed{
+\text{forecast changes},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{model mismatch}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MPC Objective}
+\label{subsec:mpc-objective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrete-time MPC objective may be
+
+\[
+\boxed{
+\sum_{k=0}^{N-1}
+\left[
+(x_k-x_r)^TQ(x_k-x_r)
++
+u_k^TRu_k
+\right]
++
+(x_N-x_r)^TP(x_N-x_r).
+}
+\]
+
+Constraints are imposed over the prediction horizon.
+
+Only \(u_0\) is implemented before optimization is repeated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constrained MPC}
+\label{subsec:constrained-mpc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MPC is particularly useful because it can handle constraints such as
+
+\[
+\boxed{
+u_{\min}\leq u_k\leq u_{\max},
+}
+\]
+
+and
+
+\[
+\boxed{
+x_{\min}\leq x_k\leq x_{\max}.
+}
+\]
+
+For linear dynamics and quadratic costs with linear constraints, each MPC
+step may become a quadratic program.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Indirect Numerical Methods}
+\label{subsec:indirect-optimal-control-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Indirect methods first derive necessary optimality conditions.
+
+One then solves:
+
+\[
+\boxed{
+\text{state equations}
++
+\text{costate equations}
++
+\text{optimality conditions}
++
+\text{boundary conditions}.
+}
+\]
+
+Examples include shooting and multiple-shooting methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shooting Method}
+\label{subsec:shooting-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a shooting method, unknown initial costate values are guessed.
+
+The state-costate differential equations are integrated.
+
+The resulting terminal error is used to update the initial costate guess.
+
+Thus a boundary-value problem is transformed into a nonlinear root-finding
+problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity of Shooting Methods}
+\label{subsec:shooting-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Shooting can be extremely sensitive to the initial costate guess.
+
+Small changes in the initial adjoint can lead to large terminal-state
+changes.
+
+This is especially problematic for:
+
+\[
+\boxed{
+\text{long horizons},
+}
+\]
+
+\[
+\boxed{
+\text{unstable dynamics},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{strong nonlinearities}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Shooting}
+\label{subsec:multiple-shooting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multiple shooting divides the horizon into several intervals.
+
+Separate initial states or costates are introduced for each interval.
+
+Continuity constraints then connect neighboring segments.
+
+This often improves numerical stability compared with single shooting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Direct Numerical Methods}
+\label{subsec:direct-optimal-control-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Direct methods discretize the control problem before deriving optimization
+conditions.
+
+The result is a finite-dimensional nonlinear program or quadratic program.
+
+Thus:
+
+\[
+\boxed{
+\text{optimal control problem}
+\rightarrow
+\text{nonlinear programming problem}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Parameterization}
+\label{subsec:control-parameterization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximate the control by finitely many parameters.
+
+For piecewise-constant control,
+
+\[
+\boxed{
+u(t)
+=
+u_k,
+\qquad
+t_k\leq t<t_{k+1}.
+}
+\]
+
+The decision variables become
+
+\[
+\boxed{
+u_0,u_1,\ldots,u_{N-1}.
+}
+\]
+
+The state equations are integrated numerically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Direct Transcription}
+\label{subsec:direct-transcription}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Direct transcription discretizes both states and controls.
+
+For example, Euler discretization gives
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
++
+h
+f(x_k,u_k,t_k).
+}
+\]
+
+These equations become equality constraints in a finite-dimensional
+optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trapezoidal Transcription}
+\label{subsec:trapezoidal-transcription}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A more accurate approximation is
+
+\[
+\boxed{
+x_{k+1}
+-
+x_k
+=
+\frac{h}{2}
+\left[
+f(x_k,u_k,t_k)
++
+f(x_{k+1},u_{k+1},t_{k+1})
+\right].
+}
+\]
+
+This is based on the trapezoidal integration rule.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Collocation}
+\label{subsec:optimal-control-collocation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Collocation approximates the state trajectory with polynomial functions
+and enforces the differential equation at selected collocation points.
+
+High-order collocation methods can achieve accurate trajectories with
+relatively few mesh intervals.
+
+They are widely used in practical trajectory optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Direct Versus Indirect Methods}
+\label{subsec:direct-versus-indirect}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Indirect methods:
+
+\[
+\boxed{
+\text{derive optimality equations first}.
+}
+\]
+
+Direct methods:
+
+\[
+\boxed{
+\text{discretize first and solve numerically}.
+}
+\]
+
+Indirect methods can provide high accuracy and analytical insight.
+
+Direct methods are usually easier to apply to complicated constrained
+problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mesh Refinement}
+\label{subsec:optimal-control-mesh-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A direct solution depends on the discretization mesh.
+
+After solving, one may:
+
+\begin{enumerate}
+    \item estimate discretization error;
+    \item refine intervals with large error;
+    \item resolve the optimization problem;
+    \item repeat until accuracy is acceptable.
+\end{enumerate}
+
+This is called mesh refinement.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Saturation}
+\label{subsec:control-saturation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A computed unconstrained control may exceed physical actuator limits.
+
+For example,
+
+\[
+u^*_{\mathrm{free}}
+=
+-Kx
+\]
+
+may violate
+
+\[
+u_{\min}
+\leq
+u
+\leq
+u_{\max}.
+\]
+
+Simply clipping the control may not preserve global optimality.
+
+The bounds should ideally be included in the optimization problem itself.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Estimation and Control}
+\label{subsec:state-estimation-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Feedback control requires knowledge of the state.
+
+If the entire state is not measured, an estimator may be used.
+
+This leads to the combination of:
+
+\[
+\boxed{
+\text{state estimation}
++
+\text{optimal control}.
+}
+\]
+
+For linear Gaussian systems, the Kalman filter and LQR combine into the
+Linear-Quadratic-Gaussian framework under standard assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Optimal Control}
+\label{subsec:stochastic-optimal-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose dynamics include random disturbances:
+
+\[
+\boxed{
+dX_t
+=
+b
+(
+X_t,
+u_t,t
+)
+\,dt
++
+\sigma
+(
+X_t,u_t,t
+)
+\,dW_t,
+}
+\]
+
+where \(W_t\) is Brownian motion.
+
+The objective may be
+
+\[
+\boxed{
+\min
+\mathbb{E}
+\left[
+\Phi(X_T)
++
+\int_t^T
+L(X_s,u_s,s)\,ds
+\right].
+}
+\]
+
+This is a stochastic optimal-control problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic HJB Equation}
+\label{subsec:stochastic-hjb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under appropriate smoothness assumptions, the value function can satisfy
+
+\[
+\boxed{
+-
+V_t
+=
+\min_u
+\left\{
+L
++
+\nabla V^T b
++
+\frac12
+\operatorname{tr}
+\left(
+\sigma\sigma^T
+\nabla^2V
+\right)
+\right\}.
+}
+\]
+
+The second-derivative term arises from the diffusion process.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deterministic HJB as a Special Case}
+\label{subsec:deterministic-hjb-special-case}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\boxed{
+\sigma=0,
+}
+\]
+
+the diffusion term disappears.
+
+Then the stochastic HJB equation reduces to
+
+\[
+\boxed{
+-
+V_t
+=
+\min_u
+\left\{
+L
++
+\nabla V^Tf
+\right\},
+}
+\]
+
+which is the deterministic HJB equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear-Quadratic-Gaussian Control Preview}
+\label{subsec:lqg-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Linear-Quadratic-Gaussian control combines:
+
+\[
+\boxed{
+\text{linear dynamics},
+}
+\]
+
+\[
+\boxed{
+\text{quadratic costs},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Gaussian disturbances and measurement noise}.
+}
+\]
+
+Under standard assumptions, optimal state estimation and optimal linear
+feedback can be designed separately.
+
+This is known as the separation principle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control and Reinforcement Learning}
+\label{subsec:optimal-control-reinforcement-learning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming in optimal control and reinforcement learning share
+the Bellman principle.
+
+Optimal control usually begins with a known mathematical model.
+
+Reinforcement learning may instead learn value functions or policies from
+interaction or data.
+
+The mathematical bridge includes:
+
+\[
+\boxed{
+\text{value functions},
+}
+\]
+
+\[
+\boxed{
+\text{Bellman equations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{policies}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Policy Iteration Preview}
+\label{subsec:policy-iteration-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Policy iteration alternates between:
+
+\[
+\boxed{
+\text{policy evaluation}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{policy improvement}.
+}
+\]
+
+Given policy \(\pi\), first evaluate its value.
+
+Then choose controls that improve the Bellman objective.
+
+Repeat until the policy stabilizes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Value Iteration Preview}
+\label{subsec:value-iteration-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Value iteration repeatedly applies a Bellman operator.
+
+For discrete time,
+
+\[
+\boxed{
+V_{k+1}(x)
+=
+\min_u
+\left[
+L(x,u)
++
+\gamma
+V_k
+(
+f(x,u)
+)
+\right]
+}
+\]
+
+in a discounted deterministic setting.
+
+The method seeks the fixed point of the Bellman equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control and Optimization}
+\label{subsec:optimal-control-optimization-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary optimization selects a finite-dimensional variable:
+
+\[
+\boxed{
+x\in\mathbb{R}^n.
+}
+\]
+
+Optimal control selects an entire function:
+
+\[
+\boxed{
+u(\cdot).
+}
+\]
+
+Thus optimal control is an infinite-dimensional optimization problem with
+differential constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control and Dynamic Programming}
+\label{subsec:optimal-control-dp-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming converts a global trajectory problem into local
+recursive decisions.
+
+The state summarizes all information relevant to future optimization.
+
+The value function summarizes the optimal future cost.
+
+Thus:
+
+\[
+\boxed{
+\text{state}
++
+\text{Bellman principle}
++
+\text{value function}
+}
+\]
+
+form the central dynamic-programming view of optimal control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control and Nonlinear Programming}
+\label{subsec:optimal-control-nlp-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After direct transcription,
+
+\[
+\boxed{
+\text{states}
++
+\text{controls}
+}
+\]
+
+at discretization points become ordinary optimization variables.
+
+Dynamics become equality constraints.
+
+Path constraints become inequalities.
+
+Thus nonlinear-programming algorithms can solve large optimal-control
+problems numerically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control and Differential Equations}
+\label{subsec:optimal-control-ode-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The state dynamics determine what trajectories are physically possible.
+
+Optimal-control algorithms repeatedly solve or approximate differential
+equations.
+
+Therefore numerical ODE accuracy can directly affect optimization
+accuracy.
+
+This creates a strong connection with Chapter~9 and Chapter~11.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control Workflow}
+\label{subsec:optimal-control-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the state variables;
+    \item identify the control variables;
+    \item construct the dynamical equations;
+    \item specify initial conditions;
+    \item specify terminal conditions;
+    \item define running and terminal costs;
+    \item specify control bounds;
+    \item specify state and path constraints;
+    \item determine whether terminal time is fixed or free;
+    \item check reachability or controllability when appropriate;
+    \item determine whether analytical optimality conditions are useful;
+    \item construct the Hamiltonian for an indirect approach;
+    \item derive state, costate, stationarity, and transversality
+          conditions;
+    \item alternatively formulate the Bellman or HJB equation;
+    \item choose direct or indirect numerical methods;
+    \item solve the resulting boundary-value or nonlinear optimization
+          problem;
+    \item verify dynamical feasibility;
+    \item inspect active constraints and switching behavior;
+    \item test sensitivity to model parameters;
+    \item simulate the resulting control under perturbed conditions;
+    \item implement feedback when robustness to disturbances is needed.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing an Optimal-Control Method}
+\label{subsec:choosing-optimal-control-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For analytical necessary conditions, consider:
+
+\[
+\boxed{
+\text{Pontryagin's Maximum Principle}.
+}
+\]
+
+For small-state feedback problems, consider:
+
+\[
+\boxed{
+\text{dynamic programming and HJB}.
+}
+\]
+
+For linear systems with quadratic objectives, use:
+
+\[
+\boxed{
+\text{LQR}.
+}
+\]
+
+For constrained real-time control, consider:
+
+\[
+\boxed{
+\text{MPC}.
+}
+\]
+
+For complicated nonlinear constrained trajectories, consider:
+
+\[
+\boxed{
+\text{direct transcription or collocation}.
+}
+\]
+
+For smooth boundary-value problems with good initial guesses, consider:
+
+\[
+\boxed{
+\text{shooting methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:optimal-control-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Treating State and Control as Independent Variables}
+
+The state must satisfy
+
+\[
+\boxed{
+\dot{x}=f(x,u,t).
+}
+\]
+
+One cannot optimize \(x(t)\) independently of the dynamics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Inconsistent Hamiltonian Signs}
+
+If using
+
+\[
+H=L+\lambda^Tf
+\]
+
+for minimization, minimize the Hamiltonian with respect to the control.
+
+If using another convention, all costate and extremum conditions must be
+changed consistently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting the Costate Equation}
+
+The state equation alone does not produce Pontryagin optimality.
+
+The coupled system includes
+
+\[
+\boxed{
+\dot{\lambda}
+=
+-H_x.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting Terminal Conditions}
+
+The state usually has an initial condition.
+
+The costate often has a terminal condition.
+
+Without the correct endpoint conditions, the boundary-value problem is
+incomplete.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using \(H_u=0\) With a Boundary Control}
+
+The condition
+
+\[
+H_u=0
+\]
+
+applies to suitable interior controls.
+
+With bounds, the optimum may lie at
+
+\[
+u_{\min}
+\]
+
+or
+
+\[
+u_{\max}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Bang-Bang Control for Every Bounded Problem}
+
+Bang-bang behavior commonly arises when the Hamiltonian is affine in the
+control.
+
+Quadratic control penalties typically produce interior controls instead.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Singular Controls}
+
+If the switching function vanishes over an interval, ordinary bang-bang
+logic may fail.
+
+Additional analysis is required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing PMP Conditions With a Global Optimality Proof}
+
+Pontryagin conditions are generally necessary conditions.
+
+A trajectory satisfying them need not automatically be the global optimum.
+
+Convexity or additional verification conditions may be needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Open-Loop and Feedback Solutions}
+
+A precomputed function \(u(t)\) does not react directly to state errors.
+
+A feedback law
+
+\[
+u=\pi(x,t)
+\]
+
+does.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Controllability}
+
+If the target state cannot be reached under the dynamics, no optimization
+algorithm can produce a feasible trajectory satisfying the target exactly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Units in Quadratic Costs}
+
+Terms such as
+
+\[
+x^TQx
+\]
+
+and
+
+\[
+u^TRu
+\]
+
+may use different physical units.
+
+The weights \(Q\) and \(R\) should be chosen with scaling and physical
+interpretation in mind.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Larger LQR Weight Always Improves Performance}
+
+Increasing a state penalty can require much larger control effort.
+
+Actuator constraints and model error may make aggressive gains
+undesirable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Control Saturation}
+
+An unconstrained LQR solution may request physically impossible control.
+
+Actuator limits should be included when they materially affect operation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing HJB With an Ordinary Differential Equation}
+
+For multidimensional continuous-state problems, HJB is generally a
+nonlinear partial differential equation.
+
+Its numerical solution can be difficult.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Curse of Dimensionality}
+
+A grid-based dynamic-programming method may become impractical as state
+dimension grows.
+
+Alternative approximations may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Too Coarse a Direct-Transcription Mesh}
+
+A discretized trajectory can satisfy the numerical NLP while poorly
+approximating the true continuous dynamics.
+
+Mesh refinement and simulation verification are important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Numerical Solver's Success Flag Proves Physical Feasibility}
+
+The optimized trajectory should be independently checked by integrating
+the original dynamics and evaluating all constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Model Error}
+
+An open-loop optimum for an inaccurate model may perform poorly in the
+physical system.
+
+Feedback, robust control, stochastic control, or repeated reoptimization
+may be needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:optimal-control-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Aerospace.}
+Optimal control determines launch, spacecraft, aircraft, descent, and
+minimum-fuel trajectories.
+
+\medskip
+
+\textbf{Robotics.}
+Robots optimize motion while respecting nonlinear dynamics, actuator
+limits, contact constraints, and obstacle avoidance.
+
+\medskip
+
+\textbf{Automotive Systems.}
+Optimal control is used for trajectory tracking, autonomous driving,
+energy management, and vehicle stability.
+
+\medskip
+
+\textbf{Energy Systems.}
+Batteries, generators, storage systems, and grids require time-dependent
+control under physical and economic constraints.
+
+\medskip
+
+\textbf{Economics.}
+Consumption, investment, resource extraction, and capital accumulation can
+be formulated as intertemporal control problems.
+
+\medskip
+
+\textbf{Biology and Medicine.}
+Intervention schedules can be optimized for epidemics, drug dosing,
+population management, and treatment planning.
+
+\medskip
+
+\textbf{Manufacturing.}
+Production rates, temperatures, pressures, and process conditions can be
+optimized dynamically.
+
+\medskip
+
+\textbf{Finance.}
+Portfolio and consumption decisions over continuous time lead to
+stochastic optimal-control models.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:optimal-control-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a state variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a control variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Define running cost.
+\end{exercise}
+
+\begin{exercise}[1]
+Define terminal cost.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an admissible control.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish open-loop and feedback control.
+\end{exercise}
+
+\begin{exercise}[1]
+Write the general Bolza optimal-control problem.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the Hamiltonian using the minimization convention of this section.
+\end{exercise}
+
+\begin{exercise}[1]
+State the costate equation.
+\end{exercise}
+
+\begin{exercise}[1]
+State the HJB equation.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+\dot{x}=ax+bu,
+\]
+
+and running cost
+
+\[
+L=\frac12(qx^2+ru^2),
+\]
+
+construct the Hamiltonian.
+\end{exercise}
+
+\begin{exercise}[2]
+Differentiate the previous Hamiltonian with respect to \(u\).
+\end{exercise}
+
+\begin{exercise}[2]
+Solve the resulting stationarity equation for \(u\).
+\end{exercise}
+
+\begin{exercise}[2]
+Write the costate equation for the same problem.
+\end{exercise}
+
+\begin{exercise}[2]
+For terminal cost
+
+\[
+\Phi(x(T))
+=
+\frac12Fx(T)^2,
+\]
+
+determine the costate terminal condition.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve the problem
+
+\[
+\dot{x}=u,
+\qquad
+x(0)=x_0,
+\]
+
+with
+
+\[
+J
+=
+\frac12x(T)^2
++
+\frac12
+\int_0^Tu^2dt
+\]
+
+using Pontryagin's conditions.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify the optimal state and control obtained in the previous problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the Hamiltonian for a minimum-time problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why bounded minimum-time controls often have bang-bang structure.
+\end{exercise}
+
+\begin{exercise}[3]
+Given switching function
+
+\[
+\psi(t)=2-t
+\]
+
+and control bounds
+
+\[
+-1\leq u\leq1,
+\]
+
+determine the minimizing bang-bang control away from the switching time.
+\end{exercise}
+
+\begin{exercise}[3]
+Identify the switching time in the previous problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain what a singular arc means.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the Hamiltonian for the finite-horizon LQR problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+u^*
+=
+-R^{-1}B^T\lambda.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the LQR costate equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Assume
+
+\[
+\lambda=Px
+\]
+
+and derive the Riccati differential equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the finite-horizon LQR feedback law.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the roles of \(Q\) and \(R\) in LQR.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the algebraic Riccati equation for infinite-horizon continuous-time
+LQR.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the controllability matrix for a two-dimensional linear system.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether the system is controllable by calculating its rank.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a discrete-time finite-horizon optimal-control problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive its Bellman recursion.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how Bellman recursion produces feedback.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the deterministic continuous-time HJB equation.
+\end{exercise}
+
+\begin{exercise}[3]
+For
+
+\[
+\dot{x}=u,
+\qquad
+L=\frac12u^2,
+\]
+
+find the HJB minimizing control in terms of \(V_x\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the relationship between the costate and value-function gradient.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare PMP and HJB approaches.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a bounded state constraint.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a bounded control constraint.
+\end{exercise}
+
+\begin{exercise}[3]
+Write an augmented Hamiltonian for a path inequality constraint.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the corresponding complementarity conditions.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a quadratic trajectory-tracking objective.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an MPC objective for a discrete-time linear system.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the receding-horizon principle.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why MPC produces feedback despite solving an open-loop trajectory
+at each update.
+\end{exercise}
+
+\begin{exercise}[3]
+Discretize
+
+\[
+\dot{x}=f(x,u,t)
+\]
+
+using forward Euler.
+\end{exercise}
+
+\begin{exercise}[3]
+Discretize the same dynamics using the trapezoidal rule.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain direct transcription.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the shooting method.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare direct and indirect numerical methods.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why mesh refinement may be necessary.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a stochastic controlled diffusion.
+\end{exercise}
+
+\begin{exercise}[3]
+Identify the additional second-order term in the stochastic HJB equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the relationship between optimal control and reinforcement
+learning.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Pontryagin's necessary conditions using constrained variational
+arguments.
+\end{exercise}
+
+\begin{exercise}[4]
+Study transversality conditions for free terminal states.
+\end{exercise}
+
+\begin{exercise}[4]
+Study transversality conditions for free terminal time.
+\end{exercise}
+
+\begin{exercise}[4]
+Study abnormal extremals in Pontryagin's Maximum Principle.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sufficient optimality conditions for convex optimal-control
+problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate bang-bang optimal control for a double integrator.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the switching curve for minimum-time double-integrator control.
+\end{exercise}
+
+\begin{exercise}[4]
+Study singular optimal controls.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Legendre--Clebsch condition.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive finite-horizon LQR using dynamic programming instead of PMP.
+\end{exercise}
+
+\begin{exercise}[4]
+Show that the HJB quadratic ansatz produces the Riccati equation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stabilizability and detectability conditions for infinite-horizon
+LQR.
+\end{exercise}
+
+\begin{exercise}[4]
+Study discrete-time LQR and the discrete Riccati equation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Hamilton--Jacobi--Bellman verification theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study viscosity solutions of HJB equations conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the curse of dimensionality in numerical dynamic programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Study state-constrained Pontryagin conditions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study direct collocation methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study pseudospectral optimal-control methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate multiple shooting for nonlinear trajectory optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sequential quadratic programming for direct transcription.
+\end{exercise}
+
+\begin{exercise}[4]
+Study constrained linear MPC.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate terminal sets and stability in MPC.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stochastic HJB equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Linear-Quadratic-Gaussian control and the separation principle.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate risk-sensitive optimal control.
+\end{exercise}
+
+\begin{exercise}[4]
+Study robust optimal control.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate differential games as a connection between optimal control and
+game theory.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:optimal-control-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Optimal control optimizes decisions distributed over time while respecting
+dynamical equations.
+
+A general problem is
+
+\[
+\boxed{
+\min_{u(\cdot)}
+\left[
+\Phi(x(T),T)
++
+\int_{t_0}^{T}
+L(x,u,t)\,dt
+\right]
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\dot{x}=f(x,u,t).
+}
+\]
+
+Using the minimization convention,
+
+\[
+\boxed{
+H
+=
+L+\lambda^Tf.
+}
+\]
+
+Pontryagin's necessary conditions include
+
+\[
+\boxed{
+\dot{x}
+=
+H_\lambda,
+}
+\]
+
+\[
+\boxed{
+\dot{\lambda}
+=
+-H_x,
+}
+\]
+
+and
+
+\[
+\boxed{
+u^*
+\in
+\operatorname*{arg\,min}_{u\in U}H.
+}
+\]
+
+For an unconstrained interior control,
+
+\[
+\boxed{
+H_u=0.
+}
+\]
+
+Dynamic programming introduces the value function and HJB equation:
+
+\[
+\boxed{
+-V_t
+=
+\min_u
+\left\{
+L
++
+\nabla V^Tf
+\right\}.
+}
+\]
+
+For linear-quadratic control,
+
+\[
+\boxed{
+\dot{x}=Ax+Bu
+}
+\]
+
+and
+
+\[
+\boxed{
+J
+=
+\frac12x(T)^TFx(T)
++
+\frac12
+\int
+(
+x^TQx+u^TRu
+)dt,
+}
+\]
+
+the optimal feedback is
+
+\[
+\boxed{
+u^*
+=
+-
+R^{-1}B^TPx,
+}
+\]
+
+where \(P\) satisfies a Riccati equation.
+
+Modern optimal control therefore combines
+
+\[
+\boxed{
+\text{optimization}
++
+\text{differential equations}
++
+\text{dynamic programming}
++
+\text{numerical computation}
++
+\text{feedback}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:optimal-control-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Optimal Control completes Chapter~10 by extending optimization from
+finite-dimensional decision vectors to time-dependent decisions governed
+by dynamical systems. Pontryagin's Maximum Principle generalizes
+Lagrange-multiplier reasoning to differential constraints, while the
+Hamilton--Jacobi--Bellman equation connects Optimal Control directly with
+Dynamic Programming. Linear-quadratic regulation provides one of the most
+important analytically solvable control families, and direct transcription
+connects modern trajectory optimization with nonlinear programming.
+Stochastic Optimal Control extends these ideas using the stochastic
+processes of Chapter~7. The next chapter, Numerical and Computational
+Mathematics, develops the computational methods required to solve many of
+the nonlinear equations, differential equations, optimization problems,
+Monte Carlo models, and large numerical systems encountered throughout
+advanced mathematics.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.16 Optimal Control
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard deterministic optimal-control theory.
+%   - Standard dynamic-programming and Hamilton--Jacobi--Bellman theory.
+%   - Standard linear-quadratic control.
+%   - Standard numerical optimal-control methods.
+%
+% Used for:
+%   - states and controls;
+%   - dynamical constraints;
+%   - admissible controls;
+%   - Bolza, Lagrange, and Mayer forms;
+%   - running and terminal costs;
+%   - fixed and free terminal conditions;
+%   - open-loop and feedback control;
+%   - calculus-of-variations connections;
+%   - Hamiltonian formulation;
+%   - costates;
+%   - Pontryagin's Maximum Principle;
+%   - sign conventions;
+%   - state and costate equations;
+%   - transversality;
+%   - pointwise Hamiltonian minimization;
+%   - control constraints;
+%   - two-point boundary-value problems;
+%   - free-final-time conditions;
+%   - minimum-time control;
+%   - bang-bang control;
+%   - switching functions;
+%   - singular arcs;
+%   - minimum-energy control;
+%   - trajectory tracking;
+%   - LQR;
+%   - Riccati differential equations;
+%   - infinite-horizon LQR;
+%   - controllability;
+%   - discrete-time optimal control;
+%   - Bellman recursion;
+%   - value functions;
+%   - HJB equations;
+%   - PMP versus HJB;
+%   - curse of dimensionality;
+%   - state, control, path, and endpoint constraints;
+%   - terminal penalties;
+%   - discounted control;
+%   - economic and biological control examples;
+%   - trajectory optimization;
+%   - MPC;
+%   - direct and indirect numerical methods;
+%   - shooting and multiple shooting;
+%   - direct transcription;
+%   - collocation;
+%   - mesh refinement;
+%   - control saturation;
+%   - state estimation connections;
+%   - stochastic optimal control;
+%   - stochastic HJB;
+%   - LQG preview;
+%   - reinforcement-learning connections;
+%   - applications and exercises.
+%
+% Notes:
+%   - This completes Chapter 10 — Optimization and Operations Research.
+%   - Chapter 11 begins with Numerical Analysis.
+%   - Differential-equation foundations appear in Chapter 9.
+%   - Stochastic-process foundations appear in Chapter 7.
+%   - Numerical methods for ODEs, optimization, Monte Carlo simulation,
+%     and scientific computing are developed in Chapter 11.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

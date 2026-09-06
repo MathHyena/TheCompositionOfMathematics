@@ -1,0 +1,3903 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.4 NUMERICAL ORDINARY DIFFERENTIAL EQUATIONS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Numerical Ordinary Differential Equations}
+\label{sec:numerical-odes}
+
+\prerequisite{
+Ordinary differential equations, initial-value problems, Taylor series,
+numerical analysis, numerical linear algebra, nonlinear equation solving,
+and basic programming concepts.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item formulate an ordinary differential-equation initial-value problem;
+    \item construct a discrete time grid;
+    \item derive the forward Euler method;
+    \item interpret Euler's method geometrically;
+    \item distinguish local and global truncation error;
+    \item understand consistency and convergence of ODE solvers;
+    \item understand zero-stability conceptually;
+    \item derive backward Euler;
+    \item distinguish explicit and implicit time-stepping methods;
+    \item recognize the trapezoidal method;
+    \item derive second-order Runge--Kutta methods;
+    \item understand midpoint and improved Euler methods;
+    \item apply the classical fourth-order Runge--Kutta method;
+    \item interpret Runge--Kutta stages;
+    \item understand Butcher-tableau notation;
+    \item distinguish one-step and multistep methods;
+    \item understand Adams--Bashforth methods;
+    \item understand Adams--Moulton methods;
+    \item recognize predictor--corrector methods;
+    \item understand backward differentiation formulas conceptually;
+    \item define absolute stability;
+    \item analyze methods using the linear test equation;
+    \item determine stability functions;
+    \item understand stability regions;
+    \item distinguish A-stability and L-stability conceptually;
+    \item recognize stiff differential equations;
+    \item explain why explicit methods struggle with stiffness;
+    \item understand adaptive time stepping;
+    \item recognize embedded Runge--Kutta pairs;
+    \item understand local error estimation;
+    \item choose time steps using error estimates;
+    \item understand relative and absolute ODE tolerances;
+    \item solve systems of ODEs numerically;
+    \item convert higher-order ODEs to first-order systems;
+    \item solve implicit method equations using Newton iteration;
+    \item understand Jacobians in stiff solvers;
+    \item recognize event detection;
+    \item distinguish interpolation from dense output;
+    \item understand numerical conservation issues;
+    \item recognize symplectic methods conceptually;
+    \item recognize positivity and invariant preservation issues;
+    \item understand shooting methods for boundary-value problems;
+    \item recognize finite-difference methods for ODE boundary-value problems;
+    \item understand method-of-lines connections to PDEs;
+    \item perform convergence studies;
+    \item connect numerical ODEs with simulation, control, mechanics,
+          biology, chemistry, economics, and scientific computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Initial-Value Problems}
+\label{subsec:numerical-ode-ivp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A first-order ordinary differential-equation initial-value problem has the
+form
+
+\[
+\boxed{
+y'(t)
+=
+f(t,y(t)),
+}
+\]
+
+with
+
+\[
+\boxed{
+y(t_0)
+=
+y_0.
+}
+\]
+
+The goal is to approximate the solution at a collection of time points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time Grid}
+\label{subsec:ode-time-grid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Choose grid points
+
+\[
+\boxed{
+t_n
+=
+t_0+nh,
+}
+\]
+
+where
+
+\[
+h>0
+\]
+
+is the time step.
+
+A numerical method produces approximations
+
+\[
+\boxed{
+y_n
+\approx
+y(t_n).
+}
+\]
+
+For variable-step methods, the step size may instead depend on \(n\):
+
+\[
+\boxed{
+h_n
+=
+t_{n+1}-t_n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward Euler Method}
+\label{subsec:forward-euler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+From Taylor expansion,
+
+\[
+y(t+h)
+=
+y(t)
++
+hy'(t)
++
+O(h^2).
+\]
+
+Since
+
+\[
+y'(t)
+=
+f(t,y(t)),
+\]
+
+we obtain
+
+\[
+y(t+h)
+=
+y(t)
++
+hf(t,y(t))
++
+O(h^2).
+\]
+
+Ignoring the higher-order term gives the forward Euler method:
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+h
+f(t_n,y_n).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Interpretation of Euler's Method}
+\label{subsec:euler-geometric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At point
+
+\[
+(t_n,y_n),
+\]
+
+the differential equation provides slope
+
+\[
+\boxed{
+f(t_n,y_n).
+}
+\]
+
+Euler's method follows the tangent line for time \(h\):
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+h
+\times
+\text{slope}.
+}
+\]
+
+Thus Euler's method repeatedly approximates the solution curve by short
+tangent-line segments.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Forward Euler}
+\label{subsec:worked-forward-euler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Approximating an Exponential Solution}
+
+Consider
+
+\[
+y'=y,
+\qquad
+y(0)=1.
+\]
+
+The exact solution is
+
+\[
+y(t)=e^t.
+\]
+
+Take
+
+\[
+h=0.1.
+\]
+
+Euler's method gives
+
+\[
+y_{n+1}
+=
+y_n+0.1y_n
+=
+1.1y_n.
+\]
+
+Starting from
+
+\[
+y_0=1,
+\]
+
+we obtain
+
+\[
+y_1=1.1,
+\]
+
+\[
+y_2=1.21,
+\]
+
+and
+
+\[
+y_3=1.331.
+\]
+
+The exact value at
+
+\[
+t=0.3
+\]
+
+is
+
+\[
+e^{0.3}
+\approx1.34986.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+y_3=1.331
+}
+\]
+
+compared with
+
+\[
+\boxed{
+y(0.3)\approx1.34986.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Truncation Error}
+\label{subsec:ode-local-truncation-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The local truncation error measures the error introduced in one step when
+the exact solution is used as the starting value.
+
+For forward Euler,
+
+\[
+y(t_{n+1})
+=
+y(t_n)
++
+hf(t_n,y(t_n))
++
+O(h^2).
+\]
+
+Therefore the one-step defect is
+
+\[
+\boxed{
+O(h^2).
+}
+\]
+
+Depending on convention, the local truncation error may be divided by
+\(h\), giving an \(O(h)\) quantity.
+
+The convention should always be stated clearly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Error}
+\label{subsec:ode-global-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The global error is
+
+\[
+\boxed{
+e_n
+=
+y(t_n)-y_n.
+}
+\]
+
+Forward Euler accumulates local errors across approximately
+
+\[
+O(1/h)
+\]
+
+steps over a fixed time interval.
+
+Under standard smoothness and stability assumptions,
+
+\[
+\boxed{
+e_n
+=
+O(h).
+}
+\]
+
+Thus forward Euler is a first-order method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Order of an ODE Method}
+\label{subsec:ode-method-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical ODE method has global order \(p\) if
+
+\[
+\boxed{
+\max_{0\leq n\leq N}
+|y(t_n)-y_n|
+=
+O(h^p)
+}
+\]
+
+over a fixed interval as
+
+\[
+h\to0.
+\]
+
+If the step size is halved, the global error should decrease by
+approximately
+
+\[
+\boxed{
+2^p
+}
+\]
+
+in the asymptotic regime.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency}
+\label{subsec:ode-consistency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ODE discretization is consistent if the discrete approximation tends
+toward the differential equation as
+
+\[
+h\to0.
+\]
+
+For forward Euler,
+
+\[
+\frac{
+y_{n+1}-y_n
+}{
+h
+}
+=
+f(t_n,y_n).
+\]
+
+As \(h\to0\), the difference quotient approaches
+
+\[
+y'(t).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stability and Convergence}
+\label{subsec:ode-stability-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consistency alone is insufficient.
+
+Numerical perturbations and local truncation errors must not grow
+uncontrollably.
+
+For many classes of ODE methods, convergence depends on both:
+
+\[
+\boxed{
+\text{consistency}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stability}.
+}
+\]
+
+For linear multistep methods, the relevant stability notion includes
+zero-stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Euler Method}
+\label{subsec:backward-euler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Backward Euler evaluates the slope at the new time:
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+h
+f(t_{n+1},y_{n+1}).
+}
+\]
+
+Because \(y_{n+1}\) appears inside \(f\), this is generally an implicit
+equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Explicit and Implicit Methods}
+\label{subsec:explicit-implicit-ode-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An explicit method computes the new state directly from known quantities.
+
+For example,
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+hf(t_n,y_n).
+}
+\]
+
+An implicit method requires solving an equation involving the unknown new
+state.
+
+For example,
+
+\[
+\boxed{
+y_{n+1}
+-
+y_n
+-
+hf(t_{n+1},y_{n+1})
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Backward Euler}
+\label{subsec:worked-backward-euler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Backward Euler for Exponential Decay}
+
+Consider
+
+\[
+y'=-5y,
+\qquad
+y(0)=1.
+\]
+
+Backward Euler gives
+
+\[
+y_{n+1}
+=
+y_n
+-
+5hy_{n+1}.
+\]
+
+Therefore,
+
+\[
+(1+5h)y_{n+1}
+=
+y_n.
+\]
+
+Hence,
+
+\[
+\boxed{
+y_{n+1}
+=
+\frac{
+y_n
+}{
+1+5h
+}.
+}
+\]
+
+For
+
+\[
+h=0.1,
+\]
+
+\[
+y_1
+=
+\frac1{1.5}
+=
+\frac23.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+y_1
+\approx0.6667.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implicit Solve for Nonlinear ODEs}
+\label{subsec:implicit-nonlinear-ode-solve}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonlinear \(f\), backward Euler requires solving
+
+\[
+\boxed{
+G(z)
+=
+z-y_n-hf(t_{n+1},z)
+=
+0.
+}
+\]
+
+Newton's method gives
+
+\[
+\boxed{
+z^{(m+1)}
+=
+z^{(m)}
+-
+[
+G'(z^{(m)})
+]^{-1}
+G(z^{(m)}).
+}
+\]
+
+Thus implicit ODE integration may require nonlinear optimization or
+root-finding technology at every time step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trapezoidal Method}
+\label{subsec:ode-trapezoidal-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Average the slopes at the beginning and end of the interval:
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{2}
+\left[
+f(t_n,y_n)
++
+f(t_{n+1},y_{n+1})
+\right].
+}
+\]
+
+This is an implicit second-order method.
+
+It is sometimes called the Crank--Nicolson method in closely related
+time-discretization contexts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Improved Euler Method}
+\label{subsec:improved-euler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An explicit predictor is
+
+\[
+\boxed{
+\widetilde{y}_{n+1}
+=
+y_n
++
+hf(t_n,y_n).
+}
+\]
+
+Then average the initial and predicted final slopes:
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{2}
+\left[
+f(t_n,y_n)
++
+f(t_{n+1},\widetilde{y}_{n+1})
+\right].
+}
+\]
+
+This method is often called Heun's method or the explicit trapezoidal
+method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Explicit Midpoint Method}
+\label{subsec:explicit-midpoint}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+First estimate the midpoint:
+
+\[
+\boxed{
+y_{n+1/2}
+=
+y_n
++
+\frac{h}{2}
+f(t_n,y_n).
+}
+\]
+
+Then use the midpoint slope:
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+h
+f
+\left(
+t_n+\frac{h}{2},
+y_{n+1/2}
+\right).
+}
+\]
+
+This is a second-order Runge--Kutta method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Runge--Kutta Methods}
+\label{subsec:runge-kutta-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Runge--Kutta methods approximate the effect of several slope samples within
+each time step.
+
+A general explicit \(s\)-stage method has stages
+
+\[
+\boxed{
+k_i
+=
+f
+\left(
+t_n+c_ih,
+y_n
++
+h
+\sum_{j=1}^{i-1}
+a_{ij}k_j
+\right),
+}
+\]
+
+and update
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+h
+\sum_{i=1}^{s}
+b_ik_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classical Fourth-Order Runge--Kutta Method}
+\label{subsec:rk4}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The classical fourth-order Runge--Kutta method, abbreviated RK4, uses
+
+\[
+\boxed{
+k_1
+=
+f(t_n,y_n),
+}
+\]
+
+\[
+\boxed{
+k_2
+=
+f
+\left(
+t_n+\frac{h}{2},
+y_n+\frac{h}{2}k_1
+\right),
+}
+\]
+
+\[
+\boxed{
+k_3
+=
+f
+\left(
+t_n+\frac{h}{2},
+y_n+\frac{h}{2}k_2
+\right),
+}
+\]
+
+and
+
+\[
+\boxed{
+k_4
+=
+f
+(
+t_n+h,
+y_n+hk_3
+).
+}
+\]
+
+Then
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{6}
+(
+k_1+2k_2+2k_3+k_4
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of RK4}
+\label{subsec:rk4-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+RK4 samples slopes at:
+
+\[
+\boxed{
+\text{the beginning},
+}
+\]
+
+\[
+\boxed{
+\text{two midpoint estimates},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{the endpoint}.
+}
+\]
+
+The weighted average
+
+\[
+\frac16
+(
+k_1+2k_2+2k_3+k_4
+)
+\]
+
+approximates the average derivative over the step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: RK4}
+\label{subsec:worked-rk4}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One RK4 Step}
+
+Consider
+
+\[
+y'=y,
+\qquad
+y(0)=1,
+\]
+
+with
+
+\[
+h=0.1.
+\]
+
+Then
+
+\[
+k_1=1.
+\]
+
+Next,
+
+\[
+k_2
+=
+1+0.05(1)
+=
+1.05.
+\]
+
+Then,
+
+\[
+k_3
+=
+1+0.05(1.05)
+=
+1.0525.
+\]
+
+Finally,
+
+\[
+k_4
+=
+1+0.1(1.0525)
+=
+1.10525.
+\]
+
+Thus,
+
+\[
+y_1
+=
+1
++
+\frac{0.1}{6}
+\left(
+1
++
+2(1.05)
++
+2(1.0525)
++
+1.10525
+\right).
+\]
+
+Therefore,
+
+\[
+y_1
+\approx1.1051708.
+\]
+
+The exact value is
+
+\[
+e^{0.1}
+\approx1.1051702.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+y_1\approx1.1051708.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Butcher Tableaux}
+\label{subsec:butcher-tableaux}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Runge--Kutta method can be represented by a Butcher tableau:
+
+\[
+\boxed{
+\begin{array}{c|cccc}
+c_1 & a_{11} & a_{12} & \cdots & a_{1s}\\
+c_2 & a_{21} & a_{22} & \cdots & a_{2s}\\
+\vdots & \vdots & \vdots & & \vdots\\
+c_s & a_{s1} & a_{s2} & \cdots & a_{ss}\\
+\hline
+& b_1 & b_2 & \cdots & b_s
+\end{array}
+}
+\]
+
+For an explicit Runge--Kutta method,
+
+\[
+\boxed{
+a_{ij}=0
+\qquad
+\text{for}
+\qquad
+j\geq i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler Butcher Tableau}
+\label{subsec:euler-butcher-tableau}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Forward Euler has tableau
+
+\[
+\boxed{
+\begin{array}{c|c}
+0&0\\
+\hline
+&1
+\end{array}
+}
+\]
+
+because it uses one stage:
+
+\[
+k_1=f(t_n,y_n).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classical RK4 Tableau}
+\label{subsec:rk4-tableau}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Classical RK4 has tableau
+
+\[
+\boxed{
+\begin{array}{c|cccc}
+0&0&0&0&0\\
+1/2&1/2&0&0&0\\
+1/2&0&1/2&0&0\\
+1&0&0&1&0\\
+\hline
+&1/6&1/3&1/3&1/6
+\end{array}
+}
+\]
+
+This compact notation describes all stages and final weights.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{One-Step Methods}
+\label{subsec:one-step-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A one-step method computes
+
+\[
+y_{n+1}
+\]
+
+using only information generated from
+
+\[
+y_n
+\]
+
+during the current step.
+
+Examples include:
+
+\[
+\boxed{
+\text{Euler},
+}
+\]
+
+\[
+\boxed{
+\text{Runge--Kutta methods},
+}
+\]
+
+and many implicit Runge--Kutta methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Multistep Methods}
+\label{subsec:linear-multistep-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A linear multistep method uses several previous values.
+
+A general form is
+
+\[
+\boxed{
+\sum_{j=0}^{k}
+\alpha_j
+y_{n+j}
+=
+h
+\sum_{j=0}^{k}
+\beta_j
+f_{n+j},
+}
+\]
+
+where
+
+\[
+f_{n+j}
+=
+f(t_{n+j},y_{n+j}).
+\]
+
+Previously computed solution history is reused.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adams--Bashforth Methods}
+\label{subsec:adams-bashforth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adams--Bashforth methods are explicit multistep methods.
+
+The two-step Adams--Bashforth method is
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{2}
+\left(
+3f_n-f_{n-1}
+\right).
+}
+\]
+
+It uses slope information from the two most recent time points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Three-Step Adams--Bashforth}
+\label{subsec:ab3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The three-step method is
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{12}
+\left(
+23f_n
+-
+16f_{n-1}
++
+5f_{n-2}
+\right).
+}
+\]
+
+It is third-order accurate under standard smoothness conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adams--Moulton Methods}
+\label{subsec:adams-moulton}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adams--Moulton methods are implicit multistep methods.
+
+The two-point trapezoidal formula can be written
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{2}
+(
+f_n+f_{n+1}
+).
+}
+\]
+
+A higher-order example is
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{12}
+\left(
+5f_{n+1}
++
+8f_n
+-
+f_{n-1}
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Predictor--Corrector Methods}
+\label{subsec:predictor-corrector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A predictor--corrector scheme may use an explicit method to estimate
+
+\[
+\widetilde{y}_{n+1},
+\]
+
+then use that value inside an implicit or more accurate correction.
+
+For example:
+
+\[
+\boxed{
+\text{Adams--Bashforth predictor}
+}
+\]
+
+followed by
+
+\[
+\boxed{
+\text{Adams--Moulton corrector}.
+}
+\]
+
+This reduces the cost of solving fully implicit equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Starting Multistep Methods}
+\label{subsec:starting-multistep-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A \(k\)-step method needs several previous solution values.
+
+At the initial time, these values are not yet available.
+
+Therefore a one-step method such as RK4 may be used to generate startup
+values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Differentiation Formulas}
+\label{subsec:backward-differentiation-formulas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Backward Differentiation Formulas, abbreviated BDF, approximate the
+derivative using backward differences and evaluate the differential
+equation at the new state.
+
+Backward Euler is the one-step BDF method.
+
+The two-step BDF formula is
+
+\[
+\boxed{
+\frac{
+3y_{n+1}-4y_n+y_{n-1}
+}{
+2h
+}
+=
+f(t_{n+1},y_{n+1}).
+}
+\]
+
+BDF methods are important for stiff differential equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Zero-Stability}
+\label{subsec:zero-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Linear multistep methods must satisfy a stability requirement even as
+
+\[
+h\to0.
+\]
+
+Suppose the first characteristic polynomial is
+
+\[
+\boxed{
+\rho(\xi)
+=
+\sum_{j=0}^{k}
+\alpha_j\xi^j.
+}
+\]
+
+The root condition requires:
+
+\[
+\boxed{
+|\xi_j|\leq1
+}
+\]
+
+for all roots and that roots with
+
+\[
+|\xi_j|=1
+\]
+
+be simple.
+
+This is the standard zero-stability condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Consistency Plus Zero-Stability}
+\label{subsec:dahlquist-equivalence-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For linear multistep methods, a fundamental result states that
+
+\[
+\boxed{
+\text{consistency}
++
+\text{zero-stability}
+\Longleftrightarrow
+\text{convergence}.
+}
+\]
+
+This is the Dahlquist equivalence principle.
+
+It shows why merely matching the differential equation locally is not
+enough.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Stability Test Equation}
+\label{subsec:ode-test-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To study numerical stability, consider
+
+\[
+\boxed{
+y'
+=
+\lambda y,
+}
+\]
+
+where
+
+\[
+\lambda\in\mathbb{C}.
+\]
+
+The exact solution is
+
+\[
+\boxed{
+y(t)
+=
+e^{\lambda t}y_0.
+}
+\]
+
+If
+
+\[
+\operatorname{Re}(\lambda)<0,
+\]
+
+the exact solution decays.
+
+A good numerical method should reproduce this decay for suitable step
+sizes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward Euler Stability Function}
+\label{subsec:forward-euler-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Apply forward Euler:
+
+\[
+y_{n+1}
+=
+y_n+h\lambda y_n.
+\]
+
+Therefore,
+
+\[
+\boxed{
+y_{n+1}
+=
+(1+h\lambda)y_n.
+}
+\]
+
+Define
+
+\[
+z=h\lambda.
+\]
+
+The amplification or stability function is
+
+\[
+\boxed{
+R(z)=1+z.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Absolute Stability Region}
+\label{subsec:absolute-stability-region}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The absolute stability region is
+
+\[
+\boxed{
+\mathcal{S}
+=
+\{
+z\in\mathbb{C}
+:
+|R(z)|\leq1
+\}.
+}
+\]
+
+For forward Euler,
+
+\[
+\boxed{
+|1+z|
+\leq1.
+}
+\]
+
+This is the disk centered at
+
+\[
+-1
+\]
+
+with radius
+
+\[
+1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Euler Stability Restriction}
+\label{subsec:worked-euler-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Stable Step for Rapid Decay}
+
+Consider
+
+\[
+y'=-100y.
+\]
+
+Forward Euler gives
+
+\[
+y_{n+1}
+=
+(1-100h)y_n.
+\]
+
+For absolute stability,
+
+\[
+|1-100h|
+\leq1.
+\]
+
+Therefore,
+
+\[
+-1
+\leq
+1-100h
+\leq
+1.
+\]
+
+This yields
+
+\[
+0
+\leq
+h
+\leq
+0.02.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+h\leq0.02
+}
+\]
+
+is required for forward Euler absolute stability.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Euler Stability Function}
+\label{subsec:backward-euler-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Apply backward Euler to
+
+\[
+y'=\lambda y:
+\]
+
+\[
+y_{n+1}
+=
+y_n+h\lambda y_{n+1}.
+\]
+
+Hence,
+
+\[
+(1-h\lambda)y_{n+1}
+=
+y_n.
+\]
+
+Therefore,
+
+\[
+\boxed{
+R(z)
+=
+\frac1{1-z}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A-Stability}
+\label{subsec:a-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A method is A-stable if its absolute stability region contains the entire
+left half-plane:
+
+\[
+\boxed{
+\operatorname{Re}(z)\leq0.
+}
+\]
+
+Backward Euler is A-stable.
+
+Thus all exponentially decaying linear test equations remain stable for
+every positive step size.
+
+Accuracy may still require small steps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trapezoidal Stability}
+\label{subsec:trapezoidal-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the test equation,
+
+\[
+y_{n+1}
+=
+y_n
++
+\frac{z}{2}
+(
+y_n+y_{n+1}
+).
+\]
+
+Therefore,
+
+\[
+\boxed{
+R(z)
+=
+\frac{
+1+z/2
+}{
+1-z/2
+}.
+}
+\]
+
+The trapezoidal method is A-stable.
+
+However, for very large negative \(z\),
+
+\[
+R(z)\to-1,
+\]
+
+so strongly damped modes may produce persistent numerical oscillation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{L-Stability}
+\label{subsec:l-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An A-stable method is L-stable if additionally
+
+\[
+\boxed{
+R(z)\to0
+}
+\]
+
+as
+
+\[
+z\to-\infty
+\]
+
+along the negative real axis or, more generally, for strongly stable
+modes in the relevant limit.
+
+Backward Euler is L-stable.
+
+The trapezoidal method is not.
+
+L-stability is useful when rapidly decaying modes should be strongly
+damped numerically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stiff Differential Equations}
+\label{subsec:stiff-odes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A differential equation is called stiff when stable numerical integration
+requires an extremely small time step for some methods even though the
+solution itself changes slowly over much of the interval.
+
+There is no single universal definition of stiffness.
+
+A common signature is the coexistence of widely separated time scales.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Stiff Example}
+\label{subsec:simple-stiff-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+y'
+=
+-1000
+(
+y-\cos t
+)
+-
+\sin t.
+}
+\]
+
+The exact solution contains a rapidly decaying transient together with a
+slow component related to
+
+\[
+\cos t.
+\]
+
+An explicit method may be forced to resolve the fast stable mode even after
+it has become negligible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Explicit Euler Struggles With Stiffness}
+\label{subsec:euler-stiffness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+y'=\lambda y
+\]
+
+with large negative \(\lambda\), forward Euler requires
+
+\[
+\boxed{
+|1+h\lambda|\leq1.
+}
+\]
+
+Thus
+
+\[
+h
+\]
+
+must be very small.
+
+The restriction arises from numerical stability rather than from the
+smoothness of the slowly varying physical solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implicit Methods for Stiff Problems}
+\label{subsec:implicit-stiff-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A-stable or L-stable implicit methods permit much larger stable steps for
+rapidly decaying modes.
+
+Common stiff methods include:
+
+\[
+\boxed{
+\text{backward Euler},
+}
+\]
+
+\[
+\boxed{
+\text{BDF methods},
+}
+\]
+
+and various
+
+\[
+\boxed{
+\text{implicit Runge--Kutta methods}.
+}
+\]
+
+The tradeoff is that nonlinear or linear algebraic systems must be solved
+at each step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Systems of ODEs}
+\label{subsec:numerical-ode-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A system has form
+
+\[
+\boxed{
+\mathbf{y}'(t)
+=
+\mathbf{f}
+(
+t,\mathbf{y}(t)
+),
+}
+\]
+
+where
+
+\[
+\mathbf{y}(t)
+\in
+\mathbb{R}^m.
+\]
+
+Euler becomes
+
+\[
+\boxed{
+\mathbf{y}_{n+1}
+=
+\mathbf{y}_n
++
+h
+\mathbf{f}
+(
+t_n,\mathbf{y}_n
+).
+}
+\]
+
+Runge--Kutta methods extend componentwise in vector form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Higher-Order ODEs as First-Order Systems}
+\label{subsec:higher-order-to-first-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+y''=F(t,y,y').
+}
+\]
+
+Define
+
+\[
+\boxed{
+y_1=y,
+}
+\]
+
+and
+
+\[
+\boxed{
+y_2=y'.
+}
+\]
+
+Then
+
+\[
+\boxed{
+y_1'=y_2,
+}
+\]
+
+and
+
+\[
+\boxed{
+y_2'
+=
+F(t,y_1,y_2).
+}
+\]
+
+Thus numerical first-order methods can solve higher-order ODEs after state
+augmentation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Harmonic Oscillator}
+\label{subsec:worked-harmonic-oscillator-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Converting a Second-Order ODE}
+
+Consider
+
+\[
+y''+y=0.
+\]
+
+Define
+
+\[
+y_1=y,
+\qquad
+y_2=y'.
+\]
+
+Then
+
+\[
+y_1'=y_2,
+\]
+
+and
+
+\[
+y_2'=-y_1.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+\begin{pmatrix}
+y_1'\\
+y_2'
+\end{pmatrix}
+=
+\begin{pmatrix}
+y_2\\
+-y_1
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+This system can be integrated using any standard numerical ODE solver.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobian Matrix}
+\label{subsec:ode-jacobian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a system
+
+\[
+\mathbf{f}
+(
+t,\mathbf{y}
+),
+\]
+
+the state Jacobian is
+
+\[
+\boxed{
+J
+=
+\frac{
+\partial\mathbf{f}
+}{
+\partial\mathbf{y}
+}.
+}
+\]
+
+Its entries are
+
+\[
+\boxed{
+J_{ij}
+=
+\frac{
+\partial f_i
+}{
+\partial y_j
+}.
+}
+\]
+
+Implicit methods often require this Jacobian or an approximation to it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton Solve for Backward Euler Systems}
+\label{subsec:newton-backward-euler-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Backward Euler requires solving
+
+\[
+\boxed{
+\mathbf{G}(\mathbf{z})
+=
+\mathbf{z}
+-
+\mathbf{y}_n
+-
+h
+\mathbf{f}
+(
+t_{n+1},\mathbf{z}
+)
+=
+0.
+}
+\]
+
+Its Jacobian is
+
+\[
+\boxed{
+G'(\mathbf{z})
+=
+I
+-
+h
+J_f
+(
+t_{n+1},\mathbf{z}
+).
+}
+\]
+
+Newton's method solves
+
+\[
+\boxed{
+\left[
+I-hJ_f
+\right]
+\Delta
+=
+-\mathbf{G},
+}
+\]
+
+then updates
+
+\[
+\boxed{
+\mathbf{z}
+\leftarrow
+\mathbf{z}+\Delta.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cost of Implicit Integration}
+\label{subsec:implicit-integration-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An implicit step may require:
+
+\[
+\boxed{
+\text{function evaluations},
+}
+\]
+
+\[
+\boxed{
+\text{Jacobian evaluation},
+}
+\]
+
+\[
+\boxed{
+\text{matrix factorization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{multiple Newton iterations}.
+}
+\]
+
+Thus one implicit step is usually more expensive than one explicit step.
+
+For stiff systems, however, far fewer time steps may be needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobian Reuse}
+\label{subsec:ode-jacobian-reuse}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the Jacobian changes slowly, an implicit solver may reuse a previous
+factorization for several nonlinear iterations or time steps.
+
+This can substantially reduce computational cost.
+
+The solver must detect when the old Jacobian approximation has become
+inadequate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adaptive Time Stepping}
+\label{subsec:adaptive-time-stepping}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fixed step size treats every part of the trajectory equally.
+
+But some intervals may be smooth while others change rapidly.
+
+Adaptive methods choose
+
+\[
+\boxed{
+h_n
+}
+\]
+
+dynamically based on estimated local error.
+
+The goals are:
+
+\[
+\boxed{
+\text{accuracy}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{computational efficiency}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Embedded Runge--Kutta Methods}
+\label{subsec:embedded-runge-kutta}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An embedded Runge--Kutta pair uses the same stage evaluations to construct
+two approximations of different orders.
+
+For example,
+
+\[
+\boxed{
+y_{n+1}^{[p]}
+}
+\]
+
+and
+
+\[
+\boxed{
+y_{n+1}^{[p+1]}.
+}
+\]
+
+Their difference estimates local error:
+
+\[
+\boxed{
+e_{n+1}
+\approx
+y_{n+1}^{[p+1]}
+-
+y_{n+1}^{[p]}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaled Error}
+\label{subsec:ode-scaled-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Absolute error alone is not appropriate for state components with
+different scales.
+
+A componentwise tolerance may use
+
+\[
+\boxed{
+\mathrm{scale}_i
+=
+\mathrm{atol}_i
++
+\mathrm{rtol}
+\max
+\{
+|y_{n,i}|,
+|y_{n+1,i}|
+\}.
+}
+\]
+
+Then form normalized errors such as
+
+\[
+\boxed{
+\frac{
+e_i
+}{
+\mathrm{scale}_i
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Absolute and Relative Tolerance}
+\label{subsec:ode-atol-rtol}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The absolute tolerance
+
+\[
+\boxed{
+\mathrm{atol}
+}
+\]
+
+controls error for quantities near zero.
+
+The relative tolerance
+
+\[
+\boxed{
+\mathrm{rtol}
+}
+\]
+
+controls error relative to the magnitude of the solution.
+
+Using both is generally more meaningful than using either alone.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Step Acceptance}
+\label{subsec:ode-step-acceptance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+E_n
+\]
+
+be a normalized local-error estimate.
+
+A typical decision is:
+
+\[
+\boxed{
+E_n\leq1
+\Rightarrow
+\text{accept the step},
+}
+\]
+
+and
+
+\[
+\boxed{
+E_n>1
+\Rightarrow
+\text{reject and retry with smaller }h.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adaptive Step-Size Formula}
+\label{subsec:adaptive-step-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose local error behaves approximately like
+
+\[
+C h^{p+1}.
+\]
+
+Then a new step may be selected using
+
+\[
+\boxed{
+h_{\mathrm{new}}
+=
+s
+h
+E_n^{-1/(p+1)},
+}
+\]
+
+where
+
+\[
+0<s<1
+\]
+
+is a safety factor.
+
+Practical solvers also limit how rapidly the step size may increase or
+decrease.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rejected Steps}
+\label{subsec:ode-rejected-steps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the estimated error is too large, the step is rejected.
+
+The numerical state returns to the beginning of the failed step.
+
+The solver then retries using a smaller step size.
+
+Rejected steps are part of normal adaptive integration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dense Output}
+\label{subsec:ode-dense-output}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical solver computes values at discrete internal time points.
+
+Applications may require the solution at arbitrary intermediate times.
+
+Dense output constructs an interpolation formula that is consistent with
+the time-stepping method.
+
+This is more accurate than arbitrary interpolation between stored points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Event Detection}
+\label{subsec:ode-event-detection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An event occurs when a function
+
+\[
+\boxed{
+g(t,y(t))
+}
+\]
+
+crosses zero.
+
+Examples include:
+
+\[
+\boxed{
+\text{impact with the ground},
+}
+\]
+
+\[
+\boxed{
+\text{threshold crossing},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{population extinction}.
+}
+\]
+
+The solver brackets and locates the event time using interpolation or
+root-finding.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Terminal and Nonterminal Events}
+\label{subsec:terminal-nonterminal-events}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A terminal event stops integration.
+
+A nonterminal event is recorded, but integration continues.
+
+Event functions may also specify which crossing direction matters:
+
+\[
+\boxed{
+\text{negative to positive},
+}
+\]
+
+\[
+\boxed{
+\text{positive to negative},
+}
+\]
+
+or either.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conservation Laws}
+\label{subsec:numerical-ode-conservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A differential equation may conserve a quantity
+
+\[
+\boxed{
+I(y(t))
+=
+\text{constant}.
+}
+\]
+
+A general-purpose numerical method may not preserve this invariant
+exactly.
+
+The numerical invariant may slowly drift.
+
+This can become important in long simulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Energy Drift}
+\label{subsec:energy-drift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For mechanical systems, the true energy may satisfy
+
+\[
+\boxed{
+H(q(t),p(t))
+=
+H(q(0),p(0)).
+}
+\]
+
+Standard numerical methods may introduce artificial energy growth or
+decay.
+
+Long-time qualitative behavior can therefore depend strongly on method
+choice.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symplectic Integrators}
+\label{subsec:symplectic-integrators}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symplectic integrators are designed for Hamiltonian systems.
+
+They preserve the underlying symplectic geometry rather than generally
+preserving energy exactly.
+
+Over long times, they often reproduce qualitative mechanical behavior much
+better than generic methods of comparable order.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symplectic Euler Preview}
+\label{subsec:symplectic-euler}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a separable Hamiltonian system
+
+\[
+\boxed{
+\dot{q}
+=
+\frac{\partial H}{\partial p},
+\qquad
+\dot{p}
+=
+-
+\frac{\partial H}{\partial q},
+}
+\]
+
+a symplectic Euler variant updates one variable implicitly and the other
+explicitly.
+
+For example,
+
+\[
+\boxed{
+p_{n+1}
+=
+p_n
+-
+h
+\nabla V(q_n),
+}
+\]
+
+followed by
+
+\[
+\boxed{
+q_{n+1}
+=
+q_n
++
+h
+M^{-1}p_{n+1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Positivity Preservation}
+\label{subsec:ode-positivity-preservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some physical variables must satisfy
+
+\[
+\boxed{
+y(t)\geq0.
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{population},
+}
+\]
+
+\[
+\boxed{
+\text{concentration},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{probability}.
+}
+\]
+
+A numerical method may produce small negative values even when the exact
+solution remains nonnegative.
+
+Method and step-size choices should respect important physical invariants
+when possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Population Conservation}
+\label{subsec:population-conservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compartmental models may satisfy
+
+\[
+\boxed{
+S+E+I+R+D=N.
+}
+\]
+
+A numerical scheme may preserve this exactly, approximately, or poorly.
+
+Checking conserved totals is a useful verification tool.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary-Value Problems}
+\label{subsec:numerical-ode-boundary-value}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ODE boundary-value problem specifies conditions at more than one point.
+
+For example,
+
+\[
+\boxed{
+y''=f(t,y,y'),
+}
+\]
+
+with
+
+\[
+\boxed{
+y(a)=\alpha,
+\qquad
+y(b)=\beta.
+}
+\]
+
+Unlike an initial-value problem, the required initial derivative may be
+unknown.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shooting Method}
+\label{subsec:ode-shooting-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+y''=f(t,y,y'),
+\]
+
+with
+
+\[
+y(a)=\alpha,
+\qquad
+y(b)=\beta,
+\]
+
+guess
+
+\[
+\boxed{
+s=y'(a).
+}
+\]
+
+Solve the initial-value problem using this guess.
+
+Then define terminal mismatch
+
+\[
+\boxed{
+F(s)
+=
+y(b;s)-\beta.
+}
+\]
+
+Adjust \(s\) using root-finding until
+
+\[
+\boxed{
+F(s)=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Shooting Formulation}
+\label{subsec:worked-shooting-formulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Turning a BVP Into Root Finding}
+
+Suppose
+
+\[
+y''=-y,
+\]
+
+with
+
+\[
+y(0)=0,
+\qquad
+y(1)=1.
+\]
+
+Let
+
+\[
+s=y'(0)
+\]
+
+be unknown.
+
+Solve the IVP
+
+\[
+y(0)=0,
+\qquad
+y'(0)=s.
+\]
+
+Define
+
+\[
+F(s)
+=
+y(1;s)-1.
+\]
+
+The boundary-value problem becomes
+
+\[
+\boxed{
+F(s)=0.
+}
+\]
+
+Thus a numerical ODE solver is nested inside a numerical root solver.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Shooting}
+\label{subsec:ode-multiple-shooting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Single shooting can become unstable when the IVP is highly sensitive to
+the unknown initial conditions.
+
+Multiple shooting divides the interval into subintervals.
+
+Separate initial states are introduced on each segment and continuity
+constraints connect them.
+
+This can improve numerical conditioning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Differences for Boundary-Value Problems}
+\label{subsec:ode-bvp-finite-differences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+y''(x)=f(x,y),
+\]
+
+use
+
+\[
+\boxed{
+y''(x_i)
+\approx
+\frac{
+y_{i+1}-2y_i+y_{i-1}
+}{
+h^2
+}.
+}
+\]
+
+Then the differential equation becomes a system of algebraic equations for
+
+\[
+y_1,\ldots,y_{N-1}.
+\]
+
+Boundary values are inserted directly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Boundary-Value Systems}
+\label{subsec:nonlinear-bvp-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the differential equation is nonlinear, finite-difference
+discretization produces a nonlinear algebraic system:
+
+\[
+\boxed{
+F(Y)=0.
+}
+\]
+
+Newton's method can then be applied to the entire discrete system.
+
+This again demonstrates the connection between differential equations,
+numerical linear algebra, and nonlinear equation solving.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Method of Lines Preview}
+\label{subsec:method-of-lines-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A time-dependent PDE can often be discretized only in space.
+
+The spatial derivatives are replaced by finite-dimensional
+approximations.
+
+The result is a large system of ODEs:
+
+\[
+\boxed{
+\mathbf{u}'(t)
+=
+F(t,\mathbf{u}(t)).
+}
+\]
+
+An ODE solver then integrates the semi-discrete system in time.
+
+This is the method of lines.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Error Propagation}
+\label{subsec:ode-error-propagation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a numerical perturbation at one step is
+
+\[
+\delta_n.
+\]
+
+The dynamics and numerical method propagate that perturbation into future
+steps.
+
+For nonlinear equations, sensitivity may depend on derivatives such as
+
+\[
+\boxed{
+\frac{\partial f}{\partial y}.
+}
+\]
+
+Stable methods control the amplification of these perturbations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lipschitz Condition}
+\label{subsec:ode-lipschitz-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+|f(t,y)-f(t,z)|
+\leq
+L|y-z|.
+}
+\]
+
+This Lipschitz condition helps control solution sensitivity and numerical
+error growth.
+
+It also appears in existence and uniqueness theory for ODEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Gronwall-Type Error Growth}
+\label{subsec:discrete-gronwall-ode}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A typical error recurrence has form
+
+\[
+\boxed{
+|e_{n+1}|
+\leq
+(1+Lh)|e_n|
++
+C h^{p+1}.
+}
+\]
+
+Repeated application gives a bound resembling
+
+\[
+\boxed{
+|e_n|
+\leq
+C'
+h^p
+e^{L(t_n-t_0)}.
+}
+\]
+
+This explains how local error becomes global error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convergence Study}
+\label{subsec:ode-convergence-study}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To test a solver:
+
+\begin{enumerate}
+    \item solve with step size \(h\);
+    \item solve with \(h/2\);
+    \item solve with \(h/4\);
+    \item compare against an exact or highly accurate reference solution;
+    \item estimate the observed convergence order.
+\end{enumerate}
+
+For an order-\(p\) method,
+
+\[
+\boxed{
+E(h)
+\approx
+C h^p.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimating ODE Convergence Order}
+\label{subsec:estimating-ode-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+E(h)
+\]
+
+and
+
+\[
+E(h/2)
+\]
+
+are known, then
+
+\[
+\boxed{
+p
+\approx
+\log_2
+\left(
+\frac{
+E(h)
+}{
+E(h/2)
+}
+\right).
+}
+\]
+
+For example, if error decreases by a factor of approximately \(16\), then
+
+\[
+\boxed{
+p\approx4.
+}
+\]
+
+This is consistent with fourth-order convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Step Size and Computational Cost}
+\label{subsec:ode-step-size-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a fixed interval of length \(T\), using step size \(h\) requires
+approximately
+
+\[
+\boxed{
+N
+=
+\frac{T}{h}
+}
+\]
+
+steps.
+
+Halving \(h\) approximately doubles the number of steps.
+
+Higher-order methods may use more function evaluations per step but require
+fewer steps for a given accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function Evaluation Cost}
+\label{subsec:ode-function-evaluation-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For many simulation problems, evaluating
+
+\[
+f(t,y)
+\]
+
+is expensive.
+
+Forward Euler requires one new evaluation per step.
+
+Classical RK4 requires four stage evaluations per step.
+
+An adaptive higher-order method may still be cheaper overall because it
+can take much larger time steps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stiffness Detection}
+\label{subsec:ode-stiffness-detection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Practical solvers may detect stiffness when:
+
+\[
+\boxed{
+\text{explicit steps repeatedly fail},
+}
+\]
+
+\[
+\boxed{
+\text{step sizes become extremely small},
+}
+\]
+
+or when estimated Jacobian eigenvalues indicate rapid stable modes.
+
+Some software can switch automatically between nonstiff and stiff
+integration strategies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonstiff Method Selection}
+\label{subsec:nonstiff-method-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For smooth nonstiff initial-value problems, adaptive explicit Runge--Kutta
+methods are often effective.
+
+Advantages include:
+
+\[
+\boxed{
+\text{no nonlinear solve},
+}
+\]
+
+\[
+\boxed{
+\text{good high-order accuracy},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{straightforward adaptive stepping}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stiff Method Selection}
+\label{subsec:stiff-method-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For stiff problems, consider methods with strong stability properties such
+as:
+
+\[
+\boxed{
+\text{BDF},
+}
+\]
+
+\[
+\boxed{
+\text{implicit Runge--Kutta},
+}
+\]
+
+or other specialized stiff integrators.
+
+Providing an accurate Jacobian can substantially improve solver
+performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical ODE Workflow}
+\label{subsec:numerical-ode-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item write the ODE or ODE system clearly;
+    \item specify initial conditions;
+    \item convert higher-order equations to first-order form;
+    \item determine the integration interval;
+    \item identify important physical constraints and invariants;
+    \item assess whether stiffness is likely;
+    \item choose an explicit or implicit solver;
+    \item choose absolute and relative tolerances;
+    \item supply a Jacobian if appropriate;
+    \item configure event functions if needed;
+    \item compute the numerical trajectory;
+    \item inspect rejected steps and step-size behavior;
+    \item verify conserved quantities or known qualitative behavior;
+    \item repeat with tighter tolerances;
+    \item perform a convergence study;
+    \item compare with exact solutions or independent methods when
+          available;
+    \item confirm that the numerical solution is sufficiently accurate for
+          the intended application.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Numerical ODE Method}
+\label{subsec:choosing-numerical-ode-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For introductory hand calculations, use:
+
+\[
+\boxed{
+\text{forward Euler}
+}
+\]
+
+or a low-order Runge--Kutta method.
+
+For general smooth nonstiff problems, use:
+
+\[
+\boxed{
+\text{adaptive explicit Runge--Kutta}.
+}
+\]
+
+For stiff systems, consider:
+
+\[
+\boxed{
+\text{implicit or BDF-type methods}.
+}
+\]
+
+For long-time Hamiltonian dynamics, consider:
+
+\[
+\boxed{
+\text{structure-preserving or symplectic methods}.
+}
+\]
+
+For boundary-value problems, consider:
+
+\[
+\boxed{
+\text{shooting}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{finite-difference/collocation approaches}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:numerical-ode-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Using the Wrong Time Level in Euler's Method}
+
+Forward Euler uses
+
+\[
+\boxed{
+f(t_n,y_n).
+}
+\]
+
+Backward Euler uses
+
+\[
+\boxed{
+f(t_{n+1},y_{n+1}).
+}
+\]
+
+The two methods are fundamentally different.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Local and Global Error}
+
+A one-step method may have local defect
+
+\[
+O(h^{p+1})
+\]
+
+while having global error
+
+\[
+O(h^p).
+\]
+
+The errors accumulate across time steps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Smaller Step Size Always Fixes Everything}
+
+Reducing \(h\) improves discretization accuracy only until floating-point,
+modeling, and other errors become relevant.
+
+It also increases computational cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Stability}
+
+A method can have a high formal order but still produce a useless solution
+if the chosen step lies outside its stability region.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Explicit Euler on a Stiff Problem With a Large Step}
+
+The exact solution may decay smoothly while Euler oscillates or diverges.
+
+The problem is numerical stability rather than physical instability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Implicit Means Automatically Accurate}
+
+Implicit methods may be stable at large steps but still have substantial
+truncation error.
+
+Stability and accuracy are different properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Nonlinear Solver Error}
+
+An implicit step is only as accurate as the nonlinear equation solve.
+
+Stopping Newton iteration too early introduces additional error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Jacobian Quality}
+
+Poor Jacobian approximations can make stiff integration inefficient or
+cause nonlinear solves to fail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Only Relative Tolerance Near Zero}
+
+When a solution component approaches zero, relative error alone becomes
+poorly scaled.
+
+An absolute tolerance is also needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Only Absolute Tolerance for Large Variables}
+
+A single absolute tolerance can demand excessive accuracy for large
+variables or insufficient accuracy for small ones.
+
+Relative and absolute tolerances should be combined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpolating Events From Coarse Output Only}
+
+An event may occur between stored output times.
+
+Proper event location should use the solver's internal interpolation or
+dense-output mechanism.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Conserved Quantities}
+
+A trajectory can look visually plausible while gradually violating mass,
+energy, or population conservation.
+
+Check known invariants.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Generic Methods for Very Long Hamiltonian Simulations}
+
+Small per-step geometric errors may accumulate systematically.
+
+Structure-preserving methods may provide much better long-time behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying a Multistep Formula Without Startup Values}
+
+A \(k\)-step method requires sufficient previous solution values.
+
+A separate startup procedure is needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Zero-Stability in Multistep Methods}
+
+A formally accurate multistep formula can still fail to converge if its
+homogeneous recurrence is unstable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating a Boundary-Value Problem Like an Initial-Value Problem}
+
+Boundary conditions at both endpoints do not usually determine all initial
+data directly.
+
+Shooting, finite differences, or collocation may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:numerical-ode-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Mechanics.}
+Numerical ODE methods simulate trajectories, oscillators, rigid-body
+motion, and mechanical systems.
+
+\medskip
+
+\textbf{Biology.}
+Population, epidemic, ecological, and biochemical models are often systems
+of nonlinear ODEs.
+
+\medskip
+
+\textbf{Chemistry.}
+Chemical reaction networks can produce strongly stiff ODE systems because
+reaction rates span many time scales.
+
+\medskip
+
+\textbf{Engineering.}
+Circuit models, control systems, thermal models, and dynamic processes are
+integrated numerically.
+
+\medskip
+
+\textbf{Optimal Control.}
+Each candidate control trajectory requires integration of state dynamics,
+and indirect methods also integrate costate equations.
+
+\medskip
+
+\textbf{Economics.}
+Continuous-time growth, capital, adjustment, and dynamic equilibrium models
+often require numerical integration.
+
+\medskip
+
+\textbf{Astronomy.}
+Orbital and \(N\)-body systems require accurate long-time numerical
+integration.
+
+\medskip
+
+\textbf{Scientific Computing.}
+ODE integrators frequently form the time-stepping component of larger
+simulation software.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:numerical-ode-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Write the standard first-order IVP form.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a time step.
+\end{exercise}
+
+\begin{exercise}[1]
+State the forward Euler method.
+\end{exercise}
+
+\begin{exercise}[1]
+State the backward Euler method.
+\end{exercise}
+
+\begin{exercise}[1]
+Define local truncation error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define global error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define absolute stability.
+\end{exercise}
+
+\begin{exercise}[1]
+Define stiffness conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an adaptive time-step method.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a boundary-value problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Use forward Euler to approximate the solution of
+
+\[
+y'=2y,
+\qquad
+y(0)=1
+\]
+
+for two time steps with a specified \(h\).
+\end{exercise}
+
+\begin{exercise}[2]
+Compare the numerical values with
+
+\[
+y(t)=e^{2t}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Derive forward Euler from Taylor's theorem.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the local truncation error of forward Euler.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a convergence study for Euler's method.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply backward Euler to
+
+\[
+y'=-4y.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the explicit formula for the backward Euler update in the previous
+problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare forward and backward Euler for several step sizes.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply the trapezoidal method to a linear decay equation.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform one improved Euler step.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform one explicit midpoint step.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the errors of Euler, midpoint, and improved Euler.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform one classical RK4 step.
+\end{exercise}
+
+\begin{exercise}[3]
+Use RK4 for several steps and compare with an exact solution.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the Butcher tableau for forward Euler.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the Butcher tableau for the explicit midpoint method.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret the stages of RK4.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply the two-step Adams--Bashforth method when the required history is
+given.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply a predictor--corrector pair.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why multistep methods require startup values.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply the two-step BDF formula to a linear ODE.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the first characteristic polynomial of a given linear multistep
+method.
+\end{exercise}
+
+\begin{exercise}[3]
+Check its root condition for zero-stability.
+\end{exercise}
+
+\begin{exercise}[2]
+Apply forward Euler to
+
+\[
+y'=\lambda y
+\]
+
+and derive its stability function.
+\end{exercise}
+
+\begin{exercise}[3]
+Sketch or describe the forward Euler absolute-stability region.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine the maximum stable step for
+
+\[
+y'=-50y.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the backward Euler stability function.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that backward Euler is stable for every negative real \(h\lambda\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the trapezoidal stability function.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the trapezoidal method is A-stable but not L-stable.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why stiff problems can force explicit methods to use unnecessarily
+small steps.
+\end{exercise}
+
+\begin{exercise}[2]
+Convert
+
+\[
+y''+4y=0
+\]
+
+to a first-order system.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply one Euler step to the resulting system.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the Jacobian for a given nonlinear ODE system.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the Newton system required by backward Euler.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one Newton iteration for an implicit Euler step.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Jacobian reuse can reduce stiff-solver cost.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the purpose of embedded Runge--Kutta pairs.
+\end{exercise}
+
+\begin{exercise}[3]
+Given two embedded approximations, compute a local error estimate.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a normalized error using specified absolute and relative
+tolerances.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether an adaptive step should be accepted.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a proposed new step size from an error estimate.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why both absolute and relative tolerances are useful.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an event function for an object hitting the ground.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between terminal and nonterminal events.
+\end{exercise}
+
+\begin{exercise}[3]
+Check whether Euler preserves the energy of the harmonic oscillator.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the motivation for symplectic integrators.
+\end{exercise}
+
+\begin{exercise}[3]
+Check whether a numerical epidemic solution preserves total population.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a shooting method for a second-order boundary-value problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the finite-difference equations for
+
+\[
+y''=f(x,y)
+\]
+
+on a uniform grid.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain multiple shooting.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the method of lines.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate observed convergence order from two ODE solution errors.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare computational cost of Euler and RK4 for a specified number of
+steps.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove first-order convergence of Euler's method under a Lipschitz
+condition.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive a discrete Gronwall error estimate.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive order conditions for second-order explicit Runge--Kutta methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the fourth-order classical Runge--Kutta order conditions
+conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Study general Runge--Kutta Butcher trees conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Adams--Bashforth formulas by polynomial interpolation of the
+derivative.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Adams--Moulton formulas.
+\end{exercise}
+
+\begin{exercise}[4]
+Study consistency conditions for linear multistep methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the root condition for zero-stability.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Dahlquist equivalence theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Dahlquist barriers for linear multistep methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive stability functions for several Runge--Kutta methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study A-stability and L-stability for implicit methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate stiffness using Jacobian eigenvalues.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Rosenbrock methods for stiff ODEs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study implicit Runge--Kutta methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study adaptive embedded Runge--Kutta pairs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stiffness-aware variable-order BDF methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive symplectic Euler from Hamiltonian equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Störmer--Verlet method.
+\end{exercise}
+
+\begin{exercise}[4]
+Compare long-time energy behavior of RK4 and a symplectic method.
+\end{exercise}
+
+\begin{exercise}[4]
+Study positivity-preserving time integration.
+\end{exercise}
+
+\begin{exercise}[4]
+Study numerical differential-algebraic equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate collocation methods for ODE boundary-value problems.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:numerical-ode-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical ODE methods approximate solutions of
+
+\[
+\boxed{
+y'=f(t,y),
+\qquad
+y(t_0)=y_0.
+}
+\]
+
+Forward Euler is
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+hf(t_n,y_n),
+}
+\]
+
+while backward Euler is
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+hf(t_{n+1},y_{n+1}).
+}
+\]
+
+Classical RK4 uses four slope evaluations:
+
+\[
+\boxed{
+y_{n+1}
+=
+y_n
++
+\frac{h}{6}
+(
+k_1+2k_2+2k_3+k_4
+).
+}
+\]
+
+Numerical ODE methods must be analyzed in terms of
+
+\[
+\boxed{
+\text{consistency}
++
+\text{stability}
++
+\text{convergence}.
+}
+\]
+
+For the test equation
+
+\[
+y'=\lambda y,
+\]
+
+stability is determined through
+
+\[
+\boxed{
+y_{n+1}
+=
+R(h\lambda)y_n.
+}
+\]
+
+Stiff problems often favor
+
+\[
+\boxed{
+\text{implicit methods}
+}
+\]
+
+with strong stability properties.
+
+Adaptive solvers balance accuracy and efficiency by controlling local error
+and varying the step size.
+
+Numerical ODE computation therefore combines
+
+\[
+\boxed{
+\text{differential equations}
++
+\text{approximation}
++
+\text{stability theory}
++
+\text{nonlinear algebra}
++
+\text{adaptive computation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:numerical-ode-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Numerical ODEs apply the error, stability, and convergence framework of
+Section~\ref{sec:numerical-analysis} to dynamical systems from Chapter~9.
+Implicit methods rely heavily on the linear-system techniques of
+Section~\ref{sec:numerical-linear-algebra}, while nonlinear implicit solves
+use methods related to Section~\ref{sec:numerical-optimization}. Adaptive
+Runge--Kutta and stiff integration methods form the computational
+foundation of many mathematical simulations and optimal-control
+algorithms. The next section, Numerical PDEs, extends these ideas to
+partial differential equations by discretizing space and time using
+finite-difference, finite-volume, finite-element, spectral, and
+method-of-lines approaches.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.4 Numerical Ordinary Differential Equations
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard numerical ODE theory.
+%   - Standard Runge--Kutta and linear multistep methods.
+%   - Standard stiff integration and adaptive-step techniques.
+%
+% Used for:
+%   - initial-value problems;
+%   - numerical time grids;
+%   - forward Euler;
+%   - local and global truncation error;
+%   - consistency and convergence;
+%   - backward Euler;
+%   - explicit and implicit methods;
+%   - trapezoidal method;
+%   - improved Euler;
+%   - explicit midpoint;
+%   - Runge--Kutta methods;
+%   - classical RK4;
+%   - Butcher tableaux;
+%   - one-step methods;
+%   - linear multistep methods;
+%   - Adams--Bashforth methods;
+%   - Adams--Moulton methods;
+%   - predictor--corrector methods;
+%   - BDF methods;
+%   - zero-stability;
+%   - Dahlquist equivalence principle;
+%   - linear stability test equation;
+%   - amplification functions;
+%   - absolute stability regions;
+%   - A-stability;
+%   - L-stability;
+%   - stiffness;
+%   - systems of ODEs;
+%   - higher-order-to-first-order conversion;
+%   - Jacobians;
+%   - Newton solves for implicit methods;
+%   - adaptive time stepping;
+%   - embedded Runge--Kutta methods;
+%   - absolute and relative tolerances;
+%   - rejected steps;
+%   - dense output;
+%   - event detection;
+%   - invariant and conservation issues;
+%   - symplectic integration preview;
+%   - positivity preservation;
+%   - boundary-value problems;
+%   - shooting and multiple shooting;
+%   - finite-difference BVP methods;
+%   - method-of-lines preview;
+%   - convergence studies;
+%   - computational cost;
+%   - applications and exercises.
+%
+% Notes:
+%   - Numerical PDEs are developed next in Section 11.5.
+%   - Monte Carlo Methods follow in Section 11.6.
+%   - Scientific Computing follows in Section 11.7.
+%   - Differential-equation theory appears in Chapter 9.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

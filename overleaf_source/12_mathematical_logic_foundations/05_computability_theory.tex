@@ -1,0 +1,3659 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 12.5 COMPUTABILITY THEORY
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Computability Theory}
+\label{sec:computability-theory}
+
+\prerequisite{
+Formal logic, proof theory, functions, sets, relations, countability,
+mathematical induction, algorithms, discrete mathematics, and elementary
+number theory.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of computability theory;
+    \item distinguish informal algorithms from formal models of computation;
+    \item understand effective procedures conceptually;
+    \item recognize Turing machines;
+    \item describe tape, states, symbols, transitions, and configurations;
+    \item understand deterministic Turing-machine computation;
+    \item recognize halting and nonhalting behavior;
+    \item distinguish recognition from decision;
+    \item define computable functions;
+    \item recognize partial computable functions;
+    \item understand semidecidable or recognizable sets;
+    \item distinguish decidable and recognizable sets;
+    \item understand enumerability;
+    \item recognize recursively enumerable sets;
+    \item understand enumerators;
+    \item recognize equivalent models of computation;
+    \item understand the Church--Turing thesis;
+    \item recognize register machines and lambda calculus conceptually;
+    \item understand universal computation;
+    \item recognize universal Turing machines;
+    \item understand encoding of machines and inputs;
+    \item recognize self-reference in computation;
+    \item understand the Halting Problem;
+    \item prove the Halting Problem undecidable;
+    \item recognize diagonal arguments in computability;
+    \item understand mapping reductions;
+    \item use reductions to prove undecidability;
+    \item recognize many-one reducibility;
+    \item understand closure properties of decidable languages;
+    \item understand closure properties of recognizable languages;
+    \item distinguish a language from its complement;
+    \item understand the relationship between recognizability and
+          co-recognizability;
+    \item recognize Rice's theorem;
+    \item understand semantic properties of programs;
+    \item recognize undecidability of equivalence problems;
+    \item understand Post's correspondence problem conceptually;
+    \item recognize undecidable problems in formal systems;
+    \item understand computation over strings and natural numbers;
+    \item understand pairing and coding functions;
+    \item recognize universal computable functions;
+    \item understand bounded simulation;
+    \item recognize dovetailing;
+    \item understand effective enumeration;
+    \item distinguish computability from computational complexity;
+    \item recognize decidable but computationally difficult problems;
+    \item understand oracle computation conceptually;
+    \item recognize relative computability;
+    \item understand Turing reducibility conceptually;
+    \item recognize the arithmetic hierarchy conceptually;
+    \item understand computable approximations conceptually;
+    \item connect computability with proof theory, recursion theory,
+          complexity theory, type theory, and mathematical foundations.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Computability Theory?}
+\label{subsec:what-is-computability-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computability theory studies which mathematical problems can be solved by
+algorithms.
+
+The central question is
+
+\[
+\boxed{
+\text{What can be computed in principle?}
+}
+\]
+
+This is different from asking
+
+\[
+\boxed{
+\text{What can be computed efficiently?}
+}
+\]
+
+The first question belongs primarily to computability theory.
+
+The second belongs primarily to computational complexity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decision Problems}
+\label{subsec:computability-decision-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A decision problem asks for a yes-or-no answer.
+
+Examples include:
+
+\[
+\boxed{
+\text{Is }n\text{ prime?}
+}
+\]
+
+\[
+\boxed{
+\text{Does a graph contain a cycle?}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Will a given program eventually halt?}
+}
+\]
+
+Computability theory asks whether an algorithm exists that always produces
+the correct answer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Languages as Decision Problems}
+\label{subsec:languages-as-decision-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\Sigma
+\]
+
+be a finite alphabet.
+
+A language is a set
+
+\[
+\boxed{
+L\subseteq\Sigma^*,
+}
+\]
+
+where
+
+\[
+\Sigma^*
+\]
+
+is the set of all finite strings over \(\Sigma\).
+
+A decision problem can be represented by asking:
+
+\[
+\boxed{
+\text{Given }w\in\Sigma^*,
+\text{ is }w\in L?
+}
+\]
+
+Thus algorithms can be viewed as machines deciding languages.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algorithms and Effective Procedures}
+\label{subsec:effective-procedures}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Informally, an algorithm is a finite, precise procedure for transforming
+inputs into outputs.
+
+A mathematical theory of computation requires a formal definition.
+
+Several different formal models were developed, including:
+
+\[
+\boxed{
+\text{Turing machines},
+}
+\]
+
+\[
+\boxed{
+\lambda calculus},
+\]
+
+\[
+\boxed{
+\text{recursive functions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{register machines}.
+}
+\]
+
+These models agree on the broad class of effectively computable functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Turing Machines}
+\label{subsec:turing-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Turing machine is an idealized mathematical model of computation.
+
+It consists conceptually of:
+
+\[
+\boxed{
+\text{a finite set of states},
+}
+\]
+
+\[
+\boxed{
+\text{an infinite tape},
+}
+\]
+
+\[
+\boxed{
+\text{a read/write head},
+}
+\]
+
+\[
+\boxed{
+\text{a finite tape alphabet},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{transition rules}.
+}
+\]
+
+Despite its simplicity, the model captures general algorithmic computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tape}
+\label{subsec:turing-machine-tape}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The tape is divided into cells.
+
+Each cell stores one symbol from a finite alphabet
+
+\[
+\Gamma.
+\]
+
+One distinguished symbol is the blank symbol, often denoted
+
+\[
+\boxed{
+\sqcup.
+}
+\]
+
+Only finitely many tape cells are nonblank at the start of an ordinary
+finite-input computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Read-Write Head}
+\label{subsec:turing-machine-head}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The machine has a head positioned over one tape cell.
+
+At each step, the head:
+
+\begin{enumerate}
+    \item reads the current symbol;
+    \item writes a symbol;
+    \item changes state;
+    \item moves one cell left or right, or possibly remains stationary
+          depending on the chosen formalism.
+\end{enumerate}
+
+Thus local actions produce an arbitrarily long computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{States}
+\label{subsec:turing-machine-states}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Turing machine has a finite state set
+
+\[
+\boxed{
+Q.
+}
+\]
+
+Among these are typically:
+
+\[
+\boxed{
+q_0
+=
+\text{start state},
+}
+\]
+
+\[
+\boxed{
+q_{\mathrm{acc}}
+=
+\text{accept state},
+}
+\]
+
+and
+
+\[
+\boxed{
+q_{\mathrm{rej}}
+=
+\text{reject state}.
+}
+\]
+
+A machine halts when it reaches a designated halting state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transition Function}
+\label{subsec:turing-transition-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a deterministic Turing machine, the transition function has form
+
+\[
+\boxed{
+\delta:
+Q\times\Gamma
+\longrightarrow
+Q\times\Gamma\times\{L,R\}
+}
+\]
+
+for nonhalting states.
+
+If
+
+\[
+\delta(q,a)
+=
+(q',b,R),
+\]
+
+then the machine:
+
+\begin{enumerate}
+    \item currently in state \(q\);
+    \item reads symbol \(a\);
+    \item writes \(b\);
+    \item changes to state \(q'\);
+    \item moves one cell to the right.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Formal Turing-Machine Description}
+\label{subsec:formal-turing-machine}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One common formalization writes a Turing machine as
+
+\[
+\boxed{
+M
+=
+(Q,\Sigma,\Gamma,\delta,q_0,q_{\mathrm{acc}},q_{\mathrm{rej}}),
+}
+\]
+
+where:
+
+\[
+\Sigma
+\]
+
+is the input alphabet,
+
+\[
+\Gamma
+\]
+
+is the tape alphabet,
+
+and the remaining components specify the states and transitions.
+
+Different textbooks use slightly different conventions without changing
+the computational power.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Configurations}
+\label{subsec:turing-configurations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A configuration records the complete instantaneous state of a machine.
+
+It includes:
+
+\[
+\boxed{
+\text{current state},
+}
+\]
+
+\[
+\boxed{
+\text{tape contents},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{head position}.
+}
+\]
+
+Thus a computation is a sequence
+
+\[
+\boxed{
+C_0
+\rightarrow
+C_1
+\rightarrow
+C_2
+\rightarrow
+\cdots.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Halting}
+\label{subsec:turing-halting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A computation halts if it eventually reaches a designated halting state.
+
+It may:
+
+\[
+\boxed{
+\text{accept},
+}
+\]
+
+\[
+\boxed{
+\text{reject},
+}
+\]
+
+or, in some conventions, halt with a computed output.
+
+A machine may also run forever.
+
+Nontermination is a fundamental part of computability theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recognizers}
+\label{subsec:turing-recognizers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Turing machine \(M\) recognizes language \(L\) if:
+
+\[
+w\in L
+\Longrightarrow
+M
+\text{ eventually accepts }w,
+\]
+
+and
+
+\[
+w\notin L
+\Longrightarrow
+M
+\text{ either rejects or runs forever}.
+\]
+
+Thus recognition guarantees halting only on positive instances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deciders}
+\label{subsec:turing-deciders}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Turing machine decides \(L\) if it halts on every input and satisfies:
+
+\[
+\boxed{
+w\in L
+\Longrightarrow
+M
+\text{ accepts},
+}
+\]
+
+and
+
+\[
+\boxed{
+w\notin L
+\Longrightarrow
+M
+\text{ rejects}.
+}
+\]
+
+A decidable language is therefore algorithmically solvable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recognizable and Decidable Languages}
+\label{subsec:recognizable-decidable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every decidable language is recognizable:
+
+\[
+\boxed{
+\text{decidable}
+\Longrightarrow
+\text{recognizable}.
+}
+\]
+
+The converse is false.
+
+There exist languages for which membership can be confirmed when true but
+for which no algorithm always halts and answers correctly on every input.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Terminology}
+\label{subsec:computability-terminology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Several equivalent terms are common.
+
+A decidable set may be called:
+
+\[
+\boxed{
+\text{recursive},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{computable}.
+}
+\]
+
+A recognizable set may be called:
+
+\[
+\boxed{
+\text{recursively enumerable},
+}
+\]
+
+\[
+\boxed{
+\text{computably enumerable},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{semidecidable}.
+}
+\]
+
+Modern usage often favors \textbf{computably enumerable}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: A Decidable Language}
+\label{subsec:worked-decidable-language}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Even Binary Integers}
+
+Let
+
+\[
+L
+=
+\{
+w\in\{0,1\}^*:
+w
+\text{ represents an even binary integer}
+\}.
+\]
+
+A binary integer is even exactly when its final digit is \(0\).
+
+An algorithm therefore:
+
+\begin{enumerate}
+    \item reads the final input symbol;
+    \item accepts if the symbol is \(0\);
+    \item rejects otherwise.
+\end{enumerate}
+
+The procedure always halts.
+
+\begin{answerbox}
+\[
+\boxed{
+L
+\text{ is decidable}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computable Functions}
+\label{subsec:computable-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A function
+
+\[
+f:\Sigma^*\to\Sigma^*
+\]
+
+is computable if some Turing machine, on every input \(w\), halts with
+
+\[
+\boxed{
+f(w)
+}
+\]
+
+encoded on its tape.
+
+Functions on natural numbers can be treated similarly through an encoding
+of integers as strings.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partial Computable Functions}
+\label{subsec:partial-computable-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A partial function
+
+\[
+f:\Sigma^*
+\rightharpoonup
+\Sigma^*
+\]
+
+need not be defined on every input.
+
+A machine computes \(f\) if:
+
+\[
+w\in\operatorname{dom}(f)
+\Longrightarrow
+M(w)
+\text{ halts with output }f(w),
+\]
+
+while
+
+\[
+w\notin\operatorname{dom}(f)
+\]
+
+may cause the machine to run forever.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Versus Partial Computability}
+\label{subsec:total-partial-computability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A total computable function halts on every valid input.
+
+A partial computable function may fail to halt for some inputs.
+
+Thus:
+
+\[
+\boxed{
+\text{total computable}
+\subsetneq
+\text{partial computable}.
+}
+\]
+
+Partial functions are essential because nontermination cannot be ignored in
+a general theory of computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic Functions}
+\label{subsec:characteristic-functions-computability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a set
+
+\[
+A\subseteq\mathbb{N},
+\]
+
+define the characteristic function
+
+\[
+\boxed{
+\chi_A(n)
+=
+\begin{cases}
+1,& n\in A,\\
+0,& n\notin A.
+\end{cases}
+}
+\]
+
+Then \(A\) is decidable exactly when
+
+\[
+\boxed{
+\chi_A
+}
+\]
+
+is a total computable function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Enumerators}
+\label{subsec:computability-enumerators}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An enumerator is a machine that prints elements of a language, possibly
+with repetitions and in arbitrary order.
+
+A language \(L\) is computably enumerable if there exists an enumerator
+whose set of outputs is exactly
+
+\[
+\boxed{
+L.
+}
+\]
+
+This provides another characterization of recognizability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recognizability and Enumeration}
+\label{subsec:recognizability-enumeration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A language is Turing recognizable if and only if it can be enumerated by a
+Turing machine.
+
+Thus
+
+\[
+\boxed{
+\text{recognizable}
+\iff
+\text{computably enumerable}.
+}
+\]
+
+The proof uses systematic simulation of computations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dovetailing}
+\label{subsec:dovetailing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose infinitely many computations must be simulated, but some may never
+halt.
+
+Running them one at a time could get stuck forever.
+
+Dovetailing interleaves the simulations:
+
+\[
+\boxed{
+1\text{ step of computation }1,
+}
+\]
+
+\[
+\boxed{
+1\text{ step each of computations }1,2,
+}
+\]
+
+\[
+\boxed{
+1\text{ step each of computations }1,2,3,
+}
+\]
+
+and so on.
+
+No single nonhalting computation permanently blocks the others.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Dovetailing}
+\label{subsec:worked-dovetailing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Searching Many Computations}
+
+Suppose machines
+
+\[
+M_1,M_2,M_3,\ldots
+\]
+
+are running on inputs
+
+\[
+w_1,w_2,w_3,\ldots.
+\]
+
+Instead of waiting for \(M_1(w_1)\) to finish, simulate:
+
+\[
+M_1
+\]
+
+for one step,
+
+then
+
+\[
+M_1,M_2
+\]
+
+for another step each,
+
+then
+
+\[
+M_1,M_2,M_3,
+\]
+
+and continue.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{Every individual computation eventually receives arbitrarily many
+simulation steps.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equivalent Models of Computation}
+\label{subsec:equivalent-computation-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many mathematically different computational systems define the same class
+of computable functions.
+
+Examples include:
+
+\[
+\boxed{
+\text{Turing machines},
+}
+\]
+
+\[
+\boxed{
+\lambda calculus,
+}
+\]
+
+\[
+\boxed{
+\mu\text{-recursive functions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{register machines}.
+}
+\]
+
+This robustness motivates the Church--Turing thesis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Church--Turing Thesis}
+\label{subsec:church-turing-thesis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Church--Turing thesis states, informally:
+
+\[
+\boxed{
+\text{every effectively calculable function is Turing computable}.
+}
+\]
+
+This is not a theorem in the ordinary mathematical sense because
+``effectively calculable'' is an informal concept.
+
+It is a foundational thesis connecting intuitive algorithms with formal
+computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why the Church--Turing Thesis Is Plausible}
+\label{subsec:why-church-turing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Its plausibility is supported by the fact that many independently proposed
+models of effective computation produce the same class of functions.
+
+Furthermore, ordinary programming languages can simulate Turing machines
+and Turing machines can simulate general-purpose programs, abstracting away
+finite resource limits.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nondeterministic Turing Machines}
+\label{subsec:nondeterministic-turing-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nondeterministic Turing machine may have several possible transitions
+from one configuration.
+
+It accepts if at least one branch of computation accepts.
+
+In computability theory, nondeterminism does not increase which languages
+are decidable or recognizable:
+
+\[
+\boxed{
+\text{deterministic and nondeterministic Turing machines have the same
+computability power}.
+}
+\]
+
+The difference becomes important in complexity theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multitape Turing Machines}
+\label{subsec:multitape-turing-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multitape Turing machine has several tapes and heads.
+
+It may be much more convenient or faster for some computations.
+
+However, every multitape machine can be simulated by a standard single-tape
+Turing machine.
+
+Thus multitape machines do not change the class of computable functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robustness of Computability}
+\label{subsec:robustness-computability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Changing details such as:
+
+\[
+\boxed{
+\text{number of tapes},
+}
+\]
+
+\[
+\boxed{
+\text{alphabet size},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{determinism versus nondeterminism}
+}
+\]
+
+does not fundamentally change which problems are computable.
+
+This invariance is one of the strongest features of computability theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Encoding Machines}
+\label{subsec:encoding-machines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Turing machine has a finite description.
+
+Therefore it can be encoded as a finite string or natural number.
+
+Write
+
+\[
+\boxed{
+\langle M\rangle
+}
+\]
+
+for an encoding of machine \(M\).
+
+Likewise,
+
+\[
+\boxed{
+\langle M,w\rangle
+}
+\]
+
+encodes a machine together with an input.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Countably Many Programs}
+\label{subsec:countably-many-programs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every Turing machine has a finite description over a finite alphabet.
+
+Therefore the set of all Turing machines is countable.
+
+One may list them:
+
+\[
+\boxed{
+M_0,M_1,M_2,\ldots.
+}
+\]
+
+The same holds for programs in any ordinary finite-description programming
+language.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncountably Many Functions}
+\label{subsec:uncountably-many-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider Boolean-valued functions
+
+\[
+f:\mathbb{N}\to\{0,1\}.
+\]
+
+Each such function corresponds to a subset of \(\mathbb{N}\).
+
+Therefore there are
+
+\[
+\boxed{
+2^{\aleph_0}
+}
+\]
+
+such functions.
+
+Since there are only countably many programs,
+
+\[
+\boxed{
+\text{most functions }\mathbb{N}\to\{0,1\}
+\text{ are not computable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universal Turing Machine}
+\label{subsec:universal-turing-machine}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A universal Turing machine \(U\) takes as input
+
+\[
+\boxed{
+\langle M,w\rangle
+}
+\]
+
+and simulates machine \(M\) on input \(w\).
+
+Thus one machine can execute the descriptions of all other machines.
+
+Conceptually,
+
+\[
+\boxed{
+U(\langle M,w\rangle)
+=
+M(w).
+}
+\]
+
+This is the theoretical basis of stored-program general-purpose computing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universal Computable Function}
+\label{subsec:universal-computable-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After enumerating programs
+
+\[
+M_0,M_1,\ldots,
+\]
+
+one can define a partial universal function
+
+\[
+\boxed{
+U(e,x)
+=
+\varphi_e(x),
+}
+\]
+
+where
+
+\[
+\varphi_e
+\]
+
+is the partial computable function computed by machine with index \(e\).
+
+Universal computation allows programs to manipulate or simulate other
+programs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Acceptance Problem}
+\label{subsec:acceptance-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+A_{\mathrm{TM}}
+=
+\{
+\langle M,w\rangle:
+M
+\text{ accepts }w
+\}.
+}
+\]
+
+A universal simulator recognizes this language.
+
+Given
+
+\[
+\langle M,w\rangle,
+\]
+
+simulate \(M\) on \(w\).
+
+If \(M\) accepts, accept.
+
+If \(M\) never halts, the simulation also never halts.
+
+Thus
+
+\[
+\boxed{
+A_{\mathrm{TM}}
+\text{ is recognizable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Halting Problem}
+\label{subsec:halting-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+\operatorname{HALT}_{\mathrm{TM}}
+=
+\{
+\langle M,w\rangle:
+M
+\text{ eventually halts on }w
+\}.
+}
+\]
+
+The Halting Problem asks whether there exists an algorithm deciding this
+language.
+
+The answer is
+
+\[
+\boxed{
+\text{no}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Halting Is Recognizable}
+\label{subsec:halting-recognizable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To recognize
+
+\[
+\operatorname{HALT}_{\mathrm{TM}},
+\]
+
+simulate \(M\) on \(w\).
+
+If the simulation halts, accept.
+
+If it runs forever, continue forever.
+
+Therefore
+
+\[
+\boxed{
+\operatorname{HALT}_{\mathrm{TM}}
+\text{ is recognizable}.
+}
+\]
+
+It is not decidable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof of Halting Undecidability}
+\label{subsec:halting-undecidability-proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assume for contradiction there exists a decider
+
+\[
+H(M,w)
+\]
+
+such that
+
+\[
+H(M,w)
+=
+\begin{cases}
+\text{YES},&M\text{ halts on }w,\\
+\text{NO},&M\text{ does not halt on }w.
+\end{cases}
+\]
+
+Construct a new program \(D\) that takes a machine description
+\(\langle M\rangle\) and does the opposite of the predicted behavior on
+self-input:
+
+\[
+\boxed{
+D(M)
+=
+\begin{cases}
+\text{loop forever},&H(M,M)=\text{YES},\\
+\text{halt},&H(M,M)=\text{NO}.
+\end{cases}
+}
+\]
+
+Now run \(D\) on its own description.
+
+If \(H(D,D)\) says \(D\) halts, then \(D\) loops.
+
+If \(H(D,D)\) says \(D\) loops, then \(D\) halts.
+
+Either case is contradictory.
+
+Therefore \(H\) cannot exist.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Diagonal Contradiction}
+\label{subsec:worked-halting-diagonal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Self-Application}
+
+Suppose \(D\) is constructed so that
+
+\[
+D(M)
+\]
+
+halts exactly when the hypothetical halting decider predicts that \(M(M)\)
+does not halt.
+
+Now substitute
+
+\[
+M=D.
+\]
+
+Then
+
+\[
+D(D)
+\]
+
+halts if and only if
+
+\[
+D(D)
+\]
+
+does not halt.
+
+\begin{answerbox}
+\[
+\boxed{
+D(D)
+\text{ halts}
+\iff
+D(D)
+\text{ does not halt},
+}
+\]
+\end{answerbox}
+
+which is impossible.
+
+Therefore a general halting decider cannot exist.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diagonalization}
+\label{subsec:computability-diagonalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Halting Problem proof is a computational version of diagonalization.
+
+The broad pattern is:
+
+\begin{enumerate}
+    \item assume all objects of interest are uniformly captured;
+    \item construct a new object that differs from the \(n\)-th object at
+          position \(n\);
+    \item derive contradiction.
+\end{enumerate}
+
+This resembles Cantor's diagonal proof and Gödel-style self-reference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recognizable but Undecidable}
+\label{subsec:recognizable-undecidable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Halting Problem is a canonical example of a language that is:
+
+\[
+\boxed{
+\text{recognizable}
+}
+\]
+
+but
+
+\[
+\boxed{
+\text{not decidable}.
+}
+\]
+
+Thus recognition is strictly weaker than decision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complement Languages}
+\label{subsec:complement-languages-computability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For language
+
+\[
+L\subseteq\Sigma^*,
+\]
+
+define its complement by
+
+\[
+\boxed{
+\overline{L}
+=
+\Sigma^*\setminus L.
+}
+\]
+
+If \(L\) is decidable, then
+
+\[
+\boxed{
+\overline{L}
+}
+\]
+
+is also decidable.
+
+Simply swap accept and reject outputs of the decider.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recognizable and Co-Recognizable}
+\label{subsec:co-recognizable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A language \(L\) is co-recognizable if
+
+\[
+\boxed{
+\overline{L}
+}
+\]
+
+is recognizable.
+
+A fundamental theorem states:
+
+\[
+\boxed{
+L
+\text{ is decidable}
+\iff
+L
+\text{ and }\overline{L}
+\text{ are both recognizable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof of the Recognition Characterization}
+\label{subsec:recognizable-complement-proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose recognizer \(M_1\) recognizes \(L\) and recognizer \(M_2\) recognizes
+\(\overline{L}\).
+
+On input \(w\), dovetail the two simulations:
+
+\[
+\boxed{
+M_1(w)
+}
+\]
+
+and
+
+\[
+\boxed{
+M_2(w).
+}
+\]
+
+Exactly one must eventually accept.
+
+If \(M_1\) accepts, accept.
+
+If \(M_2\) accepts, reject.
+
+Thus the combined machine halts on every input and decides \(L\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Complement of the Halting Problem}
+\label{subsec:complement-halting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since
+
+\[
+\operatorname{HALT}_{\mathrm{TM}}
+\]
+
+is recognizable but undecidable, its complement cannot also be
+recognizable.
+
+Otherwise the previous theorem would make the Halting Problem decidable.
+
+Therefore
+
+\[
+\boxed{
+\overline{
+\operatorname{HALT}_{\mathrm{TM}}
+}
+}
+\]
+
+is not recognizable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closure of Decidable Languages}
+\label{subsec:closure-decidable-languages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Decidable languages are closed under many Boolean operations.
+
+If \(A\) and \(B\) are decidable, then so are:
+
+\[
+\boxed{
+A\cup B,
+}
+\]
+
+\[
+\boxed{
+A\cap B,
+}
+\]
+
+\[
+\boxed{
+\overline{A},
+}
+\]
+
+and
+
+\[
+\boxed{
+A\setminus B.
+}
+\]
+
+These results follow by combining deciders.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closure of Recognizable Languages}
+\label{subsec:closure-recognizable-languages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Recognizable languages are closed under:
+
+\[
+\boxed{
+\text{union},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{intersection}.
+}
+\]
+
+Dovetailing may be required.
+
+They are not closed under complement.
+
+Otherwise every recognizable language would be decidable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reductions}
+\label{subsec:computability-reductions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A reduction transforms instances of one problem into instances of another.
+
+If problem \(A\) can be transformed effectively into problem \(B\), then a
+solver for \(B\) could be used to solve \(A\).
+
+Thus reductions transfer impossibility results.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mapping Reduction}
+\label{subsec:mapping-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Language \(A\) is mapping reducible to language \(B\), written
+
+\[
+\boxed{
+A
+\leq_m
+B,
+}
+\]
+
+if there exists a total computable function
+
+\[
+f:\Sigma^*\to\Sigma^*
+\]
+
+such that
+
+\[
+\boxed{
+w\in A
+\iff
+f(w)\in B.
+}
+\]
+
+The function \(f\) transforms membership questions about \(A\) into
+membership questions about \(B\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Using Reductions for Undecidability}
+\label{subsec:reductions-undecidability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+A
+\]
+
+is known undecidable and
+
+\[
+A\leq_m B.
+\]
+
+If \(B\) were decidable, then:
+
+\begin{enumerate}
+    \item compute \(f(w)\);
+    \item decide whether \(f(w)\in B\);
+    \item use equivalence to decide whether \(w\in A\).
+\end{enumerate}
+
+This would decide \(A\), contradiction.
+
+Therefore,
+
+\[
+\boxed{
+B
+\text{ is undecidable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduction Direction}
+\label{subsec:reduction-direction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Reduction direction is crucial.
+
+To prove \(B\) hard using known-hard problem \(A\), prove
+
+\[
+\boxed{
+A
+\leq_m
+B.
+}
+\]
+
+The known hard problem goes on the left.
+
+A reduction
+
+\[
+B\leq_m A
+\]
+
+does not generally establish that \(B\) is hard.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Reduction Logic}
+\label{subsec:worked-reduction-logic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Why the Direction Matters}
+
+Suppose \(A\) is undecidable and
+
+\[
+A\leq_m B.
+\]
+
+Assume \(B\) has a decider.
+
+Then transform input \(w\) for \(A\) into
+
+\[
+f(w)
+\]
+
+and run the \(B\)-decider.
+
+Because
+
+\[
+w\in A
+\iff
+f(w)\in B,
+\]
+
+this decides \(A\).
+
+Contradiction.
+
+\begin{answerbox}
+\[
+\boxed{
+A\leq_m B
+\text{ and }
+A
+\text{ undecidable}
+\Longrightarrow
+B
+\text{ undecidable}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acceptance Problem Undecidability}
+\label{subsec:acceptance-undecidability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The language
+
+\[
+A_{\mathrm{TM}}
+=
+\{
+\langle M,w\rangle:
+M
+\text{ accepts }w
+\}
+\]
+
+is recognizable but undecidable.
+
+One can prove this directly by diagonalization or by reduction from the
+Halting Problem.
+
+Thus even determining whether a program eventually accepts a particular
+input is undecidable in general.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Emptiness Problem for Turing Machines}
+\label{subsec:turing-emptiness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+E_{\mathrm{TM}}
+=
+\{
+\langle M\rangle:
+L(M)=\varnothing
+\}.
+}
+\]
+
+This asks whether machine \(M\) accepts no strings.
+
+The problem is undecidable.
+
+The property concerns the entire language recognized by \(M\), not merely
+one computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equivalence Problem}
+\label{subsec:turing-equivalence-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+EQ_{\mathrm{TM}}
+=
+\{
+\langle M_1,M_2\rangle:
+L(M_1)=L(M_2)
+\}.
+}
+\]
+
+This asks whether two arbitrary Turing machines recognize exactly the same
+language.
+
+The problem is undecidable.
+
+General program equivalence is therefore impossible to decide
+algorithmically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rice's Theorem}
+\label{subsec:rices-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+Every nontrivial semantic property of the language recognized by a Turing
+machine is undecidable.
+\end{theorem}
+
+A property is nontrivial if some recognizable languages possess it and some
+do not.
+
+Thus properties such as
+
+\[
+\boxed{
+L(M)=\varnothing,
+}
+\]
+
+\[
+\boxed{
+L(M)
+\text{ is finite},
+}
+\]
+
+or
+
+\[
+\boxed{
+L(M)
+\text{ contains a particular string}
+}
+\]
+
+are generally undecidable when phrased as semantic properties of arbitrary
+Turing-machine languages.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Syntactic Versus Semantic Program Properties}
+\label{subsec:syntactic-semantic-program-properties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rice's theorem applies to semantic behavior, not arbitrary syntactic
+properties of program descriptions.
+
+For example,
+
+\[
+\boxed{
+\text{``Does this program description contain 100 states?''}
+}
+\]
+
+is syntactic and decidable from the encoding.
+
+By contrast,
+
+\[
+\boxed{
+\text{``Does this program compute the zero function?''}
+}
+\]
+
+is semantic and nontrivial, so it falls under Rice-style undecidability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Rice's Theorem}
+\label{subsec:worked-rice}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Does a Machine Accept Anything?}
+
+Consider the property
+
+\[
+P(M):
+L(M)\neq\varnothing.
+\]
+
+Some machines accept at least one string.
+
+Others accept none.
+
+Thus the property is nontrivial.
+
+It depends only on the language recognized, not on the machine's syntax.
+
+Therefore Rice's theorem implies:
+
+\begin{answerbox}
+\[
+\boxed{
+\text{The property }L(M)\neq\varnothing
+\text{ is undecidable}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Post Correspondence Problem}
+\label{subsec:post-correspondence-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Post Correspondence Problem, abbreviated PCP, is a classical
+undecidable string-matching problem.
+
+One is given pairs
+
+\[
+\boxed{
+(u_1,v_1),
+\ldots,
+(u_n,v_n).
+}
+\]
+
+The question is whether there exists a nonempty index sequence
+
+\[
+i_1,\ldots,i_k
+\]
+
+such that
+
+\[
+\boxed{
+u_{i_1}\cdots u_{i_k}
+=
+v_{i_1}\cdots v_{i_k}.
+}
+\]
+
+PCP provides a useful source problem for reductions involving formal
+languages.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: A PCP Match}
+\label{subsec:worked-pcp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Matching Two String Sequences}
+
+Suppose the available pairs are
+
+\[
+(a,ab)
+\]
+
+and
+
+\[
+(ba,a).
+\]
+
+Choosing the sequence
+
+\[
+1,2
+\]
+
+gives top string
+
+\[
+a\,ba
+=
+aba,
+\]
+
+and bottom string
+
+\[
+ab\,a
+=
+aba.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+1,2
+\text{ is a PCP solution for this instance}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bounded Simulation}
+\label{subsec:bounded-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Although general halting is undecidable, bounded halting is decidable.
+
+Given:
+
+\[
+\boxed{
+M,
+\quad
+w,
+\quad
+t,
+}
+\]
+
+simulate \(M(w)\) for at most \(t\) steps.
+
+Then determine whether the machine halted within that bound.
+
+Thus
+
+\[
+\boxed{
+\text{unbounded future behavior}
+}
+\]
+
+can be undecidable even when every finite bounded simulation is
+straightforward.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite Versus Infinite Search}
+\label{subsec:finite-infinite-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A finite search can always be exhausted in principle.
+
+For example, checking all strings of length at most \(n\) is finite.
+
+An unbounded search may fail because there is no computable point at which
+one can conclude that a desired witness will never appear.
+
+This distinction underlies many recognizable but undecidable problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Witness Search}
+\label{subsec:computable-witness-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose membership in \(L\) means:
+
+\[
+\boxed{
+w\in L
+\iff
+\exists y\,R(w,y),
+}
+\]
+
+where \(R\) is decidable.
+
+One can systematically search through all possible \(y\).
+
+If a witness exists, it will eventually be found.
+
+If no witness exists, the search may continue forever.
+
+Thus such sets are natural candidates for computable enumerability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Effective Enumerations}
+\label{subsec:effective-enumerations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sequence
+
+\[
+a_0,a_1,a_2,\ldots
+\]
+
+is effectively generated if there is a computable function
+
+\[
+\boxed{
+f(n)=a_n.
+}
+\]
+
+Effective enumeration is stronger than mere countability.
+
+A set can be countable without having an effective enumeration available
+within a particular formal framework.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pairing Functions}
+\label{subsec:computable-pairing-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computability theory often encodes tuples of natural numbers as single
+natural numbers.
+
+A pairing function is a computable bijection or effective coding
+
+\[
+\boxed{
+\langle\cdot,\cdot\rangle:
+\mathbb{N}^2
+\rightarrow
+\mathbb{N}.
+}
+\]
+
+The projections should also be computable.
+
+This lets multivariable problems be encoded as unary ones.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coding Finite Sequences}
+\label{subsec:coding-finite-sequences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite sequences
+
+\[
+(a_0,\ldots,a_n)
+\]
+
+can also be encoded by natural numbers.
+
+Thus:
+
+\[
+\boxed{
+\text{strings},
+}
+\]
+
+\[
+\boxed{
+\text{machine descriptions},
+}
+\]
+
+\[
+\boxed{
+\text{proofs},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{computation histories}
+}
+\]
+
+can all be represented arithmetically.
+
+This parallels Gödel coding in proof theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation Histories}
+\label{subsec:computation-histories}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A halting computation can be represented as a finite sequence of
+configurations:
+
+\[
+\boxed{
+C_0,C_1,\ldots,C_t.
+}
+\]
+
+Each adjacent pair must satisfy the machine's transition relation.
+
+Because the history is finite, a proposed halting computation can be
+verified mechanically.
+
+This is important in both computability and complexity theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universal Search}
+\label{subsec:universal-search-computability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a property has mechanically verifiable witnesses.
+
+One can enumerate all possible witnesses and test them.
+
+This gives a universal search procedure.
+
+The search may be inefficient, but if a witness exists it is eventually
+found.
+
+Thus computability ignores efficiency unless efficiency is explicitly part
+of the problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computability Versus Complexity}
+\label{subsec:computability-versus-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computability asks:
+
+\[
+\boxed{
+\text{Does any terminating algorithm exist?}
+}
+\]
+
+Complexity asks:
+
+\[
+\boxed{
+\text{How many resources does an algorithm require?}
+}
+\]
+
+A problem may be decidable but require enormous computational resources.
+
+Therefore:
+
+\[
+\boxed{
+\text{hard}
+\neq
+\text{undecidable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decidable but Expensive Problems}
+\label{subsec:decidable-expensive-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A finite combinatorial problem may be solvable by exhaustive search.
+
+For example, a problem over \(n\) Boolean variables can be decided by
+checking all
+
+\[
+\boxed{
+2^n
+}
+\]
+
+assignments.
+
+This proves decidability.
+
+It does not imply practical efficiency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Undecidability Is Stronger Than Intractability}
+\label{subsec:undecidability-vs-intractability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an undecidable problem, no algorithm can correctly halt on every input.
+
+This is stronger than merely saying known algorithms are slow.
+
+No amount of faster hardware eliminates the theoretical impossibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Oracle Computation}
+\label{subsec:oracle-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An oracle Turing machine is an ordinary Turing machine augmented with
+access to a hypothetical black box that instantly answers membership
+questions for some set \(A\).
+
+One writes conceptually
+
+\[
+\boxed{
+M^A.
+}
+\]
+
+The oracle changes which problems the machine can solve.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relative Computability}
+\label{subsec:relative-computability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A set \(B\) is computable relative to \(A\) if an oracle machine using \(A\)
+can decide \(B\).
+
+This does not mean \(B\) is computable without the oracle.
+
+Relative computability compares the informational strength of different
+problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Turing Reducibility}
+\label{subsec:turing-reducibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Write
+
+\[
+\boxed{
+A
+\leq_T
+B
+}
+\]
+
+if \(A\) can be decided by a Turing machine with oracle access to \(B\).
+
+Turing reducibility is more flexible than mapping reducibility because the
+machine may query the oracle repeatedly and adaptively.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Turing Degrees Preview}
+\label{subsec:turing-degrees-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Two sets have the same Turing degree if each is Turing reducible to the
+other:
+
+\[
+\boxed{
+A\leq_TB
+\quad\text{and}\quad
+B\leq_TA.
+}
+\]
+
+A Turing degree therefore represents a level of computational
+unsolvability.
+
+The computable sets form the lowest degree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Halting Degree}
+\label{subsec:halting-degree}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Halting Problem is not computable.
+
+However, if a machine has access to a halting oracle, it can solve many
+problems that ordinary Turing machines cannot.
+
+Thus the halting set occupies a strictly higher level of relative
+computability than computable sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Turing Jump}
+\label{subsec:turing-jump-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given oracle \(A\), one may define a new halting problem for machines with
+oracle access to \(A\).
+
+This produces the Turing jump
+
+\[
+\boxed{
+A'.
+}
+\]
+
+The jump is strictly more powerful in the sense that
+
+\[
+\boxed{
+A
+<_T
+A'.
+}
+\]
+
+Repeated jumps generate a hierarchy of increasing computational strength.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arithmetic Hierarchy Preview}
+\label{subsec:arithmetic-hierarchy-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The arithmetic hierarchy classifies subsets of \(\mathbb{N}\) by the
+logical complexity of number quantifiers in their definitions.
+
+The levels are often written:
+
+\[
+\boxed{
+\Sigma^0_1,
+\Pi^0_1,
+\Sigma^0_2,
+\Pi^0_2,
+\ldots.
+}
+\]
+
+Computably enumerable sets correspond closely to the first existential
+level.
+
+This topic is developed further in recursion theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(\Sigma^0_1\) Form}
+\label{subsec:sigma-one-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A typical \(\Sigma^0_1\) property has form
+
+\[
+\boxed{
+n\in A
+\iff
+\exists y\,R(n,y),
+}
+\]
+
+where \(R\) is computable.
+
+The witness \(y\) can be searched for effectively.
+
+Therefore such sets are computably enumerable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(\Pi^0_1\) Form}
+\label{subsec:pi-one-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A typical \(\Pi^0_1\) property has form
+
+\[
+\boxed{
+n\in A
+\iff
+\forall y\,R(n,y),
+}
+\]
+
+where \(R\) is computable.
+
+A counterexample can be found if one exists, but verifying that no
+counterexample will ever appear may be impossible.
+
+This asymmetry is central to semidecidability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Program Verification Limits}
+\label{subsec:program-verification-limits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Undecidability does not mean that no individual programs can be verified.
+
+Many programs have provable properties.
+
+Rather, there is no universal algorithm that correctly decides every
+nontrivial semantic property of every arbitrary program.
+
+Thus practical verification relies on restricted languages, annotations,
+proofs, abstractions, or incomplete procedures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Termination Analysis}
+\label{subsec:termination-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a particular program, termination may be proved using a decreasing
+measure.
+
+For example, if each recursive call decreases
+
+\[
+n\in\mathbb{N}
+\]
+
+and cannot continue below zero, termination follows.
+
+The Halting Problem says there is no algorithm that successfully decides
+termination for every possible program-input pair.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Proving Termination}
+\label{subsec:worked-termination-measure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Decreasing Natural Measure}
+
+Suppose an algorithm repeatedly replaces positive integer \(n\) by
+
+\[
+n-1.
+\]
+
+The quantity
+
+\[
+n
+\]
+
+strictly decreases at each step and remains in
+
+\[
+\mathbb{N}.
+\]
+
+There is no infinite strictly descending sequence
+
+\[
+n>n-1>n-2>\cdots
+\]
+
+of natural numbers.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{The algorithm must terminate after at most the initial }n
+\text{ steps}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computability and Formal Proof}
+\label{subsec:computability-formal-proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Formal proofs can be mechanically enumerated when the proof system is
+effectively specified.
+
+Thus theorems of an effectively axiomatized formal theory are typically
+computably enumerable.
+
+One may systematically generate candidate finite strings and test which
+ones are valid proofs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Theoremhood and Recognizability}
+\label{subsec:theoremhood-recognizability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\operatorname{Thm}(T)
+=
+\{
+\varphi:
+T\vdash\varphi
+\}.
+\]
+
+If \(T\) is effectively axiomatized and proofs are mechanically checkable,
+then
+
+\[
+\boxed{
+\operatorname{Thm}(T)
+}
+\]
+
+is computably enumerable.
+
+Given a formula \(\varphi\), enumerate all \(T\)-proofs until one proves
+\(\varphi\).
+
+If no proof exists, the search may continue forever.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decidable Theories}
+\label{subsec:decidable-theories-computability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A theory \(T\) is decidable if there exists an algorithm that, for every
+sentence \(\varphi\), determines whether
+
+\[
+\boxed{
+T\models\varphi.
+}
+\]
+
+Some important mathematical theories are decidable.
+
+Others, particularly sufficiently expressive arithmetic theories, are
+undecidable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Undecidable Theories}
+\label{subsec:undecidable-theories}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A theory may be complete in the semantic sense yet still fail to possess an
+effective decision algorithm.
+
+Completeness and decidability are therefore distinct properties.
+
+Similarly, effective axiomatizability and decidability are different.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computability and Self-Reference}
+\label{subsec:computability-self-reference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Programs can operate on encodings of programs.
+
+This permits constructions in which a program is applied to its own
+description.
+
+Such self-reference is central to:
+
+\[
+\boxed{
+\text{Halting Problem proofs},
+}
+\]
+
+\[
+\boxed{
+\text{recursion theorems},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Gödel-style incompleteness}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed-Point Phenomena Preview}
+\label{subsec:computability-fixed-point-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computability theory contains formal fixed-point theorems showing that
+programs can, in a precise sense, obtain or reproduce descriptions of their
+own behavior.
+
+These ideas lead to the recursion theorem developed more deeply in the
+next section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computability Workflow}
+\label{subsec:computability-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When analyzing a computability problem:
+
+\begin{enumerate}
+    \item define the input encoding precisely;
+    \item identify the output or yes-no question;
+    \item determine whether the goal is recognition or decision;
+    \item attempt to construct a terminating algorithm;
+    \item separate finite search from unbounded search;
+    \item identify whether witnesses can be effectively verified;
+    \item use dovetailing when several nonterminating searches must be
+          combined;
+    \item determine whether the complement is recognizable;
+    \item identify known undecidable problems that may reduce to the target;
+    \item choose the correct reduction direction;
+    \item construct the reduction algorithm explicitly;
+    \item prove both directions of the membership equivalence;
+    \item use diagonalization when self-reference is natural;
+    \item use Rice's theorem for nontrivial semantic properties of arbitrary
+          Turing-machine languages;
+    \item distinguish syntactic properties from semantic properties;
+    \item distinguish undecidability from high computational complexity;
+    \item consider relative computability when oracles are introduced;
+    \item state the computational model clearly;
+    \item verify that all encodings and transformations are computable.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:computability-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing Recognizable With Decidable}
+
+A recognizer may run forever on negative instances.
+
+A decider must halt on every input.
+
+Thus
+
+\[
+\boxed{
+\text{recognizable}
+\not\Rightarrow
+\text{decidable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Nontermination Means Rejection}
+
+If a machine loops forever, it has not rejected unless the model explicitly
+defines a rejecting halt.
+
+Infinite computation and rejecting computation are different.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Undecidable With Unrecognizable}
+
+Some undecidable problems are recognizable.
+
+The Halting Problem is the standard example.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Countable Set Is Computably Enumerable}
+
+Countability means an enumeration exists set-theoretically.
+
+Computable enumerability requires an effective enumeration.
+
+These are different notions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Computability With Practical Feasibility}
+
+A computation may terminate only after an astronomically large number of
+steps.
+
+It is still computable in the theoretical sense.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Thinking Turing Machines Are Claims About Physical Hardware}
+
+A Turing machine is a mathematical model.
+
+It abstracts the notion of effective computation.
+
+Its purpose is foundational, not mechanical realism.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating the Church--Turing Thesis as a Formal Theorem}
+
+The thesis relates an informal concept of effective calculability to a
+formal mathematical notion.
+
+Because one side is informal, it is not proved in the same way as an
+ordinary theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Nondeterminism Solves Undecidable Problems}
+
+Nondeterministic Turing machines have the same computability power as
+deterministic Turing machines.
+
+They do not decide the Halting Problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Tapes Change Computability}
+
+Multitape machines may improve efficiency.
+
+They do not enlarge the class of computable functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Wrong Reduction Direction}
+
+To prove target \(B\) undecidable from known-undecidable \(A\), establish
+
+\[
+\boxed{
+A\leq_mB.
+}
+\]
+
+Reversing the direction does not prove the desired result.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Failing to Prove Both Directions of a Mapping Reduction}
+
+One must show
+
+\[
+\boxed{
+w\in A
+\iff
+f(w)\in B.
+}
+\]
+
+Showing only one implication is not enough.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Uncomputable Reduction}
+
+A valid mapping reduction requires the transformation function \(f\) itself
+to be computable.
+
+An abstract mathematical correspondence is insufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying Rice's Theorem to Syntactic Properties}
+
+Rice's theorem concerns nontrivial semantic properties of recognized
+languages or computed functions.
+
+It does not apply to simple properties of program text.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying Rice's Theorem Without Checking Nontriviality}
+
+A property true for every recognizable language or for none of them is
+trivial.
+
+Rice's theorem requires a nontrivial property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Halting Is Not Recognizable}
+
+Halting is recognizable.
+
+The impossibility is deciding both halting and nonhalting in every case.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming the Complement of Every Recognizable Language Is Recognizable}
+
+Recognizable languages are not closed under complement.
+
+If both a language and its complement are recognizable, then the language
+is decidable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Finite Bounded Simulation With the Halting Problem}
+
+Given a fixed time bound \(t\), simulation for \(t\) steps is decidable.
+
+The undecidable problem asks whether a machine halts after any finite number
+of steps, with no computable bound supplied.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Faster Hardware Can Solve Undecidable Problems}
+
+Undecidability is a mathematical impossibility result for algorithms.
+
+It is not a statement about current hardware limitations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Mapping Reducibility and Turing Reducibility}
+
+A mapping reduction uses one computable transformation.
+
+A Turing reduction may make repeated adaptive oracle queries.
+
+Turing reducibility is more general.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Gödel Incompleteness With the Halting Problem}
+
+The results are deeply related but distinct.
+
+Gödel incompleteness concerns provability in formal arithmetic theories.
+
+The Halting Problem concerns algorithmic termination.
+
+Both exploit encoding and self-reference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:computability-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Foundations of Mathematics.}
+Computability gives a precise framework for distinguishing algorithmically
+solvable and unsolvable mathematical problems.
+
+\medskip
+
+\textbf{Logic.}
+Decision procedures, theorem sets, effective axiomatizations, and
+undecidable theories connect computation with formal logic.
+
+\medskip
+
+\textbf{Proof Theory.}
+Gödel coding, computable proof checking, and enumeration of proofs connect
+formal derivability with effective computation.
+
+\medskip
+
+\textbf{Computer Science.}
+Halting, program equivalence, verification limits, and universal
+computation form the theoretical foundation of programming-language and
+algorithmic limitations.
+
+\medskip
+
+\textbf{Formal Verification.}
+Undecidability results explain why general-purpose verification tools must
+use restrictions, approximations, annotations, or incomplete procedures.
+
+\medskip
+
+\textbf{Recursion Theory.}
+Computable functions, computably enumerable sets, Turing reducibility, and
+jumps form the starting point for finer analysis of degrees of
+unsolvability.
+
+\medskip
+
+\textbf{Complexity Theory.}
+Computability determines whether an algorithm exists at all; complexity
+then studies the resources required by such algorithms.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:computability-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a decision problem.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a formal language.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a Turing machine conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a configuration.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a recognizer.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a decider.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a computable function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a partial computable function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a computably enumerable set.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Church--Turing thesis.
+\end{exercise}
+
+\begin{exercise}[2]
+Describe the components of a standard Turing machine.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a transition rule and explain each component.
+\end{exercise}
+
+\begin{exercise}[2]
+Describe a machine that decides whether a binary string ends in \(0\).
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the difference between halting in reject and looping forever.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why every decidable language is recognizable.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of a recognizable but undecidable language.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a characteristic function must be total to decide a set.
+\end{exercise}
+
+\begin{exercise}[2]
+Define an enumerator.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why every recognizable language can be enumerated.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why dovetailing is necessary in that construction.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a dovetailing schedule for four computations.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why multitape machines do not increase computability power.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why nondeterministic machines do not increase computability power.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the equivalence of many computational models supports the
+Church--Turing thesis.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain how machines can be encoded as strings.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why there are only countably many Turing machines.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that there are uncountably many functions
+
+\[
+f:\mathbb{N}\to\{0,1\}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use the previous results to show that noncomputable functions exist.
+\end{exercise}
+
+\begin{exercise}[2]
+Define a universal Turing machine.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why universal computation is related to stored-program computers.
+\end{exercise}
+
+\begin{exercise}[2]
+Define
+
+\[
+A_{\mathrm{TM}}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why
+
+\[
+A_{\mathrm{TM}}
+\]
+
+is recognizable.
+\end{exercise}
+
+\begin{exercise}[2]
+Define
+
+\[
+\operatorname{HALT}_{\mathrm{TM}}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the Halting Problem is recognizable.
+\end{exercise}
+
+\begin{exercise}[3]
+Reproduce the diagonal proof that the Halting Problem is undecidable.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of self-application in the proof.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the Halting Problem proof with Cantor diagonalization.
+\end{exercise}
+
+\begin{exercise}[2]
+Define the complement of a language.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove decidable languages are closed under complement.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that a language is decidable if both it and its complement are
+recognizable.
+\end{exercise}
+
+\begin{exercise}[3]
+Use this result to show that the complement of the Halting Problem is not
+recognizable.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove decidable languages are closed under union.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove decidable languages are closed under intersection.
+\end{exercise}
+
+\begin{exercise}[3]
+Show recognizable languages are closed under union.
+\end{exercise}
+
+\begin{exercise}[3]
+Show recognizable languages are closed under intersection.
+\end{exercise}
+
+\begin{exercise}[2]
+Define a mapping reduction.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a mapping reduction must be computable.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the correct reduction direction for proving undecidability.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that if
+
+\[
+A\leq_mB
+\]
+
+and \(B\) is decidable, then \(A\) is decidable.
+\end{exercise}
+
+\begin{exercise}[3]
+Deduce that if \(A\) is undecidable and
+
+\[
+A\leq_mB,
+\]
+
+then \(B\) is undecidable.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why both directions of
+
+\[
+w\in A
+\iff
+f(w)\in B
+\]
+
+are required.
+\end{exercise}
+
+\begin{exercise}[2]
+Define the Turing-machine emptiness problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain conceptually why the emptiness problem is undecidable.
+\end{exercise}
+
+\begin{exercise}[2]
+Define the Turing-machine equivalence problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why general program equivalence is undecidable.
+\end{exercise}
+
+\begin{exercise}[2]
+State Rice's theorem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the meaning of a nontrivial semantic property.
+\end{exercise}
+
+\begin{exercise}[3]
+Give three properties to which Rice's theorem applies.
+\end{exercise}
+
+\begin{exercise}[3]
+Give a syntactic machine property to which Rice's theorem does not apply.
+\end{exercise}
+
+\begin{exercise}[3]
+Use Rice's theorem to show that determining whether
+
+\[
+L(M)=\varnothing
+\]
+
+is undecidable.
+\end{exercise}
+
+\begin{exercise}[3]
+Use Rice's theorem to analyze whether a machine recognizes a finite
+language.
+\end{exercise}
+
+\begin{exercise}[2]
+State the Post Correspondence Problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Find a solution to a small supplied PCP instance.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why PCP is useful in undecidability reductions.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why bounded halting is decidable.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish bounded simulation from the ordinary Halting Problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why unbounded witness search may fail to decide nonmembership.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that sets of the form
+
+\[
+n\in A
+\iff
+\exists y\,R(n,y),
+\]
+
+with computable \(R\), are computably enumerable.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between countable and effectively enumerable.
+\end{exercise}
+
+\begin{exercise}[2]
+Describe a computable pairing function conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why finite sequences can be encoded by natural numbers.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a finite halting computation can be mechanically verified.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain universal search.
+\end{exercise}
+
+\begin{exercise}[2]
+Distinguish computability and computational complexity.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of a decidable problem solvable by exponential brute-force
+search.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why undecidability is stronger than intractability.
+\end{exercise}
+
+\begin{exercise}[2]
+Define oracle computation.
+\end{exercise}
+
+\begin{exercise}[3]
+Define relative computability.
+\end{exercise}
+
+\begin{exercise}[3]
+Define Turing reducibility.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare mapping reducibility and Turing reducibility.
+\end{exercise}
+
+\begin{exercise}[3]
+Define a Turing degree conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of a halting oracle.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the Turing jump conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the jump represents stronger computational information.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the arithmetic hierarchy conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why existential computable-witness properties are associated with
+
+\[
+\Sigma^0_1.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why universal computable conditions resemble
+
+\[
+\Pi^0_1
+\]
+
+properties.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the Halting Problem does not prevent proving termination of
+specific programs.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a decreasing measure proving termination of a simple recursive
+algorithm.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the theorem set of an effectively axiomatized proof system is
+computably enumerable.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish a decidable theory from an effectively axiomatized theory.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the connection between computability and Gödel coding.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how self-reference appears in both the Halting Problem and
+incompleteness.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct a formal Turing machine for binary increment.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct a Turing machine recognizing
+
+\[
+\{0^n1^n:n\geq0\}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Study simulation of multitape Turing machines by single-tape machines.
+\end{exercise}
+
+\begin{exercise}[4]
+Study simulation of nondeterministic Turing machines by deterministic
+machines.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove equivalence between Turing recognizability and effective
+enumerability.
+\end{exercise}
+
+\begin{exercise}[4]
+Study universal Turing machines in detail.
+\end{exercise}
+
+\begin{exercise}[4]
+Study effective machine encodings.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove undecidability of
+
+\[
+A_{\mathrm{TM}}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Prove undecidability of
+
+\[
+E_{\mathrm{TM}}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Prove undecidability of
+
+\[
+EQ_{\mathrm{TM}}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Study the proof of Rice's theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Post Correspondence Problem reduction framework.
+\end{exercise}
+
+\begin{exercise}[4]
+Study many-one degrees.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Turing degrees.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Turing jump.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the arithmetic hierarchy.
+\end{exercise}
+
+\begin{exercise}[4]
+Study computable inseparability.
+\end{exercise}
+
+\begin{exercise}[4]
+Study productive and creative sets.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the recursion theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study decidable first-order theories.
+\end{exercise}
+
+\begin{exercise}[4]
+Study undecidability of sufficiently expressive arithmetic theories.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:computability-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computability theory asks
+
+\[
+\boxed{
+\text{which problems can be solved algorithmically}.
+}
+\]
+
+A Turing machine formalizes effective computation.
+
+A language is decidable when some machine always halts and correctly
+determines membership.
+
+A language is recognizable when positive instances are eventually
+accepted, while negative instances may cause nontermination.
+
+Thus
+
+\[
+\boxed{
+\text{decidable}
+\Longrightarrow
+\text{recognizable},
+}
+\]
+
+but not conversely.
+
+The Halting Problem provides the central example:
+
+\[
+\boxed{
+\operatorname{HALT}_{\mathrm{TM}}
+\text{ is recognizable but undecidable}.
+}
+\]
+
+Reductions transfer undecidability:
+
+\[
+\boxed{
+A\leq_mB,
+\qquad
+A
+\text{ undecidable}
+\Longrightarrow
+B
+\text{ undecidable}.
+}
+\]
+
+Rice's theorem shows that nontrivial semantic properties of arbitrary
+Turing-machine behavior are undecidable.
+
+Universal computation permits machines to manipulate descriptions of other
+machines, creating the possibility of self-reference.
+
+Relative computability extends the theory using oracle access:
+
+\[
+\boxed{
+A\leq_TB.
+}
+\]
+
+Computability theory therefore identifies fundamental mathematical limits
+on algorithms while providing the foundation for recursion theory,
+complexity theory, proof theory, and formal computer science.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:computability-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Computability Theory develops the algorithmic side of the logical framework
+introduced earlier in Chapter~12. Formal Logic specifies languages and
+derivations, Model Theory studies semantic structures, and Proof Theory
+treats proofs as formal symbolic objects. Computability Theory asks which
+such symbolic processes can be carried out algorithmically and establishes
+fundamental limitations through diagonalization, the Halting Problem,
+reductions, Rice's theorem, and relative computability. The next section,
+Recursion Theory, develops computable and computably enumerable sets at a
+deeper structural level through recursive-function definitions, indices,
+the recursion theorem, reducibility, degrees, jumps, and the arithmetic
+hierarchy.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 12.5 Computability Theory
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard classical computability theory.
+%   - Standard Turing-machine theory.
+%   - Standard undecidability, reducibility, and relative-computability
+%     concepts.
+%
+% Used for:
+%   - decision problems;
+%   - languages;
+%   - effective procedures;
+%   - Turing machines;
+%   - tapes, states, symbols, heads, and transitions;
+%   - configurations;
+%   - halting;
+%   - recognizers and deciders;
+%   - computable and partial computable functions;
+%   - characteristic functions;
+%   - computably enumerable sets;
+%   - enumerators;
+%   - dovetailing;
+%   - equivalent computation models;
+%   - Church--Turing thesis;
+%   - nondeterministic and multitape machines;
+%   - encoding machines and inputs;
+%   - countability of programs;
+%   - existence of noncomputable functions;
+%   - universal Turing machines;
+%   - universal computable functions;
+%   - acceptance problem;
+%   - Halting Problem;
+%   - diagonalization;
+%   - recognizable but undecidable sets;
+%   - complements;
+%   - recognizable and co-recognizable sets;
+%   - closure properties;
+%   - mapping reductions;
+%   - reduction direction;
+%   - emptiness and equivalence problems;
+%   - Rice's theorem;
+%   - syntactic versus semantic properties;
+%   - Post Correspondence Problem;
+%   - bounded simulation;
+%   - finite versus infinite search;
+%   - witness search;
+%   - effective enumeration;
+%   - pairing and coding;
+%   - computation histories;
+%   - universal search;
+%   - computability versus complexity;
+%   - oracle computation;
+%   - relative computability;
+%   - Turing reducibility;
+%   - Turing degrees;
+%   - Turing jump;
+%   - arithmetic hierarchy preview;
+%   - program verification limits;
+%   - termination proofs;
+%   - theoremhood and effective enumeration;
+%   - decidable theories;
+%   - self-reference;
+%   - fixed-point phenomena preview;
+%   - applications and exercises.
+%
+% Notes:
+%   - Recursion Theory is developed next in Section 12.6.
+%   - Proof Theory appears in Section 12.4.
+%   - Type Theory follows in Section 12.7.
+%   - Constructive Mathematics follows in Section 12.8.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,3709 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.11 NONPARAMETRIC STATISTICS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Nonparametric Statistics}
+\label{sec:nonparametric-statistics}
+
+\prerequisite{
+Descriptive statistics, probability, random variables, sampling
+distributions, confidence intervals, hypothesis testing, order
+statistics, empirical distribution functions, categorical data, and
+basic combinatorics.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain what is meant by nonparametric statistical inference;
+    \item distinguish parametric and nonparametric procedures;
+    \item distinguish distribution-free from assumption-free methods;
+    \item explain the role of ranks and signs;
+    \item construct and interpret empirical distribution functions;
+    \item perform one-sample sign tests;
+    \item construct confidence intervals for population medians using
+          order statistics;
+    \item perform Wilcoxon signed-rank tests;
+    \item distinguish sign and signed-rank procedures;
+    \item perform Mann--Whitney--Wilcoxon rank-sum tests;
+    \item interpret the Mann--Whitney parameter carefully;
+    \item perform Kruskal--Wallis tests;
+    \item perform Friedman tests for blocked or repeated designs;
+    \item compute Spearman rank correlation;
+    \item compute Kendall rank correlation;
+    \item understand tests based on Spearman and Kendall statistics;
+    \item perform one-sample Kolmogorov--Smirnov tests conceptually;
+    \item perform two-sample Kolmogorov--Smirnov tests conceptually;
+    \item understand the Cramér--von Mises and Anderson--Darling ideas;
+    \item understand permutation tests;
+    \item distinguish permutation tests from rank tests;
+    \item understand randomization tests in designed experiments;
+    \item understand exact and asymptotic \(p\)-values;
+    \item account for ties conceptually;
+    \item understand rank-based confidence intervals;
+    \item understand Hodges--Lehmann estimators conceptually;
+    \item understand robustness and efficiency tradeoffs;
+    \item recognize nonparametric density estimation;
+    \item understand kernel density estimation conceptually;
+    \item understand nonparametric regression conceptually;
+    \item recognize bootstrap and resampling connections;
+    \item choose appropriate nonparametric procedures for common study
+          designs;
+    \item connect nonparametric statistics with robust statistics,
+          computational statistics, and statistical learning.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Nonparametric Statistics?}
+\label{subsec:what-is-nonparametric-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parametric statistical methods assume that data arise from a family of
+probability distributions described by a finite-dimensional parameter
+vector.
+
+For example,
+
+\[
+\boxed{
+X_i
+\sim
+N(\mu,\sigma^2)
+}
+\]
+
+is a parametric model with parameters
+
+\[
+\mu
+\]
+
+and
+
+\[
+\sigma^2.
+\]
+
+Nonparametric statistics develops procedures that do not require such a
+fully specified finite-dimensional distributional family.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonparametric Does Not Mean No Assumptions}
+\label{subsec:nonparametric-not-assumption-free}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nonparametric methods are sometimes incorrectly described as
+``assumption-free.''
+
+They still require assumptions involving matters such as:
+
+\[
+\boxed{
+\text{independence},
+}
+\]
+
+\[
+\boxed{
+\text{exchangeability},
+}
+\]
+
+\[
+\boxed{
+\text{continuity},
+}
+\]
+
+\[
+\boxed{
+\text{symmetry},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{common distributional shape}.
+}
+\]
+
+The exact assumptions depend on the procedure and the interpretation
+desired.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Use Nonparametric Methods?}
+\label{subsec:why-use-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nonparametric methods are useful when:
+
+\[
+\boxed{
+\text{sample sizes are small},
+}
+\]
+
+\[
+\boxed{
+\text{normality is questionable},
+}
+\]
+
+\[
+\boxed{
+\text{outliers strongly affect parametric estimates},
+}
+\]
+
+\[
+\boxed{
+\text{measurements are ordinal},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{the full population distribution is not specified}.
+}
+\]
+
+They are also important because many statistical quantities themselves,
+such as a distribution function, are infinite-dimensional objects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ranks}
+\label{subsec:statistical-ranks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose observations are
+
+\[
+X_1,\ldots,X_n.
+\]
+
+After sorting them,
+
+\[
+X_{(1)}
+\leq
+X_{(2)}
+\leq
+\cdots
+\leq
+X_{(n)},
+\]
+
+the smallest observation receives rank \(1\), the next rank \(2\), and
+so forth.
+
+Rank-based procedures replace the original measurement scale with
+relative ordering information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ranks with Ties}
+\label{subsec:ranks-with-ties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If several observations have the same value, a common convention assigns
+each tied observation the average of the ranks they would have occupied.
+
+For example, suppose values occupy ranks
+
+\[
+3,\ 4,\ 5.
+\]
+
+Each tied value receives rank
+
+\[
+\boxed{
+\frac{3+4+5}{3}
+=
+4.
+}
+\]
+
+Tie corrections may be required in exact variance formulas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Signs}
+\label{subsec:statistical-signs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some procedures use only whether an observation lies above or below a
+reference value.
+
+For example, relative to hypothesized median \(m_0\),
+
+\[
+X_i-m_0
+\]
+
+has sign
+
+\[
++
+\]
+
+if \(X_i>m_0\), and
+
+\[
+-
+\]
+
+if \(X_i<m_0\).
+
+The magnitude of the deviation is ignored.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empirical Distribution Function}
+\label{subsec:edf-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The empirical distribution function is
+
+\[
+\boxed{
+F_n(x)
+=
+\frac1n
+\sum_{i=1}^{n}
+\mathbf{1}_{\{X_i\leq x\}}.
+}
+\]
+
+It places probability mass
+
+\[
+\frac1n
+\]
+
+at each observed value.
+
+The empirical distribution is one of the most fundamental nonparametric
+estimators.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Properties of the Empirical Distribution Function}
+\label{subsec:edf-properties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The EDF satisfies:
+
+\[
+\boxed{
+0\leq F_n(x)\leq1,
+}
+\]
+
+it is nondecreasing, and
+
+\[
+\boxed{
+\lim_{x\to-\infty}F_n(x)=0,
+}
+\]
+
+\[
+\boxed{
+\lim_{x\to\infty}F_n(x)=1.
+}
+\]
+
+It is a right-continuous step function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Glivenko--Cantelli Theorem Preview}
+\label{subsec:glivenko-cantelli-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under i.i.d. sampling from distribution function \(F\),
+
+\[
+\boxed{
+\sup_x
+|F_n(x)-F(x)|
+\to0
+}
+\]
+
+almost surely.
+
+Thus the empirical distribution converges uniformly to the true
+distribution.
+
+This result provides a theoretical foundation for many nonparametric
+methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{One-Sample Sign Test}
+\label{subsec:one-sample-sign-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the goal is to test whether a continuous population has median
+
+\[
+m_0.
+\]
+
+Consider
+
+\[
+H_0:
+m=m_0.
+\]
+
+Under the null, observations above and below \(m_0\) each have probability
+
+\[
+\frac12,
+\]
+
+assuming no probability mass occurs exactly at the median.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sign-Test Statistic}
+\label{subsec:sign-test-statistic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+S
+=
+\#\{i:X_i>m_0\}.
+\]
+
+Ignoring observations exactly equal to \(m_0\), under the null,
+
+\[
+\boxed{
+S
+\sim
+\operatorname{Binomial}
+\left(
+n,\frac12
+\right).
+}
+\]
+
+Thus the sign test reduces a location problem to a binomial test.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Sign Test}
+\label{subsec:worked-sign-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Testing a Median}
+
+Suppose \(12\) non-tied observations are compared with hypothesized
+median
+
+\[
+m_0=50.
+\]
+
+Suppose
+
+\[
+9
+\]
+
+observations exceed \(50\), while
+
+\[
+3
+\]
+
+fall below \(50\).
+
+Under
+
+\[
+H_0:m=50,
+\]
+
+\[
+S
+\sim
+\operatorname{Binomial}
+\left(
+12,\frac12
+\right).
+\]
+
+For a right-tailed alternative,
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+p\text{-value}
+=
+P(S\geq9)
+=
+\sum_{j=9}^{12}
+\binom{12}{j}
+\left(
+\frac12
+\right)^{12}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Handling Ties in the Sign Test}
+\label{subsec:sign-test-ties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Observations satisfying
+
+\[
+X_i=m_0
+\]
+
+contain no directional information.
+
+A common exact procedure removes these ties and performs the binomial test
+using only the remaining observations.
+
+Thus the effective sample size may be smaller than the original sample
+size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantages of the Sign Test}
+\label{subsec:sign-test-advantages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sign test requires little distributional structure.
+
+It is resistant to extreme observations because it uses only signs.
+
+For example,
+
+\[
+51
+\]
+
+and
+
+\[
+5000
+\]
+
+both contribute one positive sign when testing against
+
+\[
+50.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limitation of the Sign Test}
+\label{subsec:sign-test-limitation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because the sign test ignores magnitudes, it can discard useful
+information.
+
+Thus it may have lower power than procedures that use both direction and
+magnitude when stronger assumptions are valid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distribution-Free Confidence Interval for a Median}
+\label{subsec:distribution-free-median-ci}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+X_{(1)}
+\leq
+\cdots
+\leq
+X_{(n)}
+\]
+
+are order statistics from a continuous distribution with median \(m\).
+
+Since each observation lies below \(m\) with probability \(1/2\), binomial
+probabilities can be used to select indices \(r\) and \(s\) such that
+
+\[
+\boxed{
+[X_{(r)},X_{(s)}]
+}
+\]
+
+has at least a desired confidence level for the population median.
+
+This interval requires no assumption of normality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Order-Statistic Logic for Median Intervals}
+\label{subsec:median-order-statistic-logic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The event
+
+\[
+X_{(r)}
+\leq
+m
+\leq
+X_{(s)}
+\]
+
+is determined by the number of sample observations below the population
+median.
+
+Because that count has a binomial distribution with success probability
+
+\[
+\frac12,
+\]
+
+exact finite-sample coverage can be calculated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Paired Nonparametric Procedures}
+\label{subsec:paired-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose paired observations are
+
+\[
+(X_i,Y_i).
+\]
+
+Define differences
+
+\[
+\boxed{
+D_i=X_i-Y_i.
+}
+\]
+
+Nonparametric paired procedures then analyze the distribution of
+
+\[
+D_1,\ldots,D_n.
+\]
+
+The sign test uses only
+
+\[
+\operatorname{sign}(D_i).
+\]
+
+The Wilcoxon signed-rank test also uses the magnitude ranking of
+\(|D_i|\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wilcoxon Signed-Rank Test}
+\label{subsec:wilcoxon-signed-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Wilcoxon signed-rank test is a rank-based procedure for paired or
+one-sample location problems.
+
+For differences
+
+\[
+D_1,\ldots,D_n,
+\]
+
+the procedure is:
+
+\begin{enumerate}
+    \item remove zero differences;
+    \item compute \(|D_i|\);
+    \item rank the absolute differences;
+    \item restore the original signs;
+    \item sum positive and negative signed ranks.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Signed-Rank Statistics}
+\label{subsec:signed-rank-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+R_i
+\]
+
+be the rank of
+
+\[
+|D_i|.
+\]
+
+Define
+
+\[
+\boxed{
+W^+
+=
+\sum_{D_i>0}R_i,
+}
+\]
+
+and
+
+\[
+\boxed{
+W^-
+=
+\sum_{D_i<0}R_i.
+}
+\]
+
+Since the ranks are
+
+\[
+1,\ldots,n
+\]
+
+when there are no ties,
+
+\[
+\boxed{
+W^++W^-
+=
+\frac{
+n(n+1)
+}{2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Signed Ranks}
+\label{subsec:worked-signed-ranks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Computing \(W^+\)}
+
+Suppose the paired differences are
+
+\[
+-2,\ 1,\ 4,\ -3.
+\]
+
+Their absolute values are
+
+\[
+2,\ 1,\ 4,\ 3.
+\]
+
+The absolute ranks are
+
+\[
+2,\ 1,\ 4,\ 3.
+\]
+
+Restoring signs gives
+
+\[
+-2,\ +1,\ +4,\ -3.
+\]
+
+Therefore,
+
+\[
+W^+
+=
+1+4
+=
+5.
+\]
+
+Also,
+
+\[
+W^-
+=
+2+3
+=
+5.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+W^+=5,
+\qquad
+W^-=5.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Signed-Rank Assumptions}
+\label{subsec:signed-rank-assumptions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the classical location interpretation, the differences are commonly
+assumed to arise independently from a continuous distribution symmetric
+about a location parameter.
+
+Thus the signed-rank test requires more structure than the sign test.
+
+It does not require normality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sign Test Versus Signed-Rank Test}
+\label{subsec:sign-versus-signed-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sign test uses only
+
+\[
+\boxed{
+\text{direction}.
+}
+\]
+
+The signed-rank test uses
+
+\[
+\boxed{
+\text{direction}
++
+\text{relative magnitude}.
+}
+\]
+
+Therefore the signed-rank test can be more efficient when its symmetry
+assumption is appropriate.
+
+The sign test is more robust to asymmetric distributions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Signed-Rank Sum}
+\label{subsec:expected-signed-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under a symmetric null with no ties, positive and negative signs are
+equally likely.
+
+Since the total rank sum is
+
+\[
+\frac{
+n(n+1)
+}{2},
+\]
+
+the expected positive-rank sum is
+
+\[
+\boxed{
+\mathbb{E}[W^+]
+=
+\frac{
+n(n+1)
+}{4}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of the Signed-Rank Statistic}
+\label{subsec:variance-signed-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Without ties,
+
+\[
+\boxed{
+\operatorname{Var}(W^+)
+=
+\frac{
+n(n+1)(2n+1)
+}{
+24
+}.
+}
+\]
+
+This leads to a normal approximation for sufficiently large samples.
+
+Tie corrections alter the variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normal Approximation to Signed-Rank}
+\label{subsec:normal-approx-signed-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sufficiently large \(n\),
+
+\[
+\boxed{
+Z
+=
+\frac{
+W^+
+-
+n(n+1)/4
+}{
+\sqrt{
+n(n+1)(2n+1)/24
+}
+}
+}
+\]
+
+is approximately standard normal under the null when no tie corrections
+are needed.
+
+A continuity correction may also be applied.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two Independent Samples}
+\label{subsec:two-independent-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two independent samples are
+
+\[
+X_1,\ldots,X_{n_1}
+\]
+
+and
+
+\[
+Y_1,\ldots,Y_{n_2}.
+\]
+
+A common nonparametric question is whether the two populations have the
+same distribution.
+
+The Mann--Whitney--Wilcoxon procedure is a rank-based method for this
+setting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wilcoxon Rank-Sum Test}
+\label{subsec:wilcoxon-rank-sum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Combine all
+
+\[
+N=n_1+n_2
+\]
+
+observations and rank them together.
+
+Let
+
+\[
+R_1
+\]
+
+be the sum of ranks belonging to sample \(1\).
+
+Under the null hypothesis of identical continuous distributions, the
+allocation of ranks between groups is exchangeable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Rank Sum}
+\label{subsec:expected-rank-sum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under the null and without ties,
+
+\[
+\boxed{
+\mathbb{E}[R_1]
+=
+\frac{
+n_1(N+1)
+}{2}.
+}
+\]
+
+The variance is
+
+\[
+\boxed{
+\operatorname{Var}(R_1)
+=
+\frac{
+n_1n_2(N+1)
+}{
+12
+}.
+}
+\]
+
+This leads to a large-sample normal approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mann--Whitney \(U\) Statistic}
+\label{subsec:mann-whitney-u}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The rank-sum statistic can be transformed into the Mann--Whitney
+statistic:
+
+\[
+\boxed{
+U_1
+=
+R_1
+-
+\frac{
+n_1(n_1+1)
+}{2}.
+}
+\]
+
+Similarly,
+
+\[
+\boxed{
+U_2
+=
+n_1n_2-U_1.
+}
+\]
+
+Thus the Wilcoxon rank-sum and Mann--Whitney tests are equivalent
+formulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pairwise Interpretation of \(U\)}
+\label{subsec:mann-whitney-pairwise}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The statistic \(U\) can be interpreted through pairwise comparisons.
+
+Ignoring ties,
+
+\[
+U_1
+\]
+
+counts the number of pairs
+
+\[
+(X_i,Y_j)
+\]
+
+for which
+
+\[
+X_i>Y_j.
+\]
+
+With ties, half-credit is commonly assigned.
+
+Thus a normalized version estimates
+
+\[
+\boxed{
+P(X>Y)
++
+\frac12P(X=Y).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mann--Whitney Does Not Automatically Test Medians}
+\label{subsec:mann-whitney-not-median}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Mann--Whitney test is often described as a test of medians.
+
+That interpretation requires additional assumptions, such as similarly
+shaped distributions differing primarily by location.
+
+More generally, the procedure detects distributional differences related
+to relative ordering.
+
+Thus:
+
+\[
+\boxed{
+\text{Mann--Whitney}
+\neq
+\text{universal median test}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Rank Sum}
+\label{subsec:worked-rank-sum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Two Independent Groups}
+
+Suppose group \(A\) contains
+
+\[
+2,\ 5,\ 8
+\]
+
+and group \(B\) contains
+
+\[
+1,\ 4,\ 6.
+\]
+
+The combined ordered observations are
+
+\[
+1_B,\ 2_A,\ 4_B,\ 5_A,\ 6_B,\ 8_A.
+\]
+
+Thus group \(A\) receives ranks
+
+\[
+2,\ 4,\ 6.
+\]
+
+Therefore,
+
+\[
+R_A
+=
+2+4+6
+=
+12.
+\]
+
+The corresponding \(U\)-statistic is
+
+\[
+U_A
+=
+12
+-
+\frac{
+3(4)
+}{2}
+=
+6.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+R_A=12,
+\qquad
+U_A=6.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normal Approximation for the Rank-Sum Test}
+\label{subsec:rank-sum-normal-approx}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sufficiently large samples and no ties,
+
+\[
+\boxed{
+Z
+=
+\frac{
+R_1
+-
+n_1(N+1)/2
+}{
+\sqrt{
+n_1n_2(N+1)/12
+}
+}
+}
+\]
+
+is approximately standard normal under the null.
+
+Tie corrections and continuity corrections may be incorporated when
+appropriate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kruskal--Wallis Test}
+\label{subsec:kruskal-wallis-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Kruskal--Wallis procedure extends the rank-sum idea to
+
+\[
+k
+\]
+
+independent groups.
+
+All observations are ranked jointly.
+
+Let
+
+\[
+R_i
+\]
+
+denote the sum of ranks in group \(i\), and
+
+\[
+n_i
+\]
+
+its sample size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kruskal--Wallis Statistic}
+\label{subsec:kruskal-wallis-statistic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Without ties, the statistic is
+
+\[
+\boxed{
+H
+=
+\frac{
+12
+}{
+N(N+1)
+}
+\sum_{i=1}^{k}
+\frac{
+R_i^2
+}{
+n_i
+}
+-
+3(N+1).
+}
+\]
+
+Under the null and suitable large-sample conditions,
+
+\[
+\boxed{
+H
+\approx
+\chi^2_{k-1}.
+}
+\]
+
+Tie corrections are used when ranks are tied.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kruskal--Wallis Hypothesis}
+\label{subsec:kruskal-wallis-hypothesis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A broad null hypothesis is that the \(k\) independent samples arise from
+the same distribution.
+
+Under additional common-shape assumptions, the procedure can be
+interpreted as testing equality of location parameters.
+
+It should not automatically be described as a test of equal medians.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Kruskal--Wallis Structure}
+\label{subsec:worked-kruskal-wallis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Three Groups}
+
+Suppose three independent groups have sizes
+
+\[
+n_1=4,
+\qquad
+n_2=4,
+\qquad
+n_3=4.
+\]
+
+After ranking all \(12\) observations, suppose the rank sums are
+
+\[
+R_1=18,
+\qquad
+R_2=26,
+\qquad
+R_3=34.
+\]
+
+Then
+
+\[
+H
+=
+\frac{
+12
+}{
+12(13)
+}
+\left[
+\frac{18^2}{4}
++
+\frac{26^2}{4}
++
+\frac{34^2}{4}
+\right]
+-
+3(13).
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+H
+=
+\frac1{13}
+\left[
+81+169+289
+\right]
+-
+39.
+}
+\]
+\end{answerbox}
+
+The resulting statistic is compared with a chi-square distribution with
+
+\[
+\boxed{
+2
+}
+\]
+
+degrees of freedom.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Post Hoc Comparisons After Kruskal--Wallis}
+\label{subsec:posthoc-kruskal-wallis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A significant Kruskal--Wallis test indicates that not all group
+distributions are alike.
+
+It does not identify the differing groups.
+
+Possible follow-up procedures compare average ranks or pairwise rank-sum
+statistics with multiplicity adjustment.
+
+Common approaches include:
+
+\[
+\boxed{
+\text{Dunn-type comparisons},
+}
+\]
+
+or pairwise rank-sum tests with
+
+\[
+\boxed{
+\text{Bonferroni}
+}
+\]
+
+or other corrections.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Friedman Test}
+\label{subsec:friedman-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Friedman test is a rank-based method for blocked or repeated-measures
+data.
+
+Suppose
+
+\[
+b
+\]
+
+blocks each receive
+
+\[
+k
+\]
+
+treatments.
+
+Within each block, rank the \(k\) treatment responses.
+
+Let
+
+\[
+R_j
+\]
+
+be the sum of ranks for treatment \(j\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Friedman Statistic}
+\label{subsec:friedman-statistic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Without ties, the Friedman statistic is
+
+\[
+\boxed{
+Q
+=
+\frac{
+12
+}{
+bk(k+1)
+}
+\sum_{j=1}^{k}
+R_j^2
+-
+3b(k+1).
+}
+\]
+
+Under the null and suitable sample sizes,
+
+\[
+\boxed{
+Q
+\approx
+\chi^2_{k-1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Friedman Versus Kruskal--Wallis}
+\label{subsec:friedman-versus-kruskal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kruskal--Wallis is designed for
+
+\[
+\boxed{
+\text{independent groups}.
+}
+\]
+
+Friedman is designed for
+
+\[
+\boxed{
+\text{blocked or repeated observations}.
+}
+\]
+
+Thus the distinction parallels:
+
+\[
+\boxed{
+\text{one-way independent ANOVA}
+}
+\]
+
+versus
+
+\[
+\boxed{
+\text{randomized-block or repeated-measures analysis}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Friedman Ranking}
+\label{subsec:worked-friedman-ranking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Three Treatments Within a Block}
+
+Suppose one block produces treatment responses
+
+\[
+8,\ 5,\ 11.
+\]
+
+Within that block, the ranks are
+
+\[
+2,\ 1,\ 3.
+\]
+
+These within-block ranks are accumulated across blocks.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{Ranks within each block, not across all observations globally.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank Correlation}
+\label{subsec:rank-correlation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pearson correlation measures linear association between numerical
+variables.
+
+Rank correlations measure monotonic association using relative ordering.
+
+The two most common rank correlations are:
+
+\[
+\boxed{
+\text{Spearman's }\rho_s
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Kendall's }\tau.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spearman Rank Correlation}
+\label{subsec:spearman-rank-correlation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spearman's rank correlation is the Pearson correlation between the rank
+variables.
+
+If
+
+\[
+R_i
+\]
+
+is the rank of \(X_i\) and
+
+\[
+S_i
+\]
+
+the rank of \(Y_i\), then
+
+\[
+\boxed{
+\rho_s
+=
+\operatorname{Corr}(R,S).
+}
+\]
+
+The sample version is calculated from observed ranks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spearman Formula Without Ties}
+\label{subsec:spearman-no-ties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When there are no ties, define
+
+\[
+d_i
+=
+R_i-S_i.
+\]
+
+Then
+
+\[
+\boxed{
+r_s
+=
+1
+-
+\frac{
+6\sum_{i=1}^{n}d_i^2
+}{
+n(n^2-1)
+}.
+}
+\]
+
+This shortcut is equivalent to Pearson correlation of ranks when ranks
+are distinct.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Spearman Correlation}
+\label{subsec:worked-spearman}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Rank Agreement}
+
+Suppose the ranks are
+
+\[
+R=(1,2,3,4)
+\]
+
+and
+
+\[
+S=(1,3,2,4).
+\]
+
+Then
+
+\[
+d=(0,-1,1,0).
+\]
+
+Therefore,
+
+\[
+\sum d_i^2
+=
+2.
+\]
+
+Thus,
+
+\[
+r_s
+=
+1
+-
+\frac{
+6(2)
+}{
+4(4^2-1)
+}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+r_s
+=
+1-\frac{12}{60}
+=
+0.8.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of Spearman Correlation}
+\label{subsec:spearman-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spearman correlation measures monotonic association.
+
+A relationship may be strongly monotone but nonlinear.
+
+For example,
+
+\[
+Y=e^X
+\]
+
+can produce a rank correlation near \(1\) even though the relationship
+is not linear.
+
+Thus Spearman correlation is less tied to linear functional form than
+Pearson correlation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kendall's Tau}
+\label{subsec:kendalls-tau}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kendall's tau is based on concordant and discordant observation pairs.
+
+Consider two observations
+
+\[
+(X_i,Y_i)
+\]
+
+and
+
+\[
+(X_j,Y_j).
+\]
+
+They are concordant if the order of the \(X\)-values agrees with the
+order of the \(Y\)-values.
+
+They are discordant if the orders disagree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kendall Tau Without Ties}
+\label{subsec:kendall-no-ties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+C
+\]
+
+be the number of concordant pairs and
+
+\[
+D
+\]
+
+the number of discordant pairs.
+
+There are
+
+\[
+\binom{n}{2}
+\]
+
+pairs.
+
+Without ties,
+
+\[
+\boxed{
+\tau
+=
+\frac{
+C-D
+}{
+\binom{n}{2}
+}.
+}
+\]
+
+Thus,
+
+\[
+-1\leq\tau\leq1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Kendall Tau}
+\label{subsec:worked-kendall}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Concordant and Discordant Pairs}
+
+Suppose \(n=4\), so there are
+
+\[
+\binom42=6
+\]
+
+pairs.
+
+Suppose
+
+\[
+C=5
+\]
+
+and
+
+\[
+D=1.
+\]
+
+Then
+
+\[
+\tau
+=
+\frac{5-1}{6}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\tau
+=
+\frac23.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kendall Tau with Ties}
+\label{subsec:kendall-ties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Several versions of Kendall's statistic exist.
+
+A commonly used adjustment is
+
+\[
+\tau_b,
+\]
+
+which accounts for ties in both variables.
+
+Therefore software output should be interpreted according to the exact
+variant reported.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spearman Versus Kendall}
+\label{subsec:spearman-versus-kendall}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Both measure monotonic association.
+
+Spearman correlation uses rank values directly.
+
+Kendall correlation uses pairwise concordance.
+
+Kendall's tau often has a direct probability interpretation through the
+difference between concordance and discordance probabilities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Testing Rank Correlations}
+\label{subsec:testing-rank-correlations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The null hypothesis may be
+
+\[
+\boxed{
+H_0:
+\text{no rank association}.
+}
+\]
+
+For small samples without ties, exact permutation distributions can be
+used.
+
+For larger samples, normal or other asymptotic approximations are
+available.
+
+The precise null interpretation differs between Spearman and Kendall
+statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{One-Sample Kolmogorov--Smirnov Test}
+\label{subsec:one-sample-ks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the null hypothesis specifies a continuous distribution
+
+\[
+F_0.
+\]
+
+The one-sample Kolmogorov--Smirnov statistic is
+
+\[
+\boxed{
+D_n
+=
+\sup_x
+|F_n(x)-F_0(x)|.
+}
+\]
+
+It measures the largest vertical distance between the empirical CDF and
+the hypothesized CDF.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of the KS Statistic}
+\label{subsec:ks-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+D_n
+\]
+
+is small, the empirical distribution lies close to \(F_0\).
+
+If
+
+\[
+D_n
+\]
+
+is large, some part of the empirical distribution deviates substantially
+from the hypothesized model.
+
+Thus the KS test compares entire distributions rather than only one
+moment such as the mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Important KS Qualification}
+\label{subsec:ks-parameter-estimation-qualification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The classical one-sample KS null distribution assumes that
+
+\[
+F_0
+\]
+
+is completely specified.
+
+If parameters of \(F_0\) are estimated from the same data, the usual
+critical values are generally no longer exact.
+
+Modified procedures or simulation methods may then be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Sample Kolmogorov--Smirnov Test}
+\label{subsec:two-sample-ks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For independent samples with empirical CDFs
+
+\[
+F_{n_1}
+\]
+
+and
+
+\[
+G_{n_2},
+\]
+
+the statistic is
+
+\[
+\boxed{
+D_{n_1,n_2}
+=
+\sup_x
+|
+F_{n_1}(x)-G_{n_2}(x)
+|.
+}
+\]
+
+The null hypothesis is
+
+\[
+\boxed{
+H_0:
+F=G.
+}
+\]
+
+Thus the test compares two entire continuous distributions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KS Versus Rank-Sum}
+\label{subsec:ks-versus-rank-sum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The rank-sum test is especially sensitive to systematic ordering or
+location-type differences.
+
+The two-sample KS test is sensitive to differences in the entire CDF,
+including:
+
+\[
+\boxed{
+\text{location},
+}
+\]
+
+\[
+\boxed{
+\text{spread},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{shape}.
+}
+\]
+
+Thus the two tests answer different questions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cramér--von Mises Statistic Preview}
+\label{subsec:cramer-von-mises-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rather than using the maximum CDF difference, the Cramér--von Mises
+approach integrates squared differences.
+
+Conceptually,
+
+\[
+\boxed{
+\int
+[
+F_n(x)-F_0(x)
+]^2
+\,dF_0(x).
+}
+\]
+
+Thus discrepancies over the whole distribution contribute to the
+statistic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Anderson--Darling Test Preview}
+\label{subsec:anderson-darling-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Anderson--Darling approach also compares
+
+\[
+F_n
+\]
+
+with
+
+\[
+F_0,
+\]
+
+but places relatively greater weight on tail discrepancies.
+
+This can make it more sensitive than KS to certain tail departures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Runs Test}
+\label{subsec:runs-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A runs test evaluates whether a sequence appears randomly ordered with
+respect to two categories.
+
+A run is a maximal consecutive sequence of the same category.
+
+For example,
+
+\[
+A\,A\,B\,B\,A\,B\,B
+\]
+
+contains four runs:
+
+\[
+AA,
+\quad
+BB,
+\quad
+A,
+\quad
+BB.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Number of Runs}
+\label{subsec:expected-runs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a sequence contains
+
+\[
+n_1
+\]
+
+observations of one type and
+
+\[
+n_2
+\]
+
+of the other.
+
+Under random ordering,
+
+\[
+\boxed{
+\mathbb{E}[R]
+=
+1+
+\frac{
+2n_1n_2
+}{
+n_1+n_2
+}.
+}
+\]
+
+Very few runs suggest clustering.
+
+Very many runs suggest excessive alternation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Tests}
+\label{subsec:permutation-tests-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A permutation test generates a null distribution by rearranging labels
+or observations in ways justified by the null hypothesis.
+
+Suppose two groups are compared using statistic
+
+\[
+T.
+\]
+
+Under an exchangeability null:
+
+\begin{enumerate}
+    \item combine the observations;
+    \item permute group labels;
+    \item recompute \(T\);
+    \item repeat over all or many valid permutations;
+    \item compare the observed statistic with the permutation
+          distribution.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Permutation \(p\)-Value}
+\label{subsec:exact-permutation-p-value}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If all
+
+\[
+M
+\]
+
+allowable permutations are enumerated, an exact upper-tail permutation
+\(p\)-value can be written
+
+\[
+\boxed{
+p
+=
+\frac{
+\#\{
+T^*\geq T_{\text{obs}}
+\}
+}{
+M
+}.
+}
+\]
+
+For a two-sided test, extremeness must be defined according to the chosen
+statistic and null hypothesis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Permutation Test}
+\label{subsec:monte-carlo-permutation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When the number of permutations is enormous, randomly sample
+
+\[
+B
+\]
+
+valid permutations.
+
+A common Monte Carlo estimate is
+
+\[
+\boxed{
+\widehat{p}
+=
+\frac{
+1+
+\#\{
+T_b^*
+\text{ at least as extreme as }T_{\text{obs}}
+\}
+}{
+B+1
+}.
+}
+\]
+
+The added \(1\) prevents an estimated \(p\)-value of exactly zero and
+provides a standard finite-simulation correction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Tests and Exchangeability}
+\label{subsec:permutation-exchangeability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Permutation validity depends on exchangeability under the null.
+
+If observations have unequal distributions or dependence structures that
+are not preserved by the permutation, an unrestricted permutation may be
+invalid.
+
+Thus:
+
+\[
+\boxed{
+\text{permutation}
+\neq
+\text{automatic assumption-free inference}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomization Tests Versus Permutation Tests}
+\label{subsec:randomization-versus-permutation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In randomized experiments, a randomization test uses the actual treatment
+assignment mechanism.
+
+Its validity comes directly from the experimental design.
+
+A permutation test in observational data instead relies on a
+distributional exchangeability assumption.
+
+The computations may look similar, but their inferential foundations
+differ.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank Tests as Permutation Tests}
+\label{subsec:rank-tests-permutation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many classical rank tests can be understood through permutation
+distributions of ranks.
+
+For example, under a two-sample identical-distribution null, ranks are
+exchangeable between the two groups.
+
+Thus rank-sum inference can be obtained from the distribution of rank
+allocations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Versus Asymptotic Inference}
+\label{subsec:exact-versus-asymptotic-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some nonparametric tests have exact finite-sample null distributions.
+
+Examples include:
+
+\[
+\boxed{
+\text{sign tests},
+}
+\]
+
+and certain permutation tests.
+
+For larger samples, exact calculations may be computationally expensive.
+
+Then normal or chi-square approximations may be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continuity Corrections}
+\label{subsec:continuity-corrections-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rank and sign statistics are discrete.
+
+When approximating them using a continuous normal distribution, a
+continuity correction may improve finite-sample approximation.
+
+The precise correction depends on the statistic and tail direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tie Corrections}
+\label{subsec:tie-corrections-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ties alter the variance of rank statistics because ranks are no longer
+all distinct.
+
+For example, a group of \(t\) tied observations produces a correction
+involving
+
+\[
+\boxed{
+t^3-t.
+}
+\]
+
+Software commonly incorporates these corrections automatically.
+
+Exact test distributions may also depend on how ties are handled.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank-Based Estimation}
+\label{subsec:rank-based-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nonparametric methods are not limited to hypothesis tests.
+
+Rank procedures can also produce point estimates and confidence
+intervals.
+
+An important example is the Hodges--Lehmann estimator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hodges--Lehmann One-Sample Estimator}
+\label{subsec:hodges-lehmann-one-sample}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a one-sample symmetric location model, form Walsh averages
+
+\[
+\boxed{
+W_{ij}
+=
+\frac{
+X_i+X_j
+}{2},
+\qquad
+i\leq j.
+}
+\]
+
+The Hodges--Lehmann estimator is the median of these Walsh averages.
+
+It is naturally connected to the Wilcoxon signed-rank procedure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Sample Hodges--Lehmann Estimator}
+\label{subsec:hodges-lehmann-two-sample}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For independent samples
+
+\[
+X_1,\ldots,X_m
+\]
+
+and
+
+\[
+Y_1,\ldots,Y_n,
+\]
+
+form all pairwise differences
+
+\[
+\boxed{
+X_i-Y_j.
+}
+\]
+
+A Hodges--Lehmann estimator of a location shift is the median of these
+
+\[
+mn
+\]
+
+pairwise differences.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank-Based Confidence Intervals}
+\label{subsec:rank-based-confidence-intervals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because signed-rank and rank-sum tests can be inverted over possible
+location shifts, they can produce confidence intervals.
+
+The endpoints often correspond to selected ordered Walsh averages or
+pairwise differences.
+
+Thus there is a nonparametric analogue of the test--confidence-interval
+duality developed earlier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robustness}
+\label{subsec:nonparametric-robustness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rank-based methods are often resistant to extreme numerical observations.
+
+For example, replacing the largest observation by an even larger value
+may leave all ranks unchanged.
+
+Thus the statistic may remain unchanged.
+
+This contrasts with the sample mean and variance, which can change
+substantially.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robust Does Not Mean Universally Better}
+\label{subsec:robust-not-universal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nonparametric procedures may sacrifice information by replacing raw
+values with ranks or signs.
+
+If a parametric model is accurate, parametric methods can be more
+efficient.
+
+Thus the choice involves a tradeoff between:
+
+\[
+\boxed{
+\text{model efficiency}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{robustness to misspecification}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Asymptotic Relative Efficiency}
+\label{subsec:asymptotic-relative-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Asymptotic relative efficiency, abbreviated ARE, compares the sample
+sizes needed by two procedures to attain similar asymptotic power.
+
+Schematically,
+
+\[
+\boxed{
+ARE(T_1,T_2)
+=
+\lim
+\frac{
+n_2
+}{
+n_1
+}.
+}
+\]
+
+An ARE near \(1\) indicates similar large-sample efficiency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wilcoxon Efficiency Under Normality}
+\label{subsec:wilcoxon-efficiency-normal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under normal location models, the Wilcoxon rank procedures retain high
+efficiency relative to classical \(t\)-procedures.
+
+This illustrates that rank methods can be robust without necessarily
+sacrificing large amounts of efficiency.
+
+The precise asymptotic efficiency depends on the distributions being
+compared.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Breakdown and Resistance}
+\label{subsec:breakdown-resistance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Robust procedures can also be compared by how much contamination they can
+tolerate before becoming arbitrarily unreliable.
+
+The sample median is far more resistant to extreme contamination than the
+sample mean.
+
+This connects nonparametric methods with robust statistics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quantile Estimation}
+\label{subsec:nonparametric-quantile-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Population quantiles can be estimated directly from order statistics.
+
+For
+
+\[
+0<p<1,
+\]
+
+the population \(p\)-quantile satisfies conceptually
+
+\[
+F(q_p)\geq p.
+\]
+
+A sample quantile is obtained from the ordered sample.
+
+Finite-sample interpolation conventions differ across software.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Median}
+\label{subsec:sample-median-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The median is the
+
+\[
+0.5
+\]
+
+quantile.
+
+For odd \(n\),
+
+\[
+\boxed{
+\widetilde{X}
+=
+X_{((n+1)/2)}.
+}
+\]
+
+For even \(n\), the conventional descriptive median is often
+
+\[
+\boxed{
+\widetilde{X}
+=
+\frac{
+X_{(n/2)}
++
+X_{(n/2+1)}
+}{2}.
+}
+\]
+
+Other quantile conventions can differ for general percentiles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonparametric Density Estimation}
+\label{subsec:nonparametric-density-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A probability density can be estimated without specifying a named
+parametric family.
+
+One simple estimator is a histogram.
+
+A smoother alternative is kernel density estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kernel Density Estimator}
+\label{subsec:kernel-density-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given observations
+
+\[
+X_1,\ldots,X_n,
+\]
+
+a kernel density estimator is
+
+\[
+\boxed{
+\widehat{f}_h(x)
+=
+\frac1{nh}
+\sum_{i=1}^{n}
+K
+\left(
+\frac{
+x-X_i
+}{h}
+\right),
+}
+\]
+
+where:
+
+\[
+K
+=
+\text{kernel function},
+\]
+
+and
+
+\[
+h>0
+\]
+
+is the bandwidth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bandwidth}
+\label{subsec:kde-bandwidth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The bandwidth controls smoothness.
+
+A small \(h\) produces a highly variable density estimate.
+
+A large \(h\) produces a smoother estimate but can hide important
+features.
+
+Thus bandwidth choice reflects a bias--variance tradeoff:
+
+\[
+\boxed{
+h\text{ small}
+\rightarrow
+\text{low smoothing, high variance},
+}
+\]
+
+\[
+\boxed{
+h\text{ large}
+\rightarrow
+\text{high smoothing, high bias}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kernel Functions}
+\label{subsec:kernel-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Common kernels include:
+
+\[
+\boxed{
+\text{Gaussian},
+}
+\]
+
+\[
+\boxed{
+\text{uniform},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Epanechnikov}.
+}
+\]
+
+In many applications, bandwidth choice affects the estimate more strongly
+than the exact kernel shape.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonparametric Regression}
+\label{subsec:nonparametric-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of assuming
+
+\[
+\mathbb{E}[Y\mid X=x]
+=
+\beta_0+\beta_1x,
+\]
+
+nonparametric regression estimates a general function
+
+\[
+\boxed{
+m(x)
+=
+\mathbb{E}[Y\mid X=x].
+}
+\]
+
+The function's shape is learned flexibly from data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kernel Regression Preview}
+\label{subsec:kernel-regression-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple kernel regression estimator is
+
+\[
+\boxed{
+\widehat{m}(x)
+=
+\frac{
+\sum_{i=1}^{n}
+K
+\left(
+\frac{x-X_i}{h}
+\right)
+Y_i
+}{
+\sum_{i=1}^{n}
+K
+\left(
+\frac{x-X_i}{h}
+\right)
+}.
+}
+\]
+
+Nearby observations receive greater weight than distant observations.
+
+This is often called the Nadaraya--Watson estimator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Regression Preview}
+\label{subsec:local-regression-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Local polynomial regression fits simple polynomial models near each
+target value \(x\).
+
+For example, local linear regression minimizes a weighted sum such as
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+w_i(x)
+[
+Y_i-a-b(X_i-x)
+]^2.
+}
+\]
+
+The fitted intercept gives the estimated mean response at \(x\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Smoothing Splines Preview}
+\label{subsec:smoothing-splines-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A smoothing spline balances data fit and smoothness through an objective
+of the form
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+[
+Y_i-f(X_i)
+]^2
++
+\lambda
+\int
+[f''(x)]^2\,dx.
+}
+\]
+
+The tuning parameter
+
+\[
+\lambda
+\]
+
+controls smoothness.
+
+This connects nonparametric regression with regularization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonparametric Bootstrap}
+\label{subsec:nonparametric-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The ordinary bootstrap can be interpreted as sampling from the empirical
+distribution
+
+\[
+F_n.
+\]
+
+A bootstrap sample consists of
+
+\[
+n
+\]
+
+observations drawn with replacement from the original sample.
+
+Thus the bootstrap is naturally nonparametric when no parametric family
+is imposed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Distribution}
+\label{subsec:bootstrap-distribution-nonparametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For statistic
+
+\[
+T_n
+=
+T(X_1,\ldots,X_n),
+\]
+
+generate bootstrap samples and compute
+
+\[
+T_1^*,
+\ldots,
+T_B^*.
+\]
+
+Their empirical distribution approximates the sampling distribution of
+
+\[
+T_n
+\]
+
+under suitable conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Versus Bootstrap}
+\label{subsec:permutation-versus-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Permutation methods primarily approximate a null distribution by
+rearranging observations or labels.
+
+Bootstrap methods approximate sampling variability by resampling with
+replacement.
+
+Thus:
+
+\[
+\boxed{
+\text{permutation}
+\rightarrow
+\text{testing under exchangeability},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{bootstrap}
+\rightarrow
+\text{sampling-distribution approximation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Nonparametric Procedure}
+\label{subsec:choosing-nonparametric-procedure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For one sample or paired data and a median-type question:
+
+\[
+\boxed{
+\text{sign test}.
+}
+\]
+
+For paired symmetric location differences:
+
+\[
+\boxed{
+\text{Wilcoxon signed-rank test}.
+}
+\]
+
+For two independent groups:
+
+\[
+\boxed{
+\text{Mann--Whitney--Wilcoxon rank-sum test}.
+}
+\]
+
+For several independent groups:
+
+\[
+\boxed{
+\text{Kruskal--Wallis test}.
+}
+\]
+
+For blocked or repeated treatments:
+
+\[
+\boxed{
+\text{Friedman test}.
+}
+\]
+
+For monotonic association:
+
+\[
+\boxed{
+\text{Spearman or Kendall correlation}.
+}
+\]
+
+For comparing full distributions:
+
+\[
+\boxed{
+\text{Kolmogorov--Smirnov procedures}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric Versus Nonparametric Choice}
+\label{subsec:parametric-versus-nonparametric-choice}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The decision should not be based only on whether a normality test rejects.
+
+Consider:
+
+\[
+\boxed{
+\text{scientific parameter of interest},
+}
+\]
+
+\[
+\boxed{
+\text{measurement scale},
+}
+\]
+
+\[
+\boxed{
+\text{sample size},
+}
+\]
+
+\[
+\boxed{
+\text{outliers},
+}
+\]
+
+\[
+\boxed{
+\text{distributional shape},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{study design}.
+}
+\]
+
+A nonparametric test may answer a different scientific question from its
+parametric counterpart.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonparametric Does Not Mean Median}
+\label{subsec:nonparametric-not-median}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common mistake is to interpret every rank test as testing medians.
+
+Different procedures target different distributional features.
+
+For example:
+
+\[
+\boxed{
+\text{sign test}
+}
+\]
+
+can directly address a median under suitable continuity conditions,
+
+while
+
+\[
+\boxed{
+\text{Mann--Whitney}
+}
+\]
+
+more generally concerns relative distributional ordering.
+
+Interpretation must follow the actual null hypothesis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:nonparametric-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Calling Nonparametric Methods Assumption-Free}
+
+Nonparametric procedures still rely on assumptions such as independence,
+exchangeability, symmetry, or continuity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Independent-Sample Rank Test for Paired Data}
+
+Paired observations require a paired procedure such as the sign test or
+signed-rank test.
+
+Ignoring pairing loses information and gives the wrong null distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Paired Test for Independent Groups}
+
+Independent groups do not provide meaningful within-pair differences.
+
+Use a two-independent-sample procedure instead.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Mann--Whitney Automatically as a Median Test}
+
+Different distributional shapes can produce a significant rank-sum test
+even when medians are similar.
+
+Median interpretation requires additional location-shift assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Symmetry for Signed-Rank Location Inference}
+
+The signed-rank procedure uses both signs and absolute ranks.
+
+Its classical location interpretation assumes symmetry of the difference
+distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Ties}
+
+Ties alter rank assignments and may change null variances.
+
+Appropriate tie corrections or exact methods should be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying Standard KS Critical Values After Estimating Parameters}
+
+If a reference distribution's parameters are estimated using the same
+data, the standard one-sample KS null distribution generally changes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming KS Tests Only Location}
+
+KS tests compare entire empirical CDFs.
+
+A significant result may arise from differences in location, scale, or
+shape.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Permuting Labels Without Exchangeability}
+
+A permutation distribution is valid only when the proposed rearrangements
+are justified under the null or experimental design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Raw Observations Instead of Within-Block Ranks in Friedman Testing}
+
+The Friedman procedure ranks treatments separately within each block.
+
+It does not rank all observations globally.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Multiple Comparisons After a Significant Omnibus Test}
+
+A significant Kruskal--Wallis or Friedman statistic does not identify the
+specific groups or treatments that differ.
+
+Follow-up comparisons require multiplicity control.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Rank Tests Are Immune to Outliers in Every Sense}
+
+Ranks reduce sensitivity to extreme magnitudes, but unusual observations
+can still affect ranks, group ordering, and interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Choosing a Test Solely Because a Normality Test Is Significant}
+
+Formal normality tests can reject negligible departures in large samples
+and have little power in small samples.
+
+Graphical diagnostics, robustness, sample size, and the scientific target
+should also be considered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:nonparametric-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Medicine.}
+Rank and sign methods analyze skewed biomarkers, ordinal outcomes,
+small clinical samples, and paired measurements.
+
+\medskip
+
+\textbf{Environmental Science.}
+Environmental concentrations often contain skewness, detection limits,
+and extreme observations that motivate robust and rank-based procedures.
+
+\medskip
+
+\textbf{Education Research.}
+Ordinal survey responses, small program samples, and paired student
+outcomes may be analyzed using rank procedures.
+
+\medskip
+
+\textbf{Psychology.}
+Rank correlations and repeated-measures rank tests are useful for ordinal
+and nonnormally distributed behavioral data.
+
+\medskip
+
+\textbf{Engineering.}
+Nonparametric procedures provide robust comparisons when lifetime or
+failure measurements do not follow simple parametric distributions.
+
+\medskip
+
+\textbf{Business.}
+Customer ratings, rankings, spending distributions, and A/B experiments
+can be studied with rank and permutation procedures.
+
+\medskip
+
+\textbf{Computational Statistics.}
+Permutation methods, bootstrap procedures, and empirical distributions
+are central computational tools.
+
+\medskip
+
+\textbf{Machine Learning.}
+Kernel methods, nonparametric regression, density estimation, and
+rank-based performance measures extend statistical modeling beyond fixed
+parametric forms.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:nonparametric-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Explain the difference between parametric and nonparametric statistics.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain why nonparametric does not mean assumption-free.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a rank.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the empirical distribution function.
+\end{exercise}
+
+\begin{exercise}[1]
+State the null distribution of the one-sample sign-test statistic.
+\end{exercise}
+
+\begin{exercise}[1]
+Describe the Wilcoxon signed-rank procedure.
+\end{exercise}
+
+\begin{exercise}[1]
+Describe the Wilcoxon rank-sum procedure.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the Mann--Whitney \(U\)-statistic.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Kruskal--Wallis statistic.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Friedman statistic.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Spearman rank correlation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Kendall's tau.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the one-sample Kolmogorov--Smirnov statistic.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the two-sample Kolmogorov--Smirnov statistic.
+\end{exercise}
+
+\begin{exercise}[2]
+Rank the observations
+
+\[
+4,\ 10,\ 7,\ 2,\ 8.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Assign average ranks to
+
+\[
+2,\ 5,\ 5,\ 5,\ 9.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose \(15\) observations are compared with a hypothesized median and
+\(11\) lie above it. Write the exact right-tailed sign-test \(p\)-value.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose paired differences are
+
+\[
+-4,\ 2,\ 1,\ -3.
+\]
+
+Compute \(W^+\) and \(W^-\).
+\end{exercise}
+
+\begin{exercise}[2]
+For \(n=10\), compute
+
+\[
+\mathbb{E}[W^+].
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+For \(n=10\), compute the no-tie variance of \(W^+\).
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose group \(1\) has \(n_1=5\), group \(2\) has \(n_2=7\), and the
+rank sum for group \(1\) is \(R_1=25\). Compute \(U_1\).
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous problem, compute \(U_2\).
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose \(N=20\), \(n_1=8\). Compute the null expected rank sum for group
+\(1\).
+\end{exercise}
+
+\begin{exercise}[2]
+Three groups have rank sums
+
+\[
+20,\ 30,\ 40
+\]
+
+and sample sizes
+
+\[
+5,\ 5,\ 5.
+\]
+
+Write the Kruskal--Wallis statistic.
+\end{exercise}
+
+\begin{exercise}[2]
+A Friedman design has \(b=8\) blocks and \(k=4\) treatments. What are the
+approximate chi-square degrees of freedom?
+\end{exercise}
+
+\begin{exercise}[2]
+Compute Spearman's correlation when
+
+\[
+\sum d_i^2=10
+\]
+
+and
+
+\[
+n=5.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+For \(n=6\), determine the total number of pairs used in Kendall's tau.
+\end{exercise}
+
+\begin{exercise}[2]
+If \(C=12\) and \(D=3\) among \(15\) untied pairs, compute Kendall's tau.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the null binomial distribution of the sign-test statistic.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how order statistics can produce an exact confidence interval for
+a population median.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+W^++W^-
+=
+\frac{
+n(n+1)
+}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the null expectation of \(W^+\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the no-tie variance of \(W^+\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why symmetry is important for the classical signed-rank location
+interpretation.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the relation between the Wilcoxon rank sum and Mann--Whitney
+\(U\)-statistic.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+U_1+U_2=n_1n_2.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the probabilistic interpretation of
+
+\[
+\frac{U}{n_1n_2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Mann--Whitney does not automatically test equality of
+medians.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the no-tie expected rank sum under the two-sample null.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Kruskal--Wallis statistic from deviations of group mean ranks
+from the overall mean rank.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Kruskal--Wallis is the rank analogue of one-way ANOVA.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Friedman ranks within blocks.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the Spearman shortcut formula follows from Pearson correlation
+of untied ranks.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the concordance interpretation of Kendall's tau.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct two datasets having perfect Spearman correlation but a
+nonlinear relationship.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the two-sample KS test can detect scale differences even when
+the population medians are equal.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why estimating parameters from the sample changes the classical
+one-sample KS null distribution.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare KS, Cramér--von Mises, and Anderson--Darling conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the expected number of runs for a two-category random sequence.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why permutation testing requires exchangeability.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish permutation tests from bootstrap procedures.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a randomization test can be exact under a randomized
+experimental design.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why ties require variance corrections in rank tests.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the Walsh averages for the sample
+
+\[
+1,\ 3,\ 6.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Find the two-sample Hodges--Lehmann estimator for
+
+\[
+X=(2,4),
+\qquad
+Y=(1,3).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the bandwidth bias--variance tradeoff in kernel density
+estimation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how kernel regression differs from ordinary linear regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the Glivenko--Cantelli theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Dvoretzky--Kiefer--Wolfowitz inequality.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the exact distribution of the sign-test statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the exact null distribution of the Wilcoxon signed-rank statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the exact permutation distribution of the rank-sum statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Pitman asymptotic relative efficiency of Wilcoxon and \(t\)-tests.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the asymptotic distribution of the Kruskal--Wallis statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate exact Friedman tests.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive asymptotic normality of Spearman rank correlation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Kendall's tau as a \(U\)-statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the asymptotic null distribution of the one-sample KS statistic.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Kolmogorov distribution.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate two-sample empirical-process convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Anderson--Darling goodness-of-fit statistics.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate permutation tests under heteroskedasticity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study studentized permutation statistics.
+\end{exercise}
+
+\begin{exercise}[4]
+Study rank-based multiple comparisons after Kruskal--Wallis.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate rank-based estimators and confidence intervals.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive bias and variance properties of kernel density estimators.
+\end{exercise}
+
+\begin{exercise}[4]
+Study bandwidth selection by cross-validation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive properties of local polynomial regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Study smoothing splines through penalized least squares.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:nonparametric-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nonparametric statistics reduces reliance on fully specified parametric
+distribution families.
+
+The empirical distribution function is
+
+\[
+\boxed{
+F_n(x)
+=
+\frac1n
+\sum_{i=1}^{n}
+\mathbf{1}_{\{X_i\leq x\}}.
+}
+\]
+
+For a one-sample median test, the sign statistic satisfies
+
+\[
+\boxed{
+S
+\sim
+\operatorname{Binomial}
+\left(
+n,\frac12
+\right)
+}
+\]
+
+under the continuous median null.
+
+The Wilcoxon signed-rank procedure uses signed ranks
+
+\[
+\boxed{
+W^+
+=
+\sum_{D_i>0}R_i.
+}
+\]
+
+For two independent groups, the Mann--Whitney statistic can be written
+
+\[
+\boxed{
+U_1
+=
+R_1
+-
+\frac{
+n_1(n_1+1)
+}{2}.
+}
+\]
+
+The Kruskal--Wallis statistic is
+
+\[
+\boxed{
+H
+=
+\frac{
+12
+}{
+N(N+1)
+}
+\sum_i
+\frac{
+R_i^2
+}{
+n_i
+}
+-
+3(N+1).
+}
+\]
+
+For blocked rank data, Friedman uses
+
+\[
+\boxed{
+Q
+=
+\frac{
+12
+}{
+bk(k+1)
+}
+\sum_jR_j^2
+-
+3b(k+1).
+}
+\]
+
+Spearman correlation measures correlation between ranks, while Kendall's
+tau measures pairwise concordance.
+
+The Kolmogorov--Smirnov statistic compares entire distribution functions:
+
+\[
+\boxed{
+D_n
+=
+\sup_x
+|F_n(x)-F_0(x)|.
+}
+\]
+
+Permutation tests generate null distributions by valid rearrangements
+under exchangeability or a randomized design.
+
+Nonparametric statistics therefore combines
+
+\[
+\boxed{
+\text{order statistics}
++
+\text{ranks}
++
+\text{empirical distributions}
++
+\text{combinatorics}
++
+\text{resampling}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:nonparametric-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Nonparametric Statistics complements the parametric inference developed
+in Sections~\ref{sec:statistical-estimation},
+\ref{sec:confidence-intervals}, and
+\ref{sec:hypothesis-testing}. Rank-sum and Kruskal--Wallis procedures
+provide alternatives to classical mean comparisons, while signed-rank
+and Friedman methods extend the same ideas to paired and blocked data.
+Permutation methods connect directly with the randomization principles
+of Section~\ref{sec:experimental-design}. The empirical distribution,
+kernel density estimation, and nonparametric regression also lead toward
+the more flexible high-dimensional methods studied later in Statistical
+Learning and Computational Statistics. The next section, Multivariate
+Statistics, studies datasets in which several quantitative variables are
+analyzed jointly rather than one response at a time.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.11 Nonparametric Statistics
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard nonparametric statistical theory.
+%   - Standard rank-based inference.
+%   - Standard permutation and empirical-distribution methods.
+%
+% Used for:
+%   - parametric versus nonparametric inference;
+%   - ranks and ties;
+%   - signs;
+%   - empirical distribution functions;
+%   - Glivenko--Cantelli preview;
+%   - sign tests;
+%   - distribution-free median intervals;
+%   - Wilcoxon signed-rank tests;
+%   - sign versus signed-rank procedures;
+%   - rank-sum tests;
+%   - Mann--Whitney U statistics;
+%   - probabilistic interpretation of U;
+%   - Kruskal--Wallis tests;
+%   - Friedman tests;
+%   - Spearman rank correlation;
+%   - Kendall rank correlation;
+%   - Kolmogorov--Smirnov tests;
+%   - Cramér--von Mises preview;
+%   - Anderson--Darling preview;
+%   - runs tests;
+%   - permutation tests;
+%   - randomization tests;
+%   - exact and asymptotic inference;
+%   - continuity corrections;
+%   - tie corrections;
+%   - Hodges--Lehmann estimators;
+%   - rank-based confidence intervals;
+%   - robustness;
+%   - asymptotic relative efficiency;
+%   - quantile estimation;
+%   - kernel density estimation;
+%   - nonparametric regression;
+%   - local regression;
+%   - smoothing splines;
+%   - nonparametric bootstrap;
+%   - procedure selection;
+%   - applications and exercises.
+%
+% Notes:
+%   - Multivariate Statistics is developed next in Section 8.12.
+%   - Mathematical Statistics later develops empirical-process,
+%     U-statistic, and asymptotic theory more deeply.
+%   - Statistical Learning later develops kernel, smoothing, and flexible
+%     predictive methods.
+%   - Computational Statistics develops bootstrap, permutation, and
+%     resampling procedures more fully.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

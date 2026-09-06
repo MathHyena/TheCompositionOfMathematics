@@ -1,0 +1,2921 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.10 NETWORK OPTIMIZATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Network Optimization}
+\label{sec:network-optimization}
+
+\prerequisite{
+Graph theory, linear programming, combinatorial optimization, integer
+programming, shortest paths, matrices, systems of linear equations, and
+basic algorithmic complexity.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a network optimization problem;
+    \item distinguish directed and undirected networks;
+    \item define nodes, arcs, capacities, costs, supplies, and demands;
+    \item formulate flow-conservation constraints;
+    \item formulate shortest-path problems as network flows;
+    \item understand shortest-path optimality conditions;
+    \item distinguish Dijkstra and Bellman--Ford methods;
+    \item define maximum-flow problems;
+    \item understand residual networks;
+    \item understand augmenting paths;
+    \item state the max-flow min-cut theorem;
+    \item identify minimum cuts;
+    \item formulate minimum-cost flow problems;
+    \item understand node potentials and reduced arc costs;
+    \item formulate transportation and transshipment problems;
+    \item formulate assignment as a network problem;
+    \item recognize circulation problems;
+    \item formulate flows with lower and upper bounds;
+    \item understand feasibility of circulations conceptually;
+    \item formulate bipartite matching as network flow;
+    \item understand network integrality;
+    \item recognize total unimodularity of network matrices conceptually;
+    \item understand minimum spanning trees as network design;
+    \item distinguish flow problems from network-design problems;
+    \item formulate fixed-charge network-design models conceptually;
+    \item understand multicommodity flow;
+    \item recognize capacity-sharing constraints;
+    \item understand network interdiction conceptually;
+    \item formulate time-expanded networks;
+    \item recognize dynamic flow problems;
+    \item understand residual optimality conditions;
+    \item recognize cycle-canceling methods;
+    \item understand successive shortest-path methods conceptually;
+    \item recognize network simplex methods;
+    \item distinguish primal and dual network interpretations;
+    \item understand shadow prices at nodes;
+    \item understand sensitivity to capacities and costs;
+    \item connect network optimization with transportation, logistics,
+          telecommunications, energy, scheduling, and supply chains.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Network Optimization?}
+\label{subsec:what-is-network-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Network optimization studies optimization problems defined on graphs or
+networks.
+
+A directed network is written
+
+\[
+\boxed{
+G=(V,A),
+}
+\]
+
+where
+
+\[
+V
+=
+\text{set of nodes},
+\]
+
+and
+
+\[
+A
+=
+\text{set of directed arcs}.
+\]
+
+Each arc may have quantities such as:
+
+\[
+\boxed{
+\text{cost},
+}
+\]
+
+\[
+\boxed{
+\text{capacity},
+}
+\]
+
+\[
+\boxed{
+\text{lower bound},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{travel time}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directed and Undirected Networks}
+\label{subsec:directed-undirected-networks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A directed arc
+
+\[
+(i,j)
+\]
+
+allows movement from node \(i\) to node \(j\).
+
+An undirected edge
+
+\[
+\{i,j\}
+\]
+
+allows connection without a preferred direction.
+
+Many undirected network problems can be represented by replacing each
+edge with two directed arcs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow Variables}
+\label{subsec:network-flow-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\boxed{
+x_{ij}
+=
+\text{flow sent along arc }(i,j).
+}
+\]
+
+Typical restrictions are
+
+\[
+\boxed{
+x_{ij}\geq0,
+}
+\]
+
+or
+
+\[
+\boxed{
+0\leq x_{ij}\leq u_{ij},
+}
+\]
+
+where
+
+\[
+u_{ij}
+\]
+
+is the arc capacity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Supply and Demand at Nodes}
+\label{subsec:network-supply-demand}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Associate each node \(i\) with a balance value
+
+\[
+b_i.
+\]
+
+We use the convention:
+
+\[
+\boxed{
+b_i>0
+\Rightarrow
+\text{node }i\text{ supplies flow},
+}
+\]
+
+\[
+\boxed{
+b_i<0
+\Rightarrow
+\text{node }i\text{ demands flow},
+}
+\]
+
+and
+
+\[
+\boxed{
+b_i=0
+\Rightarrow
+\text{transshipment node}.
+}
+\]
+
+For a balanced network,
+
+\[
+\boxed{
+\sum_{i\in V}
+b_i=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow Conservation}
+\label{subsec:flow-conservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At each node,
+
+\[
+\boxed{
+\text{outflow}
+-
+\text{inflow}
+=
+\text{supply}.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\sum_{j:(i,j)\in A}
+x_{ij}
+-
+\sum_{j:(j,i)\in A}
+x_{ji}
+=
+b_i.
+}
+\]
+
+When
+
+\[
+b_i=0,
+\]
+
+we obtain
+
+\[
+\boxed{
+\text{inflow}
+=
+\text{outflow}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Incidence Matrix}
+\label{subsec:network-incidence-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The node-arc incidence matrix \(B\) records how arcs connect nodes.
+
+For arc
+
+\[
+a=(i,j),
+\]
+
+a common convention places
+
+\[
+\boxed{
++1
+}
+\]
+
+in row \(i\),
+
+\[
+\boxed{
+-1
+}
+\]
+
+in row \(j\),
+
+and zero elsewhere.
+
+Then flow conservation becomes
+
+\[
+\boxed{
+B\mathbf{x}
+=
+\mathbf{b}.
+}
+\]
+
+Different sign conventions are possible if used consistently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generic Minimum-Cost Network Flow}
+\label{subsec:generic-minimum-cost-network-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic network-flow model is
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}
+\\
+\text{subject to}
+\quad&
+\sum_{j:(i,j)\in A}
+x_{ij}
+-
+\sum_{j:(j,i)\in A}
+x_{ji}
+=
+b_i,
+\qquad
+i\in V,
+\\
+&
+0\leq x_{ij}\leq u_{ij}.
+\end{aligned}
+}
+\]
+
+This is the minimum-cost flow problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest-Path Problem}
+\label{subsec:network-shortest-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given source \(s\), destination \(t\), and arc lengths \(c_{ij}\), the
+shortest-path problem minimizes total path cost.
+
+Define
+
+\[
+x_{ij}
+=
+\begin{cases}
+1,
+&
+\text{arc }(i,j)\text{ is used},
+\\
+0,
+&
+\text{otherwise}.
+\end{cases}
+\]
+
+The objective is
+
+\[
+\boxed{
+\min
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest Path as a Unit Flow}
+\label{subsec:shortest-path-unit-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Send one unit of flow from \(s\) to \(t\).
+
+Set
+
+\[
+\boxed{
+b_s=1,
+}
+\]
+
+\[
+\boxed{
+b_t=-1,
+}
+\]
+
+and
+
+\[
+\boxed{
+b_i=0
+}
+\]
+
+for every other node.
+
+Then solve
+
+\[
+\boxed{
+B\mathbf{x}
+=
+\mathbf{b},
+\qquad
+\mathbf{x}\geq0.
+}
+\]
+
+With appropriate assumptions, an optimal extreme-point solution gives an
+\(s\)-to-\(t\) path.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest-Path Labeling}
+\label{subsec:shortest-path-labeling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+d(v)
+\]
+
+denote the current estimate of the shortest distance from source \(s\) to
+vertex \(v\).
+
+Relaxing arc \((u,v)\) means checking whether
+
+\[
+\boxed{
+d(v)
+>
+d(u)+c_{uv}.
+}
+\]
+
+If so, update
+
+\[
+\boxed{
+d(v)
+\leftarrow
+d(u)+c_{uv}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dijkstra's Algorithm}
+\label{subsec:dijkstra-network}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonnegative arc lengths,
+
+\[
+\boxed{
+c_{ij}\geq0,
+}
+\]
+
+Dijkstra's algorithm repeatedly selects an unsettled node with smallest
+tentative distance and relaxes its outgoing arcs.
+
+Once a node is permanently labeled, its distance is optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limitation of Dijkstra's Algorithm}
+\label{subsec:dijkstra-limitation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dijkstra's algorithm requires nonnegative edge lengths.
+
+If negative edges are present, a node that appears final may later receive
+a shorter path.
+
+Thus one must use another method, such as Bellman--Ford, when negative
+weights are permitted.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bellman--Ford Algorithm}
+\label{subsec:bellman-ford-network}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bellman--Ford repeatedly relaxes every arc.
+
+For a graph with \(n\) vertices, shortest simple paths contain at most
+
+\[
+n-1
+\]
+
+edges.
+
+Thus after at most \(n-1\) full relaxation passes, shortest distances are
+obtained when no reachable negative cycle exists.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Negative Cycles}
+\label{subsec:negative-cycles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A directed cycle has negative total cost if
+
+\[
+\boxed{
+\sum_{(i,j)\in C}
+c_{ij}
+<
+0.
+}
+\]
+
+If such a cycle is reachable and can be inserted arbitrarily into a
+shortest-path walk, path cost can decrease without bound.
+
+Bellman--Ford can detect reachable negative cycles by checking for an
+additional improvement after the standard relaxation passes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Shortest Path}
+\label{subsec:worked-network-shortest-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Comparing Routes}
+
+Suppose the network contains arcs
+
+\[
+A\to B
+\quad\text{with cost }2,
+\]
+
+\[
+A\to C
+\quad\text{with cost }5,
+\]
+
+\[
+B\to C
+\quad\text{with cost }1,
+\]
+
+and
+
+\[
+C\to D
+\quad\text{with cost }3.
+\]
+
+The route
+
+\[
+A\to C\to D
+\]
+
+has cost
+
+\[
+5+3=8.
+\]
+
+The route
+
+\[
+A\to B\to C\to D
+\]
+
+has cost
+
+\[
+2+1+3=6.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+A\to B\to C\to D
+}
+\]
+
+is shorter, with total cost
+
+\[
+\boxed{
+6.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum-Flow Problem}
+\label{subsec:maximum-flow-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The maximum-flow problem sends as much flow as possible from a source
+
+\[
+s
+\]
+
+to a sink
+
+\[
+t
+\]
+
+subject to capacity restrictions.
+
+Each arc satisfies
+
+\[
+\boxed{
+0\leq x_{ij}\leq u_{ij}.
+}
+\]
+
+At intermediate nodes,
+
+\[
+\boxed{
+\text{inflow}
+=
+\text{outflow}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Value of a Flow}
+\label{subsec:value-of-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The value of an \(s\)-\(t\) flow is the net flow leaving \(s\):
+
+\[
+\boxed{
+v
+=
+\sum_j
+x_{sj}
+-
+\sum_j
+x_{js}.
+}
+\]
+
+Equivalently, by conservation, it equals the net flow entering \(t\).
+
+The objective is
+
+\[
+\boxed{
+\max v.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Capacity}
+\label{subsec:residual-capacity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose arc \((i,j)\) has capacity \(u_{ij}\) and current flow \(x_{ij}\).
+
+The forward residual capacity is
+
+\[
+\boxed{
+u_{ij}-x_{ij}.
+}
+\]
+
+A reverse residual arc allows previously sent flow to be reduced.
+
+Its capacity is
+
+\[
+\boxed{
+x_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Network}
+\label{subsec:residual-network}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The residual network contains all directions in which the current flow can
+be modified.
+
+It contains:
+
+\[
+\boxed{
+\text{forward residual arcs}
+}
+\]
+
+for unused capacity,
+
+and
+
+\[
+\boxed{
+\text{reverse residual arcs}
+}
+\]
+
+for canceling existing flow.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Augmenting Paths}
+\label{subsec:augmenting-paths}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An augmenting path is an \(s\)-to-\(t\) path in the residual network with
+positive residual capacity on every arc.
+
+The amount of additional flow that can be sent is
+
+\[
+\boxed{
+\Delta
+=
+\min_{a\in P}
+u_a^{\mathrm{res}}.
+}
+\]
+
+This is the bottleneck residual capacity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ford--Fulkerson Method}
+\label{subsec:ford-fulkerson}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ford--Fulkerson repeatedly:
+
+\begin{enumerate}
+    \item finds an augmenting path;
+    \item computes its bottleneck residual capacity;
+    \item augments the flow;
+    \item updates the residual network;
+    \item stops when no augmenting path exists.
+\end{enumerate}
+
+For integral capacities, the method can be implemented so that all flows
+remain integral.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Edmonds--Karp Algorithm}
+\label{subsec:edmonds-karp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Edmonds--Karp is a specific implementation of Ford--Fulkerson.
+
+It chooses an augmenting path with the fewest arcs by using breadth-first
+search in the residual network.
+
+This produces a polynomial-time algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cuts}
+\label{subsec:network-cuts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An \(s\)-\(t\) cut partitions the nodes into
+
+\[
+S
+\]
+
+and
+
+\[
+T=V\setminus S,
+\]
+
+with
+
+\[
+s\in S,
+\qquad
+t\in T.
+\]
+
+The capacity of the cut is
+
+\[
+\boxed{
+u(S,T)
+=
+\sum_{\substack{i\in S\\j\in T}}
+u_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow Is Bounded by Every Cut}
+\label{subsec:flow-cut-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Any \(s\)-to-\(t\) flow must cross every \(s\)-\(t\) cut.
+
+Therefore,
+
+\[
+\boxed{
+v
+\leq
+u(S,T)
+}
+\]
+
+for every \(s\)-\(t\) cut.
+
+Thus every cut provides an upper bound on maximum flow.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Max-Flow Min-Cut Theorem}
+\label{subsec:max-flow-min-cut}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Max-Flow Min-Cut Theorem]
+The maximum value of an \(s\)-\(t\) flow equals the minimum capacity of an
+\(s\)-\(t\) cut:
+
+\[
+\boxed{
+\max
+\{
+\text{flow value}
+\}
+=
+\min
+\{
+\text{cut capacity}
+\}.
+}
+\]
+\end{theorem}
+
+This is one of the fundamental duality results in network optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Flow and Cut}
+\label{subsec:worked-flow-cut}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Certifying Maximum Flow}
+
+Suppose a feasible \(s\)-\(t\) flow has value
+
+\[
+12.
+\]
+
+Suppose an \(s\)-\(t\) cut is found with capacity
+
+\[
+12.
+\]
+
+Every feasible flow satisfies
+
+\[
+v\leq12.
+\]
+
+But a flow of value \(12\) already exists.
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+v^*=12.
+}
+\]
+
+The flow and cut together certify optimality.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum-Cost Flow}
+\label{subsec:minimum-cost-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The minimum-cost flow problem combines:
+
+\[
+\boxed{
+\text{flow conservation},
+}
+\]
+
+\[
+\boxed{
+\text{capacities},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{arc costs}.
+}
+\]
+
+The model is
+
+\[
+\boxed{
+\begin{aligned}
+\min
+\quad&
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}
+\\
+\text{subject to}
+\quad&
+\sum_jx_{ij}
+-
+\sum_jx_{ji}
+=
+b_i,
+\\
+&
+0\leq x_{ij}\leq u_{ij}.
+\end{aligned}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Special Cases of Minimum-Cost Flow}
+\label{subsec:min-cost-flow-special-cases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many classical optimization problems are special cases of minimum-cost
+flow:
+
+\[
+\boxed{
+\text{shortest path},
+}
+\]
+
+\[
+\boxed{
+\text{transportation},
+}
+\]
+
+\[
+\boxed{
+\text{assignment},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{transshipment}.
+}
+\]
+
+This makes minimum-cost flow one of the most general fundamental network
+models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transportation Problem}
+\label{subsec:network-transportation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose supply node \(i\) has amount
+
+\[
+s_i,
+\]
+
+and demand node \(j\) requires amount
+
+\[
+d_j.
+\]
+
+Let
+
+\[
+x_{ij}
+\]
+
+be quantity shipped.
+
+Then
+
+\[
+\boxed{
+\min
+\sum_i
+\sum_j
+c_{ij}x_{ij}
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\sum_jx_{ij}=s_i,
+}
+\]
+
+and
+
+\[
+\boxed{
+\sum_ix_{ij}=d_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Balanced Transportation}
+\label{subsec:balanced-transportation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A transportation problem is balanced when
+
+\[
+\boxed{
+\sum_i
+s_i
+=
+\sum_j
+d_j.
+}
+\]
+
+If total supply differs from total demand, dummy supply or demand nodes
+may sometimes be introduced when appropriate to the application.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transshipment}
+\label{subsec:transshipment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A transshipment problem allows flow to pass through intermediate nodes.
+
+Such a node typically has
+
+\[
+\boxed{
+b_i=0.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\sum_jx_{ji}
+=
+\sum_jx_{ij}.
+}
+\]
+
+Transportation is a special case with no intermediate transfer nodes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Assignment as Network Flow}
+\label{subsec:assignment-network-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Construct a source connected to each worker.
+
+Connect each worker to each feasible task.
+
+Connect each task to a sink.
+
+Give each arc unit capacity.
+
+Sending one unit of flow through
+
+\[
+\boxed{
+s
+\to
+\text{worker}
+\to
+\text{task}
+\to
+t
+}
+\]
+
+represents an assignment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bipartite Matching as Maximum Flow}
+\label{subsec:bipartite-matching-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For bipartite graph
+
+\[
+G=(U\cup W,E),
+\]
+
+construct:
+
+\[
+\boxed{
+s\to U,
+}
+\]
+
+\[
+\boxed{
+U\to W,
+}
+\]
+
+and
+
+\[
+\boxed{
+W\to t,
+}
+\]
+
+with capacity \(1\) on each arc.
+
+Then a maximum integral flow corresponds to a maximum matching.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integrality of Network Flows}
+\label{subsec:network-flow-integrality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If network capacities and supplies are integral, many standard network
+flow problems possess an optimal solution with integral arc flows.
+
+Thus continuous linear programming can solve important discrete network
+problems.
+
+This is a major structural advantage of network models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Matrices and Total Unimodularity}
+\label{subsec:network-total-unimodularity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Node-arc incidence matrices are totally unimodular.
+
+Therefore, under appropriate integral right-hand sides and bounds, extreme
+points of the network-flow polyhedron are integral.
+
+This connects network optimization directly with the integrality theory of
+Sections~\ref{sec:linear-programming} and
+\ref{sec:integer-programming}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circulation}
+\label{subsec:network-circulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A circulation is a flow with zero net supply at every node:
+
+\[
+\boxed{
+b_i=0
+\qquad
+\text{for all }i.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\sum_jx_{ij}
+=
+\sum_jx_{ji}.
+}
+\]
+
+Circulation problems are useful for studying feasibility, lower bounds,
+and minimum-cost cycles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lower Bounds on Flows}
+\label{subsec:flow-lower-bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an arc must carry at least
+
+\[
+\ell_{ij}
+\]
+
+units and at most
+
+\[
+u_{ij}.
+\]
+
+Then
+
+\[
+\boxed{
+\ell_{ij}
+\leq
+x_{ij}
+\leq
+u_{ij}.
+}
+\]
+
+Lower bounds can be removed by substituting
+
+\[
+\boxed{
+x_{ij}
+=
+\ell_{ij}
++
+y_{ij},
+}
+\]
+
+where
+
+\[
+y_{ij}\geq0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Effect of Lower-Bound Transformation}
+\label{subsec:lower-bound-transformation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Substituting
+
+\[
+x_{ij}=\ell_{ij}+y_{ij}
+\]
+
+changes the node balances.
+
+The fixed lower-bound flow contributes predetermined inflow and outflow.
+
+The residual variable satisfies
+
+\[
+\boxed{
+0\leq y_{ij}\leq u_{ij}-\ell_{ij}.
+}
+\]
+
+This reduces the model to an ordinary capacity-bounded flow problem with
+adjusted supplies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum-Cost Circulation}
+\label{subsec:minimum-cost-circulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A minimum-cost circulation solves
+
+\[
+\boxed{
+\min
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}
+}
+\]
+
+subject to
+
+\[
+\boxed{
+B\mathbf{x}=0,
+}
+\]
+
+and capacity restrictions.
+
+Many minimum-cost flow problems can be transformed into circulation
+problems by adding an artificial arc or supernodes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Costs}
+\label{subsec:residual-costs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a minimum-cost flow residual network, a forward residual arc retains
+cost
+
+\[
+\boxed{
+c_{ij},
+}
+\]
+
+while a reverse residual arc has cost
+
+\[
+\boxed{
+-c_{ij}.
+}
+\]
+
+The reverse arc represents undoing one unit of existing flow and reversing
+its cost contribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Negative-Cycle Optimality}
+\label{subsec:negative-cycle-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a feasible minimum-cost circulation, if the residual network contains
+a negative-cost directed cycle, sending additional circulation around that
+cycle reduces total cost.
+
+Therefore an optimal feasible circulation has no augmentable negative-cost
+cycle in its residual network.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cycle-Canceling Method}
+\label{subsec:cycle-canceling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The cycle-canceling method repeatedly:
+
+\begin{enumerate}
+    \item identifies a negative-cost cycle in the residual network;
+    \item sends as much flow as possible around it;
+    \item updates the residual network;
+    \item stops when no negative cycle remains.
+\end{enumerate}
+
+The final feasible circulation is optimal under the standard
+minimum-cost-flow framework.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Successive Shortest-Path Method}
+\label{subsec:successive-shortest-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another minimum-cost-flow approach repeatedly sends flow from a supply node
+to a demand node along a minimum-cost residual path.
+
+After augmentation:
+
+\[
+\boxed{
+\text{residual capacities are updated},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{remaining supplies and demands are reduced}.
+}
+\]
+
+The process continues until all required flow is routed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Node Potentials}
+\label{subsec:node-potentials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Associate a potential
+
+\[
+\pi_i
+\]
+
+with each node.
+
+For arc \((i,j)\), define a reduced cost using the convention
+
+\[
+\boxed{
+\bar{c}_{ij}
+=
+c_{ij}
++
+\pi_i
+-
+\pi_j.
+}
+\]
+
+These potentials are closely related to dual variables for flow
+conservation constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduced-Cost Optimality}
+\label{subsec:network-reduced-cost-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suitable node potentials can transform residual arc costs while preserving
+path comparisons.
+
+For a minimum-cost flow optimum, the residual network admits potentials
+such that all usable residual reduced costs satisfy
+
+\[
+\boxed{
+\bar{c}_{ij}\geq0.
+}
+\]
+
+This is a network version of reduced-cost optimality in linear
+programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest Paths and Potentials}
+\label{subsec:shortest-path-potentials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If node potentials equal shortest-path distance labels from a source, then
+triangle inequalities give
+
+\[
+\boxed{
+d(j)
+\leq
+d(i)+c_{ij}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+c_{ij}
++
+d(i)
+-
+d(j)
+\geq0.
+}
+\]
+
+Thus shortest-path distances naturally produce nonnegative reduced arc
+costs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Simplex Method}
+\label{subsec:network-simplex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The network simplex method specializes the simplex algorithm to
+minimum-cost flow.
+
+A basis corresponds to a spanning-tree-like network structure.
+
+Pivots modify the tree by:
+
+\[
+\boxed{
+\text{adding one arc},
+}
+\]
+
+which creates a cycle, and then
+
+\[
+\boxed{
+\text{removing another arc}.
+}
+\]
+
+The specialized structure makes network simplex highly efficient in many
+applications.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum Spanning Tree as Network Design}
+\label{subsec:minimum-spanning-tree-network}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A minimum spanning tree chooses edges connecting all nodes at minimum total
+cost.
+
+The problem is
+
+\[
+\boxed{
+\min_{T}
+\sum_{e\in T}
+c_e
+}
+\]
+
+over all spanning trees \(T\).
+
+Unlike ordinary flow models, the primary decision is which connections
+exist.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flow Versus Network Design}
+\label{subsec:flow-versus-network-design}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a flow problem, the network is usually fixed and the decision is:
+
+\[
+\boxed{
+\text{how much to send}.
+}
+\]
+
+In a network-design problem, the decision includes:
+
+\[
+\boxed{
+\text{which arcs or facilities to build}.
+}
+\]
+
+Network design often requires binary variables and becomes a
+mixed-integer optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed-Charge Network Design}
+\label{subsec:fixed-charge-network-design}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose arc \((i,j)\) costs
+
+\[
+F_{ij}
+\]
+
+to activate and
+
+\[
+c_{ij}
+\]
+
+per unit of flow.
+
+Define
+
+\[
+y_{ij}\in\{0,1\}
+\]
+
+for arc activation.
+
+The cost is
+
+\[
+\boxed{
+F_{ij}y_{ij}
++
+c_{ij}x_{ij}.
+}
+\]
+
+Link flow to activation using
+
+\[
+\boxed{
+0\leq x_{ij}\leq u_{ij}y_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Arc Activation}
+\label{subsec:worked-arc-activation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Building a Shipping Route}
+
+Suppose route \((i,j)\) has:
+
+\[
+\text{fixed opening cost}=100,
+\]
+
+\[
+\text{shipping cost}=4
+\]
+
+per unit, and capacity
+
+\[
+30.
+\]
+
+Let
+
+\[
+y_{ij}\in\{0,1\}.
+\]
+
+Then use
+
+\[
+0\leq x_{ij}\leq30y_{ij},
+\]
+
+with objective contribution
+
+\[
+100y_{ij}+4x_{ij}.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+y_{ij}=0
+\Rightarrow
+x_{ij}=0.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multicommodity Flow}
+\label{subsec:multicommodity-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose several commodities share the same network.
+
+Let
+
+\[
+x_{ij}^{k}
+\]
+
+be flow of commodity \(k\) on arc \((i,j)\).
+
+Each commodity has its own conservation equations.
+
+Shared arc capacities satisfy
+
+\[
+\boxed{
+\sum_k
+x_{ij}^{k}
+\leq
+u_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Multicommodity Flow Is Harder}
+\label{subsec:why-multicommodity-harder}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Single-commodity network flows often have powerful integrality structure.
+
+Multiple commodities share capacities and couple otherwise separate flow
+systems.
+
+This can destroy simple network-matrix structure and produce substantially
+harder models, particularly when flows must be integral.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unsplittable Flow}
+\label{subsec:unsplittable-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In some applications, a commodity must use one path rather than splitting
+across several paths.
+
+Then path or binary arc decisions are required.
+
+For commodity \(k\),
+
+\[
+\boxed{
+x_{ij}^{k}\in\{0,1\}
+}
+\]
+
+may indicate whether its path uses arc \((i,j)\).
+
+Unsplittable flow is generally a discrete network optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Expanded Networks}
+\label{subsec:time-expanded-networks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dynamic problem can be converted into a static network by copying nodes
+across time periods.
+
+A state may be represented as
+
+\[
+\boxed{
+(i,t),
+}
+\]
+
+meaning location \(i\) at time \(t\).
+
+Arcs connect states across time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Holdover Arcs}
+\label{subsec:holdover-arcs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A holdover arc represents remaining at a node from one period to the next:
+
+\[
+\boxed{
+(i,t)
+\to
+(i,t+1).
+}
+\]
+
+Its capacity may represent storage or waiting capacity.
+
+Its cost may represent inventory holding or delay.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Movement Arcs in Time-Expanded Networks}
+\label{subsec:time-expanded-movement-arcs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose travel from node \(i\) to node \(j\) requires one period.
+
+Then a movement arc is
+
+\[
+\boxed{
+(i,t)
+\to
+(j,t+1).
+}
+\]
+
+Longer travel times connect nodes separated by multiple time layers.
+
+This technique converts scheduling and dynamic routing into network-flow
+models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Network Flow}
+\label{subsec:dynamic-network-flow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic flow problems involve movement through a network over time.
+
+Important considerations include:
+
+\[
+\boxed{
+\text{arc travel times},
+}
+\]
+
+\[
+\boxed{
+\text{time-dependent capacities},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{time-dependent costs}.
+}
+\]
+
+Time-expanded networks provide one standard finite-horizon formulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Reliability and Interdiction Preview}
+\label{subsec:network-interdiction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Network interdiction asks how disrupting selected arcs or nodes changes an
+optimal network operation.
+
+An interdictor may seek to:
+
+\[
+\boxed{
+\text{increase shortest-path distance},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{decrease maximum flow}.
+}
+\]
+
+Such models often have a bilevel structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bilevel Network Interdiction}
+\label{subsec:bilevel-network-interdiction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A schematic interdiction model is
+
+\[
+\boxed{
+\max_{y}
+\left[
+\min_{x}
+\text{network performance under }y
+\right].
+}
+\]
+
+The outer decision selects disruptions.
+
+The inner problem represents optimal network response.
+
+Bilevel optimization can be significantly more difficult than ordinary
+network flow.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cut Sets and Reliability}
+\label{subsec:cut-sets-reliability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A cut set is a collection of arcs whose removal disconnects specified
+parts of a network.
+
+Small-capacity or vulnerable cuts may indicate structural weaknesses.
+
+This connects optimization with network reliability and resilience.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Flow and Bipartite Matching}
+\label{subsec:max-flow-matching-integrality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If all capacities are integer, Ford--Fulkerson augmentation amounts can be
+chosen integral.
+
+Thus an integral maximum flow exists.
+
+In the bipartite matching construction, capacities are all \(1\).
+
+Therefore each selected flow arc corresponds exactly to a matching edge.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Duality in Shortest Paths}
+\label{subsec:shortest-path-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The shortest-path problem has a dual interpretation using node potentials.
+
+One potential formulation seeks values \(\pi_i\) satisfying
+
+\[
+\boxed{
+\pi_j-\pi_i
+\leq
+c_{ij}
+}
+\]
+
+for every arc.
+
+The difference
+
+\[
+\pi_t-\pi_s
+\]
+
+provides a lower bound on any \(s\)-to-\(t\) path cost.
+
+At optimality, this lower bound equals the shortest-path cost under the
+usual assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Duality in Maximum Flow}
+\label{subsec:max-flow-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The minimum-cut problem acts as the dual counterpart of maximum flow.
+
+A feasible cut provides an upper bound on any flow.
+
+A feasible flow provides a lower bound on the maximum-flow value.
+
+When they have equal values,
+
+\[
+\boxed{
+\text{flow value}
+=
+\text{cut capacity},
+}
+\]
+
+optimality is certified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Duality in Minimum-Cost Flow}
+\label{subsec:min-cost-flow-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dual variables associated with node balance equations can be interpreted
+as node potentials.
+
+These potentials modify arc costs through reduced costs:
+
+\[
+\boxed{
+\bar c_{ij}
+=
+c_{ij}
++
+\pi_i
+-
+\pi_j.
+}
+\]
+
+This is the network analogue of reduced-cost analysis in linear
+programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity to Arc Costs}
+\label{subsec:network-cost-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Changing
+
+\[
+c_{ij}
+\]
+
+can alter which path or flow pattern is optimal.
+
+If a nonused arc becomes sufficiently cheap, it may enter the optimal
+solution.
+
+Reduced costs help quantify how much an arc cost must change before the
+current basis loses optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity to Capacity}
+\label{subsec:network-capacity-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Increasing capacity
+
+\[
+u_{ij}
+\]
+
+has value only when the capacity is restrictive.
+
+For a maximum-flow problem, increasing an arc outside every relevant
+minimum cut may have no effect.
+
+Increasing capacity on a bottleneck cut can increase the maximum possible
+flow.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bottlenecks}
+\label{subsec:network-bottlenecks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A bottleneck is a network component limiting overall system performance.
+
+Examples include:
+
+\[
+\boxed{
+\text{minimum-cut arcs},
+}
+\]
+
+\[
+\boxed{
+\text{fully utilized transportation links},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{capacity-constrained facilities}.
+}
+\]
+
+Dual and sensitivity information can help identify bottlenecks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Decomposition}
+\label{subsec:network-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large networks may contain exploitable structure.
+
+Possible techniques include:
+
+\[
+\boxed{
+\text{decomposition by commodity},
+}
+\]
+
+\[
+\boxed{
+\text{decomposition by geographic region},
+}
+\]
+
+\[
+\boxed{
+\text{column generation using paths},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{Lagrangian relaxation of shared capacities}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arc-Based Versus Path-Based Formulations}
+\label{subsec:arc-versus-path-formulations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An arc-based model uses variables
+
+\[
+\boxed{
+x_{ij}.
+}
+\]
+
+A path-based model uses variables
+
+\[
+\boxed{
+x_p
+}
+\]
+
+for complete paths \(p\).
+
+Path formulations can contain enormous numbers of variables but may have
+strong structural advantages.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Path-Based Multicommodity Flow}
+\label{subsec:path-based-multicommodity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\mathcal{P}_k
+\]
+
+be possible paths for commodity \(k\).
+
+Let
+
+\[
+x_p^k
+\]
+
+be flow assigned to path \(p\).
+
+Demand satisfaction becomes
+
+\[
+\boxed{
+\sum_{p\in\mathcal{P}_k}
+x_p^k
+=
+d_k.
+}
+\]
+
+Arc capacity becomes
+
+\[
+\boxed{
+\sum_k
+\sum_{p\ni(i,j)}
+x_p^k
+\leq
+u_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Column Generation Connection}
+\label{subsec:network-column-generation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A path-based model may have too many path variables to list.
+
+Column generation starts with a small subset of paths.
+
+A pricing problem searches for a new path with favorable reduced cost.
+
+The pricing problem is often itself a shortest-path problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Optimization Workflow}
+\label{subsec:network-optimization-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify nodes and arcs;
+    \item determine whether the network is directed or undirected;
+    \item define flow or design variables;
+    \item assign costs, capacities, supplies, and demands;
+    \item write flow-conservation equations;
+    \item identify special structure;
+    \item determine whether the problem is shortest path, maximum flow,
+          minimum-cost flow, transportation, matching, or network design;
+    \item use a specialized network algorithm when possible;
+    \item verify supply-demand balance;
+    \item inspect capacities and bottlenecks;
+    \item exploit integrality of standard network formulations;
+    \item introduce integer variables only when discrete design or routing
+          decisions require them;
+    \item examine residual networks when using augmenting methods;
+    \item inspect dual node potentials and reduced costs;
+    \item perform sensitivity analysis;
+    \item interpret network structure in the original application.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Network Method}
+\label{subsec:choosing-network-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonnegative shortest-path costs, use:
+
+\[
+\boxed{
+\text{Dijkstra's algorithm}.
+}
+\]
+
+For shortest paths with negative edges but no relevant negative cycles,
+consider:
+
+\[
+\boxed{
+\text{Bellman--Ford}.
+}
+\]
+
+For maximum flow, use:
+
+\[
+\boxed{
+\text{augmenting-path or modern max-flow algorithms}.
+}
+\]
+
+For minimum-cost flow, consider:
+
+\[
+\boxed{
+\text{successive shortest path},
+}
+\]
+
+\[
+\boxed{
+\text{cost-scaling methods},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{network simplex}.
+}
+\]
+
+For discrete network design, use:
+
+\[
+\boxed{
+\text{mixed-integer optimization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:network-optimization-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Using the Wrong Flow-Conservation Sign Convention}
+
+If the model uses
+
+\[
+\text{outflow}-\text{inflow}=b_i,
+\]
+
+then positive \(b_i\) means supply.
+
+Changing conventions midway creates incorrect balances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Network Balance}
+
+For a closed minimum-cost flow model,
+
+\[
+\boxed{
+\sum_i b_i=0
+}
+\]
+
+is required unless external flow or special modeling devices are included.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying Dijkstra's Algorithm to Negative Edge Costs}
+
+Dijkstra's optimality logic relies on nonnegative arc lengths.
+
+Negative costs require another algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Negative Edges with Negative Cycles}
+
+A graph can contain negative edges and still have well-defined shortest
+paths.
+
+The fundamental obstruction is an exploitable reachable negative cycle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Reverse Residual Arcs}
+
+Residual reverse arcs are essential because an earlier flow decision may
+need to be undone.
+
+Without them, augmenting-path methods can become trapped in nonoptimal
+flows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Original Capacity Instead of Residual Capacity}
+
+When augmenting flow, the allowable amount is determined by
+
+\[
+\boxed{
+\text{residual capacity},
+}
+\]
+
+not the original capacity alone.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Any Cut Certifies Maximum Flow}
+
+A cut gives an upper bound.
+
+Only when its capacity equals the value of a feasible flow does it certify
+optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Flow Integrality Structure}
+
+Standard single-commodity network problems with integral data often have
+integral optimal solutions without explicit integer variables.
+
+Adding unnecessary integrality constraints can make the model harder.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Multicommodity Flow Has the Same Integrality Properties}
+
+Shared capacities couple commodities.
+
+The strong integrality properties of ordinary single-commodity network
+flow do not automatically carry over.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Flow with Network Design}
+
+Flow variables determine how much is sent.
+
+Binary design variables determine which infrastructure exists.
+
+These are different decision types.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Fixed Costs}
+
+If using an arc requires a fixed setup cost, a purely linear per-unit flow
+cost does not represent the true problem.
+
+Binary activation variables may be needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting Time in Dynamic Networks}
+
+A static flow can incorrectly allow simultaneous use of resources that are
+available at different times.
+
+Time-expanded networks preserve temporal feasibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Shortest Path and Minimum Spanning Tree}
+
+A shortest path connects specified endpoints.
+
+A minimum spanning tree connects all vertices.
+
+They solve different optimization problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:network-optimization-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Transportation.}
+Road, airline, rail, and shipping systems use shortest paths, flow models,
+and network design.
+
+\medskip
+
+\textbf{Supply Chains.}
+Goods move through factories, warehouses, distribution centers, and
+customers under capacity and cost restrictions.
+
+\medskip
+
+\textbf{Telecommunications.}
+Traffic is routed through communication links while respecting bandwidth
+capacities.
+
+\medskip
+
+\textbf{Energy Systems.}
+Electricity, natural gas, and fuel distribution systems have important
+network structures.
+
+\medskip
+
+\textbf{Water Systems.}
+Water distribution and pipeline planning involve capacities, flows, and
+network design.
+
+\medskip
+
+\textbf{Scheduling.}
+Time-expanded networks can represent jobs, resources, and time-dependent
+decisions.
+
+\medskip
+
+\textbf{Assignment.}
+Workers, machines, vehicles, and tasks can be matched through bipartite
+network models.
+
+\medskip
+
+\textbf{Emergency Logistics.}
+Maximum-flow and shortest-path models can support evacuation, relief
+distribution, and infrastructure resilience planning.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:network-optimization-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a directed network.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a flow variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Define arc capacity.
+\end{exercise}
+
+\begin{exercise}[1]
+State the flow-conservation equation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a residual network.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an augmenting path.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an \(s\)-\(t\) cut.
+\end{exercise}
+
+\begin{exercise}[1]
+State the max-flow min-cut theorem.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a circulation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a multicommodity flow problem.
+\end{exercise}
+
+\begin{exercise}[2]
+At a transshipment node with inflow \(8\), determine the required outflow.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the node-balance constraint for a supply node with supply \(12\).
+\end{exercise}
+
+\begin{exercise}[2]
+Write the node-balance constraint for a demand node requiring \(7\) units.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose an arc has capacity \(15\) and current flow \(9\). Find its forward
+residual capacity.
+\end{exercise}
+
+\begin{exercise}[2]
+For the same arc, determine the reverse residual capacity.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a unit-flow formulation of an \(s\)-to-\(t\) shortest-path problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain when Dijkstra's algorithm is applicable.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain what a negative cycle means for shortest paths.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the capacity of a given \(s\)-\(t\) cut.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply Dijkstra's algorithm to a small weighted graph.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply Bellman--Ford to a graph containing one negative edge but no
+negative cycle.
+\end{exercise}
+
+\begin{exercise}[3]
+Detect a negative cycle using Bellman--Ford relaxation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a maximum-flow model for a four-node network.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one Ford--Fulkerson augmentation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the residual network after the augmentation.
+\end{exercise}
+
+\begin{exercise}[3]
+Find an \(s\)-\(t\) cut and compute its capacity.
+\end{exercise}
+
+\begin{exercise}[3]
+Use a matching flow and cut to certify maximum-flow optimality.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a minimum-cost flow problem with two supply nodes and two demand
+nodes.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a transportation problem as a network flow.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a transshipment problem with one intermediate warehouse.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an assignment problem as a bipartite network.
+\end{exercise}
+
+\begin{exercise}[3]
+Show how maximum bipartite matching can be converted into maximum flow.
+\end{exercise}
+
+\begin{exercise}[3]
+Transform an arc with lower bound
+
+\[
+\ell_{ij}=4
+\]
+
+and upper bound
+
+\[
+u_{ij}=10
+\]
+
+using a residual variable.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how the lower-bound transformation changes node balances.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a fixed-charge network-design problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a two-commodity flow problem with a shared capacity.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why multicommodity flow is more difficult than single-commodity
+flow.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a time-expanded network for three locations and three time
+periods.
+\end{exercise}
+
+\begin{exercise}[3]
+Add holdover arcs to the previous network.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a node-potential reduced-cost formula.
+\end{exercise}
+
+\begin{exercise}[3]
+Use shortest-path distances to show that reduced arc costs are
+nonnegative.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a negative residual cycle implies a minimum-cost flow is not
+optimal.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between an arc-based and path-based formulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a path-based flow formulation for two possible routes.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why shortest path can appear as a pricing problem in column
+generation.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret a saturated arc as a possible network bottleneck.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why increasing capacity on a noncritical arc may not improve
+maximum flow.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the max-flow min-cut theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Ford--Fulkerson termination for integral capacities.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the complexity of Edmonds--Karp.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Dinic's maximum-flow algorithm.
+\end{exercise}
+
+\begin{exercise}[4]
+Study push--relabel maximum-flow algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the LP dual of the shortest-path formulation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the LP dual relationship between maximum flow and minimum cut.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive dual conditions for minimum-cost flow.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the integrality theorem for network flows.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove total unimodularity of a directed node-arc incidence matrix.
+\end{exercise}
+
+\begin{exercise}[4]
+Study minimum-cost circulation algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove negative-cycle optimality for minimum-cost circulation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study successive shortest-path algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study cost-scaling algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the network simplex method.
+\end{exercise}
+
+\begin{exercise}[4]
+Study capacitated transshipment models.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate fixed-charge network flow.
+\end{exercise}
+
+\begin{exercise}[4]
+Study multicommodity flow formulations and relaxations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study unsplittable flow problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study time-expanded network formulations for scheduling.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate maximum dynamic flow.
+\end{exercise}
+
+\begin{exercise}[4]
+Study network interdiction as a bilevel optimization problem.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate path-based column generation for multicommodity flow.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:network-optimization-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Network optimization represents decisions on
+
+\[
+\boxed{
+G=(V,A).
+}
+\]
+
+A general flow balance is
+
+\[
+\boxed{
+\sum_jx_{ij}
+-
+\sum_jx_{ji}
+=
+b_i.
+}
+\]
+
+Capacitated arcs satisfy
+
+\[
+\boxed{
+0\leq x_{ij}\leq u_{ij}.
+}
+\]
+
+Shortest path solves
+
+\[
+\boxed{
+\min
+\sum_{(i,j)}
+c_{ij}x_{ij}
+}
+\]
+
+for one unit of source-to-sink flow.
+
+Maximum flow seeks
+
+\[
+\boxed{
+\max v,
+}
+\]
+
+and the max-flow min-cut theorem gives
+
+\[
+\boxed{
+\max
+\{
+\text{flow}
+\}
+=
+\min
+\{
+\text{cut capacity}
+\}.
+}
+\]
+
+Minimum-cost flow solves
+
+\[
+\boxed{
+\min
+\sum_{(i,j)}
+c_{ij}x_{ij}
+}
+\]
+
+subject to flow conservation and capacity constraints.
+
+Important special cases include
+
+\[
+\boxed{
+\text{shortest path}
++
+\text{transportation}
++
+\text{assignment}
++
+\text{transshipment}.
+}
+\]
+
+Standard network matrices often have powerful integrality properties.
+
+Network optimization therefore combines
+
+\[
+\boxed{
+\text{graph theory}
++
+\text{linear programming}
++
+\text{combinatorial optimization}
++
+\text{algorithms}
++
+\text{operations research}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:network-optimization-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Network Optimization specializes the linear, integer, and combinatorial
+optimization ideas of Sections~\ref{sec:linear-programming},
+\ref{sec:integer-programming}, and
+\ref{sec:combinatorial-optimization} to graph-structured models. Shortest
+paths, maximum flows, minimum cuts, minimum-cost flows, transportation,
+assignment, and transshipment problems benefit from strong network
+structure and integrality properties. More complicated models introduce
+fixed-charge design, multiple commodities, time expansion, and network
+interdiction. The next section, Queueing Theory, shifts from deterministic
+network movement to stochastic service systems and develops arrival
+processes, service distributions, queue disciplines, utilization,
+Little's Law, and classical queueing models.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.10 Network Optimization
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard network optimization theory.
+%   - Standard graph algorithms and network-flow theory.
+%   - Standard linear and integer network modeling.
+%
+% Used for:
+%   - directed and undirected networks;
+%   - nodes, arcs, costs, capacities, supplies, and demands;
+%   - flow-conservation equations;
+%   - node-arc incidence matrices;
+%   - shortest-path formulations;
+%   - Dijkstra and Bellman--Ford methods;
+%   - negative cycles;
+%   - maximum flow;
+%   - residual networks;
+%   - augmenting paths;
+%   - Ford--Fulkerson and Edmonds--Karp;
+%   - cuts and max-flow min-cut;
+%   - minimum-cost flow;
+%   - transportation;
+%   - transshipment;
+%   - assignment and bipartite matching;
+%   - network-flow integrality;
+%   - total unimodularity;
+%   - circulations;
+%   - lower and upper flow bounds;
+%   - minimum-cost circulation;
+%   - residual costs;
+%   - negative-cycle optimality;
+%   - cycle canceling;
+%   - successive shortest paths;
+%   - node potentials and reduced costs;
+%   - network simplex;
+%   - minimum spanning trees;
+%   - fixed-charge network design;
+%   - multicommodity and unsplittable flows;
+%   - time-expanded networks;
+%   - dynamic flows;
+%   - network interdiction;
+%   - duality and sensitivity;
+%   - bottlenecks;
+%   - arc-based and path-based formulations;
+%   - column-generation connections;
+%   - applications and exercises.
+%
+% Notes:
+%   - Queueing Theory is developed next in Section 10.11.
+%   - Scheduling Theory follows in Section 10.12.
+%   - Network-design integer models connect with Section 10.5.
+%   - Detailed graph-theoretic foundations are developed in Chapter 6.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,3226 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.2 LINEAR PROGRAMMING
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Linear Programming}
+\label{sec:linear-programming}
+
+\prerequisite{
+Optimization fundamentals, systems of linear equations and inequalities,
+matrix notation, vectors, linear algebra, convex sets, feasible regions,
+and basic mathematical modeling.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a linear programming problem;
+    \item distinguish objective coefficients, decision variables,
+          constraint coefficients, and right-hand-side values;
+    \item write linear programs in algebraic and matrix form;
+    \item identify feasible, infeasible, bounded, and unbounded problems;
+    \item understand geometric interpretations of linear programs;
+    \item identify extreme points and vertices of feasible polyhedra;
+    \item understand why linear-programming optima occur at extreme points
+          when an optimum exists under appropriate conditions;
+    \item convert inequalities into equality form using slack variables;
+    \item distinguish slack and surplus variables;
+    \item understand standard and canonical forms;
+    \item identify basic and nonbasic variables;
+    \item define basic solutions and basic feasible solutions;
+    \item recognize degeneracy;
+    \item understand the simplex method conceptually;
+    \item perform elementary simplex pivots;
+    \item select entering and leaving variables;
+    \item use the ratio test;
+    \item recognize optimality and unboundedness in simplex tableaux;
+    \item understand artificial variables;
+    \item understand Phase I and Phase II methods;
+    \item understand the Big-\(M\) method conceptually;
+    \item formulate the dual of a linear program;
+    \item understand weak duality;
+    \item understand strong duality;
+    \item understand complementary slackness;
+    \item use duality to certify optimality;
+    \item interpret dual variables as shadow prices;
+    \item understand reduced costs;
+    \item understand sensitivity analysis;
+    \item recognize alternate optimal solutions;
+    \item recognize infeasibility certificates conceptually;
+    \item understand Farkas' lemma conceptually;
+    \item formulate transportation and blending models;
+    \item recognize network-flow structure;
+    \item understand interior-point methods conceptually;
+    \item compare simplex and interior-point approaches;
+    \item connect linear programming with convex optimization,
+          operations research, economics, logistics, and computation.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Linear Programming?}
+\label{subsec:what-is-linear-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Linear programming, abbreviated LP, is optimization in which both the
+objective function and all constraints are linear.
+
+A standard linear program has form
+
+\[
+\boxed{
+\begin{aligned}
+\max_{\mathbf{x}}
+\quad&
+\mathbf{c}^T\mathbf{x}
+\\
+\text{subject to}
+\quad&
+A\mathbf{x}\leq\mathbf{b},
+\\
+&
+\mathbf{x}\geq\mathbf{0}.
+\end{aligned}
+}
+\]
+
+Here:
+
+\[
+\mathbf{x}
+=
+\text{decision vector},
+\]
+
+\[
+\mathbf{c}
+=
+\text{objective coefficients},
+\]
+
+\[
+A
+=
+\text{constraint matrix},
+\]
+
+and
+
+\[
+\mathbf{b}
+=
+\text{resource or right-hand-side vector}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linearity}
+\label{subsec:linear-programming-linearity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A linear objective has form
+
+\[
+\boxed{
+c_1x_1+\cdots+c_nx_n.
+}
+\]
+
+A linear constraint has form
+
+\[
+\boxed{
+a_1x_1+\cdots+a_nx_n
+\leq
+b,
+}
+\]
+
+or the corresponding equality or greater-than inequality.
+
+Products such as
+
+\[
+x_1x_2
+\]
+
+or powers such as
+
+\[
+x_1^2
+\]
+
+make the model nonlinear.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General Linear Program}
+\label{subsec:general-linear-program}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A general LP can be written
+
+\[
+\boxed{
+\begin{aligned}
+\text{optimize}
+\quad&
+\mathbf{c}^T\mathbf{x}
+\\
+\text{subject to}
+\quad&
+A_1\mathbf{x}\leq\mathbf{b}_1,
+\\
+&
+A_2\mathbf{x}\geq\mathbf{b}_2,
+\\
+&
+A_3\mathbf{x}=\mathbf{b}_3,
+\end{aligned}
+}
+\]
+
+with some variables possibly restricted to be nonnegative, nonpositive,
+or unrestricted in sign.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feasible Region}
+\label{subsec:lp-feasible-region}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The feasible region is the set of all points satisfying every constraint.
+
+For
+
+\[
+A\mathbf{x}\leq\mathbf{b},
+\]
+
+the feasible region is
+
+\[
+\boxed{
+\mathcal{F}
+=
+\{
+\mathbf{x}:
+A\mathbf{x}\leq\mathbf{b}
+\}.
+}
+\]
+
+Because linear inequalities define half-spaces, the feasible region of an
+LP is convex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polyhedra}
+\label{subsec:lp-polyhedra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Polyhedron}
+A polyhedron is a set defined by finitely many linear equalities and
+inequalities.
+\end{definitionbox}
+
+Thus an LP feasible region is a polyhedron.
+
+A bounded polyhedron is called a polytope.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convexity of the Feasible Region}
+\label{subsec:lp-feasible-convex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(\mathbf{x}\) and \(\mathbf{y}\) are feasible:
+
+\[
+A\mathbf{x}\leq\mathbf{b},
+\]
+
+\[
+A\mathbf{y}\leq\mathbf{b}.
+\]
+
+For
+
+\[
+0\leq\theta\leq1,
+\]
+
+we have
+
+\[
+A
+[
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+]
+=
+\theta A\mathbf{x}
++
+(1-\theta)A\mathbf{y}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+A
+[
+\theta\mathbf{x}
++
+(1-\theta)\mathbf{y}
+]
+\leq
+\mathbf{b}.
+}
+\]
+
+Hence the feasible region is convex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Interpretation}
+\label{subsec:lp-geometric-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two decision variables, each linear inequality defines a half-plane.
+
+The intersection of these half-planes forms the feasible region.
+
+The objective
+
+\[
+\boxed{
+z=c_1x_1+c_2x_2
+}
+\]
+
+defines parallel level lines:
+
+\[
+\boxed{
+c_1x_1+c_2x_2=k.
+}
+\]
+
+Optimization moves this line parallel to itself until it last touches the
+feasible region.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extreme Points}
+\label{subsec:lp-extreme-points}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Extreme Point}
+A point \(\mathbf{x}\) in a convex set \(C\) is an extreme point if it
+cannot be written as
+
+\[
+\boxed{
+\mathbf{x}
+=
+\theta\mathbf{y}
++
+(1-\theta)\mathbf{z},
+\qquad
+0<\theta<1,
+}
+\]
+
+for two distinct points
+
+\[
+\mathbf{y},\mathbf{z}\in C.
+\]
+\end{definitionbox}
+
+In two dimensions, extreme points are the vertices of the feasible
+polygon.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fundamental LP Geometry}
+\label{subsec:fundamental-lp-geometry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a nonempty polyhedral feasible set, if a linear objective attains a
+finite optimum, then there exists an optimal extreme point.
+
+Thus linear programming can focus on vertices rather than every point of
+the feasible region.
+
+This geometric fact motivates the simplex method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Graphical Linear Program}
+\label{subsec:worked-graphical-lp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Two-Variable Linear Program}
+
+Maximize
+
+\[
+z=3x+2y
+\]
+
+subject to
+
+\[
+x+y\leq4,
+\]
+
+\[
+x\leq2,
+\]
+
+\[
+y\leq3,
+\]
+
+\[
+x,y\geq0.
+\]
+
+The feasible vertices are
+
+\[
+(0,0),
+\]
+
+\[
+(2,0),
+\]
+
+\[
+(2,2),
+\]
+
+\[
+(1,3),
+\]
+
+and
+
+\[
+(0,3).
+\]
+
+Evaluate the objective:
+
+\[
+z(0,0)=0,
+\]
+
+\[
+z(2,0)=6,
+\]
+
+\[
+z(2,2)=10,
+\]
+
+\[
+z(1,3)=9,
+\]
+
+\[
+z(0,3)=6.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+(x^*,y^*)=(2,2),
+}
+\]
+
+with
+
+\[
+\boxed{
+z^*=10.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bounded Linear Programs}
+\label{subsec:bounded-linear-programs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An LP is bounded in the objective sense if its objective cannot improve
+without limit over the feasible set.
+
+For a maximization problem,
+
+\[
+\boxed{
+\mathbf{c}^T\mathbf{x}
+\leq M
+}
+\]
+
+for some finite \(M\) over all feasible points.
+
+A feasible set itself may be unbounded while the objective remains
+bounded.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unbounded Linear Programs}
+\label{subsec:unbounded-linear-programs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A maximization LP is unbounded if feasible points exist with objective
+values tending to
+
+\[
+\boxed{
++\infty.
+}
+\]
+
+Similarly, a minimization LP is unbounded below if objective values tend to
+
+\[
+\boxed{
+-\infty.
+}
+\]
+
+Unboundedness does not mean the feasible set is empty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infeasible Linear Programs}
+\label{subsec:infeasible-linear-programs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An LP is infeasible if no point satisfies all constraints simultaneously.
+
+For example,
+
+\[
+x\leq1
+\]
+
+and
+
+\[
+x\geq3
+\]
+
+cannot both hold.
+
+Thus,
+
+\[
+\boxed{
+\mathcal{F}=\varnothing.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Optimal Solutions}
+\label{subsec:multiple-lp-optima}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A linear program may have more than one optimal solution.
+
+If two distinct feasible points are optimal, then every convex
+combination between them is also optimal because the objective is linear.
+
+Thus an entire edge or face may be optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Standard Form}
+\label{subsec:lp-standard-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One common standard form is
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+\mathbf{c}^T\mathbf{x}
+\\
+\text{subject to}
+\quad&
+A\mathbf{x}
+=
+\mathbf{b},
+\\
+&
+\mathbf{x}\geq0.
+\end{aligned}
+}
+\]
+
+Other texts use a maximization convention.
+
+The exact convention should always be stated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slack Variables}
+\label{subsec:slack-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A constraint
+
+\[
+a_1x_1+\cdots+a_nx_n\leq b
+\]
+
+can be converted to equality by adding a nonnegative slack variable:
+
+\[
+\boxed{
+a_1x_1+\cdots+a_nx_n+s=b,
+}
+\]
+
+with
+
+\[
+\boxed{
+s\geq0.
+}
+\]
+
+The slack measures unused resource.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Surplus Variables}
+\label{subsec:surplus-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a constraint
+
+\[
+a_1x_1+\cdots+a_nx_n\geq b,
+\]
+
+subtract a nonnegative surplus variable:
+
+\[
+\boxed{
+a_1x_1+\cdots+a_nx_n-s=b,
+}
+\]
+
+where
+
+\[
+\boxed{
+s\geq0.
+}
+\]
+
+A surplus variable measures how much the left side exceeds the required
+minimum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unrestricted Variables}
+\label{subsec:unrestricted-lp-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a variable \(x_j\) is unrestricted in sign, write
+
+\[
+\boxed{
+x_j
+=
+x_j^+
+-
+x_j^-,
+}
+\]
+
+where
+
+\[
+\boxed{
+x_j^+\geq0,
+\qquad
+x_j^-\geq0.
+}
+\]
+
+Thus any unrestricted variable can be represented using two nonnegative
+variables.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Solutions}
+\label{subsec:lp-basic-solutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+A\mathbf{x}=\mathbf{b},
+\]
+
+with
+
+\[
+A\in\mathbb{R}^{m\times n},
+\qquad
+m<n,
+\]
+
+and assume \(\operatorname{rank}(A)=m\).
+
+Choose \(m\) linearly independent columns of \(A\).
+
+The corresponding variables are called basic variables.
+
+Set the remaining variables to zero and solve for the basic variables.
+
+The resulting vector is a basic solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Feasible Solution}
+\label{subsec:basic-feasible-solution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic solution satisfying
+
+\[
+\boxed{
+\mathbf{x}\geq0
+}
+\]
+
+is a basic feasible solution, abbreviated BFS.
+
+Under standard assumptions, basic feasible solutions correspond to
+extreme points of the LP feasible polyhedron.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basis Matrix}
+\label{subsec:lp-basis-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(B\) be the \(m\times m\) matrix formed from basic columns.
+
+Let \(N\) contain the nonbasic columns.
+
+Partition
+
+\[
+A
+=
+[B\;N].
+\]
+
+Then
+
+\[
+B\mathbf{x}_B
++
+N\mathbf{x}_N
+=
+\mathbf{b}.
+\]
+
+Setting
+
+\[
+\mathbf{x}_N=\mathbf{0}
+\]
+
+gives
+
+\[
+\boxed{
+\mathbf{x}_B
+=
+B^{-1}\mathbf{b}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Degeneracy}
+\label{subsec:lp-degeneracy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic feasible solution is degenerate if at least one basic variable is
+zero.
+
+Thus,
+
+\[
+\boxed{
+x_{B_i}=0
+}
+\]
+
+for some basic variable.
+
+Degeneracy can cause simplex pivots that do not improve the objective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Simplex Method}
+\label{subsec:simplex-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simplex method moves from one basic feasible solution to an adjacent
+basic feasible solution while improving or maintaining the objective.
+
+Conceptually:
+
+\[
+\boxed{
+\text{vertex}
+\rightarrow
+\text{adjacent vertex}
+\rightarrow
+\text{better objective}.
+}
+\]
+
+The process continues until an optimality condition is satisfied or
+unboundedness is detected.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplex Dictionary}
+\label{subsec:simplex-dictionary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+A\mathbf{x}=\mathbf{b}
+\]
+
+is partitioned into basic and nonbasic variables.
+
+Then
+
+\[
+B\mathbf{x}_B
++
+N\mathbf{x}_N
+=
+\mathbf{b}.
+\]
+
+Hence,
+
+\[
+\boxed{
+\mathbf{x}_B
+=
+B^{-1}\mathbf{b}
+-
+B^{-1}N\mathbf{x}_N.
+}
+\]
+
+The objective becomes
+
+\[
+\boxed{
+z
+=
+\mathbf{c}_B^TB^{-1}\mathbf{b}
++
+\overline{\mathbf{c}}_N^T
+\mathbf{x}_N,
+}
+\]
+
+where the reduced costs depend on the chosen sign convention.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduced Costs}
+\label{subsec:reduced-costs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a minimization LP in standard form, a common reduced-cost formula is
+
+\[
+\boxed{
+\overline{\mathbf{c}}_N
+=
+\mathbf{c}_N
+-
+N^TB^{-T}\mathbf{c}_B.
+}
+\]
+
+Equivalently, if
+
+\[
+\boxed{
+\mathbf{y}
+=
+B^{-T}\mathbf{c}_B,
+}
+\]
+
+then
+
+\[
+\boxed{
+\overline{\mathbf{c}}_N
+=
+\mathbf{c}_N
+-
+N^T\mathbf{y}.
+}
+\]
+
+Reduced costs measure the first-order effect of increasing nonbasic
+variables from zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Entering Variable}
+\label{subsec:simplex-entering-variable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a simplex iteration, a nonbasic variable is selected to enter the
+basis.
+
+The choice depends on the reduced-cost convention.
+
+For a maximization tableau written in the common form, one chooses a
+variable whose increase improves the objective.
+
+Different pivot rules may choose among several candidates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Leaving Variable}
+\label{subsec:simplex-leaving-variable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As the entering variable increases, some basic variables decrease.
+
+The leaving variable is the first basic variable to reach zero.
+
+This maintains feasibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ratio Test}
+\label{subsec:simplex-ratio-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose increasing \(x_j\) changes the basic variables according to
+
+\[
+\mathbf{x}_B
+=
+\mathbf{b}'
+-
+\mathbf{d}x_j.
+\]
+
+For components with
+
+\[
+d_i>0,
+\]
+
+feasibility requires
+
+\[
+x_j
+\leq
+\frac{
+b'_i
+}{
+d_i
+}.
+\]
+
+Therefore the maximum feasible increase is determined by
+
+\[
+\boxed{
+\min_{d_i>0}
+\frac{
+b'_i
+}{
+d_i
+}.
+}
+\]
+
+This is the ratio test.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pivot Operation}
+\label{subsec:simplex-pivot}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simplex pivot exchanges one basic variable and one nonbasic variable.
+
+Algebraically, the equations are rewritten so the entering variable
+becomes basic and the leaving variable becomes nonbasic.
+
+In tableau form, this is implemented using row operations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Slack Form}
+\label{subsec:worked-lp-slack-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Introducing Slack Variables}
+
+Consider
+
+\[
+\max
+\quad
+3x_1+2x_2
+\]
+
+subject to
+
+\[
+x_1+x_2\leq4,
+\]
+
+\[
+x_1\leq2,
+\]
+
+\[
+x_2\leq3,
+\]
+
+\[
+x_1,x_2\geq0.
+\]
+
+Introduce slack variables:
+
+\[
+x_1+x_2+s_1=4,
+\]
+
+\[
+x_1+s_2=2,
+\]
+
+\[
+x_2+s_3=3.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+\begin{aligned}
+x_1+x_2+s_1&=4,\\
+x_1+s_2&=2,\\
+x_2+s_3&=3,
+\end{aligned}
+}
+\]
+
+with
+
+\[
+\boxed{
+x_1,x_2,s_1,s_2,s_3\geq0.
+}
+\]
+\end{answerbox}
+
+Setting
+
+\[
+x_1=x_2=0
+\]
+
+gives the initial basic feasible solution
+
+\[
+\boxed{
+s_1=4,
+\qquad
+s_2=2,
+\qquad
+s_3=3.
+}
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplex Optimality}
+\label{subsec:simplex-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a minimization LP in standard form, if every nonbasic reduced cost
+satisfies
+
+\[
+\boxed{
+\overline c_j\geq0,
+}
+\]
+
+then no feasible infinitesimal increase of a nonbasic variable can reduce
+the objective.
+
+Under the usual simplex assumptions, the current BFS is optimal.
+
+For maximization formulations, the sign convention changes accordingly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplex Detection of Unboundedness}
+\label{subsec:simplex-unboundedness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a nonbasic variable can improve the objective.
+
+If increasing it causes no basic variable to decrease to zero, then there
+is no finite ratio-test bound.
+
+The objective can improve indefinitely.
+
+Thus the LP is unbounded in that direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cycling}
+\label{subsec:simplex-cycling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Degeneracy can theoretically cause the simplex method to revisit the same
+basis repeatedly.
+
+This is called cycling.
+
+Anti-cycling pivot rules prevent this behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bland's Rule}
+\label{subsec:blands-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bland's rule selects entering and leaving variables according to a fixed
+index ordering.
+
+It is designed to prevent cycling.
+
+Although it may not be computationally fastest, it provides an important
+theoretical guarantee of termination.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Artificial Variables}
+\label{subsec:artificial-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some constraints do not produce an obvious initial basic feasible
+solution.
+
+For example,
+
+\[
+x_1+x_2=5
+\]
+
+has no slack variable that automatically provides an identity column.
+
+An artificial variable may be introduced temporarily:
+
+\[
+\boxed{
+x_1+x_2+a_1=5.
+}
+\]
+
+Artificial variables are computational devices and must ultimately be
+driven to zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Phase I Method}
+\label{subsec:phase-one-simplex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Phase I searches for a feasible basis.
+
+A common auxiliary problem minimizes the sum of artificial variables:
+
+\[
+\boxed{
+\min
+\sum_i a_i.
+}
+\]
+
+If the optimal Phase I value is positive, the original LP is infeasible.
+
+If the optimal value is zero, a feasible basis may be obtained.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Phase II Method}
+\label{subsec:phase-two-simplex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Once a feasible basis is found, artificial variables are removed and the
+original objective is restored.
+
+The simplex method then continues on the original LP.
+
+Thus:
+
+\[
+\boxed{
+\text{Phase I}
+=
+\text{find feasibility},
+}
+\]
+
+\[
+\boxed{
+\text{Phase II}
+=
+\text{optimize}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Big-\(M\) Method Preview}
+\label{subsec:big-m-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An alternative places a very large penalty on artificial variables.
+
+For a minimization problem, one may use an objective containing
+
+\[
+\boxed{
+M\sum_i a_i,
+}
+\]
+
+where \(M\) is symbolically very large and positive.
+
+The method encourages artificial variables to leave the basis.
+
+Two-phase methods are often cleaner theoretically and numerically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Duality}
+\label{subsec:linear-programming-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every linear program has an associated dual problem.
+
+For the primal maximization problem
+
+\[
+\boxed{
+\begin{aligned}
+\max_{\mathbf{x}}
+\quad&
+\mathbf{c}^T\mathbf{x}
+\\
+\text{subject to}
+\quad&
+A\mathbf{x}\leq\mathbf{b},
+\\
+&
+\mathbf{x}\geq0,
+\end{aligned}
+}
+\]
+
+the corresponding dual is
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{y}}
+\quad&
+\mathbf{b}^T\mathbf{y}
+\\
+\text{subject to}
+\quad&
+A^T\mathbf{y}\geq\mathbf{c},
+\\
+&
+\mathbf{y}\geq0.
+\end{aligned}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal and Dual Variables}
+\label{subsec:primal-dual-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Each primal constraint corresponds to a dual variable.
+
+Each primal variable corresponds to a dual constraint.
+
+Thus the structure is reversed:
+
+\[
+\boxed{
+\text{primal constraints}
+\longleftrightarrow
+\text{dual variables},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{primal variables}
+\longleftrightarrow
+\text{dual constraints}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Duality}
+\label{subsec:weak-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(\mathbf{x}\) is primal feasible and \(\mathbf{y}\) is dual
+feasible.
+
+Then
+
+\[
+A\mathbf{x}\leq\mathbf{b},
+\]
+
+and
+
+\[
+A^T\mathbf{y}\geq\mathbf{c}.
+\]
+
+Because
+
+\[
+\mathbf{x}\geq0,
+\qquad
+\mathbf{y}\geq0,
+\]
+
+we obtain
+
+\[
+\mathbf{c}^T\mathbf{x}
+\leq
+\mathbf{y}^TA\mathbf{x}
+\leq
+\mathbf{y}^T\mathbf{b}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mathbf{c}^T\mathbf{x}
+\leq
+\mathbf{b}^T\mathbf{y}.
+}
+\]
+
+This is weak duality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of Weak Duality}
+\label{subsec:weak-duality-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a primal maximization problem:
+
+\[
+\boxed{
+\text{every dual feasible value is an upper bound on primal profit}.
+}
+\]
+
+For a dual minimization problem:
+
+\[
+\boxed{
+\text{every primal feasible value is a lower bound on dual cost}.
+}
+\]
+
+If the values become equal, both solutions must be optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Duality}
+\label{subsec:strong-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the primal and dual LPs have finite optimal solutions, then
+
+\[
+\boxed{
+\mathbf{c}^T\mathbf{x}^*
+=
+\mathbf{b}^T\mathbf{y}^*.
+}
+\]
+
+This is the strong duality theorem.
+
+Thus there is no duality gap for ordinary finite-dimensional linear
+programming under the usual feasibility and boundedness assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Duality Gap}
+\label{subsec:lp-duality-gap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For primal feasible \(\mathbf{x}\) and dual feasible \(\mathbf{y}\), define
+
+\[
+\boxed{
+\mathbf{b}^T\mathbf{y}
+-
+\mathbf{c}^T\mathbf{x}.
+}
+\]
+
+Weak duality implies this gap is nonnegative.
+
+At optimality,
+
+\[
+\boxed{
+\mathbf{b}^T\mathbf{y}^*
+-
+\mathbf{c}^T\mathbf{x}^*
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Constructing the Dual}
+\label{subsec:worked-lp-dual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Primal to Dual}
+
+Consider
+
+\[
+\begin{aligned}
+\max
+\quad&
+3x_1+2x_2
+\\
+\text{subject to}
+\quad&
+x_1+x_2\leq4,
+\\
+&
+x_1\leq2,
+\\
+&
+x_2\leq3,
+\\
+&
+x_1,x_2\geq0.
+\end{aligned}
+\]
+
+Introduce dual variables
+
+\[
+y_1,y_2,y_3\geq0.
+\]
+
+The dual objective is
+
+\[
+4y_1+2y_2+3y_3.
+\]
+
+The dual constraints are obtained column by column:
+
+\[
+y_1+y_2\geq3,
+\]
+
+\[
+y_1+y_3\geq2.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\begin{aligned}
+\min
+\quad&
+4y_1+2y_2+3y_3
+\\
+\text{subject to}
+\quad&
+y_1+y_2\geq3,
+\\
+&
+y_1+y_3\geq2,
+\\
+&
+y_1,y_2,y_3\geq0.
+\end{aligned}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complementary Slackness}
+\label{subsec:lp-complementary-slackness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the standard primal-dual pair,
+
+\[
+\max
+\{
+\mathbf{c}^T\mathbf{x}:
+A\mathbf{x}\leq\mathbf{b},
+\mathbf{x}\geq0
+\},
+\]
+
+and
+
+\[
+\min
+\{
+\mathbf{b}^T\mathbf{y}:
+A^T\mathbf{y}\geq\mathbf{c},
+\mathbf{y}\geq0
+\},
+\]
+
+optimal solutions satisfy
+
+\[
+\boxed{
+y_i
+[
+b_i-(A\mathbf{x})_i
+]
+=
+0,
+}
+\]
+
+and
+
+\[
+\boxed{
+x_j
+[
+(A^T\mathbf{y})_j-c_j
+]
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complementary Slackness Interpretation}
+\label{subsec:complementary-slackness-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If primal constraint \(i\) has slack,
+
+\[
+b_i-(A\mathbf{x})_i>0,
+\]
+
+then
+
+\[
+\boxed{
+y_i=0.
+}
+\]
+
+If primal variable \(x_j\) is positive, then the corresponding dual
+constraint must be tight:
+
+\[
+\boxed{
+(A^T\mathbf{y})_j=c_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Complementary Slackness}
+\label{subsec:worked-complementary-slackness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Recovering Dual Information}
+
+For the earlier primal optimum
+
+\[
+(x_1,x_2)=(2,2),
+\]
+
+the constraints satisfy
+
+\[
+x_1+x_2=4,
+\]
+
+\[
+x_1=2,
+\]
+
+while
+
+\[
+x_2=2<3.
+\]
+
+Thus the third primal constraint has positive slack.
+
+Complementary slackness gives
+
+\[
+\boxed{
+y_3=0.
+}
+\]
+
+Since
+
+\[
+x_1>0,
+\qquad
+x_2>0,
+\]
+
+the dual constraints must both be tight:
+
+\[
+y_1+y_2=3,
+\]
+
+\[
+y_1+y_3=2.
+\]
+
+Since \(y_3=0\),
+
+\[
+y_1=2,
+\]
+
+and therefore
+
+\[
+y_2=1.
+\]
+
+The dual objective is
+
+\[
+4(2)+2(1)+3(0)=10.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+\mathbf{y}^*
+=
+(2,1,0),
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbf{b}^T\mathbf{y}^*
+=
+10
+=
+\mathbf{c}^T\mathbf{x}^*.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dual Variables as Shadow Prices}
+\label{subsec:dual-shadow-prices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dual variable often measures the marginal value of increasing a resource
+limit.
+
+If the \(i\)-th resource constraint is
+
+\[
+a_i^T x\leq b_i,
+\]
+
+then under a stable optimal basis,
+
+\[
+\boxed{
+y_i^*
+}
+\]
+
+represents the approximate change in the optimal objective per unit
+increase in \(b_i\).
+
+Thus dual variables are often called shadow prices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity to Right-Hand-Side Changes}
+\label{subsec:lp-rhs-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\mathbf{b}
+\]
+
+changes to
+
+\[
+\mathbf{b}+\Delta\mathbf{b}.
+\]
+
+If the same basis remains optimal, then the basic solution becomes
+
+\[
+\boxed{
+\mathbf{x}_B
+=
+B^{-1}
+(
+\mathbf{b}+\Delta\mathbf{b}
+).
+}
+\]
+
+Feasibility requires
+
+\[
+\boxed{
+B^{-1}
+(
+\mathbf{b}+\Delta\mathbf{b}
+)
+\geq0.
+}
+\]
+
+This determines allowable ranges for resource perturbations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity of the Optimal Value}
+\label{subsec:lp-optimal-value-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When the optimal basis remains unchanged, a small right-hand-side change
+has objective effect
+
+\[
+\boxed{
+\Delta z^*
+\approx
+(\mathbf{y}^*)^T
+\Delta\mathbf{b}.
+}
+\]
+
+Within the valid sensitivity range, this relation can be exact for an LP.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Objective-Coefficient Sensitivity}
+\label{subsec:lp-objective-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Changes in
+
+\[
+\mathbf{c}
+\]
+
+alter the slope of the objective but not the feasible region.
+
+The current basis remains optimal while the associated reduced costs
+retain the required optimality signs.
+
+Thus sensitivity analysis can determine ranges of objective coefficients
+that preserve the optimal basis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduced-Cost Interpretation}
+\label{subsec:lp-reduced-cost-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a minimization LP, the reduced cost
+
+\[
+\boxed{
+\overline c_j
+=
+c_j-a_j^Ty
+}
+\]
+
+measures the net objective cost of increasing nonbasic variable \(x_j\).
+
+At an optimal basis,
+
+\[
+\boxed{
+\overline c_j\geq0.
+}
+\]
+
+For a maximization formulation, the corresponding sign convention is
+reversed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Alternate Optimal Solutions in Simplex}
+\label{subsec:simplex-alternate-optimum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At an optimal BFS, if a nonbasic variable has zero reduced cost, then
+moving it into the basis may produce another optimal solution.
+
+Thus
+
+\[
+\boxed{
+\overline c_j=0
+}
+\]
+
+for a nonbasic variable can signal alternate optima.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dual of the Dual}
+\label{subsec:dual-of-dual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under consistent standard-form conventions, taking the dual of the dual
+returns the primal problem.
+
+Thus,
+
+\[
+\boxed{
+(P^*)^*=P.
+}
+\]
+
+This reflects the structural symmetry of LP duality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constraint and Variable Sign Rules}
+\label{subsec:lp-duality-sign-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Duality rules depend on the chosen primal orientation.
+
+For a maximization primal:
+
+\[
+\boxed{
+\text{primal } \leq
+\text{ constraint}
+\leftrightarrow
+\text{nonnegative dual variable},
+}
+\]
+
+\[
+\boxed{
+\text{primal equality}
+\leftrightarrow
+\text{unrestricted dual variable}.
+}
+\]
+
+Similarly, variable sign restrictions affect the corresponding dual
+constraint direction.
+
+A dual should therefore be derived systematically rather than memorized
+from one special case only.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Farkas' Lemma Preview}
+\label{subsec:farkas-lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Farkas' lemma provides an alternative theorem for linear inequalities.
+
+One standard version states that exactly one of the following can hold:
+
+\[
+\boxed{
+A\mathbf{x}
+=
+\mathbf{b},
+\qquad
+\mathbf{x}\geq0,
+}
+\]
+
+or there exists \(\mathbf{y}\) such that
+
+\[
+\boxed{
+A^T\mathbf{y}\geq0,
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbf{b}^T\mathbf{y}<0.
+}
+\]
+
+The vector \(\mathbf{y}\) acts as a certificate of infeasibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Certificates of Optimality}
+\label{subsec:lp-certificates-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one finds:
+
+\[
+\boxed{
+\text{primal feasible }\mathbf{x},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{dual feasible }\mathbf{y},
+}
+\]
+
+with equal objective values:
+
+\[
+\boxed{
+\mathbf{c}^T\mathbf{x}
+=
+\mathbf{b}^T\mathbf{y}.
+}
+\]
+
+Weak duality then proves both solutions are optimal.
+
+This provides a powerful certificate of optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transportation Problems}
+\label{subsec:transportation-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose goods are shipped from origins \(i\) to destinations \(j\).
+
+Let
+
+\[
+x_{ij}
+=
+\text{quantity shipped from }i\text{ to }j.
+\]
+
+If
+
+\[
+c_{ij}
+\]
+
+is unit transportation cost, then the objective is
+
+\[
+\boxed{
+\min
+\sum_i
+\sum_j
+c_{ij}x_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transportation Constraints}
+\label{subsec:transportation-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If origin \(i\) has supply \(s_i\),
+
+\[
+\boxed{
+\sum_j
+x_{ij}
+\leq
+s_i.
+}
+\]
+
+If destination \(j\) requires demand \(d_j\),
+
+\[
+\boxed{
+\sum_i
+x_{ij}
+\geq
+d_j.
+}
+\]
+
+For a balanced transportation problem,
+
+\[
+\boxed{
+\sum_i s_i
+=
+\sum_j d_j.
+}
+\]
+
+Then supply and demand constraints are often written as equalities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Blending Problems}
+\label{subsec:blending-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose ingredients \(x_i\) are combined to produce a mixture.
+
+If ingredient \(i\) costs \(c_i\),
+
+\[
+\boxed{
+\min
+\sum_i
+c_ix_i.
+}
+\]
+
+Quality requirements produce linear constraints such as
+
+\[
+\boxed{
+\sum_i
+a_{ji}x_i
+\geq
+b_j.
+}
+\]
+
+Applications include fuels, diets, alloys, feeds, and chemical mixtures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diet Problem}
+\label{subsec:diet-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The classical diet problem minimizes food cost while meeting nutritional
+requirements.
+
+Let
+
+\[
+x_j
+=
+\text{quantity of food }j.
+\]
+
+Then
+
+\[
+\boxed{
+\min
+\sum_j
+c_jx_j
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\sum_j
+a_{ij}x_j
+\geq
+b_i
+}
+\]
+
+for each nutrient \(i\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Production Planning}
+\label{subsec:lp-production-planning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A production LP may maximize profit:
+
+\[
+\boxed{
+\max
+\sum_j
+p_jx_j
+}
+\]
+
+subject to resource limits:
+
+\[
+\boxed{
+\sum_j
+a_{ij}x_j
+\leq
+b_i.
+}
+\]
+
+This is one of the standard operations-research formulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Network Flow Preview}
+\label{subsec:network-flow-lp-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many network problems are linear programs.
+
+Let
+
+\[
+x_{ij}
+\]
+
+denote flow along arc \((i,j)\).
+
+A flow-conservation equation at node \(i\) is
+
+\[
+\boxed{
+\sum_j
+x_{ji}
+-
+\sum_j
+x_{ij}
+=
+b_i.
+}
+\]
+
+Capacity constraints have form
+
+\[
+\boxed{
+0\leq x_{ij}\leq u_{ij}.
+}
+\]
+
+Network optimization is developed later in Chapter 10.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integrality in Special LPs}
+\label{subsec:special-lp-integrality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some linear programs with integral data automatically possess integral
+optimal extreme points.
+
+This occurs for important classes involving totally unimodular matrices.
+
+Examples include certain:
+
+\[
+\boxed{
+\text{network-flow problems},
+}
+\]
+
+\[
+\boxed{
+\text{assignment problems},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{transportation problems}.
+}
+\]
+
+Thus some apparently discrete problems can be solved as ordinary LPs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Unimodularity Preview}
+\label{subsec:total-unimodularity-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matrix is totally unimodular if every square subdeterminant is in
+
+\[
+\boxed{
+\{-1,0,1\}.
+}
+\]
+
+Under suitable conditions, if \(A\) is totally unimodular and
+\(\mathbf{b}\) is integral, then vertices of
+
+\[
+\{
+x:
+Ax\leq b,
+x\geq0
+\}
+\]
+
+are integral.
+
+This property becomes important in combinatorial optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interior-Point Methods}
+\label{subsec:lp-interior-point-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simplex method moves along the boundary of the feasible polyhedron.
+
+Interior-point methods instead move through the interior.
+
+A barrier formulation for
+
+\[
+A\mathbf{x}\leq\mathbf{b}
+\]
+
+may include logarithmic terms such as
+
+\[
+\boxed{
+-\mu
+\sum_i
+\log
+[
+b_i-a_i^T\mathbf{x}
+].
+}
+\]
+
+As
+
+\[
+\mu\to0,
+\]
+
+solutions approach the LP optimum under suitable conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Central Path}
+\label{subsec:lp-central-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interior-point methods generate a family of solutions parameterized by a
+barrier parameter \(\mu>0\).
+
+These points trace a curve called the central path.
+
+As
+
+\[
+\boxed{
+\mu\to0,
+}
+\]
+
+the central path approaches an optimal primal-dual solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal-Dual Interior-Point Methods}
+\label{subsec:primal-dual-interior-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modern interior-point methods often solve primal and dual conditions
+simultaneously.
+
+They approximately enforce:
+
+\[
+\boxed{
+\text{primal feasibility},
+}
+\]
+
+\[
+\boxed{
+\text{dual feasibility},
+}
+\]
+
+and a perturbed complementary-slackness condition such as
+
+\[
+\boxed{
+x_js_j
+=
+\mu.
+}
+\]
+
+Newton's method is then applied to the resulting nonlinear system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplex Versus Interior-Point Methods}
+\label{subsec:simplex-versus-interior-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simplex method:
+
+\[
+\boxed{
+\text{moves between basic feasible solutions}.
+}
+\]
+
+Interior-point methods:
+
+\[
+\boxed{
+\text{move through the interior}.
+}
+\]
+
+Simplex methods can be excellent for sensitivity analysis and warm starts.
+
+Interior-point methods have strong polynomial-time theory and can be very
+effective for large sparse LPs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Complexity}
+\label{subsec:lp-computational-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simplex method performs extremely well in many practical problems but
+has exponential worst-case examples for common pivot rules.
+
+Polynomial-time LP algorithms include:
+
+\[
+\boxed{
+\text{ellipsoid methods},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{interior-point methods}.
+}
+\]
+
+Thus linear programming is polynomial-time solvable in a theoretical
+complexity sense.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Presolve}
+\label{subsec:lp-presolve}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modern solvers simplify LP models before optimization.
+
+Presolve may:
+
+\[
+\boxed{
+\text{remove redundant constraints},
+}
+\]
+
+\[
+\boxed{
+\text{fix variables},
+}
+\]
+
+\[
+\boxed{
+\text{tighten bounds},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{detect infeasibility}.
+}
+\]
+
+A smaller equivalent model can be much easier to solve.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaling in Linear Programming}
+\label{subsec:lp-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Constraint coefficients with widely different magnitudes can cause
+numerical difficulties.
+
+For example, coefficients of order
+
+\[
+10^{-9}
+\]
+
+and
+
+\[
+10^9
+\]
+
+in the same model may produce poor conditioning.
+
+Scaling rows and columns can improve numerical reliability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Redundant Constraints}
+\label{subsec:lp-redundant-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A constraint is redundant if removing it does not change the feasible
+region.
+
+For example, if
+
+\[
+x\leq2
+\]
+
+is already required, then
+
+\[
+x\leq5
+\]
+
+adds no new restriction.
+
+Redundant constraints may still influence numerical performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binding Constraints}
+\label{subsec:binding-constraints-lp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A constraint is binding at a feasible point if it holds with equality.
+
+For
+
+\[
+a_i^Tx\leq b_i,
+\]
+
+the constraint is binding when
+
+\[
+\boxed{
+a_i^Tx=b_i.
+}
+\]
+
+Otherwise it has positive slack.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LP Modeling Workflow}
+\label{subsec:lp-modeling-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical linear-programming workflow is:
+
+\begin{enumerate}
+    \item identify the decisions;
+    \item define decision variables with units;
+    \item identify the quantity to minimize or maximize;
+    \item write the linear objective;
+    \item identify every resource, demand, logical, or policy constraint;
+    \item write each constraint linearly;
+    \item specify sign restrictions;
+    \item check whether the feasible region is nonempty;
+    \item solve the LP;
+    \item verify primal feasibility;
+    \item inspect binding constraints and slack;
+    \item inspect dual values and reduced costs;
+    \item conduct sensitivity analysis;
+    \item interpret the solution in application terms.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:linear-programming-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Using Nonlinear Expressions in an LP}
+
+Terms such as
+
+\[
+x_1x_2,
+\]
+
+\[
+x_1^2,
+\]
+
+and
+
+\[
+\frac{x_1}{x_2}
+\]
+
+are nonlinear.
+
+A model containing them is not an ordinary linear program.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting Nonnegativity Restrictions}
+
+If a production quantity cannot be negative, include
+
+\[
+\boxed{
+x_j\geq0.
+}
+\]
+
+Without that restriction, the mathematical model may allow meaningless
+solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Slack and Surplus Variables}
+
+For
+
+\[
+\leq,
+\]
+
+add slack.
+
+For
+
+\[
+\geq,
+\]
+
+subtract surplus.
+
+The resulting auxiliary variables remain nonnegative.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Feasible Vertex Is Optimal}
+
+Vertices are candidates.
+
+The objective must still be compared or optimized.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming an Unbounded Feasible Region Implies an Unbounded Objective}
+
+A feasible region may extend infinitely while the objective still has a
+finite optimum.
+
+Unboundedness must be checked relative to the optimization direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Infeasible and Unbounded}
+
+Infeasible means:
+
+\[
+\boxed{
+\text{no feasible point exists}.
+}
+\]
+
+Unbounded means:
+
+\[
+\boxed{
+\text{feasible points exist, but the objective improves without bound}.
+}
+\]
+
+These are fundamentally different outcomes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Degeneracy}
+
+A basic variable may equal zero.
+
+This can cause a pivot with no objective improvement and can complicate
+simplex behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Ratio Test with Nonpositive Pivot Coefficients}
+
+Only rows that actually limit the entering variable should be included in
+the ratio test.
+
+Using inappropriate signs can destroy feasibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Artificial Variables Are Real Decision Variables}
+
+Artificial variables are temporary computational devices.
+
+A feasible solution to the original LP must have them equal to zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Mixing Dual Sign Conventions}
+
+Dual constraints and variable signs depend on whether the primal is
+written as minimization or maximization and on inequality orientation.
+
+Use one convention consistently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting Weak Duality}
+
+For a standard primal maximization and dual minimization pair,
+
+\[
+\boxed{
+\text{primal feasible value}
+\leq
+\text{dual feasible value}.
+}
+\]
+
+A violation indicates an algebraic or formulation error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Shadow Prices as Globally Valid}
+
+A shadow price describes marginal objective sensitivity only within a
+range where the relevant optimal basis or local dual structure remains
+valid.
+
+Large parameter changes can alter the active constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Numerical Tolerances}
+
+Practical solvers use tolerances.
+
+A reported value such as
+
+\[
+-10^{-10}
+\]
+
+for a nonnegative variable may reflect floating-point error rather than a
+meaningful violation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:linear-programming-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Production Planning.}
+Linear programs allocate labor, materials, machine time, and production
+capacity to maximize profit or minimize cost.
+
+\medskip
+
+\textbf{Transportation.}
+Shipping plans minimize transportation cost while satisfying supply and
+demand constraints.
+
+\medskip
+
+\textbf{Supply Chains.}
+Linear models allocate products among warehouses, distribution centers,
+and customers.
+
+\medskip
+
+\textbf{Blending.}
+Raw materials are combined to satisfy quality specifications at minimum
+cost.
+
+\medskip
+
+\textbf{Agriculture.}
+Land, water, labor, feed, and crop decisions can be optimized using LP
+models.
+
+\medskip
+
+\textbf{Energy Systems.}
+Linear programs model generation scheduling, fuel allocation, and
+simplified power-flow decisions.
+
+\medskip
+
+\textbf{Finance.}
+Some portfolio, cash-flow, and arbitrage models can be formulated as
+linear programs.
+
+\medskip
+
+\textbf{Public Planning.}
+Budget allocation, staffing, emergency logistics, and public-resource
+planning frequently use linear optimization.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:linear-programming-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a linear programming problem.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a polyhedron.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an extreme point.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a slack variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a surplus variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a basic feasible solution.
+\end{exercise}
+
+\begin{exercise}[1]
+Define degeneracy.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the dual of a linear program conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+State weak duality.
+\end{exercise}
+
+\begin{exercise}[1]
+State strong duality.
+\end{exercise}
+
+\begin{exercise}[1]
+State complementary slackness.
+\end{exercise}
+
+\begin{exercise}[2]
+Convert
+
+\[
+2x_1+x_2\leq8
+\]
+
+to equality form using a slack variable.
+\end{exercise}
+
+\begin{exercise}[2]
+Convert
+
+\[
+3x_1+4x_2\geq12
+\]
+
+to equality form using a surplus variable.
+\end{exercise}
+
+\begin{exercise}[2]
+Represent an unrestricted variable \(x\) using nonnegative variables.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether the feasible region
+
+\[
+x+y\leq5,
+\qquad
+x,y\geq0
+\]
+
+is bounded.
+\end{exercise}
+
+\begin{exercise}[2]
+Find all vertices of
+
+\[
+x+y\leq4,
+\]
+
+\[
+x\leq3,
+\]
+
+\[
+y\leq2,
+\]
+
+\[
+x,y\geq0.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Maximize
+
+\[
+z=2x+3y
+\]
+
+over the feasible region in the previous problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Give an example of an infeasible LP.
+\end{exercise}
+
+\begin{exercise}[2]
+Give an example of an unbounded LP.
+\end{exercise}
+
+\begin{exercise}[2]
+Give an example of an LP with multiple optimal solutions.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that the feasible set of a linear program is convex.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a finite attained LP optimum can be found at an extreme point.
+\end{exercise}
+
+\begin{exercise}[3]
+For
+
+\[
+A=
+\begin{pmatrix}
+1&1&1&0\\
+2&1&0&1
+\end{pmatrix},
+\]
+
+identify possible basis matrices.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a basic solution for one basis chosen in the previous problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether that basic solution is feasible.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how degeneracy occurs at an LP vertex.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one simplex pivot on a small tableau.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the entering-variable criterion for a maximization simplex
+tableau.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the ratio test geometrically.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how the simplex method detects unboundedness.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Phase I auxiliary problem for an equality-constrained LP.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a positive Phase I optimum proves infeasibility.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the dual of
+
+\[
+\begin{aligned}
+\max\quad&
+4x_1+5x_2
+\\
+\text{subject to}\quad&
+2x_1+x_2\leq10,
+\\
+&
+x_1+3x_2\leq12,
+\\
+&
+x_1,x_2\geq0.
+\end{aligned}
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove weak duality for the standard primal-dual pair.
+\end{exercise}
+
+\begin{exercise}[3]
+Use complementary slackness to recover a dual solution from a known
+primal optimum.
+\end{exercise}
+
+\begin{exercise}[3]
+Use equal primal and dual objective values to certify optimality.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret a positive dual variable as a shadow price.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why an inactive primal resource constraint has zero dual price
+under complementary slackness.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the reduced costs for a specified basis.
+\end{exercise}
+
+\begin{exercise}[3]
+Identify an alternate optimum using a zero nonbasic reduced cost.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a two-origin, three-destination transportation problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a diet problem with three foods and two nutritional
+requirements.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a blending problem with quality constraints.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a production-planning problem with labor and material
+constraints.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the equivalence between basic feasible solutions and extreme points
+under standard full-row-rank assumptions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the simplex method algebraically using basis matrices.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the reduced-cost formula from the simplex dictionary.
+\end{exercise}
+
+\begin{exercise}[4]
+Study degeneracy and cycling.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove Bland's anti-cycling rule.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive strong LP duality.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive complementary slackness from strong duality.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Farkas' lemma and its equivalence to LP duality.
+\end{exercise}
+
+\begin{exercise}[4]
+Construct infeasibility certificates using dual multipliers.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sensitivity analysis for right-hand-side perturbations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study allowable objective-coefficient ranges for a fixed optimal basis.
+\end{exercise}
+
+\begin{exercise}[4]
+Study total unimodularity.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove integrality of network-flow polyhedra under suitable assumptions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the transportation simplex method.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Dantzig--Wolfe decomposition.
+\end{exercise}
+
+\begin{exercise}[4]
+Study column generation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive primal-dual interior-point equations for LP.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the logarithmic-barrier central path.
+\end{exercise}
+
+\begin{exercise}[4]
+Compare theoretical complexity of simplex and interior-point methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate numerical scaling and presolve in large sparse LPs.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:linear-programming-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A standard linear program is
+
+\[
+\boxed{
+\begin{aligned}
+\max_{\mathbf{x}}
+\quad&
+\mathbf{c}^T\mathbf{x}
+\\
+\text{subject to}
+\quad&
+A\mathbf{x}\leq\mathbf{b},
+\\
+&
+\mathbf{x}\geq0.
+\end{aligned}
+}
+\]
+
+Its feasible region is a convex polyhedron.
+
+When a finite optimum is attained, an optimal extreme point exists.
+
+Slack variables convert inequalities into equality form.
+
+A basic feasible solution corresponds to a basis of the constraint matrix
+and represents a vertex of the feasible polyhedron under standard
+assumptions.
+
+The simplex method moves between basic feasible solutions.
+
+For the standard primal
+
+\[
+\boxed{
+\max
+\{
+c^Tx:
+Ax\leq b,
+x\geq0
+\},
+}
+\]
+
+the dual is
+
+\[
+\boxed{
+\min
+\{
+b^Ty:
+A^Ty\geq c,
+y\geq0
+\}.
+}
+\]
+
+Weak duality gives
+
+\[
+\boxed{
+c^Tx
+\leq
+b^Ty.
+}
+\]
+
+Strong duality gives equality at optimality:
+
+\[
+\boxed{
+c^Tx^*
+=
+b^Ty^*.
+}
+\]
+
+Complementary slackness links primal activity with dual variables.
+
+Linear programming therefore combines
+
+\[
+\boxed{
+\text{linear algebra}
++
+\text{convex geometry}
++
+\text{duality}
++
+\text{algorithms}
++
+\text{decision modeling}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:linear-programming-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Linear Programming specializes the general optimization framework of
+Section~\ref{sec:optimization-fundamentals} to linear objectives and
+polyhedral feasible regions. Extreme points lead to the simplex method,
+while duality gives optimality certificates, shadow prices, and
+sensitivity information. These ideas become foundational for integer,
+combinatorial, network, scheduling, and stochastic optimization. The next
+section, Nonlinear Programming, removes the linearity restriction and
+develops general smooth constrained optimization, second-order
+conditions, nonlinear KKT systems, penalty methods, sequential quadratic
+programming, and related algorithms.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.2 Linear Programming
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard linear programming theory.
+%   - Standard simplex and duality theory.
+%   - Standard operations-research modeling.
+%
+% Used for:
+%   - LP definitions and matrix form;
+%   - feasible regions and polyhedra;
+%   - convexity;
+%   - extreme points;
+%   - graphical LP methods;
+%   - boundedness and unboundedness;
+%   - infeasibility;
+%   - alternate optima;
+%   - standard form;
+%   - slack, surplus, and unrestricted variables;
+%   - basic solutions;
+%   - basic feasible solutions;
+%   - basis matrices;
+%   - degeneracy;
+%   - simplex method;
+%   - reduced costs;
+%   - entering and leaving variables;
+%   - ratio test;
+%   - pivots;
+%   - simplex optimality;
+%   - simplex unboundedness;
+%   - cycling and Bland's rule;
+%   - artificial variables;
+%   - Phase I and Phase II;
+%   - Big-M preview;
+%   - LP duality;
+%   - weak and strong duality;
+%   - duality gaps;
+%   - complementary slackness;
+%   - shadow prices;
+%   - sensitivity analysis;
+%   - Farkas' lemma preview;
+%   - optimality and infeasibility certificates;
+%   - transportation, blending, diet, and production models;
+%   - network-flow preview;
+%   - total unimodularity preview;
+%   - interior-point methods;
+%   - central path;
+%   - computational complexity;
+%   - presolve and scaling;
+%   - applications and exercises.
+%
+% Notes:
+%   - Nonlinear Programming is developed next in Section 10.3.
+%   - Convex Optimization follows in Section 10.4.
+%   - Integer, combinatorial, and network optimization build directly
+%     on linear-programming ideas later in Chapter 10.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

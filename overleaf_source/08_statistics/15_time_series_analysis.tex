@@ -1,0 +1,5135 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.15 TIME SERIES ANALYSIS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Time Series Analysis}
+\label{sec:time-series-analysis}
+
+\prerequisite{
+Probability, random variables, expectation and variance, covariance and
+correlation, regression, statistical estimation, hypothesis testing,
+stochastic processes, linear algebra, and basic differential and
+difference equations.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain what distinguishes time series data from ordinary
+          independent observations;
+    \item identify trend, seasonality, cycles, and irregular variation;
+    \item define weak stationarity;
+    \item define autocovariance and autocorrelation functions;
+    \item interpret lag;
+    \item compute sample autocovariances and autocorrelations;
+    \item understand white-noise processes;
+    \item understand random walks;
+    \item distinguish stationary and nonstationary time series;
+    \item understand differencing;
+    \item define autoregressive models;
+    \item define moving-average models;
+    \item define ARMA and ARIMA models;
+    \item understand stationarity conditions for autoregressive models;
+    \item understand invertibility for moving-average models;
+    \item derive basic mean and variance properties of AR models;
+    \item understand the Yule--Walker equations;
+    \item interpret ACF and PACF patterns;
+    \item understand seasonal ARIMA models conceptually;
+    \item understand exponential smoothing;
+    \item understand Holt and Holt--Winters methods conceptually;
+    \item understand forecasting and forecast uncertainty;
+    \item distinguish one-step and multi-step forecasts;
+    \item understand residual diagnostics;
+    \item recognize unit-root behavior;
+    \item understand deterministic and stochastic trends;
+    \item understand transformations such as logarithms;
+    \item understand intervention and transfer-function ideas
+          conceptually;
+    \item recognize state-space models;
+    \item understand the Kalman-filter idea conceptually;
+    \item distinguish univariate and multivariate time series;
+    \item recognize vector autoregression;
+    \item understand cointegration conceptually;
+    \item recognize frequency-domain analysis;
+    \item understand spectral density conceptually;
+    \item connect time series with stochastic processes, forecasting,
+          regression, and dynamical systems.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is a Time Series?}
+\label{subsec:what-is-time-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A time series is a sequence of observations indexed by time.
+
+A discrete-time series may be written
+
+\[
+\boxed{
+X_1,
+X_2,
+\ldots,
+X_T.
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{daily temperature},
+}
+\]
+
+\[
+\boxed{
+\text{monthly sales},
+}
+\]
+
+\[
+\boxed{
+\text{hourly sensor measurements},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{annual economic indicators}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Time Order Matters}
+\label{subsec:why-time-order-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In ordinary i.i.d. sampling, rearranging observations does not change
+the probabilistic structure.
+
+In a time series, order is essential.
+
+For example,
+
+\[
+X_t
+\]
+
+may depend strongly on
+
+\[
+X_{t-1}.
+\]
+
+Thus
+
+\[
+\boxed{
+\text{time dependence}
+}
+\]
+
+is a defining feature of time series analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time Series as a Stochastic Process}
+\label{subsec:time-series-stochastic-process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A time series can be viewed as one observed realization of a stochastic
+process
+
+\[
+\boxed{
+\{X_t:t\in\mathbb{Z}\}.
+}
+\]
+
+The index \(t\) represents discrete time.
+
+The probabilistic model describes the joint behavior of
+
+\[
+X_t,
+X_{t-1},
+X_{t-2},
+\ldots
+\]
+
+across time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Components of a Time Series}
+\label{subsec:time-series-components}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A time series may contain several structural components:
+
+\[
+\boxed{
+\text{trend},
+}
+\]
+
+\[
+\boxed{
+\text{seasonality},
+}
+\]
+
+\[
+\boxed{
+\text{cycles},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{irregular variation}.
+}
+\]
+
+These components may overlap.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trend}
+\label{subsec:time-series-trend}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A trend is a long-term change in the level of a series.
+
+Examples include:
+
+\[
+\boxed{
+\text{steady growth},
+}
+\]
+
+\[
+\boxed{
+\text{steady decline},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{long-run nonlinear change}.
+}
+\]
+
+A simple deterministic linear trend is
+
+\[
+\boxed{
+X_t
+=
+\beta_0+\beta_1t+\varepsilon_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Seasonality}
+\label{subsec:time-series-seasonality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Seasonality is a repeating pattern with a known or approximately fixed
+period.
+
+Examples include:
+
+\[
+\boxed{
+\text{daily cycles},
+}
+\]
+
+\[
+\boxed{
+\text{weekly cycles},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{annual cycles}.
+}
+\]
+
+A monthly series with yearly seasonality has period
+
+\[
+\boxed{
+s=12.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cyclic Variation}
+\label{subsec:time-series-cycles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Cyclic variation involves recurring rises and falls whose periods are not
+necessarily fixed.
+
+Economic business cycles are a common example.
+
+Unlike strict seasonality, cycles may vary in duration and magnitude.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Irregular Variation}
+\label{subsec:time-series-irregular}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Irregular variation refers to remaining fluctuations not explained by
+trend, seasonality, or other systematic structure.
+
+A statistical model attempts to make this remaining component behave as
+close as possible to an unpredictable noise process.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Additive Decomposition}
+\label{subsec:additive-time-series-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An additive decomposition has the form
+
+\[
+\boxed{
+X_t
+=
+T_t
++
+S_t
++
+C_t
++
+R_t,
+}
+\]
+
+where
+
+\[
+T_t
+=
+\text{trend},
+\]
+
+\[
+S_t
+=
+\text{seasonal component},
+\]
+
+\[
+C_t
+=
+\text{cyclic component},
+\]
+
+and
+
+\[
+R_t
+=
+\text{remainder}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiplicative Decomposition}
+\label{subsec:multiplicative-time-series-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When variation increases with the level of the series, a multiplicative
+form may be more appropriate:
+
+\[
+\boxed{
+X_t
+=
+T_tS_tC_tR_t.
+}
+\]
+
+Taking logarithms converts products into sums:
+
+\[
+\boxed{
+\log X_t
+=
+\log T_t
++
+\log S_t
++
+\log C_t
++
+\log R_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lag}
+\label{subsec:time-series-lag}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A lag is a time separation between observations.
+
+For example,
+
+\[
+X_t
+\]
+
+and
+
+\[
+X_{t-1}
+\]
+
+are separated by lag \(1\).
+
+Likewise,
+
+\[
+X_t
+\]
+
+and
+
+\[
+X_{t-k}
+\]
+
+are separated by lag \(k\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean Function}
+\label{subsec:time-series-mean-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The time-dependent mean is
+
+\[
+\boxed{
+\mu_t
+=
+\mathbb{E}[X_t].
+}
+\]
+
+For a stationary process, this mean does not depend on time.
+
+Thus,
+
+\[
+\boxed{
+\mu_t=\mu.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autocovariance Function}
+\label{subsec:autocovariance-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a general time series,
+
+\[
+\boxed{
+\gamma(s,t)
+=
+\operatorname{Cov}(X_s,X_t).
+}
+\]
+
+For a weakly stationary process, covariance depends only on the lag
+
+\[
+h=t-s.
+\]
+
+Then
+
+\[
+\boxed{
+\gamma(h)
+=
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autocorrelation Function}
+\label{subsec:autocorrelation-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The autocorrelation function, abbreviated ACF, is
+
+\[
+\boxed{
+\rho(h)
+=
+\frac{
+\gamma(h)
+}{
+\gamma(0)
+}.
+}
+\]
+
+Since
+
+\[
+\gamma(0)
+=
+\operatorname{Var}(X_t),
+\]
+
+we have
+
+\[
+\boxed{
+\rho(0)=1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetry of Autocovariance}
+\label{subsec:autocovariance-symmetry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a weakly stationary process,
+
+\[
+\boxed{
+\gamma(-h)
+=
+\gamma(h).
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\rho(-h)
+=
+\rho(h).
+}
+\]
+
+Only nonnegative lags are usually displayed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Stationarity}
+\label{subsec:weak-stationarity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Weak Stationarity}
+A process \(\{X_t\}\) is weakly stationary if:
+
+\[
+\boxed{
+\mathbb{E}[X_t]
+=
+\mu
+}
+\]
+
+for all \(t\),
+
+\[
+\boxed{
+\operatorname{Var}(X_t)
+=
+\gamma(0)
+<
+\infty,
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+)
+=
+\gamma(h)
+}
+\]
+
+depends only on lag \(h\), not on \(t\).
+\end{definitionbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strict Stationarity}
+\label{subsec:strict-stationarity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A process is strictly stationary if every finite-dimensional
+distribution is unchanged by shifting time.
+
+For any times
+
+\[
+t_1,\ldots,t_k
+\]
+
+and shift \(h\),
+
+\[
+\boxed{
+(
+X_{t_1},
+\ldots,
+X_{t_k}
+)
+\overset{d}{=}
+(
+X_{t_1+h},
+\ldots,
+X_{t_k+h}
+).
+}
+\]
+
+Strict stationarity is stronger than weak stationarity unless additional
+conditions are imposed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gaussian Stationarity}
+\label{subsec:gaussian-stationarity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a Gaussian process, the joint distributions are completely
+determined by means and covariances.
+
+Therefore, for Gaussian processes,
+
+\[
+\boxed{
+\text{weak stationarity}
+\Longrightarrow
+\text{strict stationarity}.
+}
+\]
+
+This is a special property of Gaussian processes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Mean of a Time Series}
+\label{subsec:time-series-sample-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For observations
+
+\[
+X_1,\ldots,X_T,
+\]
+
+the sample mean is
+
+\[
+\boxed{
+\overline{X}
+=
+\frac1T
+\sum_{t=1}^{T}
+X_t.
+}
+\]
+
+Because observations may be dependent, its variance is generally not
+
+\[
+\sigma^2/T.
+\]
+
+Autocovariances contribute to its uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of a Time-Series Mean}
+\label{subsec:variance-time-series-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a weakly stationary process,
+
+\[
+\operatorname{Var}
+(
+\overline{X}
+)
+=
+\frac1{T^2}
+\sum_{t=1}^{T}
+\sum_{s=1}^{T}
+\gamma(t-s).
+\]
+
+This can be rewritten as
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\overline{X}
+)
+=
+\frac1T
+\left[
+\gamma(0)
++
+2
+\sum_{h=1}^{T-1}
+\left(
+1-\frac{h}{T}
+\right)
+\gamma(h)
+\right].
+}
+\]
+
+Positive serial correlation generally increases uncertainty in the sample
+mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Autocovariance}
+\label{subsec:sample-autocovariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common sample autocovariance estimator at lag \(h\) is
+
+\[
+\boxed{
+\widehat{\gamma}(h)
+=
+\frac1T
+\sum_{t=h+1}^{T}
+(
+X_t-\overline{X}
+)
+(
+X_{t-h}-\overline{X}
+).
+}
+\]
+
+Different denominator conventions are used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Autocorrelation}
+\label{subsec:sample-autocorrelation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sample autocorrelation at lag \(h\) is
+
+\[
+\boxed{
+\widehat{\rho}(h)
+=
+\frac{
+\widehat{\gamma}(h)
+}{
+\widehat{\gamma}(0)
+}.
+}
+\]
+
+Plotting
+
+\[
+\widehat{\rho}(h)
+\]
+
+against \(h\) produces the sample ACF.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autocorrelation Plot}
+\label{subsec:acf-plot}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ACF plot helps identify:
+
+\[
+\boxed{
+\text{serial dependence},
+}
+\]
+
+\[
+\boxed{
+\text{seasonality},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{possible ARMA structure}.
+}
+\]
+
+Large autocorrelations at seasonal lags may indicate repeating seasonal
+behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{White Noise}
+\label{subsec:white-noise}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{White Noise}
+A white-noise process \(\{\varepsilon_t\}\) has
+
+\[
+\boxed{
+\mathbb{E}[\varepsilon_t]=0,
+}
+\]
+
+\[
+\boxed{
+\operatorname{Var}(\varepsilon_t)=\sigma_\varepsilon^2,
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Cov}
+(
+\varepsilon_t,
+\varepsilon_s
+)
+=
+0
+\qquad
+(t\neq s).
+}
+\]
+\end{definitionbox}
+
+White noise is uncorrelated across time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent White Noise}
+\label{subsec:independent-white-noise}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the white-noise variables are also independent, the process is
+stronger than merely uncorrelated white noise.
+
+Gaussian white noise satisfies
+
+\[
+\boxed{
+\varepsilon_t
+\overset{\text{i.i.d.}}{\sim}
+N
+(
+0,\sigma_\varepsilon^2
+).
+}
+\]
+
+In Gaussian settings, zero covariance implies independence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Walk}
+\label{subsec:random-walk}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A random walk satisfies
+
+\[
+\boxed{
+X_t
+=
+X_{t-1}
++
+\varepsilon_t,
+}
+\]
+
+where \(\varepsilon_t\) is white noise.
+
+Iterating,
+
+\[
+\boxed{
+X_t
+=
+X_0
++
+\sum_{j=1}^{t}
+\varepsilon_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random-Walk Mean and Variance}
+\label{subsec:random-walk-mean-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+X_0
+\]
+
+is fixed and
+
+\[
+\mathbb{E}[\varepsilon_t]=0,
+\]
+
+then
+
+\[
+\boxed{
+\mathbb{E}[X_t]
+=
+X_0.
+}
+\]
+
+But
+
+\[
+\boxed{
+\operatorname{Var}(X_t)
+=
+t\sigma_\varepsilon^2.
+}
+\]
+
+The variance grows with time.
+
+Therefore the random walk is not weakly stationary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Walk with Drift}
+\label{subsec:random-walk-drift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A random walk with drift is
+
+\[
+\boxed{
+X_t
+=
+\delta
++
+X_{t-1}
++
+\varepsilon_t.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbb{E}[X_t]
+=
+X_0+t\delta.
+}
+\]
+
+Both the mean and variance change with time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Differencing}
+\label{subsec:differencing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The first difference is
+
+\[
+\boxed{
+\Delta X_t
+=
+X_t-X_{t-1}.
+}
+\]
+
+For a random walk,
+
+\[
+X_t
+=
+X_{t-1}
++
+\varepsilon_t,
+\]
+
+so
+
+\[
+\boxed{
+\Delta X_t
+=
+\varepsilon_t.
+}
+\]
+
+Thus differencing converts the random walk into white noise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second Differences}
+\label{subsec:second-differences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The second difference is
+
+\[
+\boxed{
+\Delta^2X_t
+=
+\Delta
+(
+\Delta X_t
+).
+}
+\]
+
+Expanding,
+
+\[
+\boxed{
+\Delta^2X_t
+=
+X_t
+-
+2X_{t-1}
++
+X_{t-2}.
+}
+\]
+
+Higher-order differencing can remove polynomial-type trends, but excessive
+differencing can create unnecessary dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Seasonal Differencing}
+\label{subsec:seasonal-differencing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For seasonal period \(s\), seasonal differencing is
+
+\[
+\boxed{
+\Delta_sX_t
+=
+X_t-X_{t-s}.
+}
+\]
+
+For monthly data with yearly seasonality,
+
+\[
+\boxed{
+s=12.
+}
+\]
+
+Seasonal differencing can remove repeating seasonal levels.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backshift Operator}
+\label{subsec:backshift-operator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define the backshift operator \(B\) by
+
+\[
+\boxed{
+BX_t
+=
+X_{t-1}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+B^kX_t
+=
+X_{t-k}.
+}
+\]
+
+First differencing becomes
+
+\[
+\boxed{
+\Delta
+=
+1-B.
+}
+\]
+
+Thus
+
+\[
+\boxed{
+\Delta X_t
+=
+(1-B)X_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Seasonal Difference Operator}
+\label{subsec:seasonal-backshift}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Seasonal differencing can be written
+
+\[
+\boxed{
+\Delta_s
+=
+1-B^s.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\Delta_sX_t
+=
+(
+1-B^s
+)
+X_t.
+}
+\]
+
+Operator notation makes ARIMA models compact.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autoregressive Models}
+\label{subsec:autoregressive-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An autoregressive model expresses the current value as a linear function
+of previous values plus noise.
+
+An AR(\(p\)) model is
+
+\[
+\boxed{
+X_t
+=
+c
++
+\phi_1X_{t-1}
++
+\cdots
++
+\phi_pX_{t-p}
++
+\varepsilon_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{AR(1) Model}
+\label{subsec:ar1-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simplest autoregressive model is
+
+\[
+\boxed{
+X_t
+=
+c
++
+\phi X_{t-1}
++
+\varepsilon_t.
+}
+\]
+
+If
+
+\[
+|\phi|<1,
+\]
+
+the process has a stationary solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean of a Stationary AR(1)}
+\label{subsec:ar1-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+X_t
+=
+c+\phi X_{t-1}+\varepsilon_t
+\]
+
+is stationary.
+
+Taking expectations,
+
+\[
+\mu
+=
+c+\phi\mu.
+\]
+
+Thus,
+
+\[
+\boxed{
+\mu
+=
+\frac{
+c
+}{
+1-\phi
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Centered AR(1) Model}
+\label{subsec:centered-ar1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Subtracting the stationary mean gives
+
+\[
+\boxed{
+X_t-\mu
+=
+\phi
+(
+X_{t-1}-\mu
+)
++
+\varepsilon_t.
+}
+\]
+
+This form simplifies covariance calculations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of a Stationary AR(1)}
+\label{subsec:ar1-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the centered model,
+
+\[
+X_t
+=
+\phi X_{t-1}
++
+\varepsilon_t,
+\]
+
+assuming mean zero for simplicity.
+
+Taking variances,
+
+\[
+\gamma(0)
+=
+\phi^2\gamma(0)
++
+\sigma_\varepsilon^2.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\gamma(0)
+=
+\frac{
+\sigma_\varepsilon^2
+}{
+1-\phi^2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{AR(1) Autocovariance}
+\label{subsec:ar1-autocovariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For \(h\geq1\),
+
+\[
+\gamma(h)
+=
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+).
+\]
+
+Using
+
+\[
+X_t
+=
+\phi X_{t-1}
++
+\varepsilon_t,
+\]
+
+and independence of future innovations from past observations,
+
+\[
+\boxed{
+\gamma(h)
+=
+\phi\gamma(h-1).
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\gamma(h)
+=
+\phi^h\gamma(0).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{AR(1) Autocorrelation}
+\label{subsec:ar1-autocorrelation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dividing by \(\gamma(0)\),
+
+\[
+\boxed{
+\rho(h)
+=
+\phi^{|h|}.
+}
+\]
+
+Therefore the ACF of an AR(1) process decays geometrically.
+
+If
+
+\[
+0<\phi<1,
+\]
+
+the decay is positive.
+
+If
+
+\[
+-1<\phi<0,
+\]
+
+the autocorrelations alternate in sign.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: AR(1) Variance and ACF}
+\label{subsec:worked-ar1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Stationary AR(1)}
+
+Suppose
+
+\[
+X_t
+=
+0.6X_{t-1}
++
+\varepsilon_t,
+\]
+
+where
+
+\[
+\operatorname{Var}(\varepsilon_t)=4.
+\]
+
+The stationary variance is
+
+\[
+\gamma(0)
+=
+\frac{
+4
+}{
+1-0.6^2
+}.
+\]
+
+Thus,
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+\gamma(0)
+=
+6.25.
+}
+\]
+
+Also,
+
+\[
+\boxed{
+\rho(h)
+=
+0.6^{|h|}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infinite Moving-Average Representation of AR(1)}
+\label{subsec:ar1-ma-infinity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+|\phi|<1,
+\]
+
+then repeatedly substituting gives
+
+\[
+X_t
+=
+\varepsilon_t
++
+\phi\varepsilon_{t-1}
++
+\phi^2\varepsilon_{t-2}
++
+\cdots
+\]
+
+for the zero-mean AR(1) model.
+
+Thus,
+
+\[
+\boxed{
+X_t
+=
+\sum_{j=0}^{\infty}
+\phi^j
+\varepsilon_{t-j}.
+}
+\]
+
+This representation explains stationarity when the coefficients decay
+sufficiently fast.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{AR(\(p\)) Operator Form}
+\label{subsec:arp-operator-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An AR(\(p\)) model may be written
+
+\[
+\boxed{
+\phi(B)X_t
+=
+c+\varepsilon_t,
+}
+\]
+
+where
+
+\[
+\boxed{
+\phi(B)
+=
+1
+-
+\phi_1B
+-
+\cdots
+-
+\phi_pB^p.
+}
+\]
+
+Stationarity depends on the roots of the autoregressive polynomial.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{AR Stationarity Condition}
+\label{subsec:ar-stationarity-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The AR(\(p\)) process is stationary when the roots of
+
+\[
+\boxed{
+1
+-
+\phi_1z
+-
+\cdots
+-
+\phi_pz^p
+=
+0
+}
+\]
+
+lie outside the unit circle:
+
+\[
+\boxed{
+|z|>1.
+}
+\]
+
+For AR(1), this reduces to
+
+\[
+\boxed{
+|\phi|<1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Yule--Walker Equations}
+\label{subsec:yule-walker}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a zero-mean stationary AR(\(p\)) process,
+
+\[
+X_t
+=
+\sum_{j=1}^{p}
+\phi_jX_{t-j}
++
+\varepsilon_t,
+\]
+
+multiply by \(X_{t-k}\) and take expectations.
+
+This gives
+
+\[
+\boxed{
+\gamma(k)
+=
+\sum_{j=1}^{p}
+\phi_j
+\gamma(k-j),
+\qquad
+k\geq1.
+}
+\]
+
+These are the Yule--Walker equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Yule--Walker Matrix Form}
+\label{subsec:yule-walker-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the first \(p\) equations,
+
+\[
+\boxed{
+\begin{pmatrix}
+\gamma(0)
+&
+\gamma(1)
+&
+\cdots
+&
+\gamma(p-1)
+\\
+\gamma(1)
+&
+\gamma(0)
+&
+\cdots
+&
+\gamma(p-2)
+\\
+\vdots
+&
+\vdots
+&
+\ddots
+&
+\vdots
+\\
+\gamma(p-1)
+&
+\gamma(p-2)
+&
+\cdots
+&
+\gamma(0)
+\end{pmatrix}
+\begin{pmatrix}
+\phi_1\\
+\phi_2\\
+\vdots\\
+\phi_p
+\end{pmatrix}
+=
+\begin{pmatrix}
+\gamma(1)\\
+\gamma(2)\\
+\vdots\\
+\gamma(p)
+\end{pmatrix}.
+}
+\]
+
+Sample autocovariances can be substituted to estimate AR parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Moving-Average Models}
+\label{subsec:moving-average-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A moving-average model expresses the current observation as a finite
+linear combination of present and past innovations.
+
+An MA(\(q\)) model is
+
+\[
+\boxed{
+X_t
+=
+\mu
++
+\varepsilon_t
++
+\theta_1\varepsilon_{t-1}
++
+\cdots
++
+\theta_q\varepsilon_{t-q}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MA(1) Model}
+\label{subsec:ma1-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A zero-mean MA(1) model is
+
+\[
+\boxed{
+X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1}.
+}
+\]
+
+Since it is a finite linear combination of white-noise terms, it is
+stationary for every finite \(\theta\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of an MA(1)}
+\label{subsec:ma1-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1},
+\]
+
+the variance is
+
+\[
+\boxed{
+\gamma(0)
+=
+\sigma_\varepsilon^2
+(
+1+\theta^2
+).
+}
+\]
+
+This follows from independence or zero covariance of innovations at
+different times.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MA(1) Autocovariance}
+\label{subsec:ma1-autocovariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At lag \(1\),
+
+\[
+\boxed{
+\gamma(1)
+=
+\theta
+\sigma_\varepsilon^2.
+}
+\]
+
+For
+
+\[
+|h|>1,
+\]
+
+there are no shared innovation terms, so
+
+\[
+\boxed{
+\gamma(h)=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MA(1) Autocorrelation}
+\label{subsec:ma1-autocorrelation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Therefore,
+
+\[
+\boxed{
+\rho(1)
+=
+\frac{
+\theta
+}{
+1+\theta^2
+},
+}
+\]
+
+and
+
+\[
+\boxed{
+\rho(h)=0
+\qquad
+|h|>1.
+}
+\]
+
+Thus the MA(1) ACF cuts off after lag \(1\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MA(\(q\)) ACF Pattern}
+\label{subsec:maq-acf-pattern}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an MA(\(q\)) process,
+
+\[
+\boxed{
+\rho(h)=0
+\qquad
+|h|>q.
+}
+\]
+
+Thus the theoretical ACF cuts off after lag \(q\).
+
+This provides a useful identification clue.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Invertibility}
+\label{subsec:ma-invertibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Invertibility allows an MA process to be expressed uniquely as an
+infinite autoregressive process.
+
+For MA(1),
+
+\[
+\boxed{
+X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1}.
+}
+\]
+
+The usual invertibility condition is
+
+\[
+\boxed{
+|\theta|<1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General MA Invertibility}
+\label{subsec:general-ma-invertibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\theta(B)
+=
+1
++
+\theta_1B
++
+\cdots
++
+\theta_qB^q,
+\]
+
+invertibility requires the roots of
+
+\[
+\boxed{
+\theta(z)=0
+}
+\]
+
+to lie outside the unit circle.
+
+This provides a unique and stable innovation representation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ARMA Models}
+\label{subsec:arma-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ARMA(\(p,q\)) model combines autoregressive and moving-average terms:
+
+\[
+\boxed{
+X_t
+=
+c
++
+\sum_{j=1}^{p}
+\phi_jX_{t-j}
++
+\varepsilon_t
++
+\sum_{k=1}^{q}
+\theta_k\varepsilon_{t-k}.
+}
+\]
+
+In operator form,
+
+\[
+\boxed{
+\phi(B)X_t
+=
+c
++
+\theta(B)\varepsilon_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ARMA Identification}
+\label{subsec:arma-identification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pure AR and MA models have characteristic ACF and PACF patterns.
+
+For ARMA models, both the ACF and PACF generally decay rather than cut off
+sharply.
+
+Therefore model identification usually combines:
+
+\[
+\boxed{
+\text{ACF},
+}
+\]
+
+\[
+\boxed{
+\text{PACF},
+}
+\]
+
+\[
+\boxed{
+\text{information criteria},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{residual diagnostics}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partial Autocorrelation Function}
+\label{subsec:partial-autocorrelation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The partial autocorrelation at lag \(h\) measures the linear association
+between
+
+\[
+X_t
+\]
+
+and
+
+\[
+X_{t-h}
+\]
+
+after accounting for the intermediate values
+
+\[
+X_{t-1},
+\ldots,
+X_{t-h+1}.
+\]
+
+It is abbreviated PACF.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PACF Interpretation}
+\label{subsec:pacf-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an AR(\(p\)) process, the theoretical PACF cuts off after lag \(p\).
+
+For an MA(\(q\)) process, the theoretical PACF generally decays.
+
+This complements the ACF behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic ACF and PACF Patterns}
+\label{subsec:acf-pacf-patterns}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common identification summary is:
+
+\[
+\begin{array}{c|c|c}
+\text{Model}
+&
+\text{ACF}
+&
+\text{PACF}
+\\
+\hline
+AR(p)
+&
+\text{decays}
+&
+\text{cuts off after }p
+\\
+MA(q)
+&
+\text{cuts off after }q
+&
+\text{decays}
+\\
+ARMA(p,q)
+&
+\text{decays}
+&
+\text{decays}
+\end{array}
+\]
+
+These are theoretical patterns, not exact finite-sample rules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ARIMA Models}
+\label{subsec:arima-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ARIMA stands for
+
+\[
+\boxed{
+\text{Autoregressive Integrated Moving Average}.
+}
+\]
+
+An ARIMA(\(p,d,q\)) model assumes that after differencing \(d\) times,
+the resulting series follows an ARMA(\(p,q\)) process.
+
+Symbolically,
+
+\[
+\boxed{
+\phi(B)
+(
+1-B
+)^d
+X_t
+=
+c
++
+\theta(B)\varepsilon_t.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Meaning of Integrated}
+\label{subsec:meaning-of-integrated-arima}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The term ``integrated'' refers to the fact that differencing reverses a
+cumulative or integrated behavior.
+
+For example, a random walk is ARIMA(\(0,1,0\)):
+
+\[
+\boxed{
+(1-B)X_t
+=
+\varepsilon_t.
+}
+\]
+
+Thus its first difference is white noise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: ARIMA Identification}
+\label{subsec:worked-arima-identification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Random Walk}
+
+Suppose
+
+\[
+X_t
+=
+X_{t-1}
++
+\varepsilon_t.
+\]
+
+Subtract \(X_{t-1}\):
+
+\[
+X_t-X_{t-1}
+=
+\varepsilon_t.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\Delta X_t
+=
+\varepsilon_t,
+}
+\]
+
+so the process is
+
+\[
+\boxed{
+ARIMA(0,1,0).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Seasonal ARIMA}
+\label{subsec:seasonal-arima}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A seasonal ARIMA model is commonly denoted
+
+\[
+\boxed{
+ARIMA
+(
+p,d,q
+)
+\times
+(
+P,D,Q
+)_s.
+}
+\]
+
+Here:
+
+\[
+p,d,q
+\]
+
+describe nonseasonal structure,
+
+while
+
+\[
+P,D,Q
+\]
+
+describe seasonal structure with period
+
+\[
+s.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Seasonal ARIMA Operator Form}
+\label{subsec:seasonal-arima-operator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A general multiplicative seasonal ARIMA model can be written
+
+\[
+\boxed{
+\Phi
+(
+B^s
+)
+\phi(B)
+(
+1-B
+)^d
+(
+1-B^s
+)^D
+X_t
+=
+\Theta
+(
+B^s
+)
+\theta(B)
+\varepsilon_t.
+}
+\]
+
+This notation compactly represents both ordinary and seasonal
+dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deterministic Trend}
+\label{subsec:deterministic-trend}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A deterministic trend model may be written
+
+\[
+\boxed{
+X_t
+=
+m(t)
++
+Y_t,
+}
+\]
+
+where
+
+\[
+m(t)
+\]
+
+is a deterministic function and
+
+\[
+Y_t
+\]
+
+is stationary.
+
+For a linear trend,
+
+\[
+\boxed{
+m(t)
+=
+\beta_0+\beta_1t.
+}
+\]
+
+Detrending can be performed by estimating and subtracting \(m(t)\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Trend}
+\label{subsec:stochastic-trend}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stochastic trend evolves through random shocks.
+
+The random walk
+
+\[
+X_t
+=
+X_{t-1}
++
+\varepsilon_t
+\]
+
+is the canonical example.
+
+Shocks have persistent effects because each innovation remains embedded
+in all future values.
+
+Differencing is often appropriate for stochastic trends.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Detrending Versus Differencing}
+\label{subsec:detrending-versus-differencing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For deterministic trends, regression on time may produce a stationary
+remainder.
+
+For stochastic trends, simply subtracting a deterministic trend may not
+remove the nonstationarity.
+
+Thus:
+
+\[
+\boxed{
+\text{deterministic trend}
+\rightarrow
+\text{detrending},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{unit-root-type stochastic trend}
+\rightarrow
+\text{differencing}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unit Roots}
+\label{subsec:unit-roots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+X_t
+=
+\phi X_{t-1}
++
+\varepsilon_t.
+\]
+
+When
+
+\[
+\boxed{
+\phi=1,
+}
+\]
+
+the autoregressive polynomial has a root on the unit circle.
+
+The process becomes a random walk:
+
+\[
+\boxed{
+X_t
+=
+X_{t-1}
++
+\varepsilon_t.
+}
+\]
+
+This is called a unit-root process.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Near Unit Roots}
+\label{subsec:near-unit-roots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\phi
+\]
+
+is close to \(1\), the process is stationary when
+
+\[
+|\phi|<1,
+\]
+
+but highly persistent.
+
+Autocorrelations decay slowly.
+
+Finite samples can make it difficult to distinguish a highly persistent
+stationary process from a true unit-root process.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unit-Root Testing Preview}
+\label{subsec:unit-root-testing-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common test considers
+
+\[
+H_0:
+\phi=1
+\]
+
+against
+
+\[
+H_A:
+|\phi|<1.
+\]
+
+Ordinary \(t\)-test reference distributions do not apply under the unit
+root null.
+
+Tests such as the Dickey--Fuller family use specialized nonstandard null
+distributions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spurious Regression}
+\label{subsec:spurious-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Regressing one unrelated nonstationary series on another can produce:
+
+\[
+\boxed{
+\text{high }R^2,
+}
+\]
+
+\[
+\boxed{
+\text{apparently significant coefficients},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{misleading relationships}.
+}
+\]
+
+This phenomenon is called spurious regression.
+
+Stationarity and cointegration must therefore be considered before
+interpreting time-series regressions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transformations}
+\label{subsec:time-series-transformations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Transformations can stabilize variance or simplify temporal structure.
+
+Common transformations include:
+
+\[
+\boxed{
+\log X_t,
+}
+\]
+
+\[
+\boxed{
+\sqrt{X_t},
+}
+\]
+
+or more generally
+
+\[
+\boxed{
+g(X_t).
+}
+\]
+
+The transformation should respect the domain and scientific meaning of
+the data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log Differences}
+\label{subsec:log-differences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For positive \(X_t\),
+
+\[
+\boxed{
+\Delta\log X_t
+=
+\log X_t
+-
+\log X_{t-1}
+=
+\log
+\left(
+\frac{
+X_t
+}{
+X_{t-1}
+}
+\right).
+}
+\]
+
+For small relative changes,
+
+\[
+\boxed{
+\Delta\log X_t
+\approx
+\frac{
+X_t-X_{t-1}
+}{
+X_{t-1}
+}.
+}
+\]
+
+Thus log differences approximate proportional growth rates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Box--Cox Transformation Preview}
+\label{subsec:box-cox-time-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For positive data, the Box--Cox family is
+
+\[
+\boxed{
+g_\lambda(x)
+=
+\begin{cases}
+\dfrac{x^\lambda-1}{\lambda},
+&
+\lambda\neq0,
+\\[1em]
+\log x,
+&
+\lambda=0.
+\end{cases}
+}
+\]
+
+It provides a systematic family for variance-stabilizing
+transformations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forecasting}
+\label{subsec:time-series-forecasting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A forecast predicts future observations using information available up to
+the present.
+
+Let
+
+\[
+\mathcal{F}_t
+\]
+
+represent information observed through time \(t\).
+
+Under squared-error loss, the optimal forecast of \(X_{t+h}\) is
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\mathbb{E}
+[
+X_{t+h}
+\mid
+\mathcal{F}_t
+].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forecast Error}
+\label{subsec:forecast-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(h\)-step-ahead forecast error is
+
+\[
+\boxed{
+e_{t+h\mid t}
+=
+X_{t+h}
+-
+\widehat{X}_{t+h\mid t}.
+}
+\]
+
+Its variance determines forecast uncertainty.
+
+As the forecast horizon increases, uncertainty often increases.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{One-Step Forecast for AR(1)}
+\label{subsec:ar1-one-step-forecast}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+X_t
+=
+c
++
+\phi X_{t-1}
++
+\varepsilon_t,
+\]
+
+the one-step forecast is
+
+\[
+\boxed{
+\widehat{X}_{t+1\mid t}
+=
+c
++
+\phi X_t.
+}
+\]
+
+The forecast error is
+
+\[
+\boxed{
+e_{t+1\mid t}
+=
+\varepsilon_{t+1}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+e_{t+1\mid t}
+)
+=
+\sigma_\varepsilon^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multi-Step AR(1) Forecast}
+\label{subsec:ar1-multistep-forecast}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a stationary AR(1) with mean \(\mu\),
+
+\[
+X_t-\mu
+=
+\phi
+(
+X_{t-1}-\mu
+)
++
+\varepsilon_t.
+\]
+
+The \(h\)-step forecast is
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\mu
++
+\phi^h
+(
+X_t-\mu
+).
+}
+\]
+
+As
+
+\[
+h\to\infty,
+\]
+
+if \(|\phi|<1\),
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+\to
+\mu.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{AR(1) Forecast Error Variance}
+\label{subsec:ar1-forecast-error-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the stationary AR(1),
+
+\[
+e_{t+h\mid t}
+=
+\sum_{j=0}^{h-1}
+\phi^j
+\varepsilon_{t+h-j}.
+\]
+
+Thus,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+=
+\sigma_\varepsilon^2
+\sum_{j=0}^{h-1}
+\phi^{2j}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+=
+\sigma_\varepsilon^2
+\frac{
+1-\phi^{2h}
+}{
+1-\phi^2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Long-Horizon AR(1) Forecast Uncertainty}
+\label{subsec:ar1-long-horizon-uncertainty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As
+
+\[
+h\to\infty,
+\]
+
+\[
+\phi^{2h}\to0
+\]
+
+for \(|\phi|<1\).
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+\to
+\frac{
+\sigma_\varepsilon^2
+}{
+1-\phi^2
+}.
+}
+\]
+
+This equals the unconditional stationary variance.
+
+At long horizons, current information becomes less useful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forecast Intervals}
+\label{subsec:forecast-intervals-time-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If forecast errors are approximately normal,
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+\pm
+z_{1-\alpha/2}
+\sqrt{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+}
+}
+\]
+
+gives an approximate forecast interval when model parameters are treated
+as known.
+
+In practice, parameter estimation adds additional uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forecasting a Random Walk}
+\label{subsec:random-walk-forecast}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+X_t
+=
+X_{t-1}
++
+\varepsilon_t,
+\]
+
+the optimal forecast is
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+=
+X_t.
+}
+\]
+
+The future value is the current value plus future innovations.
+
+The forecast error variance is
+
+\[
+\boxed{
+h\sigma_\varepsilon^2.
+}
+\]
+
+Thus forecast uncertainty grows without bound.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forecast Accuracy}
+\label{subsec:forecast-accuracy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Common forecast error measures include mean absolute error:
+
+\[
+\boxed{
+MAE
+=
+\frac1n
+\sum_{i=1}^{n}
+|e_i|,
+}
+\]
+
+and root mean squared error:
+
+\[
+\boxed{
+RMSE
+=
+\sqrt{
+\frac1n
+\sum_{i=1}^{n}
+e_i^2
+}.
+}
+\]
+
+Different measures penalize errors differently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean Absolute Percentage Error}
+\label{subsec:mape}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common scale-free measure is
+
+\[
+\boxed{
+MAPE
+=
+\frac{100}{n}
+\sum_{i=1}^{n}
+\left|
+\frac{
+e_i
+}{
+y_i
+}
+\right|.
+}
+\]
+
+MAPE can behave poorly when actual values are zero or close to zero.
+
+Thus it should not be used mechanically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Training and Test Periods}
+\label{subsec:time-series-training-test}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Forecast performance should be evaluated on future observations not used
+to estimate the model.
+
+Because time order matters, randomly shuffling observations is usually
+inappropriate.
+
+Instead, use an earlier training period and a later test period:
+
+\[
+\boxed{
+\text{past}
+\rightarrow
+\text{fit},
+}
+\]
+
+\[
+\boxed{
+\text{future}
+\rightarrow
+\text{evaluate}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rolling-Origin Evaluation}
+\label{subsec:rolling-origin-evaluation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rolling-origin evaluation repeatedly forecasts future observations from
+different historical cutoffs.
+
+For example:
+
+\[
+1{:}100
+\rightarrow
+101,
+\]
+
+\[
+1{:}101
+\rightarrow
+102,
+\]
+
+and so forth.
+
+This better reflects the sequential forecasting problem than random
+cross-validation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expanding and Rolling Windows}
+\label{subsec:expanding-rolling-windows}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An expanding window keeps all previous observations:
+
+\[
+\boxed{
+1{:}t.
+}
+\]
+
+A rolling window uses only the most recent \(w\) observations:
+
+\[
+\boxed{
+(t-w+1){:}t.
+}
+\]
+
+Rolling windows can adapt more quickly when the data-generating process
+changes over time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Exponential Smoothing}
+\label{subsec:simple-exponential-smoothing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a series with approximately constant level and no strong trend or
+seasonality, simple exponential smoothing updates the level as
+
+\[
+\boxed{
+\ell_t
+=
+\alpha X_t
++
+(1-\alpha)\ell_{t-1},
+}
+\]
+
+where
+
+\[
+0\leq\alpha\leq1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential Weighting}
+\label{subsec:exponential-weighting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Repeated substitution yields weights that decay geometrically into the
+past.
+
+Recent observations receive weights such as
+
+\[
+\alpha,
+\]
+
+\[
+\alpha(1-\alpha),
+\]
+
+\[
+\alpha(1-\alpha)^2,
+\]
+
+and so forth.
+
+Thus older observations receive exponentially smaller weights.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Exponential-Smoothing Forecast}
+\label{subsec:ses-forecast}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The forecast for all future horizons is
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\ell_t,
+\qquad
+h\geq1.
+}
+\]
+
+Thus the model forecasts a constant future level.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Holt's Linear Trend Method}
+\label{subsec:holt-linear-trend}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Holt's method extends exponential smoothing by maintaining both a level
+and a trend.
+
+A common form is
+
+\[
+\boxed{
+\ell_t
+=
+\alpha X_t
++
+(1-\alpha)
+(
+\ell_{t-1}+b_{t-1}
+),
+}
+\]
+
+\[
+\boxed{
+b_t
+=
+\beta
+(
+\ell_t-\ell_{t-1}
+)
++
+(1-\beta)b_{t-1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Holt Forecast}
+\label{subsec:holt-forecast}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(h\)-step forecast is
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\ell_t
++
+hb_t.
+}
+\]
+
+Thus the forecast extrapolates the estimated local trend.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Damped Trend Preview}
+\label{subsec:damped-trend}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Long-run extrapolation of a linear trend may be unrealistic.
+
+A damped-trend method uses a damping parameter
+
+\[
+0<\phi<1
+\]
+
+so trend contributions gradually decrease with forecast horizon.
+
+This often produces more conservative long-term forecasts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Holt--Winters Methods}
+\label{subsec:holt-winters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Holt--Winters methods extend exponential smoothing to include seasonal
+components.
+
+They maintain estimates of:
+
+\[
+\boxed{
+\text{level},
+}
+\]
+
+\[
+\boxed{
+\text{trend},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{seasonality}.
+}
+\]
+
+Additive and multiplicative seasonal versions are commonly used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Additive Versus Multiplicative Seasonality}
+\label{subsec:additive-multiplicative-seasonality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Additive seasonality is appropriate when seasonal fluctuations have
+roughly constant magnitude.
+
+Multiplicative seasonality is appropriate when seasonal variation grows
+with the level of the series.
+
+A log transformation can often convert multiplicative structure into an
+approximately additive form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Series Regression}
+\label{subsec:time-series-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A time-series regression may have the form
+
+\[
+\boxed{
+Y_t
+=
+\beta_0
++
+\beta_1X_{1t}
++
+\cdots
++
+\beta_pX_{pt}
++
+\varepsilon_t.
+}
+\]
+
+Unlike ordinary regression, the error sequence
+
+\[
+\varepsilon_t
+\]
+
+may be serially correlated.
+
+Ignoring that dependence can produce incorrect standard errors and
+forecast intervals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression with AR Errors}
+\label{subsec:regression-ar-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One model is
+
+\[
+\boxed{
+Y_t
+=
+\mathbf{x}_t^T
+\boldsymbol{\beta}
++
+u_t,
+}
+\]
+
+with
+
+\[
+\boxed{
+u_t
+=
+\phi u_{t-1}
++
+\varepsilon_t.
+}
+\]
+
+This combines regression on explanatory variables with autoregressive
+error structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Regression}
+\label{subsec:dynamic-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dynamic regression may include current and lagged predictors:
+
+\[
+\boxed{
+Y_t
+=
+\beta_0
++
+\beta_1X_t
++
+\beta_2X_{t-1}
++
+\phi Y_{t-1}
++
+\varepsilon_t.
+}
+\]
+
+Such models combine regression and time dependence.
+
+Care is required when variables are nonstationary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intervention Analysis Preview}
+\label{subsec:intervention-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An intervention represents a known event that may alter a series.
+
+For example, define
+
+\[
+I_t
+=
+\begin{cases}
+0,&t<T_0,\\
+1,&t\geq T_0.
+\end{cases}
+\]
+
+A model such as
+
+\[
+\boxed{
+X_t
+=
+\mu
++
+\beta I_t
++
+u_t
+}
+\]
+
+can represent a permanent level change while \(u_t\) follows a time-series
+model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pulse Intervention}
+\label{subsec:pulse-intervention}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A pulse intervention represents an effect occurring at one particular
+time:
+
+\[
+\boxed{
+P_t
+=
+\begin{cases}
+1,&t=T_0,\\
+0,&t\neq T_0.
+\end{cases}
+}
+\]
+
+It can represent unusual one-time events.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transfer-Function Models Preview}
+\label{subsec:transfer-function-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A transfer-function model describes how an input series affects an output
+series over time.
+
+One may write schematically
+
+\[
+\boxed{
+Y_t
+=
+\sum_{j=0}^{\infty}
+\omega_j
+X_{t-j}
++
+N_t,
+}
+\]
+
+where
+
+\[
+N_t
+\]
+
+is a noise process.
+
+The coefficients \(\omega_j\) describe delayed dynamic effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distributed-Lag Models}
+\label{subsec:distributed-lag-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A finite distributed-lag model is
+
+\[
+\boxed{
+Y_t
+=
+\alpha
++
+\beta_0X_t
++
+\beta_1X_{t-1}
++
+\cdots
++
+\beta_qX_{t-q}
++
+\varepsilon_t.
+}
+\]
+
+The total effect of a persistent one-unit change may involve
+
+\[
+\boxed{
+\sum_{j=0}^{q}\beta_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residuals}
+\label{subsec:time-series-residuals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After fitting a model, residuals are
+
+\[
+\boxed{
+e_t
+=
+X_t-\widehat{X}_t.
+}
+\]
+
+A good time-series model should leave residuals that behave approximately
+like unpredictable noise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual ACF}
+\label{subsec:residual-acf}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Residual autocorrelations should be small if the temporal dependence has
+been adequately modeled.
+
+Large residual ACF values indicate remaining structure.
+
+This may suggest:
+
+\[
+\boxed{
+\text{missing AR terms},
+}
+\]
+
+\[
+\boxed{
+\text{missing MA terms},
+}
+\]
+
+\[
+\boxed{
+\text{seasonality},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{structural change}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ljung--Box Test Preview}
+\label{subsec:ljung-box-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Ljung--Box statistic jointly evaluates several residual
+autocorrelations.
+
+For lags through \(m\),
+
+\[
+\boxed{
+Q
+=
+T(T+2)
+\sum_{h=1}^{m}
+\frac{
+\widehat{\rho}(h)^2
+}{
+T-h
+}.
+}
+\]
+
+Under suitable null conditions, \(Q\) has an approximate chi-square
+distribution with degrees of freedom adjusted for fitted model
+parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Selection}
+\label{subsec:time-series-model-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Time-series model selection should balance fit and complexity.
+
+Common tools include:
+
+\[
+\boxed{
+AIC,
+}
+\]
+
+\[
+\boxed{
+BIC,
+}
+\]
+
+\[
+\boxed{
+ACF/PACF patterns,
+}
+\]
+
+\[
+\boxed{
+residual diagnostics,
+}
+\]
+
+and
+
+\[
+\boxed{
+out-of-sample forecast performance.
+}
+\]
+
+No single criterion should be used blindly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Akaike Information Criterion}
+\label{subsec:time-series-aic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a model with maximized likelihood \(L\) and \(k\) estimated
+parameters,
+
+\[
+\boxed{
+AIC
+=
+-2\log L
++
+2k.
+}
+\]
+
+Smaller AIC values are preferred among models fit to the same data under
+comparable likelihood definitions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bayesian Information Criterion}
+\label{subsec:time-series-bic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Bayesian information criterion is
+
+\[
+\boxed{
+BIC
+=
+-2\log L
++
+k\log T.
+}
+\]
+
+BIC penalizes model complexity more strongly than AIC when \(T\) is
+sufficiently large.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State-Space Models}
+\label{subsec:state-space-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+State-space models describe an observed process through an unobserved
+state process.
+
+A linear Gaussian state-space model has:
+
+\[
+\boxed{
+\mathbf{x}_t
+=
+F\mathbf{x}_{t-1}
++
+\mathbf{w}_t
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbf{y}_t
+=
+H\mathbf{x}_t
++
+\mathbf{v}_t.
+}
+\]
+
+The first is the state equation.
+
+The second is the observation equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Latent States}
+\label{subsec:latent-states}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The state
+
+\[
+\mathbf{x}_t
+\]
+
+represents unobserved system information at time \(t\).
+
+Examples include:
+
+\[
+\boxed{
+\text{underlying level},
+}
+\]
+
+\[
+\boxed{
+\text{trend},
+}
+\]
+
+\[
+\boxed{
+\text{velocity},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{hidden economic condition}.
+}
+\]
+
+Observed data provide noisy information about these states.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kalman Filter Preview}
+\label{subsec:kalman-filter-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Kalman filter recursively estimates latent states in a linear
+Gaussian state-space model.
+
+Each step has two broad stages:
+
+\[
+\boxed{
+\text{prediction}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{update}.
+}
+\]
+
+The prediction uses the previous state estimate.
+
+The update incorporates the new observation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kalman Prediction Step}
+\label{subsec:kalman-prediction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\widehat{\mathbf{x}}_{t-1\mid t-1}
+\]
+
+is the filtered state estimate, the predicted state is
+
+\[
+\boxed{
+\widehat{\mathbf{x}}_{t\mid t-1}
+=
+F
+\widehat{\mathbf{x}}_{t-1\mid t-1}.
+}
+\]
+
+The covariance is also propagated through the state equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kalman Update Idea}
+\label{subsec:kalman-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The observed value
+
+\[
+\mathbf{y}_t
+\]
+
+is compared with its prediction.
+
+The difference is the innovation:
+
+\[
+\boxed{
+\mathbf{v}_t
+=
+\mathbf{y}_t
+-
+H
+\widehat{\mathbf{x}}_{t\mid t-1}.
+}
+\]
+
+The state estimate is corrected using a matrix called the Kalman gain.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Structural Time-Series Models}
+\label{subsec:structural-time-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+State-space models can represent structural components such as:
+
+\[
+\boxed{
+\text{local level},
+}
+\]
+
+\[
+\boxed{
+\text{local trend},
+}
+\]
+
+\[
+\boxed{
+\text{seasonality},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{regression effects}.
+}
+\]
+
+This provides an alternative framework to classical ARIMA modeling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Time Series}
+\label{subsec:multivariate-time-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multivariate time series is a vector process
+
+\[
+\boxed{
+\mathbf{X}_t
+=
+\begin{pmatrix}
+X_{1t}\\
+\vdots\\
+X_{pt}
+\end{pmatrix}.
+}
+\]
+
+Now dependence can occur:
+
+\[
+\boxed{
+\text{across time}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{across variables}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vector Autoregression}
+\label{subsec:vector-autoregression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A VAR(\(p\)) model is
+
+\[
+\boxed{
+\mathbf{X}_t
+=
+\mathbf{c}
++
+A_1
+\mathbf{X}_{t-1}
++
+\cdots
++
+A_p
+\mathbf{X}_{t-p}
++
+\boldsymbol{\varepsilon}_t.
+}
+\]
+
+Each variable may depend on past values of all variables in the system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{VAR(1)}
+\label{subsec:var1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A VAR(1) model is
+
+\[
+\boxed{
+\mathbf{X}_t
+=
+\mathbf{c}
++
+A
+\mathbf{X}_{t-1}
++
+\boldsymbol{\varepsilon}_t.
+}
+\]
+
+Its stability depends on the eigenvalues of \(A\).
+
+A standard stationarity condition is
+
+\[
+\boxed{
+|\lambda_j(A)|<1
+}
+\]
+
+for every eigenvalue \(\lambda_j(A)\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cross-Covariance}
+\label{subsec:cross-covariance-time-series}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two component series \(X_t\) and \(Y_t\), the cross-covariance at lag
+\(h\) is
+
+\[
+\boxed{
+\gamma_{XY}(h)
+=
+\operatorname{Cov}
+(
+X_t,
+Y_{t-h}
+).
+}
+\]
+
+Unlike ordinary autocovariance,
+
+\[
+\gamma_{XY}(h)
+\]
+
+need not be symmetric in \(h\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Granger Causality Preview}
+\label{subsec:granger-causality-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A series \(X_t\) is said to Granger-cause \(Y_t\) if past values of \(X\)
+improve prediction of \(Y\) beyond information already contained in past
+values of \(Y\) and other included variables.
+
+This is a predictive concept.
+
+It does not by itself establish structural or scientific causation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cointegration}
+\label{subsec:cointegration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Two nonstationary series may move together so that a particular linear
+combination is stationary.
+
+Suppose \(X_t\) and \(Y_t\) are individually nonstationary, but
+
+\[
+\boxed{
+Y_t-\beta X_t
+}
+\]
+
+is stationary.
+
+Then the series are cointegrated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Cointegration Matters}
+\label{subsec:why-cointegration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Differencing removes long-run level information.
+
+Cointegration identifies situations where nonstationary variables share a
+stable long-run relationship.
+
+Thus a model can represent:
+
+\[
+\boxed{
+\text{short-run dynamics}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{long-run equilibrium}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Error-Correction Model Preview}
+\label{subsec:error-correction-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple error-correction model may have the form
+
+\[
+\boxed{
+\Delta Y_t
+=
+\alpha
+(
+Y_{t-1}
+-
+\beta X_{t-1}
+)
++
+\gamma
+\Delta X_t
++
+\varepsilon_t.
+}
+\]
+
+The term
+
+\[
+Y_{t-1}-\beta X_{t-1}
+\]
+
+measures deviation from the long-run relationship.
+
+The coefficient \(\alpha\) controls adjustment toward equilibrium.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Frequency-Domain View}
+\label{subsec:frequency-domain-view}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Time-domain methods describe dependence through lags.
+
+Frequency-domain methods describe a series through oscillations at
+different frequencies.
+
+Thus the same stochastic behavior can often be studied through:
+
+\[
+\boxed{
+\text{time}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{frequency}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sinusoidal Components}
+\label{subsec:sinusoidal-components}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sinusoidal component has the form
+
+\[
+\boxed{
+A
+\cos
+(
+\omega t+\phi
+),
+}
+\]
+
+where
+
+\[
+A
+=
+\text{amplitude},
+\]
+
+\[
+\omega
+=
+\text{angular frequency},
+\]
+
+and
+
+\[
+\phi
+=
+\text{phase}.
+\]
+
+Repeated cycles in time correspond to concentrated energy at particular
+frequencies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectral Density}
+\label{subsec:spectral-density}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a weakly stationary process with autocovariance function
+\(\gamma(h)\), the spectral density is formally
+
+\[
+\boxed{
+f(\omega)
+=
+\frac1{2\pi}
+\sum_{h=-\infty}^{\infty}
+\gamma(h)
+e^{-i\omega h},
+}
+\]
+
+when the series converges appropriately.
+
+It is the Fourier transform of the autocovariance function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse Spectral Relation}
+\label{subsec:inverse-spectral-relation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The autocovariance can be recovered from the spectral density:
+
+\[
+\boxed{
+\gamma(h)
+=
+\int_{-\pi}^{\pi}
+e^{i\omega h}
+f(\omega)
+\,d\omega.
+}
+\]
+
+Thus autocovariance and spectrum provide two equivalent descriptions of
+stationary second-order dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectrum of White Noise}
+\label{subsec:white-noise-spectrum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For white noise,
+
+\[
+\gamma(0)
+=
+\sigma_\varepsilon^2
+\]
+
+and
+
+\[
+\gamma(h)=0
+\qquad
+h\neq0.
+\]
+
+Therefore,
+
+\[
+\boxed{
+f(\omega)
+=
+\frac{
+\sigma_\varepsilon^2
+}{
+2\pi
+}.
+}
+\]
+
+The spectrum is constant across frequencies.
+
+This motivates the term ``white'' noise by analogy with white light.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Periodogram Preview}
+\label{subsec:periodogram-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The periodogram estimates how sample variation is distributed across
+frequencies.
+
+A common form is
+
+\[
+\boxed{
+I(\omega)
+=
+\frac1{2\pi T}
+\left|
+\sum_{t=1}^{T}
+X_t
+e^{-i\omega t}
+\right|^2.
+}
+\]
+
+Large peaks may indicate strong periodic components.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Varying Behavior}
+\label{subsec:time-varying-behavior}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Real series may change behavior over time.
+
+Examples include:
+
+\[
+\boxed{
+\text{changing mean},
+}
+\]
+
+\[
+\boxed{
+\text{changing variance},
+}
+\]
+
+\[
+\boxed{
+\text{changing AR coefficients},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{structural breaks}.
+}
+\]
+
+Stationary models may then provide only local approximations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Structural Breaks}
+\label{subsec:structural-breaks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A structural break is a persistent change in the data-generating process.
+
+For example,
+
+\[
+\boxed{
+\mu_t
+=
+\begin{cases}
+\mu_1,&t<T_0,\\
+\mu_2,&t\geq T_0.
+\end{cases}
+}
+\]
+
+Ignoring such a change can produce misleading estimates and forecasts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Volatility Clustering Preview}
+\label{subsec:volatility-clustering}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some time series have little autocorrelation in their levels but strong
+dependence in their squared values.
+
+Large fluctuations tend to be followed by large fluctuations.
+
+This is called volatility clustering.
+
+It motivates models such as ARCH and GARCH.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ARCH Model Preview}
+\label{subsec:arch-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ARCH(\(q\)) model allows conditional variance to depend on past squared
+innovations:
+
+\[
+\boxed{
+\sigma_t^2
+=
+\alpha_0
++
+\alpha_1
+\varepsilon_{t-1}^2
++
+\cdots
++
+\alpha_q
+\varepsilon_{t-q}^2.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\varepsilon_t
+=
+\sigma_tZ_t,
+}
+\]
+
+where \(Z_t\) is often standardized white noise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{GARCH Model Preview}
+\label{subsec:garch-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A GARCH(\(p,q\)) model also includes past conditional variances:
+
+\[
+\boxed{
+\sigma_t^2
+=
+\alpha_0
++
+\sum_{i=1}^{q}
+\alpha_i
+\varepsilon_{t-i}^2
++
+\sum_{j=1}^{p}
+\beta_j
+\sigma_{t-j}^2.
+}
+\]
+
+GARCH models are widely used for financial volatility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Series Modeling Workflow}
+\label{subsec:time-series-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item plot the data against time;
+    \item identify trend and seasonal structure;
+    \item inspect changes in variability;
+    \item transform the data if scientifically appropriate;
+    \item assess stationarity;
+    \item remove deterministic trend or difference as needed;
+    \item inspect the ACF and PACF;
+    \item identify candidate models;
+    \item estimate model parameters;
+    \item compare model-selection criteria;
+    \item inspect residuals;
+    \item inspect residual ACF;
+    \item test for remaining serial dependence when useful;
+    \item evaluate forecasts using future observations;
+    \item quantify forecast uncertainty;
+    \item revise the model if important residual structure remains.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:time-series-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Treating Time-Series Observations as Independent}
+
+Serial dependence changes estimator uncertainty.
+
+Ordinary independent-sample formulas may substantially underestimate or
+overestimate standard errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Time Order}
+
+Randomly rearranging a time series destroys dependence and temporal
+structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Randomly Splitting Time-Series Training and Test Data}
+
+Random splitting can allow future observations to influence models used
+to predict the past.
+
+Use time-respecting validation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Trend with Autocorrelation}
+
+A strong deterministic trend can produce large sample autocorrelations
+even if residuals around the trend are independent.
+
+Trend should be handled before interpreting stationary dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Differencing Every Series Automatically}
+
+Differencing can remove useful long-run information and can introduce
+unnecessary moving-average structure.
+
+Use it only when justified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Failing to Difference a Unit-Root Process}
+
+Fitting stationary ARMA models directly to strongly unit-root
+nonstationary data can produce misleading inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Deterministic and Stochastic Trends}
+
+A deterministic trend may be removed by regression on time.
+
+A stochastic unit-root trend generally requires different treatment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Ordinary \(t\)-Critical Values for Unit-Root Tests}
+
+Unit-root null distributions are nonstandard.
+
+Specialized critical values are required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting ACF Cutoffs Too Literally}
+
+Sample ACF and PACF values are noisy.
+
+Finite-sample plots rarely display perfect theoretical patterns.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Seasonality}
+
+Seasonal dependence can remain even after ordinary differencing.
+
+Inspect seasonal lags.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Residual Autocorrelation}
+
+A fitted model with strongly autocorrelated residuals has not captured
+all predictable temporal structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using In-Sample Fit as Forecast Accuracy}
+
+A model can fit historical data very well and forecast poorly.
+
+Evaluate on future or rolling-origin observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Narrow Parameter Intervals Mean Narrow Forecast Intervals}
+
+Forecast uncertainty includes future random shocks in addition to
+parameter uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Structural Breaks}
+
+A model estimated from old observations may be irrelevant after a regime
+change.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Granger Causality as Scientific Causality}
+
+Granger causality is based on predictive improvement from lagged
+variables.
+
+It does not by itself establish intervention-based causation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Regressing Unrelated Nonstationary Series}
+
+Spurious regression can create apparently strong relationships between
+unrelated trending processes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Parameter Uncertainty in Forecasts}
+
+Simple theoretical forecast intervals often condition on estimated
+parameters as if known.
+
+Finite-sample forecast uncertainty may therefore be larger.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:time-series-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Environmental Science.}
+Temperature, rainfall, dissolved oxygen, salinity, and sensor
+measurements are often recorded repeatedly through time and exhibit
+seasonal and serial dependence.
+
+\medskip
+
+\textbf{Economics.}
+GDP, inflation, employment, interest rates, and other economic indicators
+are modeled using ARIMA, VAR, cointegration, and state-space methods.
+
+\medskip
+
+\textbf{Finance.}
+Asset prices, returns, and volatility require models for dependence,
+nonstationarity, and time-varying variance.
+
+\medskip
+
+\textbf{Engineering.}
+Sensor streams, vibration measurements, control systems, and reliability
+signals are naturally modeled as stochastic processes.
+
+\medskip
+
+\textbf{Business.}
+Sales, demand, inventory, call volume, and web traffic frequently require
+trend and seasonal forecasting.
+
+\medskip
+
+\textbf{Medicine.}
+Repeated physiological measurements, monitoring signals, and disease
+trajectories often exhibit temporal dependence.
+
+\medskip
+
+\textbf{Epidemiology.}
+Disease counts and incidence rates through time can contain trends,
+seasonality, interventions, and structural changes.
+
+\medskip
+
+\textbf{Operations.}
+Forecasts of arrivals, demand, workload, and resource usage support
+scheduling and inventory decisions.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:time-series-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a time series.
+\end{exercise}
+
+\begin{exercise}[1]
+Define lag.
+\end{exercise}
+
+\begin{exercise}[1]
+Define weak stationarity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the autocovariance function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the autocorrelation function.
+\end{exercise}
+
+\begin{exercise}[1]
+Define white noise.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an AR(1) process.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an MA(1) process.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an ARMA(\(p,q\)) process.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain the meaning of ARIMA(\(p,d,q\)).
+\end{exercise}
+
+\begin{exercise}[1]
+Define first differencing.
+\end{exercise}
+
+\begin{exercise}[1]
+Define seasonal differencing.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the PACF conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a forecast error.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+X_t
+=
+0.4X_{t-1}
++
+\varepsilon_t,
+\]
+
+determine whether the AR(1) process is stationary.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+X_t
+=
+1.2X_{t-1}
++
+\varepsilon_t,
+\]
+
+determine whether the AR(1) process is stationary.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+X_t
+=
+2
++
+0.5X_{t-1}
++
+\varepsilon_t.
+\]
+
+Find the stationary mean.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose an AR(1) has
+
+\[
+\phi=0.8
+\]
+
+and
+
+\[
+\sigma_\varepsilon^2=9.
+\]
+
+Find the stationary variance.
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous AR(1), compute
+
+\[
+\rho(1),
+\quad
+\rho(2),
+\quad
+\rho(3).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+X_t
+=
+\varepsilon_t
++
+0.5\varepsilon_{t-1}.
+\]
+
+Find the variance.
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous MA(1), compute \(\rho(1)\).
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous MA(1), find \(\rho(2)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Classify a random walk as an ARIMA model.
+\end{exercise}
+
+\begin{exercise}[2]
+Write
+
+\[
+X_t-X_{t-12}
+\]
+
+using the backshift operator.
+\end{exercise}
+
+\begin{exercise}[2]
+Expand
+
+\[
+(1-B)^2X_t.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+For a monthly series with annual seasonality, state the seasonal period.
+\end{exercise}
+
+\begin{exercise}[2]
+If the AR(1) stationary mean is \(\mu=20\), \(\phi=0.7\), and
+\(X_t=25\), find the one-step forecast.
+\end{exercise}
+
+\begin{exercise}[2]
+For the previous model, find the two-step forecast.
+\end{exercise}
+
+\begin{exercise}[2]
+For a random walk with innovation variance \(4\), find the variance of a
+five-step forecast error.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose simple exponential smoothing uses
+
+\[
+\alpha=0.3,
+\]
+
+with
+
+\[
+X_t=20,
+\qquad
+\ell_{t-1}=18.
+\]
+
+Find \(\ell_t\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the stationary mean of an AR(1) process.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the stationary variance of an AR(1) process.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+\rho(h)
+=
+\phi^{|h|}
+\]
+
+for a stationary AR(1).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the infinite moving-average representation of a stationary AR(1).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the variance of an MA(1) process.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the lag-one autocorrelation of an MA(1).
+\end{exercise}
+
+\begin{exercise}[3]
+Show that an MA(1) has zero autocorrelation beyond lag \(1\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between stationarity and invertibility.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Yule--Walker equations for an AR(2) process.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the PACF of an AR(\(p\)) process cuts off after lag \(p\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the ACF of an MA(\(q\)) process cuts off after lag \(q\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why differencing removes a random-walk stochastic trend.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare deterministic detrending and stochastic differencing.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a unit-root test does not use the usual \(t\)-distribution.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why two unrelated random walks can produce spurious regression.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the one-step AR(1) forecast.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the \(h\)-step AR(1) forecast.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the AR(1) \(h\)-step forecast error variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why random-walk forecast uncertainty grows with horizon.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why time-series validation should preserve temporal ordering.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare expanding-window and rolling-window forecasting.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that exponential-smoothing weights decay geometrically.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain when additive seasonality is more suitable than multiplicative
+seasonality.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why residual autocorrelation indicates model inadequacy.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between an intervention variable and ordinary
+random noise.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the distinction between VAR and univariate AR models.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the meaning of cointegration.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Granger causality is not equivalent to scientific causality.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that white noise has a constant spectral density.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the stationary solution of a general AR(\(p\)) process under its
+root condition.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the causal MA(\(\infty\)) representation of ARMA models.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive invertibility conditions for MA(\(q\)) processes.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Yule--Walker estimator for AR(\(p\)) parameters.
+\end{exercise}
+
+\begin{exercise}[4]
+Study maximum likelihood estimation for Gaussian ARMA models.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate innovations algorithms for ARMA models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Dickey--Fuller and augmented Dickey--Fuller unit-root tests.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate KPSS-type stationarity tests.
+\end{exercise}
+
+\begin{exercise}[4]
+Study seasonal unit roots.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive properties of seasonal ARIMA models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study forecast distributions with parameter uncertainty.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate optimal forecast combinations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Kalman filter equations for a linear Gaussian state-space
+model.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the local-level model as a state-space process.
+\end{exercise}
+
+\begin{exercise}[4]
+Study vector autoregression estimation.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate impulse-response functions in VAR models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Granger-causality tests in VAR systems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study cointegration and error-correction models.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the Engle--Granger cointegration procedure.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Johansen cointegration framework.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Wiener--Khinchin relationship between autocovariance and
+spectral density.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the periodogram and its statistical properties.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate ARCH and GARCH models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study change-point and structural-break models.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:time-series-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A time series is an ordered stochastic process
+
+\[
+\boxed{
+\{X_t\}.
+}
+\]
+
+For a weakly stationary process,
+
+\[
+\boxed{
+\mathbb{E}[X_t]=\mu,
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+)
+=
+\gamma(h).
+}
+\]
+
+The autocorrelation function is
+
+\[
+\boxed{
+\rho(h)
+=
+\frac{
+\gamma(h)
+}{
+\gamma(0)
+}.
+}
+\]
+
+White noise satisfies
+
+\[
+\boxed{
+\gamma(h)=0
+\qquad
+h\neq0.
+}
+\]
+
+A stationary AR(1) process is
+
+\[
+\boxed{
+X_t
+=
+c
++
+\phi X_{t-1}
++
+\varepsilon_t,
+\qquad
+|\phi|<1.
+}
+\]
+
+Its mean is
+
+\[
+\boxed{
+\mu
+=
+\frac{
+c
+}{
+1-\phi
+},
+}
+\]
+
+and its autocorrelation is
+
+\[
+\boxed{
+\rho(h)
+=
+\phi^{|h|}.
+}
+\]
+
+An MA(1) process is
+
+\[
+\boxed{
+X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1},
+}
+\]
+
+with autocorrelation
+
+\[
+\boxed{
+\rho(1)
+=
+\frac{
+\theta
+}{
+1+\theta^2
+}
+}
+\]
+
+and
+
+\[
+\boxed{
+\rho(h)=0
+\qquad
+|h|>1.
+}
+\]
+
+ARIMA models combine autoregression, differencing, and moving-average
+structure:
+
+\[
+\boxed{
+ARIMA(p,d,q).
+}
+\]
+
+Forecasting uses conditional expectation:
+
+\[
+\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\mathbb{E}
+[
+X_{t+h}
+\mid
+\mathcal{F}_t
+].
+}
+\]
+
+Time series analysis therefore combines
+
+\[
+\boxed{
+\text{probability}
++
+\text{stochastic processes}
++
+\text{regression}
++
+\text{difference equations}
++
+\text{forecasting}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:time-series-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Time Series Analysis applies the stochastic-process ideas developed in
+Chapter~\ref{chap:probability} to ordered statistical observations.
+Autoregressive models are stochastic difference equations, while ARIMA
+models combine autoregressive dynamics, differencing, and innovations.
+Regression models can be extended to include serially correlated errors,
+lagged predictors, and interventions. State-space models connect time
+series with dynamical systems and filtering, while vector autoregressions
+extend the framework to multivariate processes. The next section,
+Spatial Statistics, studies dependence indexed by geographic or spatial
+location rather than primarily by time.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.15 Time Series Analysis
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard time-series theory.
+%   - Standard stochastic-process and forecasting methods.
+%   - Standard ARIMA and state-space concepts.
+%
+% Used for:
+%   - time-series structure;
+%   - trend, seasonality, cycles, and irregular variation;
+%   - additive and multiplicative decomposition;
+%   - lag;
+%   - weak and strict stationarity;
+%   - autocovariance;
+%   - autocorrelation;
+%   - sample ACF;
+%   - white noise;
+%   - random walks;
+%   - differencing;
+%   - seasonal differencing;
+%   - backshift operators;
+%   - autoregressive models;
+%   - AR(1) mean, variance, and ACF;
+%   - AR stationarity conditions;
+%   - Yule--Walker equations;
+%   - moving-average models;
+%   - MA(1) variance and ACF;
+%   - invertibility;
+%   - ARMA models;
+%   - PACF;
+%   - ARIMA models;
+%   - seasonal ARIMA;
+%   - deterministic and stochastic trends;
+%   - unit roots;
+%   - spurious regression;
+%   - transformations;
+%   - forecasting;
+%   - forecast errors and intervals;
+%   - exponential smoothing;
+%   - Holt and Holt--Winters methods;
+%   - time-series regression;
+%   - dynamic regression;
+%   - intervention analysis;
+%   - transfer functions;
+%   - residual diagnostics;
+%   - Ljung--Box tests;
+%   - AIC and BIC;
+%   - state-space models;
+%   - Kalman filter preview;
+%   - multivariate time series;
+%   - VAR models;
+%   - cross-covariance;
+%   - Granger causality preview;
+%   - cointegration;
+%   - error-correction models;
+%   - frequency-domain analysis;
+%   - spectral density;
+%   - periodograms;
+%   - structural breaks;
+%   - ARCH and GARCH previews;
+%   - applications and exercises.
+%
+% Notes:
+%   - Spatial Statistics is developed next in Section 8.16.
+%   - Stochastic Processes in Chapter 7 provides the underlying
+%     probability theory.
+%   - Differential Equations and Dynamical Systems later develops
+%     deterministic and stochastic dynamical models more deeply.
+%   - Computational Statistics later develops numerical forecasting,
+%     simulation, and state-estimation methods.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

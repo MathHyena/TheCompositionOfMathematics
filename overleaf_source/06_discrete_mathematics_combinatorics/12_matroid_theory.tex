@@ -1,0 +1,3513 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 6.12 MATROID THEORY
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Matroid Theory}
+\label{sec:matroid-theory}
+
+\prerequisite{
+Sets, functions, graph theory, trees, spanning trees, linear
+independence, vector spaces, finite fields, basic combinatorics,
+optimization, and familiarity with rank and dimension.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of matroid theory;
+    \item define a matroid using independent sets;
+    \item verify the hereditary and exchange axioms;
+    \item identify dependent sets, bases, circuits, and rank;
+    \item understand graphic and vector matroids;
+    \item work with uniform and partition matroids;
+    \item recognize spanning sets, closure, and flats;
+    \item define the rank function of a matroid;
+    \item use rank axioms and submodularity;
+    \item understand basis exchange;
+    \item define matroid duality;
+    \item identify cocircuits and cobases;
+    \item perform deletion and contraction;
+    \item understand matroid minors;
+    \item recognize representable matroids;
+    \item understand binary matroids;
+    \item connect matroids with projective geometry;
+    \item understand the greedy algorithm characterization of matroids;
+    \item formulate maximum-weight basis problems;
+    \item recognize the Tutte polynomial of a matroid;
+    \item understand direct sums and connectedness;
+    \item recognize matroid intersection and union problems;
+    \item connect matroid theory with graphs, linear algebra, geometry,
+          optimization, coding theory, and design theory.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Matroids?}
+\label{subsec:why-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many different areas of mathematics contain a notion of
+\emph{independence}.
+
+In linear algebra, a set of vectors may be linearly independent.
+
+In graph theory, a set of edges may contain no cycle.
+
+In combinatorics, one may choose objects subject to compatibility
+constraints.
+
+These ideas look different, but they satisfy strikingly similar
+structural rules.
+
+Matroid theory abstracts these common properties.
+
+The central idea is
+
+\[
+\boxed{
+\text{matroid}
+=
+\text{abstract theory of independence}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent-Set Definition}
+\label{subsec:matroid-independent-definition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Matroid}
+A matroid is a pair
+
+\[
+\boxed{
+M=(E,\mathcal{I}),
+}
+\]
+
+where \(E\) is a finite ground set and
+
+\[
+\mathcal{I}\subseteq\mathcal{P}(E)
+\]
+
+is a family of subsets called independent sets satisfying:
+
+\begin{enumerate}
+    \item
+    \[
+    \varnothing\in\mathcal{I};
+    \]
+
+    \item if
+    \[
+    I\in\mathcal{I}
+    \]
+    and
+    \[
+    J\subseteq I,
+    \]
+    then
+    \[
+    J\in\mathcal{I};
+    \]
+
+    \item if
+    \[
+    I,J\in\mathcal{I}
+    \]
+    and
+    \[
+    |I|<|J|,
+    \]
+    then there exists
+    \[
+    e\in J\setminus I
+    \]
+    such that
+    \[
+    I\cup\{e\}\in\mathcal{I}.
+    \]
+\end{enumerate}
+\end{definitionbox}
+
+The third condition is called the exchange axiom.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Ground Set}
+\label{subsec:matroid-ground-set}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The set
+
+\[
+E
+\]
+
+is called the ground set.
+
+Its elements depend on the application.
+
+For example:
+
+\begin{itemize}
+    \item in a graph matroid, \(E\) is a set of graph edges;
+    \item in a vector matroid, \(E\) indexes vectors;
+    \item in a partition matroid, \(E\) is divided into categories.
+\end{itemize}
+
+The matroid structure determines which subsets of \(E\) are considered
+independent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Hereditary Axiom}
+\label{subsec:matroid-hereditary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The hereditary axiom states:
+
+\[
+\boxed{
+I\in\mathcal{I}
+\text{ and }
+J\subseteq I
+\Longrightarrow
+J\in\mathcal{I}.
+}
+\]
+
+Thus removing elements from an independent set cannot create
+dependence.
+
+This matches both:
+
+\[
+\text{linear independence}
+\]
+
+and
+
+\[
+\text{acyclic edge sets}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Exchange Axiom}
+\label{subsec:matroid-exchange}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+I,J\in\mathcal{I}
+\]
+
+with
+
+\[
+|I|<|J|.
+\]
+
+The exchange axiom guarantees that some element of \(J\) can be added
+to \(I\) while preserving independence.
+
+Thus a smaller independent set can always be enlarged toward a larger
+one.
+
+This axiom produces the remarkable uniformity of maximal independent
+sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dependent Sets}
+\label{subsec:matroid-dependent-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A subset
+
+\[
+D\subseteq E
+\]
+
+is dependent if
+
+\[
+D\notin\mathcal{I}.
+\]
+
+By the hereditary axiom, every superset of a dependent set is also
+dependent.
+
+Thus dependence propagates upward under inclusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bases}
+\label{subsec:matroid-bases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Basis of a Matroid}
+A basis is a maximal independent subset of \(E\).
+\end{definitionbox}
+
+Thus \(B\subseteq E\) is a basis when:
+
+\[
+B\in\mathcal{I}
+\]
+
+but
+
+\[
+B\cup\{e\}\notin\mathcal{I}
+\]
+
+for every
+
+\[
+e\in E\setminus B.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{All Bases Have the Same Size}
+\label{subsec:all-bases-same-size}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}
+Every basis of a finite matroid has the same cardinality.
+\end{theorem}
+
+Suppose \(B_1\) and \(B_2\) are bases.
+
+If
+
+\[
+|B_1|<|B_2|,
+\]
+
+the exchange axiom would allow some
+
+\[
+e\in B_2\setminus B_1
+\]
+
+to be added to \(B_1\) while preserving independence.
+
+This contradicts maximality of \(B_1\).
+
+Therefore,
+
+\[
+\boxed{
+|B_1|=|B_2|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank of a Matroid}
+\label{subsec:matroid-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Rank}
+The rank of a matroid \(M\), written
+
+\[
+\boxed{
+r(M),
+}
+\]
+
+is the size of any basis of \(M\).
+\end{definitionbox}
+
+Since all bases have equal size, this is well-defined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank of a Subset}
+\label{subsec:rank-of-subset}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+A\subseteq E,
+\]
+
+define
+
+\[
+\boxed{
+r(A)
+=
+\max
+\{
+|I|:
+I\subseteq A,\;
+I\in\mathcal{I}
+\}.
+}
+\]
+
+Thus \(r(A)\) is the size of the largest independent subset contained
+in \(A\).
+
+In particular,
+
+\[
+\boxed{
+r(E)=r(M).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank Properties}
+\label{subsec:rank-properties-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The rank function satisfies:
+
+\[
+\boxed{
+0\leq r(A)\leq|A|;
+}
+\]
+
+if
+
+\[
+A\subseteq B,
+\]
+
+then
+
+\[
+\boxed{
+r(A)\leq r(B);
+}
+\]
+
+and
+
+\[
+\boxed{
+r(A\cup B)+r(A\cap B)
+\leq
+r(A)+r(B).
+}
+\]
+
+The final inequality is called submodularity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Submodularity}
+\label{subsec:matroid-submodularity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A set function \(f\) is submodular if
+
+\[
+\boxed{
+f(A)+f(B)
+\geq
+f(A\cup B)+f(A\cap B).
+}
+\]
+
+Submodularity may be interpreted as a discrete form of diminishing
+returns.
+
+Matroid rank is one of the most important examples of a submodular
+function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circuits}
+\label{subsec:matroid-circuits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Circuit}
+A circuit is a minimal dependent set.
+\end{definitionbox}
+
+Thus \(C\subseteq E\) is a circuit if:
+
+\[
+C
+\]
+
+is dependent, but every proper subset of \(C\) is independent.
+
+Circuits represent the smallest possible causes of dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circuit Characterization}
+\label{subsec:circuit-characterization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A set \(I\subseteq E\) is independent if and only if it contains no
+circuit.
+
+Therefore,
+
+\[
+\boxed{
+I\in\mathcal{I}
+\iff
+\text{\(I\) contains no circuit}.
+}
+\]
+
+This is analogous to graph theory, where an edge set is acyclic exactly
+when it contains no cycle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circuit Elimination}
+\label{subsec:circuit-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Circuits satisfy an important elimination property.
+
+If \(C_1\) and \(C_2\) are distinct circuits and
+
+\[
+e\in C_1\cap C_2,
+\]
+
+then there exists a circuit \(C_3\) satisfying
+
+\[
+\boxed{
+C_3
+\subseteq
+(C_1\cup C_2)\setminus\{e\}.
+}
+\]
+
+This is called the circuit elimination axiom.
+
+It provides an alternative axiomatization of matroids.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graphic Matroids}
+\label{subsec:graphic-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One of the most important examples comes from graphs.
+
+Let
+
+\[
+G=(V,E)
+\]
+
+be a finite graph.
+
+Define a subset of edges to be independent when it contains no cycle.
+
+Then
+
+\[
+\boxed{
+M(G)
+=
+(E,\mathcal{I})
+}
+\]
+
+is a matroid called the graphic matroid or cycle matroid of \(G\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent Sets in Graphic Matroids}
+\label{subsec:graphic-independent-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a graphic matroid:
+
+\[
+\boxed{
+I\subseteq E
+\text{ is independent}
+\iff
+I\text{ is a forest}.
+}
+\]
+
+Thus forests are exactly the independent sets.
+
+If \(G\) is connected, the bases are spanning trees.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bases of a Graphic Matroid}
+\label{subsec:graphic-matroid-bases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(G\) is connected.
+
+A maximal acyclic edge set is a spanning tree.
+
+Therefore,
+
+\[
+\boxed{
+\text{bases of }M(G)
+=
+\text{spanning trees of }G.
+}
+\]
+
+Since every spanning tree has
+
+\[
+|V|-1
+\]
+
+edges,
+
+\[
+\boxed{
+r(M(G))
+=
+|V|-1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graphic Matroid Rank}
+\label{subsec:graphic-matroid-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For any edge set
+
+\[
+A\subseteq E,
+\]
+
+let
+
+\[
+c(A)
+\]
+
+be the number of connected components of the spanning subgraph
+
+\[
+(V,A).
+\]
+
+Then
+
+\[
+\boxed{
+r(A)
+=
+|V|-c(A).
+}
+\]
+
+For the entire graph,
+
+\[
+\boxed{
+r(E)
+=
+|V|-c(G).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Circuits of a Graphic Matroid}
+\label{subsec:graphic-matroid-circuits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The minimal dependent edge sets in a graph are cycles.
+
+Therefore,
+
+\[
+\boxed{
+\text{circuits of }M(G)
+=
+\text{cycles of }G.
+}
+\]
+
+Thus the abstract word ``circuit'' was chosen to generalize graph
+cycles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Graphic Matroid}
+\label{subsec:worked-graphic-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Cycle Graph}
+
+Consider
+
+\[
+G=C_4.
+\]
+
+Its edge set contains four edges.
+
+Any set of at most three edges is acyclic.
+
+The entire four-edge set forms a cycle.
+
+Therefore the unique circuit is
+
+\[
+E(C_4).
+\]
+
+Any three-edge subset is a spanning tree and hence a basis.
+
+\begin{answerbox}
+\[
+\boxed{
+r(M(C_4))=3.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vector Matroids}
+\label{subsec:vector-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+v_1,\ldots,v_n
+\]
+
+be vectors over a field \(\mathbb{F}\).
+
+Take
+
+\[
+E=\{1,\ldots,n\}.
+\]
+
+Declare
+
+\[
+I\subseteq E
+\]
+
+independent when
+
+\[
+\{v_i:i\in I\}
+\]
+
+is linearly independent.
+
+This defines a matroid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Matroid}
+\label{subsec:linear-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Vector Matroid}
+The matroid defined by linear independence among a finite collection of
+vectors is called a vector matroid or linear matroid.
+\end{definitionbox}
+
+The exchange axiom follows from the familiar basis-exchange property of
+vector spaces.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix Representation}
+\label{subsec:matroid-matrix-representation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+A
+\]
+
+be a matrix over a field \(\mathbb{F}\).
+
+Label its columns by the elements of \(E\).
+
+A set of labels is independent when the corresponding columns are
+linearly independent.
+
+The resulting matroid is denoted informally by
+
+\[
+\boxed{
+M[A].
+}
+\]
+
+Different matrices can represent the same matroid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Vector Matroid}
+\label{subsec:worked-vector-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Three Vectors in \(\mathbb{R}^2\)}
+
+Consider
+
+\[
+v_1=
+\begin{pmatrix}
+1\\
+0
+\end{pmatrix},
+\qquad
+v_2=
+\begin{pmatrix}
+0\\
+1
+\end{pmatrix},
+\qquad
+v_3=
+\begin{pmatrix}
+1\\
+1
+\end{pmatrix}.
+\]
+
+Every pair is linearly independent.
+
+However,
+
+\[
+v_3=v_1+v_2.
+\]
+
+Therefore,
+
+\[
+\{1,2,3\}
+\]
+
+is dependent.
+
+It is minimal dependent, so it is a circuit.
+
+\begin{answerbox}
+\[
+\boxed{
+r(M)=2,
+\qquad
+\{1,2,3\}\text{ is a circuit}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Representable Matroids}
+\label{subsec:representable-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Representable Matroid}
+A matroid is representable over a field \(\mathbb{F}\) if it is
+isomorphic to a vector matroid represented by a matrix over
+\(\mathbb{F}\).
+\end{definitionbox}
+
+One may therefore ask:
+
+\[
+\boxed{
+\text{Over which fields is a given matroid representable?}
+}
+\]
+
+This is a central structural question.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Matroids}
+\label{subsec:binary-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid representable over
+
+\[
+\mathbb{F}_2
+\]
+
+is called binary.
+
+Thus a binary matroid can be represented by a matrix whose entries are
+
+\[
+0
+\]
+
+and
+
+\[
+1,
+\]
+
+with arithmetic performed modulo \(2\).
+
+Every graphic matroid is binary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ternary and Regular Matroids}
+\label{subsec:ternary-regular-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid representable over
+
+\[
+\mathbb{F}_3
+\]
+
+is called ternary.
+
+A matroid representable over every field is called regular.
+
+Thus,
+
+\[
+\boxed{
+\text{regular}
+\Longrightarrow
+\text{binary and ternary}.
+}
+\]
+
+Regular matroids occupy an important position between graph theory and
+linear algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uniform Matroids}
+\label{subsec:uniform-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Uniform Matroid}
+The uniform matroid
+
+\[
+\boxed{
+U_{r,n}
+}
+\]
+
+has ground set of size \(n\), and a subset is independent exactly when
+its size is at most \(r\).
+\end{definitionbox}
+
+Thus,
+
+\[
+\mathcal{I}
+=
+\{
+I\subseteq E:
+|I|\leq r
+\}.
+\]
+
+Every \(r\)-element subset is a basis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uniform Matroid Circuits}
+\label{subsec:uniform-matroid-circuits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In
+
+\[
+U_{r,n},
+\]
+
+every set of size at most \(r\) is independent.
+
+Therefore the minimal dependent sets have size
+
+\[
+r+1.
+\]
+
+Hence,
+
+\[
+\boxed{
+\text{circuits of }U_{r,n}
+=
+\binom{E}{r+1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partition Matroids}
+\label{subsec:partition-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the ground set is partitioned as
+
+\[
+E
+=
+E_1\sqcup E_2\sqcup\cdots\sqcup E_m.
+\]
+
+Choose nonnegative capacities
+
+\[
+r_1,\ldots,r_m.
+\]
+
+Declare \(I\subseteq E\) independent when
+
+\[
+\boxed{
+|I\cap E_j|
+\leq
+r_j
+}
+\]
+
+for every \(j\).
+
+This defines a partition matroid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Partition Matroid}
+\label{subsec:worked-partition-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Category Constraints}
+
+Suppose
+
+\[
+E=A\sqcup B\sqcup C
+\]
+
+and one may select:
+
+\[
+\text{at most }2\text{ elements from }A,
+\]
+
+\[
+\text{at most }1\text{ element from }B,
+\]
+
+and
+
+\[
+\text{at most }3\text{ elements from }C.
+\]
+
+Then the independent sets satisfy
+
+\[
+|I\cap A|\leq2,
+\]
+
+\[
+|I\cap B|\leq1,
+\]
+
+and
+
+\[
+|I\cap C|\leq3.
+\]
+
+\begin{answerbox}
+This independence system is a partition matroid of rank
+
+\[
+\boxed{
+2+1+3=6
+}
+\]
+
+provided each part contains at least its capacity.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Loops}
+\label{subsec:matroid-loops}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An element
+
+\[
+e\in E
+\]
+
+is a loop if
+
+\[
+\boxed{
+\{e\}
+}
+\]
+
+is dependent.
+
+Thus a loop belongs to no basis.
+
+In a vector matroid, a zero vector corresponds to a loop.
+
+In a graphic matroid, a graph loop corresponds to a matroid loop.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coloops}
+\label{subsec:matroid-coloops}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An element \(e\) is a coloop if it belongs to every basis.
+
+In a connected graph, a bridge is a coloop of the graphic matroid.
+
+Thus:
+
+\[
+\boxed{
+\text{graph bridge}
+\longleftrightarrow
+\text{matroid coloop}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Elements}
+\label{subsec:parallel-elements-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Two distinct nonloop elements \(e,f\) are parallel if
+
+\[
+\{e,f\}
+\]
+
+is a circuit.
+
+In a vector matroid, this means the corresponding nonzero vectors are
+scalar multiples.
+
+In a graphic matroid of a multigraph, parallel graph edges produce
+parallel matroid elements.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spanning Sets}
+\label{subsec:matroid-spanning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A set
+
+\[
+S\subseteq E
+\]
+
+is spanning if
+
+\[
+\boxed{
+r(S)=r(E).
+}
+\]
+
+Thus \(S\) contains enough elements to achieve the full rank of the
+matroid.
+
+A basis is simultaneously:
+
+\[
+\boxed{
+\text{independent}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{spanning}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closure}
+\label{subsec:matroid-closure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Closure}
+For \(A\subseteq E\), the closure of \(A\) is
+
+\[
+\boxed{
+\operatorname{cl}(A)
+=
+\{
+e\in E:
+r(A\cup\{e\})=r(A)
+\}.
+}
+\]
+\end{definitionbox}
+
+Thus the closure contains all elements that fail to increase the rank.
+
+This generalizes linear span.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closure in Vector Matroids}
+\label{subsec:closure-vector-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a vector matroid,
+
+\[
+e\in\operatorname{cl}(A)
+\]
+
+exactly when the vector corresponding to \(e\) lies in the linear span
+of the vectors corresponding to \(A\).
+
+Thus,
+
+\[
+\boxed{
+\text{matroid closure}
+\longleftrightarrow
+\text{linear span}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Closure in Graphic Matroids}
+\label{subsec:closure-graphic-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a graphic matroid,
+
+\[
+e=uv
+\]
+
+lies in the closure of \(A\) when \(u\) and \(v\) already lie in the
+same connected component of the graph \((V,A)\).
+
+Adding \(e\) then creates a cycle and does not increase rank.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Flats}
+\label{subsec:matroid-flats}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Flat}
+A flat is a set
+
+\[
+F\subseteq E
+\]
+
+satisfying
+
+\[
+\boxed{
+\operatorname{cl}(F)=F.
+}
+\]
+\end{definitionbox}
+
+Equivalently, adding any element outside \(F\) increases the rank.
+
+Flats generalize linear subspaces.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hyperplanes}
+\label{subsec:matroid-hyperplanes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A hyperplane is a maximal proper flat.
+
+If
+
+\[
+r(M)=r,
+\]
+
+then every hyperplane has rank
+
+\[
+\boxed{
+r-1.
+}
+\]
+
+This generalizes codimension-one subspaces in linear algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basis Exchange}
+\label{subsec:basis-exchange}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bases satisfy a powerful exchange rule.
+
+\begin{theorem}[Basis Exchange]
+If \(B_1\) and \(B_2\) are bases and
+
+\[
+e\in B_1\setminus B_2,
+\]
+
+then there exists
+
+\[
+f\in B_2\setminus B_1
+\]
+
+such that
+
+\[
+\boxed{
+(B_1-\{e\})\cup\{f\}
+}
+\]
+
+is also a basis.
+\end{theorem}
+
+This is one of the central structural properties of matroids.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Basis Exchange}
+\label{subsec:strong-basis-exchange}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stronger theorem states that one can choose \(f\) so that both
+
+\[
+(B_1-\{e\})\cup\{f\}
+\]
+
+and
+
+\[
+(B_2-\{f\})\cup\{e\}
+\]
+
+are bases.
+
+This reveals a strong symmetry among bases.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fundamental Circuits}
+\label{subsec:fundamental-circuits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(B\) be a basis and let
+
+\[
+e\notin B.
+\]
+
+Then
+
+\[
+B\cup\{e\}
+\]
+
+is dependent.
+
+It contains a unique circuit, called the fundamental circuit of \(e\)
+with respect to \(B\).
+
+Thus,
+
+\[
+\boxed{
+C(e,B)
+\subseteq
+B\cup\{e\}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dual Matroids}
+\label{subsec:dual-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Matroids possess a natural duality.
+
+\begin{definitionbox}{Dual Matroid}
+Let \(M\) be a matroid on ground set \(E\).
+
+The dual matroid
+
+\[
+\boxed{
+M^*
+}
+\]
+
+has as bases the complements of the bases of \(M\):
+
+\[
+\boxed{
+\mathcal{B}(M^*)
+=
+\{
+E\setminus B:
+B\in\mathcal{B}(M)
+\}.
+}
+\]
+\end{definitionbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank of the Dual}
+\label{subsec:dual-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+|E|=n
+\]
+
+and
+
+\[
+r(M)=r,
+\]
+
+then every basis of \(M^*\) has size
+
+\[
+n-r.
+\]
+
+Therefore,
+
+\[
+\boxed{
+r(M^*)
+=
+|E|-r(M).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dual Rank Formula}
+\label{subsec:dual-rank-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+A\subseteq E,
+\]
+
+the dual rank satisfies
+
+\[
+\boxed{
+r_{M^*}(A)
+=
+|A|
+-r_M(E)
++
+r_M(E\setminus A).
+}
+\]
+
+This formula allows dual properties to be derived from the original
+rank function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cobases and Cocircuits}
+\label{subsec:cobases-cocircuits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basis of the dual matroid is sometimes called a cobasis of \(M\).
+
+A circuit of \(M^*\) is called a cocircuit of \(M\).
+
+Thus,
+
+\[
+\boxed{
+\text{cocircuit of }M
+=
+\text{circuit of }M^*.
+}
+\]
+
+In graphic matroids, cocircuits correspond to minimal edge cuts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graphic Duality}
+\label{subsec:graphic-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a planar graph \(G\), the planar dual graph \(G^*\) has:
+
+\begin{itemize}
+    \item one vertex for each face of \(G\);
+    \item one dual edge crossing each edge of \(G\).
+\end{itemize}
+
+Under appropriate conditions,
+
+\[
+\boxed{
+M(G)^*
+\cong
+M(G^*).
+}
+\]
+
+Thus planar graph duality is a special case of matroid duality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deletion}
+\label{subsec:matroid-deletion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+e\in E.
+\]
+
+The deletion of \(e\) is denoted
+
+\[
+\boxed{
+M\setminus e.
+}
+\]
+
+Its ground set is
+
+\[
+E\setminus\{e\}.
+\]
+
+Its independent sets are simply the independent sets of \(M\) that do
+not contain \(e\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Contraction}
+\label{subsec:matroid-contraction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Contraction is the dual operation to deletion.
+
+The contraction of \(e\) is denoted
+
+\[
+\boxed{
+M/e.
+}
+\]
+
+For a nonloop element \(e\), the rank function satisfies
+
+\[
+\boxed{
+r_{M/e}(A)
+=
+r_M(A\cup\{e\})-r_M(\{e\})
+}
+\]
+
+for
+
+\[
+A\subseteq E\setminus\{e\}.
+\]
+
+For a nonloop,
+
+\[
+r_M(\{e\})=1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deletion--Contraction Duality}
+\label{subsec:deletion-contraction-duality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Deletion and contraction are exchanged by duality:
+
+\[
+\boxed{
+(M\setminus e)^*
+=
+M^*/e
+}
+\]
+
+and
+
+\[
+\boxed{
+(M/e)^*
+=
+M^*\setminus e.
+}
+\]
+
+This is one reason deletion--contraction recurrences appear naturally
+throughout graph and matroid theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graphic Deletion and Contraction}
+\label{subsec:graphic-deletion-contraction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a graphic matroid:
+
+\[
+M(G)\setminus e
+\]
+
+corresponds to deleting the graph edge \(e\).
+
+Similarly,
+
+\[
+M(G)/e
+\]
+
+corresponds to contracting the graph edge \(e\), with the usual care
+for loops and parallel edges.
+
+Thus abstract matroid operations generalize familiar graph operations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minors}
+\label{subsec:matroid-minors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid obtained through a sequence of deletions and contractions is
+called a minor.
+
+Thus,
+
+\[
+\boxed{
+\text{matroid minor}
+=
+\text{repeated deletion and contraction}.
+}
+\]
+
+Minor-closed classes of matroids play a role analogous to minor-closed
+classes of graphs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Excluded Minors}
+\label{subsec:excluded-minors-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A class of matroids may sometimes be characterized by forbidden minors.
+
+An excluded minor for a class is a matroid not in the class, all of
+whose proper minors belong to the class.
+
+This generalizes forbidden-minor characterizations in graph theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Representability and Minors}
+\label{subsec:representability-minors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a matroid is representable over a field \(\mathbb{F}\), then every
+minor is also representable over \(\mathbb{F}\).
+
+Therefore representability over a fixed field is a minor-closed
+property.
+
+This makes excluded-minor characterizations possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Fano Matroid}
+\label{subsec:fano-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Fano plane produces an important rank-\(3\) matroid on seven
+elements.
+
+Its elements are the seven points of the Fano plane.
+
+A triple is dependent exactly when its three points lie on a Fano line.
+
+This matroid is denoted
+
+\[
+\boxed{
+F_7.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Representation of the Fano Matroid}
+\label{subsec:fano-matroid-representation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Fano matroid can be represented over
+
+\[
+\mathbb{F}_2
+\]
+
+using the seven nonzero vectors of
+
+\[
+\mathbb{F}_2^3.
+\]
+
+For example, use columns
+
+\[
+\begin{pmatrix}
+1\\0\\0
+\end{pmatrix},
+\begin{pmatrix}
+0\\1\\0
+\end{pmatrix},
+\begin{pmatrix}
+0\\0\\1
+\end{pmatrix},
+\begin{pmatrix}
+1\\1\\0
+\end{pmatrix},
+\begin{pmatrix}
+1\\0\\1
+\end{pmatrix},
+\begin{pmatrix}
+0\\1\\1
+\end{pmatrix},
+\begin{pmatrix}
+1\\1\\1
+\end{pmatrix}.
+\]
+
+Thus,
+
+\[
+\boxed{
+F_7
+\text{ is binary}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projective Geometry Matroids}
+\label{subsec:projective-geometry-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The points of projective geometry
+
+\[
+\operatorname{PG}(r-1,q)
+\]
+
+define a rank-\(r\) matroid.
+
+Independence is inherited from linear independence of representative
+vectors in
+
+\[
+\mathbb{F}_q^r.
+\]
+
+This produces a natural bridge among:
+
+\[
+\boxed{
+\text{finite geometry}
++
+\text{linear algebra}
++
+\text{design theory}
++
+\text{matroids}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Affine Geometry Matroids}
+\label{subsec:affine-geometry-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite affine geometries similarly produce representable matroids.
+
+Affine dependence may be converted into linear dependence by using
+homogeneous coordinates.
+
+Thus many finite geometric incidence structures possess a natural
+matroid interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greedy Algorithms}
+\label{subsec:matroid-greedy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One of the deepest elementary properties of matroids is their
+relationship with greedy optimization.
+
+Suppose every element
+
+\[
+e\in E
+\]
+
+has a weight
+
+\[
+w(e).
+\]
+
+We want an independent set of maximum total weight.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Greedy Algorithm}
+\label{subsec:matroid-greedy-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Order the elements so that
+
+\[
+w(e_1)\geq w(e_2)\geq\cdots\geq w(e_n).
+\]
+
+Start with
+
+\[
+I=\varnothing.
+\]
+
+For \(j=1,\ldots,n\):
+
+\begin{itemize}
+    \item if
+    \[
+    I\cup\{e_j\}
+    \]
+    is independent, add \(e_j\);
+    \item otherwise skip \(e_j\).
+\end{itemize}
+
+The final set is a maximum-weight basis when the weights are
+nonnegative, and more generally yields the appropriate maximum-weight
+independent solution under the usual formulation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greedy Characterization of Matroids}
+\label{subsec:greedy-characterization-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Greedy Characterization]
+A finite hereditary independence system is a matroid if and only if the
+greedy algorithm produces a maximum-weight basis for every assignment
+of weights.
+\end{theorem}
+
+Thus matroids are exactly the independence systems for which the
+natural greedy algorithm always works.
+
+This gives a powerful algorithmic interpretation of the exchange axiom.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Greedy in a Graphic Matroid}
+\label{subsec:worked-greedy-graphic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Minimum Spanning Tree Connection}
+
+Let \(G\) be a connected weighted graph.
+
+The independent sets of the graphic matroid are forests.
+
+To obtain a minimum-weight spanning tree, process edges from lowest to
+highest weight and add an edge whenever doing so does not create a
+cycle.
+
+This is Kruskal's algorithm.
+
+The matroid exchange property guarantees optimality.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{Kruskal's algorithm is a matroid greedy algorithm.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum-Weight Bases}
+\label{subsec:maximum-weight-bases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a weight function
+
+\[
+w:E\to\mathbb{R},
+\]
+
+the weight of a set is
+
+\[
+\boxed{
+w(A)
+=
+\sum_{e\in A}w(e).
+}
+\]
+
+The maximum-weight basis problem is
+
+\[
+\boxed{
+\max
+\{
+w(B):
+B\text{ is a basis}
+\}.
+}
+\]
+
+For matroids, this optimization problem is solved greedily.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Polytopes Preview}
+\label{subsec:matroid-polytopes-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Associate to every basis \(B\) its incidence vector
+
+\[
+\mathbf{1}_B\in\mathbb{R}^{E}.
+\]
+
+The convex hull
+
+\[
+\boxed{
+P(M)
+=
+\operatorname{conv}
+\{
+\mathbf{1}_B:
+B\text{ basis}
+\}
+}
+\]
+
+is called the base polytope of the matroid.
+
+Matroid polytopes connect discrete independence with convex
+optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent-Set Polytope}
+\label{subsec:independent-set-polytope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The convex hull of the incidence vectors of all independent sets is the
+independence polytope.
+
+It can be described using rank inequalities:
+
+\[
+\boxed{
+\sum_{e\in A}x_e
+\leq
+r(A)
+}
+\]
+
+for every
+
+\[
+A\subseteq E,
+\]
+
+together with
+
+\[
+x_e\geq0.
+\]
+
+This is a fundamental bridge between submodularity and optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Intersection}
+\label{subsec:matroid-intersection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+M_1=(E,\mathcal{I}_1)
+\]
+
+and
+
+\[
+M_2=(E,\mathcal{I}_2)
+\]
+
+are matroids on the same ground set.
+
+The matroid intersection problem seeks
+
+\[
+\boxed{
+\max
+\{
+|I|:
+I\in\mathcal{I}_1\cap\mathcal{I}_2
+\}.
+}
+\]
+
+Unlike optimization over one matroid, simple greedy selection is not
+generally sufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bipartite Matching as Matroid Intersection}
+\label{subsec:matching-matroid-intersection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A bipartite matching can be viewed using two partition matroids.
+
+Let the ground set consist of graph edges.
+
+One matroid permits at most one chosen edge incident with each vertex
+in the left part.
+
+The second permits at most one chosen edge incident with each vertex in
+the right part.
+
+A set independent in both matroids is exactly a matching.
+
+Thus,
+
+\[
+\boxed{
+\text{bipartite matching}
+=
+\text{intersection of two partition matroids}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Intersection Min--Max Theorem}
+\label{subsec:matroid-intersection-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fundamental theorem gives a min--max characterization of maximum
+common independent sets.
+
+For matroids \(M_1\) and \(M_2\) on \(E\),
+
+\[
+\boxed{
+\max
+\{
+|I|:
+I\in\mathcal{I}_1\cap\mathcal{I}_2
+\}
+=
+\min_{A\subseteq E}
+\left(
+r_1(A)+r_2(E\setminus A)
+\right).
+}
+\]
+
+This generalizes several classical matching and covering theorems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Union}
+\label{subsec:matroid-union}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given matroids
+
+\[
+M_1,\ldots,M_k
+\]
+
+on the same ground set \(E\), matroid union studies sets expressible as
+
+\[
+I_1\cup\cdots\cup I_k,
+\]
+
+where each
+
+\[
+I_j
+\]
+
+is independent in \(M_j\).
+
+This generalizes partitioning structures into several independent
+pieces.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arboricity Connection}
+\label{subsec:matroid-union-arboricity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a graphic matroid, matroid union asks whether a graph's edges can be
+partitioned into forests.
+
+This leads naturally to graph arboricity.
+
+The arboricity of a graph is the minimum number of forests whose union
+contains all graph edges.
+
+Thus matroid union generalizes a classical graph decomposition problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transversal Matroids}
+\label{subsec:transversal-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\mathcal{A}
+=
+(A_1,\ldots,A_m)
+\]
+
+be a family of subsets of \(E\).
+
+A partial transversal is a set of distinct representatives chosen from
+distinct members of \(\mathcal{A}\).
+
+The subsets of \(E\) that can occur as partial transversals form the
+independent sets of a matroid.
+
+This is called a transversal matroid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hall's Theorem Connection}
+\label{subsec:transversal-hall}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Transversal matroids are closely related to bipartite matching.
+
+Construct a bipartite graph with:
+
+\begin{itemize}
+    \item one side representing the sets \(A_i\);
+    \item the other side representing elements of \(E\);
+    \item an edge when an element belongs to a set.
+\end{itemize}
+
+Partial transversals correspond to matchings.
+
+Thus Hall's Marriage Theorem naturally enters matroid theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gammoids Preview}
+\label{subsec:gammoids-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A gammoid is a matroid derived from vertex-disjoint directed paths in a
+digraph.
+
+A set is independent when its elements can be linked by disjoint paths
+to a specified target set.
+
+Gammoids extend the connection between matroids and network flow.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Direct Sums}
+\label{subsec:matroid-direct-sums}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+M_1=(E_1,\mathcal{I}_1)
+\]
+
+and
+
+\[
+M_2=(E_2,\mathcal{I}_2)
+\]
+
+with
+
+\[
+E_1\cap E_2=\varnothing.
+\]
+
+Their direct sum
+
+\[
+\boxed{
+M_1\oplus M_2
+}
+\]
+
+has ground set
+
+\[
+E_1\cup E_2
+\]
+
+and independent sets
+
+\[
+I_1\cup I_2
+\]
+
+with
+
+\[
+I_j\in\mathcal{I}_j.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Connected Matroids}
+\label{subsec:connected-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid is connected if it cannot be written as a nontrivial direct
+sum.
+
+For graphic matroids, matroid connectedness is related to the cycle
+structure of the graph rather than merely ordinary graph connectedness.
+
+Thus matroid connectivity captures dependence connectivity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Restriction}
+\label{subsec:matroid-restriction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+A\subseteq E,
+\]
+
+the restriction of \(M\) to \(A\), written
+
+\[
+\boxed{
+M|A,
+}
+\]
+
+is the matroid whose independent sets are the independent subsets of
+\(A\).
+
+Restriction is equivalent to deleting every element outside \(A\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Truncation}
+\label{subsec:matroid-truncation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(M\) has rank \(r\).
+
+Its truncation lowers the maximum allowed independent-set size by one.
+
+Thus the truncated matroid has independent sets
+
+\[
+\boxed{
+\{
+I\in\mathcal{I}(M):
+|I|\leq r-1
+\}.
+}
+\]
+
+More generally, one may truncate to any smaller rank.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tutte Polynomial of a Matroid}
+\label{subsec:matroid-tutte-polynomial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Tutte polynomial extends naturally from graphs to matroids.
+
+For a matroid \(M=(E,r)\),
+
+\[
+\boxed{
+T_M(x,y)
+=
+\sum_{A\subseteq E}
+(x-1)^{r(E)-r(A)}
+(y-1)^{|A|-r(A)}.
+}
+\]
+
+This polynomial encodes substantial structural information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank and Nullity in the Tutte Polynomial}
+\label{subsec:rank-nullity-tutte}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The exponent
+
+\[
+r(E)-r(A)
+\]
+
+measures how far \(A\) is from spanning.
+
+The exponent
+
+\[
+|A|-r(A)
+\]
+
+is the nullity of \(A\), measuring how much dependence it contains.
+
+Thus the Tutte polynomial simultaneously records spanning deficiency
+and dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deletion--Contraction for the Tutte Polynomial}
+\label{subsec:tutte-deletion-contraction-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(e\) is neither a loop nor a coloop, then
+
+\[
+\boxed{
+T_M(x,y)
+=
+T_{M\setminus e}(x,y)
++
+T_{M/e}(x,y).
+}
+\]
+
+If \(e\) is a coloop,
+
+\[
+\boxed{
+T_M(x,y)
+=
+xT_{M/e}(x,y).
+}
+\]
+
+If \(e\) is a loop,
+
+\[
+\boxed{
+T_M(x,y)
+=
+yT_{M\setminus e}(x,y).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tutte Polynomial and Bases}
+\label{subsec:tutte-bases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A particularly important evaluation is
+
+\[
+\boxed{
+T_M(1,1)
+=
+\text{number of bases of }M.
+}
+\]
+
+For a connected graphic matroid,
+
+\[
+T_{M(G)}(1,1)
+\]
+
+therefore equals the number of spanning trees of \(G\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic Polynomial Preview}
+\label{subsec:matroid-characteristic-polynomial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid also has a characteristic polynomial.
+
+For loopless \(M\), one form is
+
+\[
+\boxed{
+\chi_M(\lambda)
+=
+\sum_{A\subseteq E}
+(-1)^{|A|}
+\lambda^{r(E)-r(A)}.
+}
+\]
+
+This generalizes graph chromatic phenomena and is closely related to
+the lattice of flats.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lattice of Flats}
+\label{subsec:lattice-of-flats}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The flats of a matroid, ordered by inclusion, form a lattice.
+
+This is called the lattice of flats.
+
+For representable matroids, this resembles the lattice of linear
+subspaces.
+
+For graphic matroids, flats correspond to edge sets closed under
+connectivity.
+
+Thus matroid theory naturally connects with lattice theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Lattices}
+\label{subsec:geometric-lattices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The lattice of flats of a simple matroid is a geometric lattice.
+
+Conversely, finite geometric lattices correspond to simple matroids.
+
+This provides a deep equivalence between:
+
+\[
+\boxed{
+\text{matroids}
+\quad\text{and}\quad
+\text{certain lattices}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Matroids}
+\label{subsec:simple-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid is simple if it contains:
+
+\begin{itemize}
+    \item no loops;
+    \item no parallel elements.
+\end{itemize}
+
+Thus every circuit has size at least \(3\).
+
+Simple matroids are analogous to simple graphs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cosimple Matroids}
+\label{subsec:cosimple-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid is cosimple if its dual is simple.
+
+Equivalently, it has:
+
+\begin{itemize}
+    \item no coloops;
+    \item no two-element cocircuits.
+\end{itemize}
+
+Thus simplicity and cosimplicity are dual notions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Isomorphism}
+\label{subsec:matroid-isomorphism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Matroids
+
+\[
+M_1=(E_1,\mathcal{I}_1)
+\]
+
+and
+
+\[
+M_2=(E_2,\mathcal{I}_2)
+\]
+
+are isomorphic if there exists a bijection
+
+\[
+f:E_1\to E_2
+\]
+
+such that
+
+\[
+\boxed{
+I\in\mathcal{I}_1
+\iff
+f(I)\in\mathcal{I}_2.
+}
+\]
+
+Thus matroid isomorphisms preserve independence structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Automorphisms of Matroids}
+\label{subsec:matroid-automorphisms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An automorphism is a matroid isomorphism from a matroid to itself.
+
+The automorphisms form a group.
+
+For representable or geometric matroids, these symmetries may arise
+from:
+
+\begin{itemize}
+    \item graph automorphisms;
+    \item linear transformations;
+    \item projective transformations;
+    \item design automorphisms.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroids and Coding Theory}
+\label{subsec:matroids-coding-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A linear code defined by a matrix determines a representable matroid
+from the matrix columns.
+
+Linear dependence among columns records structural properties of the
+code.
+
+Circuits correspond to minimal dependent column sets.
+
+This links matroid invariants with:
+
+\begin{itemize}
+    \item parity-check matrices;
+    \item minimum distance;
+    \item code supports;
+    \item finite geometry.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroids and Design Theory}
+\label{subsec:matroids-design-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite projective and affine geometries support both:
+
+\[
+\text{combinatorial designs}
+\]
+
+and
+
+\[
+\text{representable matroids}.
+\]
+
+For example, the Fano plane gives:
+
+\[
+\boxed{
+\text{a }2\text{-}(7,3,1)\text{ design}
+}
+\]
+
+and simultaneously
+
+\[
+\boxed{
+\text{the rank-3 binary Fano matroid }F_7.
+}
+\]
+
+Thus the same incidence structure can be interpreted through different
+mathematical frameworks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroids and Optimization}
+\label{subsec:matroids-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Matroids provide one of the clearest settings in which combinatorial
+structure guarantees efficient optimization.
+
+Important problems include:
+
+\[
+\boxed{
+\text{maximum-weight basis},
+}
+\]
+
+\[
+\boxed{
+\text{matroid intersection},
+}
+\]
+
+\[
+\boxed{
+\text{matroid union},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{submodular optimization}.
+}
+\]
+
+These ideas are developed more algorithmically in optimization and
+operations research.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why the Exchange Axiom Matters}
+\label{subsec:why-exchange-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Without the exchange axiom, maximal independent sets can have different
+sizes.
+
+Greedy choices can then become trapped in a small maximal set.
+
+The exchange property prevents this.
+
+It guarantees that local independent choices can be exchanged and
+extended toward globally optimal bases.
+
+Thus,
+
+\[
+\boxed{
+\text{exchange}
+\Longrightarrow
+\text{uniform basis size}
++
+\text{greedy optimality}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independence Systems That Are Not Matroids}
+\label{subsec:nonmatroid-independence-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Not every hereditary family is a matroid.
+
+Consider
+
+\[
+E=\{1,2,3\}
+\]
+
+with independent sets
+
+\[
+\varnothing,
+\{1\},
+\{2\},
+\{3\},
+\{1,2\}.
+\]
+
+This family is hereditary.
+
+However,
+
+\[
+I=\{3\}
+\]
+
+and
+
+\[
+J=\{1,2\}
+\]
+
+satisfy
+
+\[
+|I|<|J|,
+\]
+
+but neither
+
+\[
+\{1,3\}
+\]
+
+nor
+
+\[
+\{2,3\}
+\]
+
+is independent.
+
+Thus exchange fails.
+
+Therefore this independence system is not a matroid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Testing a Matroid}
+\label{subsec:worked-testing-matroid}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Checking the Exchange Axiom}
+
+Let
+
+\[
+E=\{a,b,c\}
+\]
+
+and let
+
+\[
+\mathcal{I}
+=
+\{
+\varnothing,
+\{a\},
+\{b\},
+\{c\},
+\{a,b\},
+\{a,c\},
+\{b,c\}
+\}.
+\]
+
+Every subset of an independent set is independent.
+
+Now take any independent sets \(I,J\) with
+
+\[
+|I|<|J|.
+\]
+
+Because every two-element subset is independent, one can always add an
+element of \(J\setminus I\) when \(I\) has size \(0\) or \(1\).
+
+Thus the exchange axiom holds.
+
+\begin{answerbox}
+\[
+\boxed{
+M\cong U_{2,3}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:matroid-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing Maximal and Maximum}
+
+A maximal independent set cannot be enlarged while remaining
+independent.
+
+A maximum independent set has largest possible cardinality.
+
+In a matroid, every maximal independent set is maximum.
+
+In a general independence system, this need not hold.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Hereditary System Is a Matroid}
+
+Hereditary independence is necessary but not sufficient.
+
+The exchange axiom must also hold.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Circuits with Arbitrary Dependent Sets}
+
+A circuit is minimally dependent.
+
+A larger dependent set containing a circuit is not itself necessarily a
+circuit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Graph Circuits with All Graph Cycles in General Matroids}
+
+For graphic matroids, circuits are graph cycles.
+
+For arbitrary matroids, circuits are abstract minimal dependent sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Rank with Cardinality}
+
+For a dependent set \(A\),
+
+\[
+r(A)<|A|.
+\]
+
+Rank measures the maximum size of an independent subset, not the number
+of elements present.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Basis and Spanning Set}
+
+Every basis is spanning.
+
+A spanning set may contain dependent elements and therefore may be
+larger than a basis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Closure with Set-Theoretic Closure}
+
+Matroid closure is defined through rank:
+
+\[
+e\in\operatorname{cl}(A)
+\iff
+r(A\cup\{e\})=r(A).
+\]
+
+It is an abstract dependence operator, not a topological closure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Matroid Is Representable}
+
+Many matroids cannot be represented by vectors over a given field.
+
+Some matroids are not representable over any field.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Deletion and Contraction}
+
+Deletion removes an element.
+
+Contraction removes the element after treating it as already included
+in the rank structure.
+
+They are dual operations but generally produce different matroids.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying Greedy Optimization to Arbitrary Constraints}
+
+Greedy selection is guaranteed for matroid independence systems.
+
+General combinatorial constraints may not satisfy matroid exchange.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:matroid-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Graph Theory.}
+Graphic matroids abstract forests, spanning trees, cycles, cuts, and
+graph minors.
+
+\medskip
+
+\textbf{Linear Algebra.}
+Vector matroids capture linear independence, bases, span, rank, and
+dependence without requiring coordinates.
+
+\medskip
+
+\textbf{Optimization.}
+Maximum-weight basis problems are solved optimally by greedy algorithms.
+
+\medskip
+
+\textbf{Network Design.}
+Spanning trees, forest decompositions, and connectivity constraints
+have natural matroid formulations.
+
+\medskip
+
+\textbf{Matching Theory.}
+Bipartite matching can be formulated as the intersection of two
+partition matroids.
+
+\medskip
+
+\textbf{Finite Geometry.}
+Projective and affine geometries produce representable matroids over
+finite fields.
+
+\medskip
+
+\textbf{Coding Theory.}
+Linear codes produce matroids through generator and parity-check
+matrices.
+
+\medskip
+
+\textbf{Design Theory.}
+Finite incidence geometries can simultaneously define block designs
+and matroids.
+
+\medskip
+
+\textbf{Combinatorial Optimization.}
+Matroid intersection, matroid union, and submodular optimization form
+major generalizations of classical graph algorithms.
+
+\medskip
+
+\textbf{Algebraic Combinatorics.}
+The Tutte polynomial, geometric lattices, characteristic polynomials,
+and representability link matroids with algebraic structure.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:matroid-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+State the three independent-set axioms of a matroid.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the ground set of a matroid.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a basis.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a circuit.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the rank of a matroid.
+\end{exercise}
+
+\begin{exercise}[1]
+What are the independent sets of a graphic matroid?
+\end{exercise}
+
+\begin{exercise}[1]
+What are the circuits of a graphic matroid?
+\end{exercise}
+
+\begin{exercise}[1]
+What are the bases of the graphic matroid of a connected graph?
+\end{exercise}
+
+\begin{exercise}[1]
+Define the uniform matroid
+
+\[
+U_{r,n}.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+How many bases does
+
+\[
+U_{3,7}
+\]
+
+have?
+\end{exercise}
+
+\begin{exercise}[1]
+What are the circuits of
+
+\[
+U_{3,7}?
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Define a loop in a matroid.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a coloop.
+\end{exercise}
+
+\begin{exercise}[2]
+Prove that all bases of a matroid have equal cardinality.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that every independent set is contained in a basis.
+\end{exercise}
+
+\begin{exercise}[2]
+For the graphic matroid of \(C_5\), determine:
+\begin{itemize}
+    \item the rank;
+    \item all circuits;
+    \item the number of bases.
+\end{itemize}
+\end{exercise}
+
+\begin{exercise}[2]
+Let \(G\) be a connected graph with \(8\) vertices. What is the rank of
+its graphic matroid?
+\end{exercise}
+
+\begin{exercise}[2]
+Let \(G\) have \(10\) vertices and \(3\) connected components. Find the
+rank of \(M(G)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Show that every bridge of a connected graph is a coloop of its graphic
+matroid.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct the vector matroid represented by
+
+\[
+A=
+\begin{pmatrix}
+1&0&1&1\\
+0&1&1&0
+\end{pmatrix}
+\]
+
+over \(\mathbb{R}\).
+\end{exercise}
+
+\begin{exercise}[2]
+Determine the circuits of the vector matroid in the previous exercise.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine all bases of the vector matroid in the previous exercise.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the rank of
+
+\[
+U_{4,10}.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the rank of a partition matroid with capacities
+
+\[
+2,3,1,4
+\]
+
+assuming each part is sufficiently large.
+\end{exercise}
+
+\begin{exercise}[2]
+Give an example of a hereditary independence system that is not a
+matroid.
+\end{exercise}
+
+\begin{exercise}[2]
+For a matroid of rank \(r\) on \(n\) elements, determine the rank of
+its dual.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the basis-exchange theorem from the independent-set axioms.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that an independent set contains no circuit.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that every dependent set contains a circuit.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the circuit elimination property.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that the rank function is monotone.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the submodularity inequality
+
+\[
+r(A\cup B)+r(A\cap B)
+\leq
+r(A)+r(B).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+For a graphic matroid, prove
+
+\[
+r(A)=|V|-c(A).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the closure of an edge set in a graphic matroid.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the closure operation in a vector matroid.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that every basis is both independent and spanning.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the dual rank formula
+
+\[
+r_{M^*}(A)
+=
+|A|-r_M(E)+r_M(E\setminus A).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+For a planar graph, investigate the relation
+
+\[
+M(G)^*
+\cong
+M(G^*).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that deletion and contraction are exchanged by duality.
+\end{exercise}
+
+\begin{exercise}[3]
+Represent the Fano matroid over
+
+\[
+\mathbb{F}_2.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Determine the seven three-element circuits of the Fano matroid.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the greedy algorithm to find a maximum-weight basis of a partition
+matroid of your own construction.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Kruskal's algorithm is an instance of matroid greedy
+optimization.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate bipartite matching as an intersection of two partition
+matroids.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the Tutte polynomial of
+
+\[
+U_{1,2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Verify that
+
+\[
+T_M(1,1)
+\]
+
+counts the bases for a small matroid.
+\end{exercise}
+
+\begin{exercise}[4]
+Study alternative matroid axiomatizations using:
+\begin{itemize}
+    \item bases;
+    \item circuits;
+    \item rank functions;
+    \item closure operators.
+\end{itemize}
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the greedy characterization theorem for matroids.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the matroid intersection theorem and derive the min--max formula
+
+\[
+\max |I|
+=
+\min_{A\subseteq E}
+\left(
+r_1(A)+r_2(E\setminus A)
+\right).
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Edmonds' matroid intersection algorithm.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the matroid union theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate transversal matroids and their relationship with Hall's
+Marriage Theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study gammoids and their relationship with directed linkage problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate excluded-minor characterizations of binary matroids.
+\end{exercise}
+
+\begin{exercise}[4]
+Study regular matroids and their relationship with graphic and cographic
+matroids.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the Tutte polynomial of a matroid and its important
+specializations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the lattice of flats and its Möbius function.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the characteristic polynomial of a matroid.
+\end{exercise}
+
+\begin{exercise}[4]
+Study matroid base polytopes and their role in combinatorial
+optimization.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:matroid-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid is an abstract independence structure
+
+\[
+\boxed{
+M=(E,\mathcal{I})
+}
+\]
+
+satisfying hereditary and exchange properties.
+
+A basis is a maximal independent set.
+
+All bases have the same size.
+
+Thus the rank is well-defined:
+
+\[
+\boxed{
+r(M)=|B|.
+}
+\]
+
+For a subset \(A\),
+
+\[
+\boxed{
+r(A)
+=
+\max
+\{
+|I|:
+I\subseteq A,\,
+I\in\mathcal{I}
+\}.
+}
+\]
+
+A circuit is a minimal dependent set.
+
+Graphic matroids satisfy
+
+\[
+\boxed{
+\text{independent sets}
+=
+\text{forests},
+}
+\]
+
+\[
+\boxed{
+\text{bases}
+=
+\text{spanning forests},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{circuits}
+=
+\text{cycles}.
+}
+\]
+
+Vector matroids abstract linear independence.
+
+Uniform matroids satisfy
+
+\[
+\boxed{
+I\text{ independent}
+\iff
+|I|\leq r.
+}
+\]
+
+Partition matroids enforce category capacities.
+
+Closure is defined by
+
+\[
+\boxed{
+\operatorname{cl}(A)
+=
+\{
+e:
+r(A\cup\{e\})=r(A)
+\}.
+}
+\]
+
+Flats are closed sets.
+
+Matroid duality defines
+
+\[
+\boxed{
+\mathcal{B}(M^*)
+=
+\{
+E\setminus B:
+B\in\mathcal{B}(M)
+\}.
+}
+\]
+
+Deletion and contraction produce minors.
+
+Representable matroids arise from matrices over fields.
+
+The Fano matroid
+
+\[
+\boxed{
+F_7
+}
+\]
+
+comes from the Fano plane and is representable over
+
+\[
+\mathbb{F}_2.
+\]
+
+The exchange axiom gives the fundamental algorithmic property:
+
+\[
+\boxed{
+\text{greedy optimization is always correct for matroid bases}.
+}
+\]
+
+The Tutte polynomial is
+
+\[
+\boxed{
+T_M(x,y)
+=
+\sum_{A\subseteq E}
+(x-1)^{r(E)-r(A)}
+(y-1)^{|A|-r(A)}.
+}
+\]
+
+Matroid theory therefore unifies
+
+\[
+\boxed{
+\text{graph cycles}
++
+\text{linear independence}
++
+\text{finite geometry}
++
+\text{greedy optimization}
++
+\text{abstract dependence}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:matroid-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Matroid Theory completes Chapter 6 by abstracting independence
+structures that appeared throughout the chapter. Graph Theory provides
+graphic matroids, where forests are independent and spanning trees are
+bases. Design Theory and finite geometry provide representable matroids
+such as the Fano matroid. Algebraic Combinatorics contributes the Tutte
+polynomial, lattices of flats, finite-field representations, and
+symmetry. Extremal and Probabilistic Combinatorics motivate independence
+and optimization questions, while Basic Counting and Enumerative
+Combinatorics count bases and other matroid structures. The subject also
+connects strongly with Chapter~\ref{chap:algebra} through vector spaces
+and fields and with Optimization and Operations Research through greedy
+algorithms, matroid intersection, matroid union, and submodular
+optimization.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 6.12 Matroid Theory
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard finite matroid theory.
+%   - Standard graphic and representable matroids.
+%   - Standard matroid optimization.
+%   - Standard Tutte-polynomial theory.
+%
+% Used for:
+%   - independent-set matroid axioms;
+%   - hereditary property;
+%   - exchange axiom;
+%   - dependent sets;
+%   - bases;
+%   - equal basis cardinality;
+%   - rank;
+%   - subset rank;
+%   - rank submodularity;
+%   - circuits;
+%   - circuit elimination;
+%   - graphic matroids;
+%   - graphic rank;
+%   - spanning trees and forests;
+%   - vector matroids;
+%   - matrix representations;
+%   - representable matroids;
+%   - binary, ternary, and regular matroids;
+%   - uniform matroids;
+%   - partition matroids;
+%   - loops, coloops, and parallel elements;
+%   - spanning sets;
+%   - closure and flats;
+%   - hyperplanes;
+%   - basis exchange;
+%   - fundamental circuits;
+%   - dual matroids;
+%   - cocircuits;
+%   - graphic duality;
+%   - deletion;
+%   - contraction;
+%   - minors;
+%   - excluded minors;
+%   - Fano matroid;
+%   - finite projective geometry matroids;
+%   - greedy algorithm;
+%   - greedy characterization;
+%   - maximum-weight bases;
+%   - matroid polytopes;
+%   - matroid intersection;
+%   - bipartite matching as intersection;
+%   - matroid union;
+%   - transversal matroids;
+%   - gammoid preview;
+%   - direct sums;
+%   - connected matroids;
+%   - restriction and truncation;
+%   - Tutte polynomial;
+%   - deletion--contraction;
+%   - characteristic polynomial preview;
+%   - lattice of flats;
+%   - geometric lattices;
+%   - simple and cosimple matroids;
+%   - matroid isomorphisms and automorphisms;
+%   - coding-theory connections;
+%   - design-theory connections;
+%   - optimization applications;
+%   - exercises.
+%
+% Notes:
+%   - Linear independence and field theory are developed more fully in
+%     Chapter 1.
+%   - Graph terminology and spanning-tree concepts were developed in
+%     Section 6.9.
+%   - Finite projective geometry and the Fano plane connect directly
+%     with Section 6.11 Design Theory.
+%   - Greedy, intersection, union, polyhedral, and submodular methods
+%     connect strongly with Chapter 10 Optimization and Operations
+%     Research.
+%   - The Tutte polynomial was previewed in Algebraic Combinatorics and
+%     Graph Theory and reaches its natural abstract setting here.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

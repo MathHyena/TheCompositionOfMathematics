@@ -1,0 +1,2565 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 6.7 ALGEBRAIC COMBINATORICS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Algebraic Combinatorics}
+\label{sec:algebraic-combinatorics}
+
+\prerequisite{
+Permutations, group actions, basic linear algebra, polynomial algebra,
+generating functions, integer partitions, and the enumerative methods
+developed earlier in this chapter.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the role of algebra in combinatorial enumeration;
+    \item use group actions to formalize symmetry;
+    \item compute orbits and stabilizers;
+    \item apply the orbit--stabilizer theorem;
+    \item apply Burnside's lemma to count objects up to symmetry;
+    \item use cycle structure in permutation actions;
+    \item understand the purpose of P\'olya enumeration;
+    \item work with cycle index polynomials;
+    \item distinguish labeled and unlabeled enumeration;
+    \item understand permutation statistics algebraically;
+    \item define \(q\)-integers, \(q\)-factorials, and Gaussian binomial
+          coefficients;
+    \item interpret Gaussian coefficients as finite-field subspace
+          counts;
+    \item understand Young diagrams and standard Young tableaux;
+    \item apply the hook-length formula in basic cases;
+    \item recognize symmetric functions as generating objects;
+    \item understand the roles of Schur functions and representation
+          theory;
+    \item recognize association schemes and algebraic graph invariants;
+    \item connect algebraic structure with combinatorial classification
+          and enumeration.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Algebraic Combinatorics?}
+\label{subsec:what-is-algebraic-combinatorics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Algebraic combinatorics uses algebraic structures and techniques to
+study discrete objects.
+
+The central philosophy is
+
+\[
+\boxed{
+\text{combinatorial structure}
+\longrightarrow
+\text{algebraic representation}
+\longrightarrow
+\text{structural or enumerative information}.
+}
+\]
+
+Typical algebraic tools include:
+
+\begin{itemize}
+    \item groups and group actions;
+    \item rings and polynomial algebras;
+    \item vector spaces;
+    \item matrices;
+    \item symmetric functions;
+    \item representation theory;
+    \item finite fields.
+\end{itemize}
+
+These tools frequently reveal symmetries and identities that are
+difficult to see by direct counting alone.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetry and Group Actions}
+\label{subsec:symmetry-group-actions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a group \(G\) acts on a set \(X\).
+
+For
+
+\[
+g\in G
+\]
+
+and
+
+\[
+x\in X,
+\]
+
+the image of \(x\) under \(g\) is written
+
+\[
+g\cdot x.
+\]
+
+A group action satisfies
+
+\[
+\boxed{
+e\cdot x=x
+}
+\]
+
+for the identity element \(e\), and
+
+\[
+\boxed{
+g\cdot(h\cdot x)
+=
+(gh)\cdot x.
+}
+\]
+
+Group actions provide the natural framework for describing symmetry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Orbits}
+\label{subsec:orbits-algebraic-combinatorics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Orbit}
+The orbit of \(x\in X\) under \(G\) is
+
+\[
+\boxed{
+\operatorname{Orb}(x)
+=
+\{g\cdot x:g\in G\}.
+}
+\]
+\end{definitionbox}
+
+Two objects lie in the same orbit exactly when one can be transformed
+into the other by an allowed symmetry.
+
+Thus orbits represent equivalence classes under symmetry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stabilizers}
+\label{subsec:stabilizers-algebraic-combinatorics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Stabilizer}
+The stabilizer of \(x\in X\) is
+
+\[
+\boxed{
+\operatorname{Stab}(x)
+=
+\{g\in G:g\cdot x=x\}.
+}
+\]
+\end{definitionbox}
+
+The stabilizer consists of the symmetries that leave \(x\) unchanged.
+
+Highly symmetric objects have large stabilizers.
+
+Generic objects often have smaller stabilizers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Orbit--Stabilizer Theorem}
+\label{subsec:orbit-stabilizer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Orbit--Stabilizer Theorem]
+If a finite group \(G\) acts on \(X\), then for every \(x\in X\),
+
+\[
+\boxed{
+|G|
+=
+|\operatorname{Orb}(x)|
+|\operatorname{Stab}(x)|.
+}
+\]
+\end{theorem}
+
+Equivalently,
+
+\[
+\boxed{
+|\operatorname{Orb}(x)|
+=
+\frac{|G|}{|\operatorname{Stab}(x)|}.
+}
+\]
+
+This explains why symmetric objects may have smaller orbits than
+generic objects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Rotating a Square}
+\label{subsec:worked-square-orbit}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Orbit of a Marked Vertex}
+
+Consider the rotational symmetries of a square.
+
+The rotation group has size
+
+\[
+|G|=4.
+\]
+
+Mark one vertex.
+
+Only the identity rotation fixes that marked vertex, so
+
+\[
+|\operatorname{Stab}(x)|=1.
+\]
+
+Therefore,
+
+\[
+|\operatorname{Orb}(x)|
+=
+\frac41
+=
+4.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+|\operatorname{Orb}(x)|=4.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Counting Up to Symmetry}
+\label{subsec:counting-up-to-symmetry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one wants to count colorings of a geometric object.
+
+If rotations or reflections are considered equivalent, ordinary
+counting overcounts.
+
+The correct objects are the orbits of the symmetry group.
+
+Thus the problem becomes
+
+\[
+\boxed{
+\text{count the orbits of }G\text{ acting on }X.
+}
+\]
+
+Burnside's lemma gives a direct formula.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed Points of a Group Element}
+\label{subsec:fixed-points-group-action}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+g\in G,
+\]
+
+define
+
+\[
+\boxed{
+\operatorname{Fix}(g)
+=
+\{x\in X:g\cdot x=x\}.
+}
+\]
+
+The quantity
+
+\[
+|\operatorname{Fix}(g)|
+\]
+
+counts the objects unchanged by the symmetry \(g\).
+
+Different symmetries generally fix different numbers of objects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Burnside's Lemma}
+\label{subsec:burnsides-lemma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Burnside's Lemma]
+If a finite group \(G\) acts on a finite set \(X\), then the number of
+orbits is
+
+\[
+\boxed{
+|X/G|
+=
+\frac{1}{|G|}
+\sum_{g\in G}
+|\operatorname{Fix}(g)|.
+}
+\]
+\end{theorem}
+
+This is also called the Cauchy--Frobenius lemma.
+
+The notation
+
+\[
+X/G
+\]
+
+denotes the set of orbits.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Burnside's Lemma Works}
+\label{subsec:why-burnside-works}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Count pairs
+
+\[
+(g,x)
+\]
+
+such that
+
+\[
+g\cdot x=x.
+\]
+
+Counting by \(g\) gives
+
+\[
+\sum_{g\in G}
+|\operatorname{Fix}(g)|.
+\]
+
+Counting by \(x\) gives
+
+\[
+\sum_{x\in X}
+|\operatorname{Stab}(x)|.
+\]
+
+Group the second sum by orbits.
+
+For each orbit \(\mathcal{O}\),
+
+\[
+|\mathcal{O}|
+|\operatorname{Stab}(x)|
+=
+|G|.
+\]
+
+Thus every orbit contributes exactly \(|G|\).
+
+Hence,
+
+\[
+\sum_{g\in G}
+|\operatorname{Fix}(g)|
+=
+|G|\cdot|X/G|.
+\]
+
+Dividing by \(|G|\) gives Burnside's formula.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Two-Color Necklaces}
+\label{subsec:worked-burnside-necklace}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Coloring Four Beads Up to Rotation}
+
+Consider four positions arranged in a circle.
+
+Each position may be colored black or white.
+
+There are
+
+\[
+2^4=16
+\]
+
+labeled colorings.
+
+Let the cyclic rotation group \(C_4\) act.
+
+The identity fixes all
+
+\[
+16
+\]
+
+colorings.
+
+A \(90^\circ\) rotation fixes only colorings in which all four positions
+have the same color:
+
+\[
+2.
+\]
+
+A \(180^\circ\) rotation has two cycles of positions and therefore fixes
+
+\[
+2^2=4
+\]
+
+colorings.
+
+A \(270^\circ\) rotation again fixes
+
+\[
+2
+\]
+
+colorings.
+
+Burnside's lemma gives
+
+\[
+\frac{16+2+4+2}{4}
+=
+6.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+6
+}
+\]
+
+binary necklaces of length \(4\) exist up to rotation.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cycle Structure and Fixed Colorings}
+\label{subsec:cycle-structure-fixed-colorings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a permutation \(g\) acts on \(n\) positions.
+
+If the action decomposes the positions into
+
+\[
+c(g)
+\]
+
+cycles, then a coloring fixed by \(g\) must be constant on every cycle.
+
+With \(q\) available colors,
+
+\[
+\boxed{
+|\operatorname{Fix}(g)|
+=
+q^{c(g)}.
+}
+\]
+
+This simple observation is the basis of many symmetry-counting formulas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Necklaces}
+\label{subsec:necklaces}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A necklace is a circular arrangement of colored beads in which
+rotations are considered equivalent.
+
+For length \(n\) with \(q\) colors, Burnside's lemma gives
+
+\[
+\boxed{
+N_q(n)
+=
+\frac1n
+\sum_{k=0}^{n-1}
+q^{\gcd(n,k)}.
+}
+\]
+
+The notation
+
+\[
+\gcd(n,k)
+\]
+
+means the greatest common divisor of \(n\) and \(k\).
+
+An equivalent divisor-sum formula is
+
+\[
+\boxed{
+N_q(n)
+=
+\frac1n
+\sum_{d\mid n}
+\varphi(d)\,
+q^{n/d},
+}
+\]
+
+where \(\varphi\) is Euler's totient function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bracelets}
+\label{subsec:bracelets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A bracelet identifies colorings under both rotations and reflections.
+
+The relevant symmetry group is the dihedral group
+
+\[
+D_n.
+\]
+
+Thus bracelets are counted using Burnside's lemma over all:
+
+\begin{itemize}
+    \item rotations;
+    \item reflections.
+\end{itemize}
+
+The reflection contribution depends on whether \(n\) is even or odd.
+
+This illustrates how the group itself determines the counting formula.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cycle Index}
+\label{subsec:cycle-index}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Burnside's lemma can be organized using a cycle index polynomial.
+
+Suppose \(G\) acts on \(n\) positions.
+
+For \(g\in G\), let
+
+\[
+c_i(g)
+\]
+
+be the number of cycles of length \(i\) in the permutation induced by
+\(g\).
+
+\begin{definitionbox}{Cycle Index Polynomial}
+The cycle index of \(G\) is
+
+\[
+\boxed{
+Z_G(a_1,\ldots,a_n)
+=
+\frac{1}{|G|}
+\sum_{g\in G}
+\prod_{i=1}^{n}
+a_i^{c_i(g)}.
+}
+\]
+\end{definitionbox}
+
+The variables
+
+\[
+a_1,a_2,\ldots
+\]
+
+record cycle lengths.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cycle Index of a Cyclic Group}
+\label{subsec:cycle-index-cyclic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For the cyclic group acting on \(n\) positions,
+
+\[
+C_n,
+\]
+
+the cycle index can be written
+
+\[
+\boxed{
+Z_{C_n}
+=
+\frac1n
+\sum_{d\mid n}
+\varphi(d)
+a_d^{\,n/d}.
+}
+\]
+
+This compact expression organizes the rotational symmetry of an
+\(n\)-cycle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{P\'olya Enumeration}
+\label{subsec:polya-enumeration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+P\'olya enumeration generalizes Burnside's lemma by allowing different
+colors to carry weights.
+
+Suppose colors have weights
+
+\[
+w_1,w_2,\ldots,w_q.
+\]
+
+In the cycle index, substitute
+
+\[
+\boxed{
+a_i
+\longmapsto
+w_1^i+w_2^i+\cdots+w_q^i.
+}
+\]
+
+The resulting polynomial records colorings up to symmetry according to
+their color content.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Cycle Index of \(C_4\)}
+\label{subsec:worked-cycle-index-c4}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Cycle Index for Four Rotational Positions}
+
+For the rotations of four positions:
+
+\begin{itemize}
+    \item the identity has cycle type \(1^4\);
+    \item the \(90^\circ\) and \(270^\circ\) rotations each have cycle
+          type \(4^1\);
+    \item the \(180^\circ\) rotation has cycle type \(2^2\).
+\end{itemize}
+
+Therefore,
+
+\[
+Z_{C_4}
+=
+\frac14
+\left(
+a_1^4
++
+a_2^2
++
+2a_4
+\right).
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+Z_{C_4}
+=
+\frac14
+\left(
+a_1^4+a_2^2+2a_4
+\right).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{P\'olya Substitution Example}
+\label{subsec:polya-substitution-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two colors, say \(x\) and \(y\), substitute
+
+\[
+a_i
+\longmapsto
+x^i+y^i.
+\]
+
+For \(C_4\),
+
+\[
+Z_{C_4}
+=
+\frac14
+\left(
+a_1^4+a_2^2+2a_4
+\right)
+\]
+
+becomes
+
+\[
+\boxed{
+\frac14
+\left[
+(x+y)^4
++
+(x^2+y^2)^2
++
+2(x^4+y^4)
+\right].
+}
+\]
+
+The coefficient of
+
+\[
+x^ry^{4-r}
+\]
+
+counts rotational equivalence classes using exactly \(r\) objects of the
+first color.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetry Counting and Chemical Isomers}
+\label{subsec:symmetry-chemical-isomers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+P\'olya enumeration was historically important in counting chemical
+isomers.
+
+If positions on a molecular structure are permuted by geometric
+symmetries, different substitutions may represent the same molecule.
+
+Thus one studies
+
+\[
+\boxed{
+\text{colorings of positions}
+\big/
+\text{molecular symmetry group}.
+}
+\]
+
+The same mathematics appears in:
+
+\begin{itemize}
+    \item necklaces;
+    \item graph colorings;
+    \item molecular substitution patterns;
+    \item tilings;
+    \item crystal structures.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Permutation Statistics}
+\label{subsec:algebraic-permutation-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Algebraic combinatorics often refines permutation enumeration using
+statistics.
+
+For
+
+\[
+\pi\in S_n,
+\]
+
+examples include
+
+\[
+\operatorname{inv}(\pi)
+\]
+
+for inversion number,
+
+\[
+\operatorname{des}(\pi)
+\]
+
+for number of descents,
+
+and
+
+\[
+\operatorname{cyc}(\pi)
+\]
+
+for number of cycles.
+
+One may form generating polynomials such as
+
+\[
+\boxed{
+\sum_{\pi\in S_n}
+q^{\operatorname{inv}(\pi)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(q\)-Integers}
+\label{subsec:q-integers-algebraic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+[n]_q
+=
+1+q+q^2+\cdots+q^{n-1}.
+}
+\]
+
+When \(q\neq1\),
+
+\[
+\boxed{
+[n]_q
+=
+\frac{1-q^n}{1-q}.
+}
+\]
+
+As \(q\to1\),
+
+\[
+[n]_q\to n.
+\]
+
+Thus \([n]_q\) is called a \(q\)-analogue of \(n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(q\)-Factorials}
+\label{subsec:q-factorials-algebraic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+[n]_q!
+=
+[1]_q[2]_q\cdots[n]_q.
+}
+\]
+
+One important identity is
+
+\[
+\boxed{
+[n]_q!
+=
+\sum_{\pi\in S_n}
+q^{\operatorname{inv}(\pi)}.
+}
+\]
+
+Thus the \(q\)-factorial refines \(n!\) by tracking inversion number.
+
+Setting
+
+\[
+q=1
+\]
+
+recovers
+
+\[
+n!.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gaussian Binomial Coefficients}
+\label{subsec:gaussian-binomial-coefficients}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Gaussian Binomial Coefficient}
+The Gaussian binomial coefficient is
+
+\[
+\boxed{
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q
+=
+\frac{
+[n]_q!
+}{
+[k]_q![n-k]_q!
+}.
+}
+\]
+\end{definitionbox}
+
+It is also called the \(q\)-binomial coefficient.
+
+As \(q\to1\),
+
+\[
+\boxed{
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q
+\longrightarrow
+\binom{n}{k}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Field Interpretation}
+\label{subsec:gaussian-finite-field}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(q\) be a prime power.
+
+Then the number of \(k\)-dimensional subspaces of the vector space
+
+\[
+\mathbb{F}_q^n
+\]
+
+is
+
+\[
+\boxed{
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q.
+}
+\]
+
+Thus ordinary binomial coefficients count subsets, while Gaussian
+binomial coefficients count subspaces.
+
+The analogy is
+
+\[
+\boxed{
+\text{subsets of an }n\text{-set}
+\quad\leftrightarrow\quad
+\text{subspaces of }\mathbb{F}_q^n.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Lines in \(\mathbb{F}_q^2\)}
+\label{subsec:worked-gaussian-lines}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One-Dimensional Subspaces}
+
+The number of one-dimensional subspaces of
+
+\[
+\mathbb{F}_q^2
+\]
+
+is
+
+\[
+\begin{bmatrix}
+2\\
+1
+\end{bmatrix}_q.
+\]
+
+Using
+
+\[
+[2]_q=1+q,
+\]
+
+we obtain
+
+\[
+\begin{bmatrix}
+2\\
+1
+\end{bmatrix}_q
+=
+1+q.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+q+1
+}
+\]
+
+one-dimensional subspaces exist.
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(q\)-Binomial Recurrence}
+\label{subsec:q-binomial-recurrence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gaussian coefficients satisfy a \(q\)-analogue of Pascal's identity:
+
+\[
+\boxed{
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q
+=
+\begin{bmatrix}
+n-1\\
+k
+\end{bmatrix}_q
++
+q^{n-k}
+\begin{bmatrix}
+n-1\\
+k-1
+\end{bmatrix}_q.
+}
+\]
+
+Another equivalent version is
+
+\[
+\boxed{
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q
+=
+q^k
+\begin{bmatrix}
+n-1\\
+k
+\end{bmatrix}_q
++
+\begin{bmatrix}
+n-1\\
+k-1
+\end{bmatrix}_q.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Young Diagrams}
+\label{subsec:young-diagrams-algebraic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\lambda
+=
+(\lambda_1,\lambda_2,\ldots,\lambda_r)
+\]
+
+be a partition of \(n\), written
+
+\[
+\lambda\vdash n.
+\]
+
+A Young diagram represents the partition using left-aligned rows of
+boxes whose lengths are
+
+\[
+\lambda_1,\lambda_2,\ldots,\lambda_r.
+\]
+
+For example,
+
+\[
+\lambda=(4,2,1)
+\]
+
+has seven boxes.
+
+Young diagrams encode integer partitions geometrically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Young Tableaux}
+\label{subsec:young-tableaux-algebraic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Young tableau is obtained by filling a Young diagram with entries.
+
+A standard Young tableau of size \(n\):
+
+\begin{itemize}
+    \item uses each of
+    \[
+    1,2,\ldots,n
+    \]
+    exactly once;
+    \item increases across each row;
+    \item increases down each column.
+\end{itemize}
+
+Standard Young tableaux play a central role in the representation theory
+of symmetric groups.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hook Length}
+\label{subsec:hook-length}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a cell \(u\) in a Young diagram, its hook consists of:
+
+\begin{itemize}
+    \item the cell \(u\);
+    \item all cells directly to its right;
+    \item all cells directly below it.
+\end{itemize}
+
+The number of cells in this hook is the hook length
+
+\[
+\boxed{
+h(u).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hook-Length Formula}
+\label{subsec:hook-length-formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Hook-Length Formula]
+If
+
+\[
+\lambda\vdash n,
+\]
+
+then the number \(f^\lambda\) of standard Young tableaux of shape
+\(\lambda\) is
+
+\[
+\boxed{
+f^\lambda
+=
+\frac{n!}{
+\prod_{u\in\lambda}h(u)
+}.
+}
+\]
+\end{theorem}
+
+The product runs over every cell in the Young diagram.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Hook-Length Formula}
+\label{subsec:worked-hook-length}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Shape \((2,1)\)}
+
+Consider the partition
+
+\[
+\lambda=(2,1).
+\]
+
+There are \(3\) cells.
+
+Their hook lengths are
+
+\[
+3,\qquad1,\qquad1.
+\]
+
+Therefore,
+
+\[
+f^{(2,1)}
+=
+\frac{3!}{3\cdot1\cdot1}.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+f^{(2,1)}=2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Young's Lattice}
+\label{subsec:youngs-lattice}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Integer partitions may themselves be organized into a partially ordered
+set.
+
+Define
+
+\[
+\lambda\leq\mu
+\]
+
+when the Young diagram of \(\lambda\) is contained inside the Young
+diagram of \(\mu\).
+
+The resulting poset is called Young's lattice.
+
+A covering relation corresponds to adding a single box.
+
+Thus algebraic combinatorics links:
+
+\[
+\boxed{
+\text{partitions}
++
+\text{posets}
++
+\text{tableaux}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetric Polynomials}
+\label{subsec:symmetric-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial
+
+\[
+f(x_1,\ldots,x_n)
+\]
+
+is symmetric if permuting the variables leaves the polynomial unchanged.
+
+For example,
+
+\[
+x_1+x_2+\cdots+x_n
+\]
+
+is symmetric.
+
+So is
+
+\[
+\sum_{i<j}x_ix_j.
+\]
+
+Symmetric polynomials naturally encode objects whose labels may be
+permuted.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Elementary Symmetric Functions}
+\label{subsec:elementary-symmetric-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(k\)-th elementary symmetric polynomial is
+
+\[
+\boxed{
+e_k(x_1,\ldots,x_n)
+=
+\sum_{1\leq i_1<\cdots<i_k\leq n}
+x_{i_1}\cdots x_{i_k}.
+}
+\]
+
+For example,
+
+\[
+e_1=x_1+\cdots+x_n,
+\]
+
+and
+
+\[
+e_2
+=
+\sum_{i<j}x_ix_j.
+\]
+
+These functions appear as coefficients of
+
+\[
+\boxed{
+\prod_{i=1}^{n}(1+x_it)
+=
+\sum_{k=0}^{n}
+e_k t^k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete Homogeneous Symmetric Functions}
+\label{subsec:complete-homogeneous-symmetric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The complete homogeneous symmetric function \(h_k\) is the sum of all
+monomials of total degree \(k\):
+
+\[
+\boxed{
+h_k(x_1,\ldots,x_n)
+=
+\sum_{i_1+\cdots+i_n=k}
+x_1^{i_1}\cdots x_n^{i_n}.
+}
+\]
+
+Its generating function is
+
+\[
+\boxed{
+\sum_{k=0}^{\infty}
+h_k t^k
+=
+\prod_{i=1}^{n}
+\frac{1}{1-x_it}.
+}
+\]
+
+Thus symmetric functions connect directly with generating functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power-Sum Symmetric Functions}
+\label{subsec:power-sum-symmetric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+p_k
+=
+x_1^k+x_2^k+\cdots+x_n^k.
+}
+\]
+
+Products
+
+\[
+p_\lambda
+=
+p_{\lambda_1}\cdots p_{\lambda_r}
+\]
+
+are indexed by integer partitions
+
+\[
+\lambda.
+\]
+
+Power-sum functions are particularly natural when studying cycle types
+of permutations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Schur Functions}
+\label{subsec:schur-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Schur functions are symmetric functions indexed by partitions:
+
+\[
+\boxed{
+s_\lambda.
+}
+\]
+
+They can be defined combinatorially using semistandard Young tableaux.
+
+They are central because they connect:
+
+\[
+\boxed{
+\text{Young tableaux}
++
+\text{symmetric functions}
++
+\text{representations of }S_n.
+}
+\]
+
+Schur functions form one of the most important bases of the ring of
+symmetric functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Representation Theory Connection}
+\label{subsec:representation-theory-combinatorics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The irreducible complex representations of the symmetric group
+
+\[
+S_n
+\]
+
+are indexed by partitions
+
+\[
+\lambda\vdash n.
+\]
+
+The dimension of the irreducible representation corresponding to
+\(\lambda\) is
+
+\[
+\boxed{
+f^\lambda,
+}
+\]
+
+the number of standard Young tableaux of shape \(\lambda\).
+
+Thus the hook-length formula also computes representation dimensions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robinson--Schensted Correspondence}
+\label{subsec:robinson-schensted}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Robinson--Schensted correspondence associates a permutation
+
+\[
+\pi\in S_n
+\]
+
+with a pair
+
+\[
+(P,Q)
+\]
+
+of standard Young tableaux of the same shape.
+
+Symbolically,
+
+\[
+\boxed{
+\pi
+\longleftrightarrow
+(P,Q).
+}
+\]
+
+This correspondence is bijective.
+
+Consequently,
+
+\[
+\boxed{
+n!
+=
+\sum_{\lambda\vdash n}
+(f^\lambda)^2.
+}
+\]
+
+This identity also reflects the decomposition of the regular
+representation of \(S_n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Longest Increasing Subsequences}
+\label{subsec:longest-increasing-subsequences}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Robinson--Schensted correspondence contains information about
+subsequences of permutations.
+
+The length of the first row of the associated Young diagram equals the
+length of the longest increasing subsequence.
+
+Similarly, the first column records the longest decreasing subsequence.
+
+Thus tableau shape converts a sequence-ordering problem into a partition
+problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incidence Algebra}
+\label{subsec:incidence-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(P\) be a locally finite poset.
+
+An incidence algebra consists of functions
+
+\[
+f(x,y)
+\]
+
+defined for comparable pairs
+
+\[
+x\leq y.
+\]
+
+The product is convolution:
+
+\[
+\boxed{
+(f*g)(x,z)
+=
+\sum_{x\leq y\leq z}
+f(x,y)g(y,z).
+}
+\]
+
+Incidence algebras provide an algebraic framework for inversion on
+partially ordered sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Zeta Function of a Poset}
+\label{subsec:zeta-function-poset}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The zeta function of a poset is
+
+\[
+\boxed{
+\zeta(x,y)
+=
+\begin{cases}
+1,&x\leq y,\\
+0,&\text{otherwise}.
+\end{cases}
+}
+\]
+
+It acts as a cumulative summation operator over intervals of the poset.
+
+The inverse of \(\zeta\) under incidence-algebra convolution is the
+Möbius function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Möbius Function of a Poset}
+\label{subsec:mobius-function-poset}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Möbius function
+
+\[
+\mu(x,y)
+\]
+
+is defined recursively by
+
+\[
+\boxed{
+\mu(x,x)=1
+}
+\]
+
+and, for \(x<y\),
+
+\[
+\boxed{
+\sum_{x\leq z\leq y}
+\mu(x,z)=0.
+}
+\]
+
+The Greek letter
+
+\[
+\mu
+\]
+
+is called ``mu.''
+
+The Möbius function generalizes the alternating signs found in
+inclusion--exclusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Möbius Inversion}
+\label{subsec:mobius-inversion-posets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Möbius Inversion]
+Suppose
+
+\[
+g(x)
+=
+\sum_{y\leq x}f(y).
+\]
+
+Then
+
+\[
+\boxed{
+f(x)
+=
+\sum_{y\leq x}
+\mu(y,x)g(y).
+}
+\]
+\end{theorem}
+
+Thus cumulative summation over a poset can be inverted algebraically.
+
+Classical binomial inversion and number-theoretic Möbius inversion are
+special cases of this broader principle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boolean Lattice Möbius Function}
+\label{subsec:boolean-lattice-mobius}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In the Boolean lattice
+
+\[
+\mathcal{P}([n]),
+\]
+
+if
+
+\[
+A\subseteq B,
+\]
+
+then
+
+\[
+\boxed{
+\mu(A,B)
+=
+(-1)^{|B\setminus A|}.
+}
+\]
+
+Thus inclusion--exclusion is exactly Möbius inversion on the Boolean
+lattice.
+
+This provides an algebraic explanation for alternating signs in
+inclusion--exclusion formulas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chromatic Polynomial Preview}
+\label{subsec:chromatic-polynomial-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a graph \(G\), the chromatic polynomial
+
+\[
+\boxed{
+P_G(q)
+}
+\]
+
+counts proper vertex colorings using \(q\) available colors.
+
+Although graph coloring will be developed later, the chromatic
+polynomial is an important algebraic-combinatorial invariant.
+
+For example, for the complete graph
+
+\[
+K_n,
+\]
+
+\[
+\boxed{
+P_{K_n}(q)
+=
+q(q-1)(q-2)\cdots(q-n+1).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deletion--Contraction}
+\label{subsec:deletion-contraction-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an edge \(e\) of a graph \(G\), the chromatic polynomial satisfies
+
+\[
+\boxed{
+P_G(q)
+=
+P_{G-e}(q)
+-
+P_{G/e}(q).
+}
+\]
+
+Here:
+
+\[
+G-e
+\]
+
+means delete \(e\), while
+
+\[
+G/e
+\]
+
+means contract \(e\).
+
+Deletion--contraction is a recurring algebraic-combinatorial recurrence.
+
+It appears again in matroid theory and the Tutte polynomial.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tutte Polynomial Preview}
+\label{subsec:tutte-polynomial-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Tutte polynomial
+
+\[
+\boxed{
+T_G(x,y)
+}
+\]
+
+is a two-variable graph invariant satisfying deletion--contraction
+relations.
+
+Many graph quantities can be recovered from special evaluations of
+\(T_G\).
+
+Examples include information about:
+
+\begin{itemize}
+    \item spanning trees;
+    \item colorings;
+    \item flows;
+    \item connectivity.
+\end{itemize}
+
+The Tutte polynomial becomes especially natural in matroid theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adjacency Algebra}
+\label{subsec:adjacency-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Matrices associated with combinatorial objects may generate algebras.
+
+For a graph with adjacency matrix \(A\), the matrices
+
+\[
+I,A,A^2,A^3,\ldots
+\]
+
+encode walk structure.
+
+Polynomial expressions in \(A\),
+
+\[
+p(A),
+\]
+
+form an algebra under matrix addition and multiplication.
+
+Spectral properties of \(A\) often reveal combinatorial information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Eigenvalues as Combinatorial Invariants}
+\label{subsec:eigenvalues-combinatorial-invariants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If two graphs are isomorphic, their adjacency matrices differ by a
+permutation similarity transformation.
+
+Therefore they have the same eigenvalues.
+
+Thus the adjacency spectrum is an isomorphism invariant.
+
+However, the converse is false:
+
+\[
+\boxed{
+\text{same spectrum}
+\not\Longrightarrow
+\text{isomorphic graphs}.
+}
+\]
+
+Graphs with the same spectrum are called cospectral.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Association Schemes}
+\label{subsec:association-schemes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An association scheme partitions pairs of elements into several regular
+relation classes.
+
+It generalizes highly symmetric graph structures.
+
+Association schemes connect:
+
+\begin{itemize}
+    \item algebraic combinatorics;
+    \item coding theory;
+    \item design theory;
+    \item distance-regular graphs;
+    \item representation theory.
+\end{itemize}
+
+Their adjacency matrices span a finite-dimensional algebra called the
+Bose--Mesner algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bose--Mesner Algebra}
+\label{subsec:bose-mesner-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an association scheme has adjacency matrices
+
+\[
+A_0,A_1,\ldots,A_d.
+\]
+
+Their linear span
+
+\[
+\boxed{
+\mathcal{A}
+=
+\operatorname{span}
+\{A_0,\ldots,A_d\}
+}
+\]
+
+is the Bose--Mesner algebra.
+
+This algebra is closed under matrix multiplication and contains
+important spectral information about the scheme.
+
+It provides a bridge between finite combinatorial relations and linear
+algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distance-Regular Graphs}
+\label{subsec:distance-regular-graphs-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A distance-regular graph is a highly symmetric graph in which the number
+of vertices at specified relative distances depends only on the
+distance between two chosen vertices.
+
+These graphs are closely related to association schemes.
+
+They appear in:
+
+\begin{itemize}
+    \item coding theory;
+    \item finite geometry;
+    \item spectral graph theory;
+    \item design theory.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algebraic Enumeration Strategy}
+\label{subsec:algebraic-enumeration-strategy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common workflow in algebraic combinatorics is:
+
+\begin{enumerate}
+    \item identify the combinatorial objects;
+    \item identify symmetries or algebraic structure;
+    \item encode the structure using a group, polynomial, matrix, or
+          symmetric function;
+    \item perform algebraic operations;
+    \item translate the algebraic result back into combinatorial
+          information.
+\end{enumerate}
+
+This is the central methodological pattern of the subject.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:algebraic-combinatorics-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Dividing by the Group Size Without Checking Stabilizers}
+
+The number of unlabeled objects is not generally
+
+\[
+\frac{|X|}{|G|}.
+\]
+
+Different objects may have different stabilizer sizes.
+
+Burnside's lemma correctly handles this variation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Orbits and Stabilizers}
+
+The orbit describes where an object can move.
+
+The stabilizer describes which symmetries leave it fixed.
+
+They are connected by
+
+\[
+|G|
+=
+|\operatorname{Orb}(x)|
+|\operatorname{Stab}(x)|.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Counting Fixed Points Incorrectly}
+
+When a permutation of positions has several cycles, a fixed coloring
+must be constant on each cycle.
+
+With \(q\) colors, the count is
+
+\[
+q^{c(g)},
+\]
+
+not necessarily \(q^n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Burnside and P\'olya Enumeration}
+
+Burnside's lemma counts orbits.
+
+P\'olya enumeration refines the count by tracking color multiplicities
+using the cycle index.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Ordinary and Gaussian Binomial Coefficients}
+
+The ordinary coefficient
+
+\[
+\binom{n}{k}
+\]
+
+counts \(k\)-element subsets.
+
+The Gaussian coefficient
+
+\[
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q
+\]
+
+counts \(k\)-dimensional subspaces of \(\mathbb{F}_q^n\) when \(q\) is
+a prime power.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting What \(q\) Represents}
+
+In some contexts, \(q\) is a formal variable.
+
+In finite-field counting, \(q\) is a prime power.
+
+The interpretation depends on context.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Integer Partitions with Set Partitions}
+
+Young diagrams are indexed by integer partitions, not set partitions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Miscomputing Hook Lengths}
+
+The hook of a cell includes:
+
+\[
+\boxed{
+\text{the cell itself}
++
+\text{cells to the right}
++
+\text{cells below}.
+}
+\]
+
+Diagonal cells are not included unless they lie directly right or below.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Spectral Equality Implies Isomorphism}
+
+Isomorphic graphs are cospectral.
+
+Cospectral graphs need not be isomorphic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:algebraic-combinatorics-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Symmetry Enumeration.}
+Burnside's lemma and P\'olya enumeration count necklaces, bracelets,
+tilings, colorings, and molecular substitution patterns.
+
+\medskip
+
+\textbf{Representation Theory.}
+Young tableaux and Schur functions describe irreducible representations
+of symmetric groups.
+
+\medskip
+
+\textbf{Coding Theory.}
+Gaussian binomial coefficients, association schemes, and
+distance-regular graphs arise naturally in finite coding spaces.
+
+\medskip
+
+\textbf{Graph Theory.}
+Chromatic polynomials, Tutte polynomials, adjacency spectra, and
+association schemes encode graph structure algebraically.
+
+\medskip
+
+\textbf{Finite Geometry.}
+Subspace counting over finite fields produces Gaussian binomial
+coefficients.
+
+\medskip
+
+\textbf{Chemistry.}
+Molecular symmetry groups permit systematic enumeration of distinct
+substitution patterns.
+
+\medskip
+
+\textbf{Statistical Physics.}
+Symmetry reduction prevents equivalent configurations from being
+counted repeatedly.
+
+\medskip
+
+\textbf{Computer Science.}
+Canonical forms, permutation groups, symmetry reduction, and graph
+isomorphism algorithms rely on algebraic-combinatorial structure.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:algebraic-combinatorics-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define the orbit of an element under a group action.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the stabilizer of an element under a group action.
+\end{exercise}
+
+\begin{exercise}[1]
+State the orbit--stabilizer theorem.
+\end{exercise}
+
+\begin{exercise}[1]
+State Burnside's lemma.
+\end{exercise}
+
+\begin{exercise}[1]
+A symmetry group has order \(12\), and an object has stabilizer of size
+\(3\). Find the size of its orbit.
+\end{exercise}
+
+\begin{exercise}[1]
+How many binary colorings of four labeled positions exist before
+symmetry is considered?
+\end{exercise}
+
+\begin{exercise}[1]
+Compute
+
+\[
+[4]_q.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Compute
+
+\[
+[3]_q!.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Find
+
+\[
+\begin{bmatrix}
+3\\
+1
+\end{bmatrix}_q.
+\]
+\end{exercise}
+
+\begin{exercise}[1]
+Draw the Young diagram of
+
+\[
+\lambda=(5,3,1).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Use Burnside's lemma to count binary necklaces of length \(3\).
+\end{exercise}
+
+\begin{exercise}[2]
+Use Burnside's lemma to count binary necklaces of length \(5\).
+\end{exercise}
+
+\begin{exercise}[2]
+Count colorings of the vertices of a square using two colors up to
+rotation.
+\end{exercise}
+
+\begin{exercise}[2]
+Repeat the previous problem when reflections are also considered
+equivalent.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the cycle index of \(C_3\) acting on three positions.
+\end{exercise}
+
+\begin{exercise}[2]
+Use that cycle index to count colorings with \(q\) colors.
+\end{exercise}
+
+\begin{exercise}[2]
+Show that a permutation with \(c\) cycles fixes exactly \(q^c\)
+colorings of its positions using \(q\) colors.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute
+
+\[
+\begin{bmatrix}
+4\\
+2
+\end{bmatrix}_q.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Evaluate
+
+\[
+\begin{bmatrix}
+4\\
+2
+\end{bmatrix}_q
+\]
+
+at \(q=1\).
+\end{exercise}
+
+\begin{exercise}[2]
+How many one-dimensional subspaces does
+
+\[
+\mathbb{F}_2^3
+\]
+
+contain?
+\end{exercise}
+
+\begin{exercise}[2]
+Use the hook-length formula to find the number of standard Young
+tableaux of shape
+
+\[
+(3,1).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Write the first three elementary symmetric polynomials in
+
+\[
+x_1,x_2,x_3.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Show that
+
+\[
+\prod_{i=1}^{n}(1+x_it)
+=
+\sum_{k=0}^{n}e_kt^k.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove Burnside's lemma by double counting pairs
+
+\[
+(g,x)
+\]
+
+with \(g\cdot x=x\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the necklace formula
+
+\[
+N_q(n)
+=
+\frac1n
+\sum_{d\mid n}
+\varphi(d)q^{n/d}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the cycle index of \(C_4\).
+\end{exercise}
+
+\begin{exercise}[3]
+Use P\'olya enumeration to count rotationally distinct colorings of a
+square with exactly two red and two blue vertices.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the \(q\)-Pascal recurrence for Gaussian binomial coefficients.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that
+
+\[
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q
+\]
+
+counts \(k\)-dimensional subspaces of
+
+\[
+\mathbb{F}_q^n.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove
+
+\[
+[n]_q!
+=
+\sum_{\pi\in S_n}
+q^{\operatorname{inv}(\pi)}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the hook lengths of every cell in the Young diagram of
+
+\[
+(3,2).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use the hook-length formula to find
+
+\[
+f^{(3,2)}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Verify for \(n=3\) that
+
+\[
+3!
+=
+\sum_{\lambda\vdash3}
+(f^\lambda)^2.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that inclusion--exclusion is Möbius inversion on the Boolean
+lattice.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the Möbius function of a finite chain.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the chromatic polynomial of a tree with \(n\) vertices.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify deletion--contraction for a triangle.
+\end{exercise}
+
+\begin{exercise}[4]
+Study P\'olya's enumeration theorem in full generality.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the cycle index polynomial of the dihedral group \(D_n\).
+\end{exercise}
+
+\begin{exercise}[4]
+Use P\'olya enumeration to count bracelets with a prescribed color
+inventory.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the relationship between Gaussian binomial coefficients and
+partitions fitting inside a rectangle.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Schur functions and their definition through semistandard Young
+tableaux.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the Robinson--Schensted correspondence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the relationship between longest increasing subsequences and the
+shape produced by Robinson--Schensted.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate incidence algebras and Möbius inversion on general locally
+finite posets.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Tutte polynomial and its deletion--contraction recurrence.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate association schemes and the Bose--Mesner algebra.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:algebraic-combinatorics-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Algebraic combinatorics uses algebraic structure to study discrete
+objects.
+
+A group action organizes objects into orbits.
+
+For \(x\in X\),
+
+\[
+\boxed{
+|G|
+=
+|\operatorname{Orb}(x)|
+|\operatorname{Stab}(x)|.
+}
+\]
+
+Burnside's lemma counts symmetry classes:
+
+\[
+\boxed{
+|X/G|
+=
+\frac1{|G|}
+\sum_{g\in G}
+|\operatorname{Fix}(g)|.
+}
+\]
+
+For colorings, a symmetry with \(c(g)\) cycles fixes
+
+\[
+\boxed{
+q^{c(g)}
+}
+\]
+
+colorings.
+
+Cycle index polynomials organize cycle structure, while P\'olya
+enumeration refines orbit counts by color content.
+
+The \(q\)-integer is
+
+\[
+\boxed{
+[n]_q
+=
+1+q+\cdots+q^{n-1}.
+}
+\]
+
+Gaussian binomial coefficients
+
+\[
+\boxed{
+\begin{bmatrix}
+n\\
+k
+\end{bmatrix}_q
+}
+\]
+
+count \(k\)-dimensional subspaces of \(\mathbb{F}_q^n\).
+
+Young diagrams encode integer partitions.
+
+The hook-length formula gives
+
+\[
+\boxed{
+f^\lambda
+=
+\frac{n!}{
+\prod_{u\in\lambda}h(u)
+}.
+}
+\]
+
+Symmetric functions and Schur functions connect tableaux with
+representation theory.
+
+Möbius inversion generalizes inclusion--exclusion to partially ordered
+sets.
+
+Polynomial and matrix invariants such as chromatic polynomials,
+Tutte polynomials, and adjacency spectra translate combinatorial
+structure into algebra.
+
+The overall theme is
+
+\[
+\boxed{
+\text{symmetry}
++
+\text{algebra}
++
+\text{enumeration}
++
+\text{structure}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:algebraic-combinatorics-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Algebraic Combinatorics builds on the symmetry, permutation, partition,
+and generating-function ideas developed throughout the earlier sections
+of Chapter 6. It connects especially strongly with Chapter~\ref{chap:algebra}
+through group actions, symmetric groups, representation theory, finite
+fields, and polynomial algebra. The next section, Probabilistic
+Combinatorics, replaces algebraic averaging over symmetry groups with
+probabilistic averaging over random structures. Graph Theory later
+develops chromatic, spectral, and structural graph concepts in greater
+detail. Design Theory uses group actions, incidence algebras, and
+association schemes, while Matroid Theory generalizes deletion--
+contraction and Tutte-polynomial methods to abstract independence
+structures.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 6.7 Algebraic Combinatorics
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard algebraic combinatorics.
+%   - Standard finite group actions.
+%   - Standard symmetry enumeration.
+%   - Standard symmetric-function and tableau theory.
+%   - Standard incidence-algebra methods.
+%
+% Used for:
+%   - group actions;
+%   - orbits and stabilizers;
+%   - orbit--stabilizer theorem;
+%   - Burnside's lemma;
+%   - fixed-point enumeration;
+%   - cycle structure;
+%   - necklace and bracelet counting;
+%   - cycle index polynomials;
+%   - Polya enumeration;
+%   - color-content enumeration;
+%   - permutation statistics;
+%   - q-integers;
+%   - q-factorials;
+%   - Gaussian binomial coefficients;
+%   - finite-field subspace counting;
+%   - Young diagrams;
+%   - Young tableaux;
+%   - hook lengths;
+%   - hook-length formula;
+%   - Young's lattice;
+%   - symmetric polynomials;
+%   - elementary symmetric functions;
+%   - complete homogeneous symmetric functions;
+%   - power-sum symmetric functions;
+%   - Schur functions;
+%   - representation-theoretic connections;
+%   - Robinson--Schensted correspondence;
+%   - longest increasing subsequences;
+%   - incidence algebras;
+%   - zeta and Möbius functions of posets;
+%   - Möbius inversion;
+%   - Boolean-lattice inclusion--exclusion;
+%   - chromatic polynomial preview;
+%   - deletion--contraction;
+%   - Tutte polynomial preview;
+%   - adjacency algebra;
+%   - spectral invariants;
+%   - association schemes;
+%   - Bose--Mesner algebra;
+%   - distance-regular graphs;
+%   - applications and exercises.
+%
+% Notes:
+%   - Group theory and representation theory are developed more
+%     systematically in Chapter 1.
+%   - Graph polynomial and spectral ideas are revisited in Graph Theory.
+%   - Association schemes connect strongly with Design Theory.
+%   - Deletion--contraction and the Tutte polynomial reappear naturally
+%     in Matroid Theory.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

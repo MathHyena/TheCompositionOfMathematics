@@ -1,0 +1,4076 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.16 SPATIAL STATISTICS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Spatial Statistics}
+\label{sec:spatial-statistics}
+
+\prerequisite{
+Probability, random variables, covariance and correlation, regression,
+multivariate statistics, hypothesis testing, stochastic processes,
+matrix algebra, and basic geometry.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain what distinguishes spatial data from ordinary
+          independent observations;
+    \item distinguish geostatistical, areal, and point-pattern data;
+    \item define spatial location, distance, and neighborhood structure;
+    \item explain spatial dependence and spatial autocorrelation;
+    \item understand first-order and second-order spatial structure;
+    \item define spatial covariance functions;
+    \item understand isotropy and anisotropy;
+    \item understand stationarity in spatial processes;
+    \item define semivariograms and variograms;
+    \item interpret nugget, sill, and range;
+    \item construct empirical semivariograms conceptually;
+    \item understand common variogram models;
+    \item understand kriging conceptually;
+    \item distinguish ordinary, simple, and universal kriging;
+    \item derive basic kriging weights conceptually;
+    \item understand spatial prediction uncertainty;
+    \item define spatial weights matrices;
+    \item compute and interpret Moran's \(I\);
+    \item understand Geary's \(C\);
+    \item understand local indicators of spatial association;
+    \item distinguish global and local spatial statistics;
+    \item understand spatial regression conceptually;
+    \item distinguish spatial lag and spatial error models;
+    \item understand neighborhood-based areal models;
+    \item understand Gaussian random fields conceptually;
+    \item understand conditional autoregressive models conceptually;
+    \item understand simultaneous autoregressive models conceptually;
+    \item understand point processes;
+    \item define intensity functions;
+    \item understand homogeneous Poisson point processes;
+    \item understand Ripley's \(K\)-function conceptually;
+    \item distinguish clustering, inhibition, and complete spatial
+          randomness;
+    \item understand edge effects;
+    \item recognize spatial confounding;
+    \item understand spatial sampling design;
+    \item understand spatial interpolation;
+    \item recognize spatiotemporal extensions;
+    \item connect spatial statistics with stochastic processes,
+          regression, environmental modeling, and statistical learning.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Spatial Statistics?}
+\label{subsec:what-is-spatial-statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial statistics studies data indexed by geographic or spatial
+location.
+
+An observation may be represented as
+
+\[
+\boxed{
+Y(\mathbf{s}),
+}
+\]
+
+where
+
+\[
+\mathbf{s}
+\in
+\mathbb{R}^d
+\]
+
+is a spatial location.
+
+For two-dimensional geographic data,
+
+\[
+\boxed{
+\mathbf{s}
+=
+\begin{pmatrix}
+s_1\\
+s_2
+\end{pmatrix}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Location Matters}
+\label{subsec:why-location-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nearby observations are often more similar than distant observations.
+
+For example, measurements of
+
+\[
+\boxed{
+\text{temperature},
+}
+\]
+
+\[
+\boxed{
+\text{rainfall},
+}
+\]
+
+\[
+\boxed{
+\text{soil chemistry},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{disease prevalence}
+}
+\]
+
+may exhibit spatial dependence.
+
+Thus ordinary independence assumptions may fail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Dependence}
+\label{subsec:spatial-dependence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial dependence means that the distribution of an observation depends
+on the values observed at other locations.
+
+Informally,
+
+\[
+\boxed{
+\text{nearby locations often provide related information}.
+}
+\]
+
+This dependence may arise from:
+
+\[
+\boxed{
+\text{physical diffusion},
+}
+\]
+
+\[
+\boxed{
+\text{shared environment},
+}
+\]
+
+\[
+\boxed{
+\text{movement},
+}
+\]
+
+\[
+\boxed{
+\text{social interaction},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{common latent processes}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Three Major Spatial Data Types}
+\label{subsec:three-spatial-data-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial statistics commonly distinguishes:
+
+\[
+\boxed{
+\text{geostatistical data},
+}
+\]
+
+\[
+\boxed{
+\text{areal data},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{spatial point patterns}.
+}
+\]
+
+Each type requires different statistical tools.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geostatistical Data}
+\label{subsec:geostatistical-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Geostatistical data consist of measurements observed at locations within
+a continuous spatial region.
+
+Examples include:
+
+\[
+\boxed{
+\text{temperature at weather stations},
+}
+\]
+
+\[
+\boxed{
+\text{dissolved oxygen at monitoring sites},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{soil concentration measurements}.
+}
+\]
+
+The underlying process is conceptualized as existing throughout the
+region, even where it was not observed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Areal Data}
+\label{subsec:areal-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Areal data are aggregated over regions such as:
+
+\[
+\boxed{
+\text{counties},
+}
+\]
+
+\[
+\boxed{
+\text{states},
+}
+\]
+
+\[
+\boxed{
+\text{school districts},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{census tracts}.
+}
+\]
+
+Spatial relationships are often represented through neighborhood or
+adjacency structures rather than continuous distance alone.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Point Patterns}
+\label{subsec:spatial-point-patterns}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Point-pattern data consist of locations where events occur.
+
+Examples include:
+
+\[
+\boxed{
+\text{tree locations},
+}
+\]
+
+\[
+\boxed{
+\text{earthquake epicenters},
+}
+\]
+
+\[
+\boxed{
+\text{crime incidents},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{disease cases}.
+}
+\]
+
+The locations themselves are the primary random objects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Coordinates}
+\label{subsec:spatial-coordinates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A location may be represented by coordinates
+
+\[
+\mathbf{s}_i.
+\]
+
+For planar data,
+
+\[
+\boxed{
+\mathbf{s}_i
+=
+(x_i,y_i).
+}
+\]
+
+Distance between two locations can be defined using Euclidean distance:
+
+\[
+\boxed{
+d_{ij}
+=
+\|
+\mathbf{s}_i-\mathbf{s}_j
+\|_2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euclidean Distance}
+\label{subsec:spatial-euclidean-distance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\mathbf{s}_i=(x_i,y_i)
+\]
+
+and
+
+\[
+\mathbf{s}_j=(x_j,y_j),
+\]
+
+the Euclidean distance is
+
+\[
+\boxed{
+d_{ij}
+=
+\sqrt{
+(x_i-x_j)^2
++
+(y_i-y_j)^2
+}.
+}
+\]
+
+This is appropriate when planar geometry is reasonable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geographic Distance}
+\label{subsec:geographic-distance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For large geographic regions, longitude and latitude lie on a curved
+surface.
+
+Straight Euclidean distance on raw latitude--longitude coordinates may
+therefore be inappropriate.
+
+Possible alternatives include:
+
+\[
+\boxed{
+\text{great-circle distance},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{projected coordinate systems}.
+}
+\]
+
+The distance definition should match the spatial scale and geometry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{First-Order Spatial Structure}
+\label{subsec:first-order-spatial-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+First-order structure concerns changes in the mean across space.
+
+A spatial process may satisfy
+
+\[
+\boxed{
+\mathbb{E}
+[
+Y(\mathbf{s})
+]
+=
+\mu(\mathbf{s}).
+}
+\]
+
+For example,
+
+\[
+\mu(\mathbf{s})
+\]
+
+may depend on:
+
+\[
+\boxed{
+\text{elevation},
+}
+\]
+
+\[
+\boxed{
+\text{distance from the coast},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{latitude}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Spatial Structure}
+\label{subsec:second-order-spatial-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Second-order structure describes covariance between observations at
+different locations.
+
+Define
+
+\[
+\boxed{
+C(\mathbf{s},\mathbf{t})
+=
+\operatorname{Cov}
+\left[
+Y(\mathbf{s}),
+Y(\mathbf{t})
+\right].
+}
+\]
+
+This determines how spatial dependence changes with separation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Second-Order Stationarity}
+\label{subsec:spatial-second-order-stationarity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spatial process is second-order stationary if
+
+\[
+\boxed{
+\mathbb{E}
+[
+Y(\mathbf{s})
+]
+=
+\mu
+}
+\]
+
+for every location and
+
+\[
+\boxed{
+\operatorname{Cov}
+[
+Y(\mathbf{s}),
+Y(\mathbf{s}+\mathbf{h})
+]
+=
+C(\mathbf{h})
+}
+\]
+
+depends only on the displacement vector
+
+\[
+\mathbf{h}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Lag Vector}
+\label{subsec:spatial-lag-vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For locations
+
+\[
+\mathbf{s}
+\]
+
+and
+
+\[
+\mathbf{s}+\mathbf{h},
+\]
+
+the vector
+
+\[
+\boxed{
+\mathbf{h}
+}
+\]
+
+is the spatial lag.
+
+It contains both:
+
+\[
+\boxed{
+\text{distance}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{direction}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Isotropy}
+\label{subsec:spatial-isotropy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A stationary covariance function is isotropic if dependence depends only
+on distance:
+
+\[
+\boxed{
+C(\mathbf{h})
+=
+C
+(
+\|\mathbf{h}\|
+).
+}
+\]
+
+Thus two pairs of locations separated by the same distance have the same
+covariance regardless of direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Anisotropy}
+\label{subsec:spatial-anisotropy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A process is anisotropic when spatial dependence differs by direction.
+
+For example, pollution may spread more strongly along prevailing wind
+directions.
+
+Then
+
+\[
+\boxed{
+C(\mathbf{h})
+}
+\]
+
+depends on both the length and direction of \(\mathbf{h}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Covariance Function}
+\label{subsec:spatial-covariance-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A covariance function
+
+\[
+\boxed{
+C(\mathbf{h})
+}
+\]
+
+must generate valid positive semidefinite covariance matrices.
+
+For locations
+
+\[
+\mathbf{s}_1,\ldots,\mathbf{s}_n,
+\]
+
+the matrix
+
+\[
+\boxed{
+\Sigma_{ij}
+=
+C
+(
+\mathbf{s}_i-\mathbf{s}_j
+)
+}
+\]
+
+must satisfy
+
+\[
+\boxed{
+\mathbf{a}^T
+\Sigma
+\mathbf{a}
+\geq0
+}
+\]
+
+for every vector \(\mathbf{a}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Correlation Function}
+\label{subsec:spatial-correlation-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+C(\mathbf{0})>0,
+\]
+
+the spatial correlation function is
+
+\[
+\boxed{
+\rho(\mathbf{h})
+=
+\frac{
+C(\mathbf{h})
+}{
+C(\mathbf{0})
+}.
+}
+\]
+
+For isotropic processes, this is often written
+
+\[
+\boxed{
+\rho(h),
+\qquad
+h=\|\mathbf{h}\|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential Covariance Model}
+\label{subsec:exponential-spatial-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common isotropic covariance model is
+
+\[
+\boxed{
+C(h)
+=
+\sigma^2
+e^{-h/\phi},
+}
+\]
+
+where
+
+\[
+\sigma^2
+\]
+
+controls variance and
+
+\[
+\phi>0
+\]
+
+controls spatial correlation length.
+
+As \(h\) increases,
+
+\[
+C(h)
+\to0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gaussian Covariance Model}
+\label{subsec:gaussian-spatial-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another model is
+
+\[
+\boxed{
+C(h)
+=
+\sigma^2
+\exp
+\left[
+-
+\left(
+\frac{h}{\phi}
+\right)^2
+\right].
+}
+\]
+
+This produces a smoother spatial process than the exponential model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matérn Covariance Preview}
+\label{subsec:matern-covariance-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A flexible spatial covariance family is the Matérn family.
+
+One form is
+
+\[
+\boxed{
+C(h)
+=
+\sigma^2
+\frac{
+2^{1-\nu}
+}{
+\Gamma(\nu)
+}
+\left(
+\frac{h}{\phi}
+\right)^\nu
+K_\nu
+\left(
+\frac{h}{\phi}
+\right),
+}
+\]
+
+where \(K_\nu\) is a modified Bessel function.
+
+The parameter
+
+\[
+\nu
+\]
+
+controls smoothness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intrinsic Stationarity}
+\label{subsec:intrinsic-stationarity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some spatial processes may not have a stationary covariance function but
+their increments may still have stable behavior.
+
+A process is intrinsically stationary if
+
+\[
+\boxed{
+\mathbb{E}
+[
+Y(\mathbf{s}+\mathbf{h})
+-
+Y(\mathbf{s})
+]
+}
+\]
+
+does not depend on \(\mathbf{s}\), and the variance of the increment
+depends only on \(\mathbf{h}\).
+
+This motivates variogram methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Semivariogram}
+\label{subsec:semivariogram}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The semivariogram is defined by
+
+\[
+\boxed{
+\gamma(\mathbf{h})
+=
+\frac12
+\operatorname{Var}
+\left[
+Y(\mathbf{s}+\mathbf{h})
+-
+Y(\mathbf{s})
+\right].
+}
+\]
+
+Under isotropy,
+
+\[
+\boxed{
+\gamma(h)
+}
+\]
+
+depends only on distance \(h\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Semivariogram and Covariance}
+\label{subsec:semivariogram-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a second-order stationary process,
+
+\[
+\operatorname{Var}
+[
+Y(\mathbf{s}+\mathbf{h})
+-
+Y(\mathbf{s})
+]
+=
+2C(0)-2C(\mathbf{h}).
+\]
+
+Therefore,
+
+\[
+\boxed{
+\gamma(\mathbf{h})
+=
+C(0)-C(\mathbf{h}).
+}
+\]
+
+Thus increasing semivariance corresponds to decreasing covariance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variogram}
+\label{subsec:variogram}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some authors call
+
+\[
+\boxed{
+2\gamma(\mathbf{h})
+}
+\]
+
+the variogram and
+
+\[
+\gamma(\mathbf{h})
+\]
+
+the semivariogram.
+
+Terminology varies.
+
+The convention used should therefore be stated explicitly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empirical Semivariogram}
+\label{subsec:empirical-semivariogram}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(N(h)\) is the set of location pairs whose separation is near
+distance \(h\).
+
+A common empirical estimator is
+
+\[
+\boxed{
+\widehat{\gamma}(h)
+=
+\frac{
+1
+}{
+2|N(h)|
+}
+\sum_{(i,j)\in N(h)}
+[
+Y(\mathbf{s}_i)
+-
+Y(\mathbf{s}_j)
+]^2.
+}
+\]
+
+Distances are usually grouped into lag bins.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Empirical Semivariance}
+\label{subsec:worked-empirical-semivariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One Distance Bin}
+
+Suppose three pairs of observations at approximately the same separation
+have differences
+
+\[
+2,
+\quad
+-4,
+\quad
+3.
+\]
+
+Then
+
+\[
+\widehat{\gamma}(h)
+=
+\frac1{2(3)}
+\left[
+2^2+(-4)^2+3^2
+\right].
+\]
+
+Thus,
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\gamma}(h)
+=
+\frac{29}{6}
+\approx
+4.833.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nugget}
+\label{subsec:variogram-nugget}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The nugget represents semivariance at extremely small spatial separation.
+
+A nonzero nugget may reflect:
+
+\[
+\boxed{
+\text{measurement error},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{spatial variation below the sampling resolution}.
+}
+\]
+
+A pure continuous process without measurement error may have
+
+\[
+\gamma(0)=0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sill}
+\label{subsec:variogram-sill}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sill is the level approached by the semivariogram at large distances
+when spatial correlation becomes negligible.
+
+For a stationary process,
+
+\[
+\boxed{
+\text{sill}
+\approx
+C(0)
+}
+\]
+
+up to nugget conventions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Range}
+\label{subsec:variogram-range}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The range is the distance beyond which spatial dependence is negligible
+under a chosen model.
+
+Some covariance models reach the sill exactly.
+
+Others, such as exponential models, approach it asymptotically.
+
+Then a practical range is often defined using a chosen correlation
+threshold.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spherical Semivariogram Model}
+\label{subsec:spherical-semivariogram}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common spherical model is
+
+\[
+\boxed{
+\gamma(h)
+=
+\begin{cases}
+c_0
++
+c
+\left[
+\dfrac{3h}{2a}
+-
+\dfrac12
+\left(
+\dfrac{h}{a}
+\right)^3
+\right],
+&
+0<h\leq a,
+\\[1em]
+c_0+c,
+&
+h>a,
+\end{cases}
+}
+\]
+
+with
+
+\[
+\gamma(0)=0
+\]
+
+under one common nugget convention.
+
+Here,
+
+\[
+c_0
+=
+\text{nugget},
+\]
+
+\[
+c_0+c
+=
+\text{sill},
+\]
+
+and
+
+\[
+a
+=
+\text{range}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential Semivariogram}
+\label{subsec:exponential-semivariogram}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common exponential semivariogram is
+
+\[
+\boxed{
+\gamma(h)
+=
+c_0
++
+c
+\left[
+1-e^{-h/\phi}
+\right]
+}
+\]
+
+for \(h>0\), under a nugget convention.
+
+It approaches the sill
+
+\[
+c_0+c
+\]
+
+as
+
+\[
+h\to\infty.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directional Variograms}
+\label{subsec:directional-variograms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To investigate anisotropy, empirical semivariograms can be computed
+separately for different directions.
+
+For example:
+
+\[
+\boxed{
+\text{north--south},
+}
+\]
+
+\[
+\boxed{
+\text{east--west},
+}
+\]
+
+or other angular sectors.
+
+Different ranges or sills by direction suggest anisotropy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kriging}
+\label{subsec:kriging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kriging is a spatial prediction method that combines observed values
+using weights derived from a spatial covariance or variogram model.
+
+A predictor at unobserved location
+
+\[
+\mathbf{s}_0
+\]
+
+has the form
+
+\[
+\boxed{
+\widehat{Y}
+(
+\mathbf{s}_0
+)
+=
+\sum_{i=1}^{n}
+\lambda_i
+Y
+(
+\mathbf{s}_i
+).
+}
+\]
+
+The weights depend on spatial dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kriging Versus Ordinary Weighted Averaging}
+\label{subsec:kriging-versus-weighting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kriging does not assign weights solely according to distance.
+
+It accounts for:
+
+\[
+\boxed{
+\text{distance to the prediction location},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{dependence among observed locations}.
+}
+\]
+
+Two observations very close to each other may contain redundant
+information and therefore receive less combined weight.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Kriging}
+\label{subsec:simple-kriging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Simple kriging assumes the process mean
+
+\[
+\mu
+\]
+
+is known.
+
+The predictor may be written
+
+\[
+\boxed{
+\widehat{Y}(\mathbf{s}_0)
+=
+\mu
++
+\mathbf{c}_0^T
+\Sigma^{-1}
+(
+\mathbf{Y}
+-
+\mu\mathbf{1}
+),
+}
+\]
+
+where
+
+\[
+\mathbf{c}_0
+=
+\operatorname{Cov}
+(
+\mathbf{Y},
+Y(\mathbf{s}_0)
+).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Kriging Weights}
+\label{subsec:simple-kriging-weights}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a centered process,
+
+\[
+\widehat{Y}
+(
+\mathbf{s}_0
+)
+=
+\boldsymbol{\lambda}^T
+\mathbf{Y}.
+\]
+
+The minimum mean squared prediction error weights satisfy
+
+\[
+\boxed{
+\Sigma
+\boldsymbol{\lambda}
+=
+\mathbf{c}_0.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\boldsymbol{\lambda}
+=
+\Sigma^{-1}
+\mathbf{c}_0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Kriging Variance}
+\label{subsec:simple-kriging-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+C(0)
+=
+\operatorname{Var}
+[
+Y(\mathbf{s}_0)
+].
+\]
+
+The minimum prediction-error variance is
+
+\[
+\boxed{
+\sigma_K^2
+=
+C(0)
+-
+\mathbf{c}_0^T
+\Sigma^{-1}
+\mathbf{c}_0.
+}
+\]
+
+This quantifies spatial prediction uncertainty under the assumed model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ordinary Kriging}
+\label{subsec:ordinary-kriging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary kriging assumes an unknown but constant mean.
+
+The predictor is
+
+\[
+\boxed{
+\widehat{Y}
+(
+\mathbf{s}_0
+)
+=
+\sum_{i=1}^{n}
+\lambda_i
+Y
+(
+\mathbf{s}_i
+),
+}
+\]
+
+with unbiasedness constraint
+
+\[
+\boxed{
+\sum_{i=1}^{n}\lambda_i=1.
+}
+\]
+
+A Lagrange multiplier is used to minimize prediction variance subject to
+this constraint.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ordinary Kriging System}
+\label{subsec:ordinary-kriging-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using covariance notation, the weights satisfy a system of the form
+
+\[
+\boxed{
+\begin{pmatrix}
+\Sigma
+&
+\mathbf{1}
+\\
+\mathbf{1}^T
+&
+0
+\end{pmatrix}
+\begin{pmatrix}
+\boldsymbol{\lambda}\\
+\nu
+\end{pmatrix}
+=
+\begin{pmatrix}
+\mathbf{c}_0\\
+1
+\end{pmatrix}.
+}
+\]
+
+The multiplier
+
+\[
+\nu
+\]
+
+enforces the unbiasedness constraint.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universal Kriging}
+\label{subsec:universal-kriging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Universal kriging allows the mean to vary with spatial covariates.
+
+For example,
+
+\[
+\boxed{
+\mu(\mathbf{s})
+=
+\beta_0
++
+\beta_1x_1(\mathbf{s})
++
+\cdots
++
+\beta_px_p(\mathbf{s}).
+}
+\]
+
+The residual spatial process is modeled through a covariance structure.
+
+Thus universal kriging combines:
+
+\[
+\boxed{
+\text{regression}
++
+\text{spatial covariance}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression Kriging}
+\label{subsec:regression-kriging}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common conceptual decomposition is
+
+\[
+\boxed{
+Y(\mathbf{s})
+=
+\mathbf{x}(\mathbf{s})^T
+\boldsymbol{\beta}
++
+Z(\mathbf{s}),
+}
+\]
+
+where
+
+\[
+Z(\mathbf{s})
+\]
+
+is a mean-zero spatially correlated residual process.
+
+Prediction combines the fitted regression component and a kriged
+residual.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gaussian Random Fields}
+\label{subsec:gaussian-random-fields}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Gaussian random field is a spatial process for which every finite
+collection
+
+\[
+\boxed{
+(
+Y(\mathbf{s}_1),
+\ldots,
+Y(\mathbf{s}_n)
+)
+}
+\]
+
+has a multivariate normal distribution.
+
+Thus the process is completely specified by:
+
+\[
+\boxed{
+\text{mean function}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{covariance function}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gaussian Process Spatial Model}
+\label{subsec:gaussian-process-spatial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common model is
+
+\[
+\boxed{
+Y(\mathbf{s})
+=
+\mu(\mathbf{s})
++
+Z(\mathbf{s})
++
+\varepsilon(\mathbf{s}),
+}
+\]
+
+where
+
+\[
+Z(\mathbf{s})
+\]
+
+is a Gaussian spatial process and
+
+\[
+\varepsilon(\mathbf{s})
+\]
+
+is independent measurement error.
+
+This naturally produces a nugget effect.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Prediction as Conditional Normal Theory}
+\label{subsec:spatial-conditional-normal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under a Gaussian process,
+
+\[
+\begin{pmatrix}
+\mathbf{Y}\\
+Y(\mathbf{s}_0)
+\end{pmatrix}
+\]
+
+is jointly normal.
+
+Therefore the conditional distribution
+
+\[
+\boxed{
+Y(\mathbf{s}_0)
+\mid
+\mathbf{Y}
+}
+\]
+
+is normal.
+
+Its conditional mean produces the kriging predictor, while its
+conditional variance gives prediction uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Weights Matrix}
+\label{subsec:spatial-weights-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For areal data, spatial relationships are often represented by a matrix
+
+\[
+\boxed{
+W=(w_{ij}).
+}
+\]
+
+The entry
+
+\[
+w_{ij}
+\]
+
+describes how strongly region \(j\) is considered a neighbor of region
+\(i\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Adjacency Weights}
+\label{subsec:binary-adjacency-weights}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple choice is
+
+\[
+\boxed{
+w_{ij}
+=
+\begin{cases}
+1,
+&
+\text{regions }i\text{ and }j\text{ are neighbors},
+\\
+0,
+&
+\text{otherwise}.
+\end{cases}
+}
+\]
+
+Typically,
+
+\[
+\boxed{
+w_{ii}=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rook and Queen Adjacency}
+\label{subsec:rook-queen-adjacency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For polygonal regions:
+
+\[
+\boxed{
+\text{rook adjacency}
+}
+\]
+
+requires a shared boundary segment.
+
+\[
+\boxed{
+\text{queen adjacency}
+}
+\]
+
+allows either a shared boundary or a shared corner.
+
+The chosen neighborhood definition can affect results.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distance-Based Weights}
+\label{subsec:distance-based-spatial-weights}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Weights may depend on distance.
+
+For example,
+
+\[
+\boxed{
+w_{ij}
+=
+\frac1{
+d_{ij}
+}
+}
+\]
+
+for \(i\neq j\), or
+
+\[
+\boxed{
+w_{ij}
+=
+\mathbf{1}
+\{
+d_{ij}\leq d_0
+\}.
+}
+\]
+
+The weighting rule should represent the scientific mechanism of spatial
+interaction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Row Standardization}
+\label{subsec:row-standardization-spatial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A weights matrix is often row-standardized:
+
+\[
+\boxed{
+w_{ij}^*
+=
+\frac{
+w_{ij}
+}{
+\sum_jw_{ij}
+}.
+}
+\]
+
+Then each row sums to \(1\).
+
+This makes
+
+\[
+\sum_j
+w_{ij}^*Y_j
+\]
+
+a weighted average of neighboring values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Lag}
+\label{subsec:spatial-lag}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For areal observations stored in vector
+
+\[
+\mathbf{y},
+\]
+
+the spatial lag is
+
+\[
+\boxed{
+W\mathbf{y}.
+}
+\]
+
+The \(i\)-th component is
+
+\[
+\boxed{
+\sum_j
+w_{ij}y_j.
+}
+\]
+
+It summarizes neighboring outcomes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Autocorrelation}
+\label{subsec:spatial-autocorrelation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial autocorrelation measures similarity between values at nearby
+locations.
+
+Positive spatial autocorrelation means nearby observations tend to be
+similar.
+
+Negative spatial autocorrelation means neighboring observations tend to
+be dissimilar.
+
+No spatial autocorrelation means the spatial arrangement carries little
+systematic information about the observed values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Moran's \(I\)}
+\label{subsec:morans-i}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A widely used global spatial autocorrelation statistic is Moran's \(I\):
+
+\[
+\boxed{
+I
+=
+\frac{
+n
+}{
+S_0
+}
+\frac{
+\displaystyle
+\sum_i
+\sum_j
+w_{ij}
+(
+y_i-\overline{y}
+)
+(
+y_j-\overline{y}
+)
+}{
+\displaystyle
+\sum_i
+(
+y_i-\overline{y}
+)^2
+},
+}
+\]
+
+where
+
+\[
+\boxed{
+S_0
+=
+\sum_i
+\sum_j
+w_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of Moran's \(I\)}
+\label{subsec:morans-i-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large positive values indicate spatial clustering of similar values.
+
+Negative values indicate neighboring dissimilarity.
+
+The exact expected value under a randomization null is often
+
+\[
+\boxed{
+\mathbb{E}[I]
+=
+-\frac1{n-1}
+}
+\]
+
+under common assumptions.
+
+Therefore the null expectation is not generally exactly zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Moran Structure}
+\label{subsec:worked-moran-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Neighbor Similarity}
+
+Suppose neighboring regions tend to have outcomes both above the mean or
+both below the mean.
+
+Then terms
+
+\[
+(
+y_i-\overline{y}
+)
+(
+y_j-\overline{y}
+)
+\]
+
+are often positive.
+
+Therefore the numerator of Moran's \(I\) tends to increase.
+
+\begin{answerbox}
+\[
+\boxed{
+I>0
+\text{ suggests positive spatial autocorrelation.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geary's \(C\)}
+\label{subsec:gearys-c}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another global spatial statistic is Geary's \(C\):
+
+\[
+\boxed{
+C
+=
+\frac{
+(n-1)
+\displaystyle
+\sum_i
+\sum_j
+w_{ij}
+(
+y_i-y_j
+)^2
+}{
+2S_0
+\displaystyle
+\sum_i
+(
+y_i-\overline{y}
+)^2
+}.
+}
+\]
+
+Unlike Moran's \(I\), it is based directly on neighboring differences.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of Geary's \(C\)}
+\label{subsec:gearys-c-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under common null formulations,
+
+\[
+\boxed{
+C\approx1
+}
+\]
+
+indicates little spatial autocorrelation.
+
+Values
+
+\[
+\boxed{
+C<1
+}
+\]
+
+suggest positive spatial autocorrelation.
+
+Values
+
+\[
+\boxed{
+C>1
+}
+\]
+
+suggest negative spatial autocorrelation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Versus Local Spatial Statistics}
+\label{subsec:global-versus-local-spatial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Global statistics summarize spatial dependence across the entire study
+region.
+
+Local statistics identify spatial patterns around particular locations.
+
+Thus:
+
+\[
+\boxed{
+\text{global}
+=
+\text{overall spatial structure},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{local}
+=
+\text{location-specific spatial structure}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Moran's \(I\)}
+\label{subsec:local-morans-i}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common local Moran statistic has the form
+
+\[
+\boxed{
+I_i
+=
+\frac{
+y_i-\overline{y}
+}{
+m_2
+}
+\sum_j
+w_{ij}
+(
+y_j-\overline{y}
+),
+}
+\]
+
+where \(m_2\) is a variance-like normalization.
+
+It measures whether observation \(i\) is surrounded by similar or
+dissimilar values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LISA}
+\label{subsec:lisa}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Local indicators of spatial association are often abbreviated LISA.
+
+They can identify:
+
+\[
+\boxed{
+\text{high--high clusters},
+}
+\]
+
+\[
+\boxed{
+\text{low--low clusters},
+}
+\]
+
+\[
+\boxed{
+\text{high--low outliers},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{low--high outliers}.
+}
+\]
+
+Multiple-testing issues arise when many local statistics are examined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Regression}
+\label{subsec:spatial-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary regression assumes errors are independent after conditioning on
+predictors.
+
+Spatial data may violate this assumption.
+
+A basic regression model is
+
+\[
+\boxed{
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+}
+\]
+
+If
+
+\[
+\boldsymbol{\varepsilon}
+\]
+
+is spatially correlated, ordinary least-squares standard errors may be
+incorrect.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Error Model}
+\label{subsec:spatial-error-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spatial error model places spatial dependence in the residual process:
+
+\[
+\boxed{
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\mathbf{u},
+}
+\]
+
+with
+
+\[
+\boxed{
+\mathbf{u}
+=
+\lambda
+W\mathbf{u}
++
+\boldsymbol{\varepsilon}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+(
+I-\lambda W
+)
+\mathbf{u}
+=
+\boldsymbol{\varepsilon}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Lag Model}
+\label{subsec:spatial-lag-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spatial lag model includes neighboring outcomes directly:
+
+\[
+\boxed{
+\mathbf{y}
+=
+\rho
+W\mathbf{y}
++
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+}
+\]
+
+The parameter
+
+\[
+\rho
+\]
+
+controls dependence on neighboring response values.
+
+This is also called a spatial autoregressive model in some contexts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reduced Form of the Spatial Lag Model}
+\label{subsec:spatial-lag-reduced-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rearrange:
+
+\[
+(
+I-\rho W
+)
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+\]
+
+If the inverse exists,
+
+\[
+\boxed{
+\mathbf{y}
+=
+(
+I-\rho W
+)^{-1}
+X\boldsymbol{\beta}
++
+(
+I-\rho W
+)^{-1}
+\boldsymbol{\varepsilon}.
+}
+\]
+
+Thus a local change can propagate through the spatial network.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Lag Versus Spatial Error Dependence}
+\label{subsec:spatial-lag-versus-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spatial lag model says neighboring outcomes directly enter the response
+structure.
+
+A spatial error model says dependence remains in unobserved residual
+factors.
+
+These correspond to different scientific mechanisms and should not be
+selected solely by whichever model fits better numerically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Confounding}
+\label{subsec:spatial-confounding}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial confounding can arise when a predictor has spatial structure that
+overlaps strongly with an unobserved spatial effect.
+
+Then estimated covariate effects and spatial random effects may be
+difficult to distinguish.
+
+This can increase uncertainty or alter coefficient interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditional Autoregressive Models}
+\label{subsec:conditional-autoregressive-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Conditional autoregressive, or CAR, models are commonly used for areal
+spatial random effects.
+
+The distribution of spatial effect \(U_i\) is specified conditionally on
+neighboring effects.
+
+Conceptually,
+
+\[
+\boxed{
+U_i
+\mid
+U_{-i}
+}
+\]
+
+has a mean related to nearby
+
+\[
+U_j.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple CAR Structure}
+\label{subsec:simple-car-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simplified conditional mean may have the form
+
+\[
+\boxed{
+\mathbb{E}
+[
+U_i
+\mid
+U_{-i}
+]
+=
+\frac{
+\sum_j
+w_{ij}U_j
+}{
+\sum_jw_{ij}
+}.
+}
+\]
+
+Thus each region tends toward a weighted average of its neighbors.
+
+The corresponding conditional variance often decreases when a region has
+more neighbors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intrinsic CAR Preview}
+\label{subsec:intrinsic-car-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Intrinsic CAR models use local difference penalties such as
+
+\[
+\boxed{
+\sum_{i\sim j}
+(
+U_i-U_j
+)^2.
+}
+\]
+
+These models encourage neighboring effects to be similar.
+
+Some intrinsic CAR priors are improper until an identifiability
+constraint such as
+
+\[
+\boxed{
+\sum_iU_i=0
+}
+\]
+
+is imposed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simultaneous Autoregressive Models}
+\label{subsec:simultaneous-autoregressive-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simultaneous autoregressive, or SAR, model may be written
+
+\[
+\boxed{
+\mathbf{u}
+=
+\rho W\mathbf{u}
++
+\boldsymbol{\varepsilon}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mathbf{u}
+=
+(
+I-\rho W
+)^{-1}
+\boldsymbol{\varepsilon}.
+}
+\]
+
+This gives an explicit joint covariance structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{CAR Versus SAR}
+\label{subsec:car-versus-sar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+CAR models are usually specified through conditional distributions.
+
+SAR models are usually specified through simultaneous equations.
+
+Both generate spatial dependence, but their mathematical constructions
+differ.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Generalized Linear Models}
+\label{subsec:spatial-generalized-linear-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial dependence can be incorporated into models for non-Gaussian
+outcomes.
+
+For binary data,
+
+\[
+\boxed{
+Y_i
+\sim
+\operatorname{Bernoulli}(p_i),
+}
+\]
+
+with
+
+\[
+\boxed{
+\operatorname{logit}(p_i)
+=
+\mathbf{x}_i^T
+\boldsymbol{\beta}
++
+U_i.
+}
+\]
+
+For count data,
+
+\[
+\boxed{
+Y_i
+\sim
+\operatorname{Poisson}(\lambda_i),
+}
+\]
+
+with
+
+\[
+\boxed{
+\log\lambda_i
+=
+\mathbf{x}_i^T
+\boldsymbol{\beta}
++
+U_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Point Processes}
+\label{subsec:point-processes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spatial point process models a random collection of event locations.
+
+Let
+
+\[
+N(A)
+\]
+
+denote the number of events in spatial region \(A\).
+
+The process is characterized by probabilities for these random counts and
+event configurations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intensity Function}
+\label{subsec:spatial-intensity-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The intensity function
+
+\[
+\boxed{
+\lambda(\mathbf{s})
+}
+\]
+
+describes expected event density near location \(\mathbf{s}\).
+
+Informally,
+
+\[
+\boxed{
+\lambda(\mathbf{s})
+\approx
+\frac{
+\mathbb{E}
+[
+N(d\mathbf{s})
+]
+}{
+|d\mathbf{s}|
+}.
+}
+\]
+
+For a homogeneous process,
+
+\[
+\boxed{
+\lambda(\mathbf{s})
+=
+\lambda.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homogeneous Poisson Point Process}
+\label{subsec:homogeneous-poisson-point-process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A homogeneous Poisson point process has constant intensity
+
+\[
+\lambda.
+\]
+
+For region \(A\),
+
+\[
+\boxed{
+N(A)
+\sim
+\operatorname{Poisson}
+(
+\lambda|A|
+),
+}
+\]
+
+where
+
+\[
+|A|
+\]
+
+is the area of \(A\).
+
+Counts in disjoint regions are independent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete Spatial Randomness}
+\label{subsec:complete-spatial-randomness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A homogeneous Poisson point process is commonly used as a model of
+complete spatial randomness, abbreviated CSR.
+
+Under CSR:
+
+\[
+\boxed{
+\text{intensity is constant},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{events do not interact}.
+}
+\]
+
+Observed departures may suggest clustering or inhibition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Clustering and Inhibition}
+\label{subsec:clustering-inhibition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A clustered point pattern contains more nearby event pairs than expected
+under CSR.
+
+An inhibited or regular pattern contains fewer nearby pairs.
+
+Examples include:
+
+\[
+\boxed{
+\text{disease clusters}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{territorial trees or animals}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nearest-Neighbor Distance}
+\label{subsec:nearest-neighbor-distance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For event \(i\), define the nearest-neighbor distance
+
+\[
+\boxed{
+D_i
+=
+\min_{j\neq i}
+\|
+\mathbf{s}_i-\mathbf{s}_j
+\|.
+}
+\]
+
+The distribution of these distances provides information about spatial
+clustering or inhibition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ripley's \(K\)-Function}
+\label{subsec:ripleys-k-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ripley's \(K\)-function summarizes the expected number of other events
+within distance \(r\) of a typical event, adjusted for intensity.
+
+Under homogeneous CSR in two dimensions,
+
+\[
+\boxed{
+K(r)
+=
+\pi r^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of \(K(r)\)}
+\label{subsec:ripleys-k-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If an estimated \(K(r)\) exceeds
+
+\[
+\pi r^2,
+\]
+
+there may be more nearby event pairs than expected under CSR.
+
+This suggests clustering at scale \(r\).
+
+If it is below
+
+\[
+\pi r^2,
+\]
+
+the pattern may show inhibition.
+
+Inference should account for sampling variability and edge effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(L\)-Function Transformation}
+\label{subsec:ripley-l-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common transformation is
+
+\[
+\boxed{
+L(r)
+=
+\sqrt{
+\frac{
+K(r)
+}{
+\pi
+}
+}.
+}
+\]
+
+Under CSR,
+
+\[
+\boxed{
+L(r)=r.
+}
+\]
+
+Thus plotting
+
+\[
+L(r)-r
+\]
+
+around zero simplifies interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Edge Effects}
+\label{subsec:spatial-edge-effects}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Events near the boundary of the observation region have potential
+neighbors outside the observed region.
+
+If ignored, this can bias estimates of neighborhood statistics.
+
+This is called an edge effect.
+
+Several correction methods reweight or adjust boundary observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inhomogeneous Point Processes}
+\label{subsec:inhomogeneous-point-processes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Event intensity may vary across space because of measured environmental
+factors.
+
+A model may use
+
+\[
+\boxed{
+\log
+\lambda(\mathbf{s})
+=
+\beta_0
++
+\beta_1x_1(\mathbf{s})
++
+\cdots
++
+\beta_px_p(\mathbf{s}).
+}
+\]
+
+Then apparent clustering may be explained partly by changing first-order
+intensity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cox Processes Preview}
+\label{subsec:cox-processes-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Cox process is a Poisson point process with a random intensity field.
+
+Conditional on
+
+\[
+\lambda(\mathbf{s}),
+\]
+
+events follow a Poisson process.
+
+Random variation in the intensity induces extra clustering.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Gaussian Cox Process Preview}
+\label{subsec:log-gaussian-cox-process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A log-Gaussian Cox process assumes
+
+\[
+\boxed{
+\log
+\lambda(\mathbf{s})
+=
+\mu(\mathbf{s})
++
+Z(\mathbf{s}),
+}
+\]
+
+where
+
+\[
+Z(\mathbf{s})
+\]
+
+is a Gaussian random field.
+
+This combines point-process and geostatistical modeling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Sampling}
+\label{subsec:spatial-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial dependence affects how locations should be sampled.
+
+Possible designs include:
+
+\[
+\boxed{
+\text{simple random spatial sampling},
+}
+\]
+
+\[
+\boxed{
+\text{systematic grids},
+}
+\]
+
+\[
+\boxed{
+\text{stratified spatial sampling},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{adaptive sampling}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regular Grid Sampling}
+\label{subsec:regular-grid-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A regular grid provides uniform spatial coverage.
+
+It is useful for mapping and interpolation.
+
+However, systematic alignment with an unrecognized periodic spatial
+pattern can create bias.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatially Balanced Sampling}
+\label{subsec:spatially-balanced-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatially balanced designs spread sample locations across the study
+region.
+
+The goal is to avoid excessive clustering of sampling sites.
+
+This can improve coverage and prediction over a fixed sampling budget.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preferential Sampling}
+\label{subsec:preferential-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Preferential sampling occurs when the locations selected for observation
+depend on the underlying spatial process.
+
+For example, monitors may be placed more frequently where pollution is
+expected to be high.
+
+Then the observed locations are not independent of the process being
+measured.
+
+Ignoring this mechanism can bias inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Interpolation}
+\label{subsec:spatial-interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial interpolation predicts values at unsampled locations.
+
+Methods include:
+
+\[
+\boxed{
+\text{nearest-neighbor interpolation},
+}
+\]
+
+\[
+\boxed{
+\text{inverse-distance weighting},
+}
+\]
+
+\[
+\boxed{
+\text{splines},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{kriging}.
+}
+\]
+
+Kriging differs by explicitly using a probabilistic spatial dependence
+model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse-Distance Weighting}
+\label{subsec:inverse-distance-weighting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Inverse-distance weighting predicts
+
+\[
+\boxed{
+\widehat{Y}
+(
+\mathbf{s}_0
+)
+=
+\frac{
+\displaystyle
+\sum_i
+d_i^{-p}Y_i
+}{
+\displaystyle
+\sum_i
+d_i^{-p}
+},
+}
+\]
+
+where
+
+\[
+d_i
+=
+\|
+\mathbf{s}_i-\mathbf{s}_0
+\|.
+\]
+
+The exponent \(p>0\) controls how rapidly influence decreases with
+distance.
+
+This is deterministic rather than model-based spatial prediction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Cross-Validation}
+\label{subsec:spatial-cross-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Random cross-validation can be optimistic when nearby training and test
+observations are strongly correlated.
+
+Spatial cross-validation may instead withhold:
+
+\[
+\boxed{
+\text{blocks},
+}
+\]
+
+\[
+\boxed{
+\text{regions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{spatially separated folds}.
+}
+\]
+
+This better evaluates geographic generalization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modifiable Areal Unit Problem}
+\label{subsec:maup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For areal data, conclusions can depend on how spatial regions are defined.
+
+This is called the modifiable areal unit problem.
+
+Changing:
+
+\[
+\boxed{
+\text{boundary placement}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{aggregation scale}
+}
+\]
+
+can change correlations, rates, and regression coefficients.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ecological Fallacy}
+\label{subsec:ecological-fallacy-spatial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Relationships observed among aggregated geographic regions need not hold
+for individuals within those regions.
+
+For example,
+
+\[
+\boxed{
+\text{region-level association}
+}
+\]
+
+does not automatically imply
+
+\[
+\boxed{
+\text{individual-level association}.
+}
+\]
+
+This is the ecological fallacy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Change of Support}
+\label{subsec:change-of-support}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial data may be observed at one scale but predictions are required at
+another.
+
+Examples include:
+
+\[
+\boxed{
+\text{point measurements}
+\rightarrow
+\text{regional averages},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{county totals}
+\rightarrow
+\text{smaller areas}.
+}
+\]
+
+This is called a change-of-support problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatiotemporal Data}
+\label{subsec:spatiotemporal-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many datasets vary over both space and time.
+
+Write
+
+\[
+\boxed{
+Y(\mathbf{s},t).
+}
+\]
+
+Examples include:
+
+\[
+\boxed{
+\text{weather fields},
+}
+\]
+
+\[
+\boxed{
+\text{air pollution},
+}
+\]
+
+\[
+\boxed{
+\text{disease spread},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{ocean measurements}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatiotemporal Covariance}
+\label{subsec:spatiotemporal-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spatiotemporal covariance function may be written
+
+\[
+\boxed{
+C
+(
+\mathbf{h},
+u
+)
+=
+\operatorname{Cov}
+[
+Y(\mathbf{s},t),
+Y(\mathbf{s}+\mathbf{h},t+u)
+].
+}
+\]
+
+Here,
+
+\[
+\mathbf{h}
+\]
+
+is spatial lag and
+
+\[
+u
+\]
+
+is temporal lag.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Separable Spatiotemporal Covariance}
+\label{subsec:separable-spatiotemporal-covariance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A separable covariance has the form
+
+\[
+\boxed{
+C
+(
+\mathbf{h},
+u
+)
+=
+C_S(\mathbf{h})
+C_T(u).
+}
+\]
+
+This simplifies modeling and computation.
+
+However, real systems may have interactions between spatial and temporal
+dependence that violate separability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Prediction Uncertainty}
+\label{subsec:spatial-prediction-uncertainty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Prediction uncertainty generally increases when:
+
+\[
+\boxed{
+\text{prediction sites are far from observations},
+}
+\]
+
+\[
+\boxed{
+\text{measurement noise is large},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{spatial dependence is weak}.
+}
+\]
+
+Dense nearby observations usually reduce uncertainty, though redundancy
+among highly correlated observations matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Model Diagnostics}
+\label{subsec:spatial-model-diagnostics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After fitting a spatial model, one should examine:
+
+\[
+\boxed{
+\text{residual maps},
+}
+\]
+
+\[
+\boxed{
+\text{residual spatial autocorrelation},
+}
+\]
+
+\[
+\boxed{
+\text{variogram behavior},
+}
+\]
+
+\[
+\boxed{
+\text{prediction errors},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{spatial cross-validation}.
+}
+\]
+
+Residual spatial structure suggests the model has not captured all
+dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spatial Statistical Workflow}
+\label{subsec:spatial-statistical-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical spatial workflow is:
+
+\begin{enumerate}
+    \item identify the spatial data type;
+    \item map the observations;
+    \item verify coordinate systems;
+    \item inspect spatial coverage;
+    \item identify relevant covariates;
+    \item examine first-order spatial trends;
+    \item examine pairwise distances or neighborhood structure;
+    \item inspect empirical spatial dependence;
+    \item select a covariance, variogram, or weights structure;
+    \item fit the spatial model;
+    \item examine residual spatial autocorrelation;
+    \item quantify spatial prediction uncertainty;
+    \item validate using spatially appropriate holdout procedures;
+    \item assess sensitivity to neighborhood or covariance choices;
+    \item interpret results at the correct spatial scale.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Spatial Method}
+\label{subsec:choosing-spatial-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For continuous measurements over a region:
+
+\[
+\boxed{
+\text{geostatistical models and kriging}.
+}
+\]
+
+For regional counts or rates:
+
+\[
+\boxed{
+\text{areal spatial models}.
+}
+\]
+
+For event locations:
+
+\[
+\boxed{
+\text{point-process methods}.
+}
+\]
+
+For residual spatial dependence in regression:
+
+\[
+\boxed{
+\text{spatial regression}.
+}
+\]
+
+For spatially correlated latent effects:
+
+\[
+\boxed{
+\text{Gaussian-process, CAR, or SAR models}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:spatial-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Treating Spatial Observations as Independent}
+
+Nearby observations may contain redundant information.
+
+Ignoring spatial dependence can lead to underestimated standard errors
+and overconfident inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Latitude and Longitude as Ordinary Euclidean Coordinates}
+
+Large geographic regions require appropriate geographic distance or map
+projection methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Spatial Trend with Spatial Correlation}
+
+A broad spatial gradient can create apparent correlation.
+
+First-order trend should be separated from second-order dependence when
+possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Isotropy Without Checking Direction}
+
+Dependence may differ by direction because of terrain, wind, water flow,
+roads, or other mechanisms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting the Empirical Variogram Without Enough Pairs}
+
+Semivariogram estimates at sparsely populated distance bins can be highly
+variable.
+
+The number of pairs should be considered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating the Nugget as Only Measurement Error}
+
+A nugget can also represent unresolved variation occurring at scales
+smaller than the sampling distance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Kriging Is Just Distance Weighting}
+
+Kriging accounts for covariance among observations, not only distance
+from the target location.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Covariance-Model Uncertainty}
+
+Kriging variance often treats estimated covariance parameters as known.
+
+Actual uncertainty may therefore be larger.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Choosing a Spatial Weights Matrix Arbitrarily}
+
+Moran statistics and spatial regression results can depend strongly on
+the definition of \(W\).
+
+Neighborhood structure should have scientific justification.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting Moran's \(I\) as a Correlation Coefficient}
+
+Moran's \(I\) is related to spatial autocorrelation but is not bounded in
+exactly the same way as an ordinary Pearson correlation in all settings.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Multiple Testing in Local Spatial Statistics}
+
+A map containing many local significance tests can produce false
+clusters by chance.
+
+Multiplicity or simulation-based reference procedures should be
+considered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Spatial Lag and Spatial Error Models}
+
+They represent different forms of dependence.
+
+One cannot generally substitute one for the other without changing the
+scientific interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Spatial Confounding}
+
+A spatially smooth predictor may overlap strongly with a latent spatial
+effect.
+
+This can make regression coefficients unstable or difficult to
+interpret.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Random Cross-Validation for Strongly Spatial Data}
+
+Nearby training observations may make predictions appear unrealistically
+accurate.
+
+Spatial blocking gives a more demanding generalization assessment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Edge Effects in Point Patterns}
+
+Events near study boundaries have fewer observable neighboring locations.
+
+Uncorrected neighborhood summaries may therefore be biased.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Equating Clustering with a Point-Interaction Process}
+
+Apparent clustering may arise simply because intensity varies across
+space.
+
+First-order inhomogeneity must be separated from interaction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Inferring Individual Relationships from Areal Data}
+
+Area-level associations do not automatically hold at the individual
+level.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:spatial-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Environmental Science.}
+Spatial statistics models dissolved oxygen, temperature, salinity,
+pollution, soil properties, and ecological measurements across
+monitoring locations.
+
+\medskip
+
+\textbf{Epidemiology.}
+Disease incidence, environmental exposures, and regional health outcomes
+may exhibit geographic clustering and spatial dependence.
+
+\medskip
+
+\textbf{Ecology.}
+Species abundance, habitat suitability, vegetation, and point patterns of
+organisms are naturally spatial.
+
+\medskip
+
+\textbf{Geology.}
+Mineral concentrations, subsurface properties, and geological fields are
+frequently interpolated using geostatistical methods.
+
+\medskip
+
+\textbf{Meteorology.}
+Temperature, rainfall, wind, and pressure are spatial fields that also
+change through time.
+
+\medskip
+
+\textbf{Agriculture.}
+Crop yield, soil nutrients, irrigation response, and pest occurrence can
+be modeled over fields and regions.
+
+\medskip
+
+\textbf{Economics and Social Science.}
+Income, employment, housing values, and demographic variables may exhibit
+dependence across neighboring geographic regions.
+
+\medskip
+
+\textbf{Engineering.}
+Spatial sensor networks, structural monitoring, and environmental
+measurement systems require prediction over unsampled locations.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:spatial-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define geostatistical data.
+\end{exercise}
+
+\begin{exercise}[1]
+Define areal data.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a spatial point pattern.
+\end{exercise}
+
+\begin{exercise}[1]
+Define spatial autocorrelation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define isotropy.
+\end{exercise}
+
+\begin{exercise}[1]
+Define anisotropy.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a semivariogram.
+\end{exercise}
+
+\begin{exercise}[1]
+Define nugget, sill, and range.
+\end{exercise}
+
+\begin{exercise}[1]
+Define kriging.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a spatial weights matrix.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Moran's \(I\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define an intensity function for a point process.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the Euclidean distance between
+
+\[
+(1,2)
+\]
+
+and
+
+\[
+(4,6).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+C(0)=10
+\]
+
+and
+
+\[
+C(h)=4.
+\]
+
+Compute the semivariogram value \(\gamma(h)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose four location pairs in a distance bin have differences
+
+\[
+1,\ -2,\ 3,\ -4.
+\]
+
+Compute the empirical semivariance.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+C(h)
+=
+5e^{-h/2},
+\]
+
+compute \(C(0)\).
+\end{exercise}
+
+\begin{exercise}[2]
+For the same covariance model, compute \(C(2)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a row of a spatial weights matrix is
+
+\[
+(0,1,1,2).
+\]
+
+Row-standardize the weights.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a homogeneous Poisson point process has intensity
+
+\[
+\lambda=3
+\]
+
+events per square kilometer.
+
+Find the expected number of events in a region of area \(5\).
+\end{exercise}
+
+\begin{exercise}[2]
+Under the same process, state the distribution of the event count in the
+region.
+\end{exercise}
+
+\begin{exercise}[2]
+Under complete spatial randomness, compute
+
+\[
+K(2).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+If an estimated \(K(2)\) greatly exceeds the CSR value, what type of
+pattern may be present?
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+\gamma(\mathbf{h})
+=
+C(0)-C(\mathbf{h})
+\]
+
+under second-order stationarity.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a valid covariance function must produce a positive
+semidefinite covariance matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why isotropy is stronger than second-order stationarity.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare exponential and Gaussian covariance models conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how directional variograms can reveal anisotropy.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the simple kriging weights from minimum mean squared prediction
+error.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the simple kriging prediction variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why ordinary kriging imposes
+
+\[
+\sum_i\lambda_i=1.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between ordinary and universal kriging.
+\end{exercise}
+
+\begin{exercise}[3]
+Show how kriging follows from the conditional distribution of a
+multivariate normal vector.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why spatially close observations may be statistically redundant.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how row-standardization changes interpretation of a spatial lag.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between Moran's \(I\) and Geary's \(C\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between global Moran's \(I\) and local Moran
+statistics.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why multiple-testing correction may be needed for LISA maps.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between spatial lag and spatial error regression.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the reduced form
+
+\[
+\mathbf{y}
+=
+(
+I-\rho W
+)^{-1}
+X\boldsymbol{\beta}
++
+(
+I-\rho W
+)^{-1}
+\boldsymbol{\varepsilon}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how a CAR prior encourages neighboring effects to be similar.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the conceptual difference between CAR and SAR models.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain complete spatial randomness.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how inhomogeneous intensity can create apparent point clustering.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why edge correction is needed for nearest-neighbor or
+\(K\)-function analysis.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare inverse-distance weighting and kriging.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why spatial cross-validation can be more realistic than random
+cross-validation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the modifiable areal unit problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the ecological fallacy.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the concept of preferential sampling.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the meaning of a separable spatiotemporal covariance function.
+\end{exercise}
+
+\begin{exercise}[4]
+Study conditions for validity of isotropic covariance functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive properties of the Matérn covariance family.
+\end{exercise}
+
+\begin{exercise}[4]
+Study intrinsic random functions and generalized covariance models.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive ordinary kriging using Lagrange multipliers.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive universal kriging under a linear mean model.
+\end{exercise}
+
+\begin{exercise}[4]
+Study restricted maximum likelihood estimation of spatial covariance
+parameters.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate covariance tapering for large spatial datasets.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Gaussian-process approximation methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the expectation and variance of Moran's \(I\) under a randomization
+null.
+\end{exercise}
+
+\begin{exercise}[4]
+Study permutation tests for global and local spatial autocorrelation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the covariance structure of a SAR model.
+\end{exercise}
+
+\begin{exercise}[4]
+Study propriety and identifiability of intrinsic CAR models.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Bayesian disease-mapping models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study spatial generalized linear mixed models.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive likelihoods for homogeneous Poisson point processes.
+\end{exercise}
+
+\begin{exercise}[4]
+Study inhomogeneous Poisson point processes.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate Cox and log-Gaussian Cox processes.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Ripley's \(K\)-function under complete spatial randomness.
+\end{exercise}
+
+\begin{exercise}[4]
+Study edge corrections for point-process summary statistics.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate spatial point-process interaction models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study preferential sampling models.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate nonseparable spatiotemporal covariance functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study spatiotemporal Gaussian processes.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:spatial-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Spatial statistics studies observations indexed by location:
+
+\[
+\boxed{
+Y(\mathbf{s}).
+}
+\]
+
+Second-order spatial dependence is described by
+
+\[
+\boxed{
+C(\mathbf{h})
+=
+\operatorname{Cov}
+[
+Y(\mathbf{s}),
+Y(\mathbf{s}+\mathbf{h})
+].
+}
+\]
+
+For isotropic processes,
+
+\[
+\boxed{
+C(\mathbf{h})
+=
+C
+(
+\|\mathbf{h}\|
+).
+}
+\]
+
+The semivariogram is
+
+\[
+\boxed{
+\gamma(\mathbf{h})
+=
+\frac12
+\operatorname{Var}
+[
+Y(\mathbf{s}+\mathbf{h})
+-
+Y(\mathbf{s})
+].
+}
+\]
+
+Under stationarity,
+
+\[
+\boxed{
+\gamma(\mathbf{h})
+=
+C(0)-C(\mathbf{h}).
+}
+\]
+
+Kriging predicts
+
+\[
+\boxed{
+\widehat{Y}
+(
+\mathbf{s}_0
+)
+=
+\sum_i
+\lambda_i
+Y
+(
+\mathbf{s}_i
+)
+}
+\]
+
+using weights based on spatial dependence.
+
+For areal data, dependence may be represented through a spatial weights
+matrix
+
+\[
+\boxed{
+W.
+}
+\]
+
+A global measure of spatial autocorrelation is Moran's statistic
+
+\[
+\boxed{
+I
+=
+\frac{
+n
+}{
+S_0
+}
+\frac{
+\sum_i\sum_j
+w_{ij}
+(
+y_i-\overline{y}
+)
+(
+y_j-\overline{y}
+)
+}{
+\sum_i
+(
+y_i-\overline{y}
+)^2
+}.
+}
+\]
+
+For spatial point patterns, a homogeneous Poisson process satisfies
+
+\[
+\boxed{
+N(A)
+\sim
+\operatorname{Poisson}
+(
+\lambda|A|
+).
+}
+\]
+
+Under complete spatial randomness in two dimensions,
+
+\[
+\boxed{
+K(r)
+=
+\pi r^2.
+}
+\]
+
+Spatial statistics therefore combines
+
+\[
+\boxed{
+\text{geometry}
++
+\text{probability}
++
+\text{covariance}
++
+\text{regression}
++
+\text{stochastic processes}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:spatial-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Spatial Statistics extends the dependence ideas of
+Section~\ref{sec:time-series-analysis} from temporal indexing to spatial
+locations. Geostatistical models use covariance and variogram structures
+to describe continuously indexed spatial fields, while areal models use
+neighborhood structures and spatial weights matrices. Point-process
+models instead treat event locations themselves as random. Gaussian
+random fields connect spatial statistics with multivariate normal theory,
+while spatial regression extends the models of
+Section~\ref{sec:regression} to geographically dependent observations.
+Spatiotemporal models combine both spatial and temporal dependence. The
+next section, Survival Analysis, studies time-to-event outcomes,
+censoring, hazard functions, and statistical models for event times.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.16 Spatial Statistics
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard spatial statistical theory.
+%   - Standard geostatistical methods.
+%   - Standard areal and point-process models.
+%
+% Used for:
+%   - spatial data types;
+%   - geographic coordinates and distance;
+%   - first- and second-order spatial structure;
+%   - spatial stationarity;
+%   - isotropy and anisotropy;
+%   - covariance and correlation functions;
+%   - exponential, Gaussian, and Matern covariance models;
+%   - intrinsic stationarity;
+%   - semivariograms and variograms;
+%   - empirical semivariograms;
+%   - nugget, sill, and range;
+%   - spherical and exponential variogram models;
+%   - directional variograms;
+%   - kriging;
+%   - simple, ordinary, and universal kriging;
+%   - kriging variance;
+%   - Gaussian random fields;
+%   - spatial weights matrices;
+%   - adjacency and distance weights;
+%   - spatial lags;
+%   - Moran's I;
+%   - Geary's C;
+%   - local spatial association;
+%   - spatial regression;
+%   - spatial lag models;
+%   - spatial error models;
+%   - spatial confounding;
+%   - CAR and SAR models;
+%   - spatial generalized linear models;
+%   - point processes;
+%   - intensity functions;
+%   - homogeneous Poisson point processes;
+%   - complete spatial randomness;
+%   - clustering and inhibition;
+%   - Ripley's K-function;
+%   - edge effects;
+%   - inhomogeneous point processes;
+%   - Cox-process previews;
+%   - spatial sampling;
+%   - preferential sampling;
+%   - spatial interpolation;
+%   - spatial cross-validation;
+%   - modifiable areal unit problems;
+%   - ecological fallacy;
+%   - change of support;
+%   - spatiotemporal covariance;
+%   - model diagnostics;
+%   - applications and exercises.
+%
+% Notes:
+%   - Survival Analysis is developed next in Section 8.17.
+%   - Time Series Analysis provides the parallel theory for temporal
+%     dependence.
+%   - Multivariate Statistics provides covariance and Gaussian theory.
+%   - Statistical Learning later develops Gaussian processes and
+%     spatially structured predictive models further.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

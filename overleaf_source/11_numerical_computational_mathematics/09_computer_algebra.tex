@@ -1,0 +1,4293 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.9 COMPUTER ALGEBRA
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Computer Algebra}
+\label{sec:computer-algebra}
+
+\prerequisite{
+Abstract algebra, polynomial arithmetic, rings and fields, ideals,
+elementary number theory, symbolic computation, algorithms, data
+structures, and basic computational complexity.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the goals of computer algebra;
+    \item distinguish symbolic computation from computer algebra;
+    \item understand algebraic data representations;
+    \item represent integers, rationals, polynomials, and rational
+          functions exactly;
+    \item distinguish dense and sparse polynomial representations;
+    \item understand coefficient domains;
+    \item recognize polynomial rings;
+    \item understand multivariate monomials;
+    \item work with monomial orderings;
+    \item recognize lexicographic and graded orderings;
+    \item perform polynomial addition and multiplication algorithmically;
+    \item understand polynomial division;
+    \item recognize pseudo-division over nonfields;
+    \item compute polynomial greatest common divisors;
+    \item understand subresultant ideas conceptually;
+    \item recognize square-free factorization;
+    \item understand polynomial factorization over finite fields;
+    \item recognize rational polynomial factorization;
+    \item understand modular factorization strategies;
+    \item recognize Hensel lifting conceptually;
+    \item understand the Chinese Remainder Theorem in computer algebra;
+    \item understand rational reconstruction;
+    \item recognize modular algorithms for exact computation;
+    \item understand algebraic numbers;
+    \item represent algebraic extensions;
+    \item recognize minimal polynomials;
+    \item perform arithmetic modulo polynomial relations;
+    \item understand polynomial ideals computationally;
+    \item define leading terms and leading monomials;
+    \item understand multivariate polynomial reduction;
+    \item define Gröbner bases;
+    \item recognize Buchberger's algorithm;
+    \item understand S-polynomials;
+    \item understand ideal membership testing;
+    \item recognize elimination using Gröbner bases;
+    \item understand solving zero-dimensional polynomial systems
+          conceptually;
+    \item recognize resultants and Sylvester matrices;
+    \item understand elimination theory;
+    \item recognize polynomial system solving over exact fields;
+    \item distinguish exact and numerical algebraic geometry;
+    \item understand symbolic linear algebra;
+    \item recognize fraction-free elimination;
+    \item understand determinant algorithms;
+    \item recognize exact matrix normal forms;
+    \item understand Hermite and Smith normal forms conceptually;
+    \item recognize sparse exact linear algebra;
+    \item understand expression swell;
+    \item recognize modular methods for matrix computations;
+    \item understand fast integer arithmetic conceptually;
+    \item recognize fast polynomial multiplication;
+    \item understand FFT-based polynomial multiplication conceptually;
+    \item recognize computational complexity in algebraic algorithms;
+    \item understand bit complexity;
+    \item recognize coefficient growth;
+    \item understand probabilistic and randomized algebra algorithms;
+    \item distinguish Las Vegas and Monte Carlo algebra algorithms;
+    \item understand computer algebra system architecture conceptually;
+    \item recognize kernels, simplifiers, domains, and evaluators;
+    \item understand canonicalization;
+    \item recognize pattern matching and rewriting within computer algebra;
+    \item understand symbolic-numeric hybrid algorithms;
+    \item connect computer algebra with algebra, number theory, algebraic
+          geometry, cryptography, coding theory, optimization, and
+          scientific computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Computer Algebra?}
+\label{subsec:what-is-computer-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computer algebra studies algorithms and data structures for exact
+mathematical computation.
+
+Its central objects include:
+
+\[
+\boxed{
+\text{integers},
+}
+\]
+
+\[
+\boxed{
+\text{rational numbers},
+}
+\]
+
+\[
+\boxed{
+\text{polynomials},
+}
+\]
+
+\[
+\boxed{
+\text{algebraic numbers},
+}
+\]
+
+\[
+\boxed{
+\text{matrices},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{symbolic expressions}.
+}
+\]
+
+The emphasis is on exact algebraic manipulation rather than approximate
+floating-point computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computer Algebra Versus Symbolic Computation}
+\label{subsec:computer-algebra-vs-symbolic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Symbolic computation is the broad practice of manipulating mathematical
+expressions.
+
+Computer algebra focuses more specifically on the algorithms that make
+exact algebraic manipulation possible.
+
+Thus:
+
+\[
+\boxed{
+\text{symbolic computation}
+=
+\text{user-level exact manipulation},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{computer algebra}
+=
+\text{algorithmic machinery behind exact manipulation}.
+}
+\]
+
+The two subjects overlap heavily.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Algebraic Domains}
+\label{subsec:exact-algebraic-domains}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A computer algebra system must know the algebraic domain in which an object
+lives.
+
+Examples include:
+
+\[
+\boxed{
+\mathbb{Z},
+}
+\]
+
+\[
+\boxed{
+\mathbb{Q},
+}
+\]
+
+\[
+\boxed{
+\mathbb{F}_p,
+}
+\]
+
+\[
+\boxed{
+\mathbb{Q}[x],
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbb{Q}(x).
+}
+\]
+
+The domain determines which operations are permitted and which algorithms
+apply.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integers}
+\label{subsec:computer-algebra-integers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Arbitrary-size integers are fundamental exact objects.
+
+Unlike fixed-width machine integers, their size is limited primarily by
+available memory.
+
+For
+
+\[
+a,b\in\mathbb{Z},
+\]
+
+a computer algebra system must support exact:
+
+\[
+\boxed{
+a+b,
+}
+\]
+
+\[
+\boxed{
+ab,
+}
+\]
+
+\[
+\boxed{
+\gcd(a,b),
+}
+\]
+
+and
+
+\[
+\boxed{
+a\bmod b.
+}
+\]
+
+Large-integer arithmetic is the foundation of many higher-level symbolic
+algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rational Numbers}
+\label{subsec:computer-algebra-rationals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A rational number is usually stored as
+
+\[
+\boxed{
+\frac{p}{q},
+}
+\]
+
+where
+
+\[
+p,q\in\mathbb{Z},
+\qquad
+q>0,
+\]
+
+and
+
+\[
+\boxed{
+\gcd(p,q)=1.
+}
+\]
+
+This normalization gives a canonical representation.
+
+For example,
+
+\[
+\frac{-8}{-12}
+\]
+
+becomes
+
+\[
+\boxed{
+\frac23.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normalization of Rational Arithmetic}
+\label{subsec:rational-normalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\frac{a}{b}
++
+\frac{c}{d}
+=
+\frac{
+ad+bc
+}{
+bd
+}.
+\]
+
+The numerator and denominator may share a common factor.
+
+A normalized result divides by
+
+\[
+\boxed{
+g
+=
+\gcd(ad+bc,bd).
+}
+\]
+
+Repeated normalization prevents uncontrolled growth of equivalent
+fraction representations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Rings}
+\label{subsec:computer-algebra-polynomial-rings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial ring in variable \(x\) over coefficient ring \(R\) is denoted
+
+\[
+\boxed{
+R[x].
+}
+\]
+
+For example,
+
+\[
+\mathbb{Q}[x]
+\]
+
+contains polynomials
+
+\[
+\boxed{
+a_0+a_1x+\cdots+a_nx^n,
+\qquad
+a_i\in\mathbb{Q}.
+}
+\]
+
+For several variables,
+
+\[
+\boxed{
+R[x_1,\ldots,x_n].
+}
+\]
+
+The coefficient domain plays a central role in algorithm selection.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dense Polynomial Representation}
+\label{subsec:dense-polynomial-representation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dense univariate polynomial
+
+\[
+p(x)
+=
+a_0+a_1x+\cdots+a_nx^n
+\]
+
+may be stored as
+
+\[
+\boxed{
+[a_0,a_1,\ldots,a_n].
+}
+\]
+
+This is efficient when many coefficients are nonzero.
+
+For example,
+
+\[
+2-3x+5x^2
+\]
+
+may be stored as
+
+\[
+\boxed{
+[2,-3,5].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Polynomial Representation}
+\label{subsec:sparse-polynomial-representation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sparse polynomial stores only nonzero terms.
+
+For example,
+
+\[
+x^{1000}+3x^7-2
+\]
+
+may be stored conceptually as
+
+\[
+\boxed{
+\{
+(1000,1),
+(7,3),
+(0,-2)
+\}.
+}
+\]
+
+This avoids storing hundreds of zero coefficients.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dense Versus Sparse Representation}
+\label{subsec:dense-vs-sparse-polynomial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dense representation is efficient for moderate-degree polynomials with
+many nonzero coefficients.
+
+Sparse representation is efficient when
+
+\[
+\boxed{
+\#\text{nonzero terms}
+\ll
+\deg p.
+}
+\]
+
+The best representation depends on the algebraic structure of the
+problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Monomials}
+\label{subsec:multivariate-monomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multivariate monomial has form
+
+\[
+\boxed{
+x_1^{\alpha_1}
+x_2^{\alpha_2}
+\cdots
+x_n^{\alpha_n},
+}
+\]
+
+where
+
+\[
+\alpha_i\in\mathbb{Z}_{\geq0}.
+\]
+
+The exponent vector is
+
+\[
+\boxed{
+\alpha
+=
+(\alpha_1,\ldots,\alpha_n).
+}
+\]
+
+Thus a polynomial can be represented as a mapping from exponent vectors to
+coefficients.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monomial Ordering}
+\label{subsec:monomial-ordering}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multivariate algorithms require an ordering on monomials.
+
+A monomial order must be:
+
+\[
+\boxed{
+\text{total},
+}
+\]
+
+\[
+\boxed{
+\text{multiplicatively compatible},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{well ordered}.
+}
+\]
+
+Different orderings produce different Gröbner bases and different
+computational behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lexicographic Order}
+\label{subsec:lexicographic-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In lexicographic order, compare exponent vectors from the first variable
+onward.
+
+For
+
+\[
+x>y,
+\]
+
+we have
+
+\[
+\boxed{
+x^2
+>
+xy^{100}
+}
+\]
+
+because the exponent of \(x\) is compared first.
+
+Lexicographic order is particularly useful for elimination.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graded Lexicographic Order}
+\label{subsec:graded-lexicographic-order}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Graded lexicographic order first compares total degree.
+
+For monomials
+
+\[
+x^\alpha
+\]
+
+and
+
+\[
+x^\beta,
+\]
+
+compare
+
+\[
+|\alpha|
+=
+\sum_i\alpha_i
+\]
+
+and
+
+\[
+|\beta|.
+\]
+
+If total degrees tie, lexicographic order breaks the tie.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graded Reverse Lexicographic Order}
+\label{subsec:grevlex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Graded reverse lexicographic order also compares total degree first.
+
+Ties are resolved by examining exponent differences from the last
+variable backward.
+
+This ordering often performs efficiently in Gröbner-basis computations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Leading Monomial and Leading Term}
+\label{subsec:leading-monomial-term}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given a chosen monomial order, a nonzero polynomial has a largest
+monomial.
+
+The leading monomial is
+
+\[
+\boxed{
+\operatorname{LM}(f).
+}
+\]
+
+If its coefficient is included, the leading term is
+
+\[
+\boxed{
+\operatorname{LT}(f).
+}
+\]
+
+For example, under lexicographic order with \(x>y\),
+
+\[
+f=x^2+xy^5+y^{20}
+\]
+
+has
+
+\[
+\boxed{
+\operatorname{LM}(f)=x^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Addition Algorithm}
+\label{subsec:polynomial-addition-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Polynomial addition combines coefficients of matching monomials.
+
+For sparse representations, terms can be merged according to monomial
+order.
+
+If
+
+\[
+f
+=
+3x^2+2x+1
+\]
+
+and
+
+\[
+g
+=
+x^2-5x+4,
+\]
+
+then
+
+\[
+\boxed{
+f+g
+=
+4x^2-3x+5.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Multiplication Algorithm}
+\label{subsec:polynomial-multiplication-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f(x)
+=
+\sum_i a_ix^i
+\]
+
+and
+
+\[
+g(x)
+=
+\sum_j b_jx^j,
+\]
+
+the coefficient of \(x^k\) in the product is
+
+\[
+\boxed{
+c_k
+=
+\sum_{i+j=k}
+a_ib_j.
+}
+\]
+
+The naive dense multiplication algorithm requires approximately
+
+\[
+\boxed{
+O(n^2)
+}
+\]
+
+coefficient operations for degree-\(n\) inputs of comparable size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fast Polynomial Multiplication}
+\label{subsec:fast-polynomial-multiplication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Polynomial multiplication can be accelerated using divide-and-conquer or
+transform methods.
+
+Evaluation-based methods use the principle
+
+\[
+\boxed{
+\text{evaluate}
+\rightarrow
+\text{multiply values}
+\rightarrow
+\text{interpolate}.
+}
+\]
+
+FFT-based multiplication can reduce complexity toward
+
+\[
+\boxed{
+O(n\log n)
+}
+\]
+
+up to logarithmic and coefficient-arithmetic factors in suitable settings.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Division Over a Field}
+\label{subsec:polynomial-division-field}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f,g\in F[x],
+\qquad
+g\neq0,
+\]
+
+where \(F\) is a field, there exist unique \(q,r\) satisfying
+
+\[
+\boxed{
+f=qg+r,
+}
+\]
+
+with
+
+\[
+\boxed{
+\deg r<\deg g.
+}
+\]
+
+Division works because the leading coefficient of \(g\) is invertible in
+the field.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Polynomial Division}
+\label{subsec:worked-polynomial-division}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Exact Polynomial Division}
+
+Divide
+
+\[
+x^3-1
+\]
+
+by
+
+\[
+x-1.
+\]
+
+Since
+
+\[
+x^3-1
+=
+(x-1)(x^2+x+1),
+\]
+
+we obtain
+
+\begin{answerbox}
+\[
+\boxed{
+q(x)
+=
+x^2+x+1,
+\qquad
+r(x)=0.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pseudo-Division}
+\label{subsec:pseudo-division}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Over a coefficient ring where leading coefficients may not be invertible,
+ordinary polynomial division may introduce fractions.
+
+Pseudo-division avoids these fractions by multiplying the dividend by a
+power of the divisor's leading coefficient.
+
+Conceptually,
+
+\[
+\boxed{
+c^k f
+=
+qg+r,
+}
+\]
+
+where \(c\) is the leading coefficient of \(g\).
+
+This is useful in exact polynomial gcd algorithms over \(\mathbb{Z}[x]\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial GCD}
+\label{subsec:computer-algebra-polynomial-gcd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f,g\in F[x],
+\]
+
+their gcd can be computed using the Euclidean algorithm.
+
+Repeatedly compute
+
+\[
+\boxed{
+r_{k+1}
+=
+r_{k-1}
+\bmod
+r_k.
+}
+\]
+
+The last nonzero remainder is the gcd up to multiplication by a nonzero
+constant.
+
+The result is usually normalized to be monic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Euclidean Algorithm}
+\label{subsec:worked-polynomial-euclidean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Polynomial GCD}
+
+Let
+
+\[
+f=x^3-x
+\]
+
+and
+
+\[
+g=x^2-1.
+\]
+
+Since
+
+\[
+x^3-x
+=
+x(x^2-1),
+\]
+
+the remainder after dividing \(f\) by \(g\) is zero.
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\gcd(f,g)
+=
+x^2-1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primitive Part and Content}
+\label{subsec:primitive-part-content}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f(x)
+=
+a_0+a_1x+\cdots+a_nx^n
+\in
+\mathbb{Z}[x],
+\]
+
+define the content
+
+\[
+\boxed{
+\operatorname{cont}(f)
+=
+\gcd(a_0,\ldots,a_n).
+}
+\]
+
+Then write
+
+\[
+\boxed{
+f
+=
+\operatorname{cont}(f)
+\operatorname{pp}(f),
+}
+\]
+
+where \(\operatorname{pp}(f)\) is the primitive part.
+
+This separation is useful in gcd and factorization algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gauss's Lemma Computationally}
+\label{subsec:gauss-lemma-computational}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Primitive polynomial arithmetic over
+
+\[
+\mathbb{Z}[x]
+\]
+
+is closely related to arithmetic over
+
+\[
+\mathbb{Q}[x].
+\]
+
+Gauss's lemma allows factorization and gcd questions over the rationals to
+be reduced to primitive integer polynomials.
+
+This avoids unnecessary rational coefficient growth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subresultant Polynomial Remainder Sequences}
+\label{subsec:subresultant-prs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Naive pseudo-remainder sequences can produce very large coefficients.
+
+Subresultant polynomial remainder sequences scale intermediate remainders
+to control coefficient growth.
+
+They are important in exact:
+
+\[
+\boxed{
+\text{gcd computation},
+}
+\]
+
+\[
+\boxed{
+\text{resultants},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{real-root algorithms}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Square-Free Factorization}
+\label{subsec:computer-algebra-square-free}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+f\in F[x]
+\]
+
+over characteristic zero.
+
+Repeated factors can be detected using
+
+\[
+\boxed{
+g
+=
+\gcd(f,f').
+}
+\]
+
+If
+
+\[
+g=1,
+\]
+
+then \(f\) is square-free.
+
+If \(g\neq1\), repeated factors are present.
+
+Square-free decomposition separates factors according to multiplicity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Repeated Factor Detection}
+\label{subsec:worked-square-free}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Detecting Multiplicity}
+
+Let
+
+\[
+f(x)
+=
+(x-1)^3(x+2).
+\]
+
+Then
+
+\[
+f'
+\]
+
+also contains a factor
+
+\[
+(x-1)^2.
+\]
+
+Therefore,
+
+\[
+\gcd(f,f')
+\neq1.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+f
+\text{ is not square-free.}
+}
+\]
+\end{answerbox}
+
+The common factor reveals repeated roots.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factorization Over Finite Fields}
+\label{subsec:finite-field-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+f(x)
+\in
+\mathbb{F}_p[x].
+\]
+
+Finite-field factorization algorithms typically break the task into:
+
+\[
+\boxed{
+\text{square-free factorization},
+}
+\]
+
+\[
+\boxed{
+\text{distinct-degree factorization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{equal-degree factorization}.
+}
+\]
+
+Finite fields provide a computationally convenient environment because
+there are only finitely many coefficients.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Finite Fields Matter}
+\label{subsec:why-finite-fields-computer-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite-field computations appear in:
+
+\[
+\boxed{
+\text{coding theory},
+}
+\]
+
+\[
+\boxed{
+\text{cryptography},
+}
+\]
+
+\[
+\boxed{
+\text{polynomial factorization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{modular algorithms}.
+}
+\]
+
+They also provide efficient intermediate domains for exact calculations
+over the integers and rationals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modular Polynomial Factorization}
+\label{subsec:modular-polynomial-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To factor a polynomial over
+
+\[
+\mathbb{Z},
+\]
+
+one may reduce it modulo a suitable prime \(p\):
+
+\[
+\boxed{
+f(x)
+\mapsto
+f(x)\bmod p.
+}
+\]
+
+Factor the smaller polynomial in
+
+\[
+\mathbb{F}_p[x].
+\]
+
+Then lift and reconstruct factors over the integers.
+
+This avoids large intermediate integer computations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hensel Lifting Preview}
+\label{subsec:hensel-lifting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a factorization is known modulo \(p\):
+
+\[
+\boxed{
+f
+\equiv
+gh
+\pmod p.
+}
+\]
+
+Under suitable coprimality conditions, Hensel lifting improves this to a
+factorization modulo
+
+\[
+\boxed{
+p^2,
+p^4,
+\ldots
+}
+\]
+
+or successive powers of \(p\).
+
+Eventually enough modular information is available to reconstruct integer
+factors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chinese Remainder Reconstruction}
+\label{subsec:chinese-remainder-reconstruction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an integer \(a\) is known modulo several pairwise coprime moduli:
+
+\[
+a\equiv a_i\pmod{m_i}.
+\]
+
+The Chinese Remainder Theorem reconstructs \(a\) modulo
+
+\[
+\boxed{
+M
+=
+\prod_i m_i.
+}
+\]
+
+If the true integer is known to lie within a sufficiently small range, the
+exact value can be recovered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Chinese Remainder Reconstruction}
+\label{subsec:worked-chinese-remainder}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Reconstructing an Integer}
+
+Suppose
+
+\[
+x\equiv2\pmod3,
+\]
+
+and
+
+\[
+x\equiv3\pmod5.
+\]
+
+Numbers congruent to \(2\) modulo \(3\) are
+
+\[
+2,5,8,11,14,\ldots.
+\]
+
+Among these,
+
+\[
+8\equiv3\pmod5.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+x\equiv8\pmod{15}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rational Reconstruction}
+\label{subsec:rational-reconstruction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose modular computation gives
+
+\[
+a
+\pmod M.
+\]
+
+One may seek integers \(p,q\) satisfying
+
+\[
+\boxed{
+a
+\equiv
+pq^{-1}
+\pmod M
+}
+\]
+
+with \(p\) and \(q\) sufficiently small.
+
+Under appropriate bounds, the rational number
+
+\[
+\boxed{
+\frac pq
+}
+\]
+
+can be recovered uniquely.
+
+This is useful when exact rational coefficients are reconstructed from
+modular images.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modular Algorithms}
+\label{subsec:modular-algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A general modular strategy is:
+
+\[
+\boxed{
+\text{large exact problem}
+}
+\]
+
+\[
+\downarrow
+\]
+
+\[
+\boxed{
+\text{many small modular problems}
+}
+\]
+
+\[
+\downarrow
+\]
+
+\[
+\boxed{
+\text{reconstruction of exact result}.
+}
+\]
+
+This technique reduces coefficient growth and enables parallel
+computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algebraic Numbers}
+\label{subsec:computer-algebra-algebraic-numbers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A complex number \(\alpha\) is algebraic over \(\mathbb{Q}\) if it is a
+root of a nonzero polynomial
+
+\[
+\boxed{
+p(x)\in\mathbb{Q}[x].
+}
+\]
+
+For example,
+
+\[
+\sqrt{2}
+\]
+
+is algebraic because
+
+\[
+\boxed{
+x^2-2=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimal Polynomial}
+\label{subsec:minimal-polynomial-computer-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The minimal polynomial of algebraic number \(\alpha\) over \(\mathbb{Q}\)
+is the monic irreducible polynomial of least degree satisfying
+
+\[
+\boxed{
+m_\alpha(\alpha)=0.
+}
+\]
+
+For
+
+\[
+\alpha=\sqrt{2},
+\]
+
+the minimal polynomial is
+
+\[
+\boxed{
+m_\alpha(x)=x^2-2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algebraic Number Fields}
+\label{subsec:algebraic-number-fields-computation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple algebraic extension is written
+
+\[
+\boxed{
+\mathbb{Q}(\alpha),
+}
+\]
+
+where \(\alpha\) satisfies an irreducible polynomial of degree \(d\).
+
+Every field element can be represented as
+
+\[
+\boxed{
+a_0
++
+a_1\alpha
++
+\cdots
++
+a_{d-1}\alpha^{d-1},
+}
+\]
+
+with
+
+\[
+a_i\in\mathbb{Q}.
+\]
+
+Higher powers are reduced using the minimal polynomial.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Arithmetic in \(\mathbb{Q}(\sqrt{2})\)}
+\label{subsec:worked-algebraic-number-arithmetic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Reducing Powers}
+
+Let
+
+\[
+\alpha=\sqrt{2}.
+\]
+
+Then
+
+\[
+\alpha^2=2.
+\]
+
+Compute
+
+\[
+(1+\alpha)^2.
+\]
+
+Expanding,
+
+\[
+1+2\alpha+\alpha^2.
+\]
+
+Since
+
+\[
+\alpha^2=2,
+\]
+
+we obtain
+
+\begin{answerbox}
+\[
+\boxed{
+(1+\sqrt{2})^2
+=
+3+2\sqrt{2}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Quotient Representation}
+\label{subsec:polynomial-quotient-representation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(\alpha\) satisfies irreducible polynomial \(m(x)\), then
+
+\[
+\boxed{
+\mathbb{Q}(\alpha)
+\cong
+\mathbb{Q}[x]/(m(x)).
+}
+\]
+
+Arithmetic is performed modulo the relation
+
+\[
+\boxed{
+m(x)=0.
+}
+\]
+
+This quotient-ring viewpoint gives a clean computational representation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Ideals}
+\label{subsec:computer-algebra-polynomial-ideals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+R
+=
+F[x_1,\ldots,x_n].
+\]
+
+Given polynomials
+
+\[
+f_1,\ldots,f_m,
+\]
+
+their ideal is
+
+\[
+\boxed{
+I
+=
+\langle
+f_1,\ldots,f_m
+\rangle.
+}
+\]
+
+Every element of \(I\) has form
+
+\[
+\boxed{
+h_1f_1+\cdots+h_mf_m,
+}
+\]
+
+where
+
+\[
+h_i\in R.
+\]
+
+A central computational problem is determining whether a polynomial belongs
+to \(I\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multivariate Polynomial Reduction}
+\label{subsec:multivariate-polynomial-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given polynomials
+
+\[
+g_1,\ldots,g_s,
+\]
+
+one reduces a polynomial \(f\) by canceling leading monomials whenever
+
+\[
+\boxed{
+\operatorname{LM}(g_i)
+\mid
+\operatorname{LM}(f).
+}
+\]
+
+The process generalizes univariate polynomial division.
+
+Unlike the univariate case, the remainder may depend on the reduction
+order unless the divisors form a Gröbner basis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gröbner Basis}
+\label{subsec:computer-algebra-groebner-basis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Gröbner Basis}
+Let
+
+\[
+I
+\subseteq
+F[x_1,\ldots,x_n]
+\]
+
+be an ideal with a fixed monomial ordering.
+
+A finite set
+
+\[
+G
+=
+\{g_1,\ldots,g_s\}
+\subseteq I
+\]
+
+is a Gröbner basis if the leading monomials of the \(g_i\) generate the
+leading-term ideal of \(I\).
+\end{definitionbox}
+
+Equivalently, every nonzero polynomial in \(I\) has leading monomial
+divisible by at least one
+
+\[
+\operatorname{LM}(g_i).
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Gröbner Bases Matter}
+\label{subsec:why-groebner-bases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gröbner bases provide algorithmic solutions to several problems:
+
+\[
+\boxed{
+\text{ideal membership},
+}
+\]
+
+\[
+\boxed{
+\text{polynomial-system solving},
+}
+\]
+
+\[
+\boxed{
+\text{elimination},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{algebraic simplification modulo equations}.
+}
+\]
+
+They play a role similar to row-reduced echelon form for systems of linear
+equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Analogy With Gaussian Elimination}
+\label{subsec:groebner-gaussian-analogy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gaussian elimination transforms linear equations into a structured basis
+that supports solving and consistency testing.
+
+Gröbner-basis algorithms perform an analogous transformation for
+polynomial ideals.
+
+Thus one may think conceptually of
+
+\[
+\boxed{
+\text{Gaussian elimination}
+\leftrightarrow
+\text{linear systems},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Gröbner bases}
+\leftrightarrow
+\text{polynomial systems}.
+}
+\]
+
+The polynomial problem is much more computationally difficult.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{S-Polynomials}
+\label{subsec:s-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+f
+\]
+
+and
+
+\[
+g
+\]
+
+have leading terms
+
+\[
+\operatorname{LT}(f)
+\]
+
+and
+
+\[
+\operatorname{LT}(g).
+\]
+
+Let
+
+\[
+L
+=
+\operatorname{lcm}
+(
+\operatorname{LM}(f),
+\operatorname{LM}(g)
+).
+\]
+
+The S-polynomial is constructed to cancel the leading monomials:
+
+\[
+\boxed{
+S(f,g)
+=
+\frac{
+L
+}{
+\operatorname{LT}(f)
+}
+f
+-
+\frac{
+L
+}{
+\operatorname{LT}(g)
+}
+g.
+}
+\]
+
+S-polynomials reveal missing leading-term relations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Buchberger's Algorithm}
+\label{subsec:buchberger-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic Gröbner-basis algorithm is:
+
+\begin{enumerate}
+    \item begin with generators
+    \[
+    G=\{f_1,\ldots,f_m\};
+    \]
+    \item form S-polynomials of pairs in \(G\);
+    \item reduce each S-polynomial by \(G\);
+    \item if a nonzero remainder appears, add it to \(G\);
+    \item repeat until every relevant S-polynomial reduces to zero.
+\end{enumerate}
+
+The final set is a Gröbner basis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Buchberger Criterion}
+\label{subsec:buchberger-criterion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A finite generating set \(G\) is a Gröbner basis if and only if every
+S-polynomial of pairs of elements of \(G\) reduces to zero with respect to
+\(G\).
+
+This gives an algorithmic test for Gröbner-basis completeness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ideal Membership}
+\label{subsec:ideal-membership}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(G\) is a Gröbner basis for ideal \(I\).
+
+Reduce polynomial \(f\) by \(G\).
+
+Then
+
+\[
+\boxed{
+f\in I
+}
+\]
+
+if and only if the Gröbner remainder is
+
+\[
+\boxed{
+0.
+}
+\]
+
+Thus ideal membership becomes a finite algorithmic calculation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Ideal Membership Idea}
+\label{subsec:worked-ideal-membership}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Simple Polynomial Ideal}
+
+Consider the ideal
+
+\[
+I
+=
+\langle
+x-y,
+y-1
+\rangle.
+\]
+
+The equations imply
+
+\[
+y=1,
+\]
+
+and
+
+\[
+x=1.
+\]
+
+Consider
+
+\[
+f=x+y-2.
+\]
+
+Substituting the ideal relations gives
+
+\[
+f
+=
+1+1-2
+=
+0.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+x+y-2
+\in
+\langle
+x-y,y-1
+\rangle.
+}
+\]
+\end{answerbox}
+
+A Gröbner-basis reduction provides a systematic version of this reasoning.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Elimination Theorem}
+\label{subsec:groebner-elimination-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With lexicographic ordering, Gröbner bases can eliminate variables.
+
+Suppose
+
+\[
+I
+\subset
+F[x_1,\ldots,x_n].
+\]
+
+A lexicographic Gröbner basis may contain polynomials involving only the
+later variables.
+
+This permits sequential solution of multivariate polynomial systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Triangular Polynomial Systems}
+\label{subsec:triangular-polynomial-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ideal may be transformed into equations such as
+
+\[
+\boxed{
+g_1(x_n)=0,
+}
+\]
+
+\[
+\boxed{
+g_2(x_{n-1},x_n)=0,
+}
+\]
+
+and so on.
+
+This resembles triangular linear systems.
+
+Solve the univariate equation first, then substitute backward.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Zero-Dimensional Ideals Preview}
+\label{subsec:zero-dimensional-ideals-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial system with finitely many solutions over an algebraic closure
+is associated, under standard algebraic conditions, with a zero-dimensional
+ideal.
+
+For such systems, Gröbner bases can reduce solving to univariate
+polynomials and back-substitution.
+
+This provides an exact algebraic counterpart to numerical root finding.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resultants}
+\label{subsec:computer-algebra-resultants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two univariate polynomials
+
+\[
+f(x)
+\]
+
+and
+
+\[
+g(x),
+\]
+
+their resultant satisfies
+
+\[
+\boxed{
+\operatorname{Res}(f,g)=0
+}
+\]
+
+if the polynomials share a common root over an algebraic closure, subject
+to the usual nondegenerate interpretation.
+
+Resultants can also eliminate a variable from multivariate polynomial
+systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sylvester Matrix}
+\label{subsec:sylvester-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The resultant of two univariate polynomials can be computed as the
+determinant of their Sylvester matrix.
+
+For
+
+\[
+f(x)
+=
+a_mx^m+\cdots+a_0
+\]
+
+and
+
+\[
+g(x)
+=
+b_nx^n+\cdots+b_0,
+\]
+
+the Sylvester matrix arranges shifted coefficient rows of \(f\) and \(g\).
+
+Then
+
+\[
+\boxed{
+\operatorname{Res}(f,g)
+=
+\det(S(f,g)).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Simple Resultant}
+\label{subsec:worked-resultant}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Two Linear Polynomials}
+
+Let
+
+\[
+f(x)=ax+b,
+\]
+
+and
+
+\[
+g(x)=cx+d.
+\]
+
+The Sylvester matrix is
+
+\[
+\begin{pmatrix}
+a&b\\
+c&d
+\end{pmatrix}.
+\]
+
+Therefore,
+
+\[
+\operatorname{Res}(f,g)
+=
+ad-bc.
+\]
+
+The polynomials have a common root precisely when
+
+\[
+ad-bc=0
+\]
+
+provided the equations are interpreted without degenerate zero-polynomial
+cases.
+
+\begin{answerbox}
+\[
+\boxed{
+\operatorname{Res}(f,g)
+=
+ad-bc.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Real Root Isolation}
+\label{subsec:exact-real-root-isolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A symbolic system may isolate real polynomial roots using rational
+intervals.
+
+For each real root \(\alpha\), find
+
+\[
+\boxed{
+a<\alpha<b
+}
+\]
+
+with rational endpoints such that the interval contains exactly one root.
+
+This yields an exact representation even when no radical expression is
+available.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sturm Sequences Preview}
+\label{subsec:sturm-sequences-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sturm sequences provide an exact method for counting distinct real roots
+of a polynomial inside an interval.
+
+By repeatedly subdividing intervals, one can isolate all real roots.
+
+This is an important example of exact real algebraic computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic Linear Algebra}
+\label{subsec:computer-algebra-symbolic-linear-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computer algebra also performs matrix computations over exact domains.
+
+Examples include:
+
+\[
+\boxed{
+A\in\mathbb{Z}^{m\times n},
+}
+\]
+
+\[
+\boxed{
+A\in\mathbb{Q}^{m\times n},
+}
+\]
+
+or matrices over polynomial rings.
+
+Typical tasks include:
+
+\[
+\boxed{
+\text{rank},
+}
+\]
+
+\[
+\boxed{
+\text{determinant},
+}
+\]
+
+\[
+\boxed{
+\text{null space},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{linear-system solution}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Gaussian Elimination}
+\label{subsec:exact-gaussian-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gaussian elimination over \(\mathbb{Q}\) produces exact rational
+solutions.
+
+However, fractions may grow quickly.
+
+For example, repeated pivot operations can create numerators and
+denominators much larger than the original matrix entries.
+
+This motivates fraction-free and modular approaches.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fraction-Free Elimination}
+\label{subsec:fraction-free-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fraction-free elimination reorganizes Gaussian elimination so divisions
+are exact and fractions are postponed or avoided.
+
+The intermediate values remain integers when the input matrix is integral.
+
+This can dramatically reduce rational expression growth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bareiss-Type Elimination Preview}
+\label{subsec:bareiss-elimination-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fraction-free elimination scheme updates entries using divisions that
+are known to be exact.
+
+Conceptually, it preserves determinant-related scaling so intermediate
+integers remain much smaller than those produced by naive rational
+elimination.
+
+This approach is useful for exact determinants and linear systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Determinant Computation}
+\label{subsec:exact-determinant}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Possible strategies include:
+
+\[
+\boxed{
+\text{fraction-free elimination},
+}
+\]
+
+\[
+\boxed{
+\text{modular determinant computation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{structured formulas}.
+}
+\]
+
+Direct cofactor expansion is usually impractical for large matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modular Determinants}
+\label{subsec:modular-determinants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an integer matrix \(A\), compute
+
+\[
+\det(A)
+\bmod p_i
+\]
+
+for several primes.
+
+Use Chinese Remainder reconstruction to recover
+
+\[
+\boxed{
+\det(A).
+}
+\]
+
+If a bound on
+
+\[
+|\det(A)|
+\]
+
+is known, enough primes guarantee exact reconstruction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hadamard Bound}
+\label{subsec:hadamard-bound-computer-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For matrix \(A\) with row vectors \(r_i\),
+
+\[
+\boxed{
+|\det(A)|
+\leq
+\prod_i
+\|r_i\|_2.
+}
+\]
+
+This provides an upper bound useful in determining how much modular
+information is needed to reconstruct an exact determinant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hermite Normal Form}
+\label{subsec:hermite-normal-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Hermite normal form gives a canonical triangular-like form for integer
+matrices under multiplication by unimodular integer matrices.
+
+It is useful for:
+
+\[
+\boxed{
+\text{integer linear systems},
+}
+\]
+
+\[
+\boxed{
+\text{lattices},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{module computations}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Smith Normal Form}
+\label{subsec:smith-normal-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an integer matrix \(A\), the Smith normal form has diagonal structure
+
+\[
+\boxed{
+UAV
+=
+D,
+}
+\]
+
+where \(U\) and \(V\) are unimodular and
+
+\[
+\boxed{
+D
+=
+\operatorname{diag}
+(
+d_1,\ldots,d_r,0,\ldots,0
+),
+}
+\]
+
+with divisibility conditions
+
+\[
+\boxed{
+d_1\mid d_2\mid\cdots\mid d_r.
+}
+\]
+
+This reveals structural information about finitely generated abelian
+groups and integer modules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Exact Linear Algebra}
+\label{subsec:sparse-exact-linear-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Exact matrices can also be sparse.
+
+However, elimination may create fill-in.
+
+Sparse exact algorithms therefore balance:
+
+\[
+\boxed{
+\text{sparsity preservation}
+}
+\]
+
+against
+
+\[
+\boxed{
+\text{coefficient growth}.
+}
+\]
+
+This is more difficult than ordinary sparse floating-point computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expression Swell in Computer Algebra}
+\label{subsec:computer-algebra-expression-swell}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Exact algorithms may produce enormous intermediate expressions.
+
+For example,
+
+\[
+\boxed{
+\text{small input}
+\longrightarrow
+\text{huge intermediate result}
+\longrightarrow
+\text{small final answer}.
+}
+\]
+
+This is expression swell.
+
+It can dominate runtime and memory even when the theoretical number of
+algebraic operations appears moderate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coefficient Growth}
+\label{subsec:computer-algebra-coefficient-growth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose initial coefficients contain at most \(b\) bits.
+
+Intermediate coefficients may contain many more bits.
+
+Thus the actual work depends on both:
+
+\[
+\boxed{
+\text{number of algebraic operations}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{size of coefficients}.
+}
+\]
+
+This motivates bit-complexity analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bit Complexity}
+\label{subsec:computer-algebra-bit-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In exact computation, multiplying two \(n\)-digit integers is more
+expensive than multiplying machine-sized integers.
+
+If \(M(n)\) denotes the cost of multiplying \(n\)-bit integers, then many
+algebra algorithms are analyzed in terms of \(M(n)\).
+
+Thus symbolic complexity often requires more detailed analysis than a
+simple arithmetic-operation count.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fast Integer Multiplication}
+\label{subsec:fast-integer-multiplication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The elementary multiplication algorithm has quadratic digit complexity.
+
+Faster algorithms use:
+
+\[
+\boxed{
+\text{divide and conquer},
+}
+\]
+
+and for sufficiently large integers,
+
+\[
+\boxed{
+\text{transform-based multiplication}.
+}
+\]
+
+These techniques are important because large-integer arithmetic appears
+inside many exact algebra algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Evaluation and Interpolation Methods}
+\label{subsec:evaluation-interpolation-computer-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some polynomial algorithms replace symbolic coefficient manipulation by:
+
+\[
+\boxed{
+\text{evaluation at many points},
+}
+\]
+
+followed by
+
+\[
+\boxed{
+\text{pointwise computation},
+}
+\]
+
+and then
+
+\[
+\boxed{
+\text{interpolation}.
+}
+\]
+
+This can accelerate multiplication, resultants, and other polynomial
+operations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modular Images}
+\label{subsec:modular-images}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A large exact object may be mapped into smaller computational domains.
+
+For example,
+
+\[
+A
+\in
+\mathbb{Z}^{n\times n}
+\]
+
+can be reduced to
+
+\[
+\boxed{
+A\bmod p
+\in
+\mathbb{F}_p^{n\times n}.
+}
+\]
+
+The modular image is easier to compute with.
+
+Several images can later reconstruct the exact result.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unlucky Primes}
+\label{subsec:unlucky-primes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A prime used in modular computation can sometimes destroy important
+structural information.
+
+For example, a leading coefficient may become zero modulo \(p\), or rank
+may decrease.
+
+Such primes are often called unlucky primes.
+
+Robust modular algorithms detect or avoid them.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Verification of Reconstructed Results}
+\label{subsec:verification-reconstructed-results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After reconstructing an exact candidate, verify it against the original
+problem.
+
+For factorization,
+
+\[
+\boxed{
+f
+\stackrel{?}{=}
+g_1g_2\cdots g_k.
+}
+\]
+
+For a linear system,
+
+\[
+\boxed{
+Ax
+\stackrel{?}{=}
+b.
+}
+\]
+
+Exact verification is often inexpensive relative to discovering the
+candidate result.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomized Computer Algebra}
+\label{subsec:randomized-computer-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Randomization can simplify exact algebraic algorithms.
+
+Examples include choosing random:
+
+\[
+\boxed{
+\text{evaluation points},
+}
+\]
+
+\[
+\boxed{
+\text{primes},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{linear combinations}.
+}
+\]
+
+Randomization may avoid pathological cases and reduce computational cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Las Vegas Algorithms}
+\label{subsec:las-vegas-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Las Vegas algorithm always returns a correct result, but its runtime is
+random.
+
+For example, the algorithm may choose random parameters and restart if a
+bad choice is detected.
+
+Thus:
+
+\[
+\boxed{
+\text{random runtime}
++
+\text{guaranteed correctness}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Algorithms in Algebra}
+\label{subsec:monte-carlo-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Monte Carlo algorithm has bounded or controlled runtime but may return an
+incorrect answer with small probability.
+
+Repeated independent checks can reduce that probability.
+
+Thus:
+
+\[
+\boxed{
+\text{controlled runtime}
++
+\text{small failure probability}.
+}
+\]
+
+This terminology parallels randomized algorithms more broadly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Identity Testing}
+\label{subsec:polynomial-identity-testing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one wants to test whether polynomial
+
+\[
+P(x_1,\ldots,x_n)
+\]
+
+is identically zero.
+
+Expanding \(P\) may be expensive.
+
+Instead, choose random input values and evaluate.
+
+If
+
+\[
+P(a_1,\ldots,a_n)\neq0,
+\]
+
+then \(P\) is certainly nonzero.
+
+If the evaluation is zero, repeat with new random values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Schwartz--Zippel Principle Preview}
+\label{subsec:schwartz-zippel-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a nonzero polynomial of total degree \(d\), evaluating at random points
+from a sufficiently large finite set yields zero with probability at most
+approximately
+
+\[
+\boxed{
+\frac{d}{|S|}.
+}
+\]
+
+This provides a probabilistic identity test.
+
+The error probability can be made very small by repeated trials.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computer Algebra System Architecture}
+\label{subsec:cas-architecture}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A computer algebra system typically contains several layers.
+
+Conceptually:
+
+\[
+\boxed{
+\text{parser}
+\rightarrow
+\text{expression representation}
+\rightarrow
+\text{algebraic domains}
+\rightarrow
+\text{algorithms}
+\rightarrow
+\text{simplifier}
+\rightarrow
+\text{output}.
+}
+\]
+
+Each layer has a distinct role.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parser}
+\label{subsec:cas-parser}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The parser converts user notation into internal mathematical objects.
+
+For example,
+
+\[
+\boxed{
+x^2+2x+1
+}
+\]
+
+must be recognized as a polynomial expression rather than an unstructured
+text string.
+
+Parsing determines operator precedence, function calls, and syntactic
+structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expression Kernel}
+\label{subsec:expression-kernel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The expression kernel stores fundamental symbolic objects such as:
+
+\[
+\boxed{
+\text{symbols},
+}
+\]
+
+\[
+\boxed{
+\text{numbers},
+}
+\]
+
+\[
+\boxed{
+\text{sums},
+}
+\]
+
+\[
+\boxed{
+\text{products},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{powers}.
+}
+\]
+
+Higher-level mathematics is built on these basic structures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Domain System}
+\label{subsec:cas-domain-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A domain system tracks whether coefficients belong to:
+
+\[
+\boxed{
+\mathbb{Z},
+}
+\]
+
+\[
+\boxed{
+\mathbb{Q},
+}
+\]
+
+\[
+\boxed{
+\mathbb{F}_p,
+}
+\]
+
+or more complicated extensions.
+
+Algorithms can then dispatch to methods suited to the domain.
+
+For example, polynomial division differs over \(\mathbb{Z}\) and
+\(\mathbb{Q}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Canonicalization}
+\label{subsec:cas-canonicalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Basic expressions are often automatically normalized.
+
+Examples include:
+
+\[
+x+x
+\longrightarrow
+2x,
+\]
+
+\[
+3+5
+\longrightarrow
+8,
+\]
+
+and reordering terms according to an internal canonical order.
+
+Canonicalization makes expression comparison and hashing easier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplification Engine}
+\label{subsec:cas-simplification-engine}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simplifier applies transformations to obtain a preferred form.
+
+Some simplifications are universally safe.
+
+Others depend on:
+
+\[
+\boxed{
+\text{domains},
+}
+\]
+
+\[
+\boxed{
+\text{sign assumptions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{branch conventions}.
+}
+\]
+
+A reliable system must distinguish these cases.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pattern Matcher}
+\label{subsec:cas-pattern-matcher}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Pattern matching enables rules such as
+
+\[
+\boxed{
+a+a
+\longrightarrow
+2a,
+}
+\]
+
+or
+
+\[
+\boxed{
+\sin^2x+\cos^2x
+\longrightarrow
+1.
+}
+\]
+
+Advanced matchers may support:
+
+\[
+\boxed{
+\text{wildcards},
+}
+\]
+
+\[
+\boxed{
+\text{sequence patterns},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{conditional rules}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Assumption Engine}
+\label{subsec:cas-assumption-engine}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the system knows
+
+\[
+\boxed{
+x>0.
+}
+\]
+
+Then it may simplify
+
+\[
+\sqrt{x^2}
+\]
+
+to
+
+\[
+\boxed{
+x.
+}
+\]
+
+Without that assumption, over the real numbers the safe simplification is
+
+\[
+\boxed{
+|x|.
+}
+\]
+
+Assumption systems therefore affect symbolic correctness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expression DAGs}
+\label{subsec:cas-expression-dags}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Repeated subexpressions can be shared.
+
+Instead of representing
+
+\[
+f(g(x))+h(g(x))
+\]
+
+with two separate copies of \(g(x)\), a system may store one shared node.
+
+This creates a directed acyclic graph.
+
+Sharing reduces memory and supports faster equality checks.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hashing Symbolic Objects}
+\label{subsec:hashing-symbolic-objects}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A normalized symbolic expression can be assigned a hash value.
+
+Hashing supports:
+
+\[
+\boxed{
+\text{fast lookup},
+}
+\]
+
+\[
+\boxed{
+\text{memoization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{common-subexpression detection}.
+}
+\]
+
+Hash-based data structures are therefore important in large symbolic
+computations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memoization}
+\label{subsec:computer-algebra-memoization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a symbolic operation is expensive and repeated, store the result.
+
+For function \(F\),
+
+\[
+\boxed{
+x
+\mapsto
+F(x)
+}
+\]
+
+can be cached.
+
+Future calls with the same normalized input reuse the stored answer.
+
+This is especially effective for recursive symbolic algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lazy Algebraic Objects}
+\label{subsec:lazy-algebraic-objects}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some exact objects can be represented without fully expanding them.
+
+For example,
+
+\[
+\boxed{
+(x+1)^{1000}
+}
+\]
+
+can remain as a power.
+
+Only if coefficients are explicitly requested must the polynomial be
+expanded.
+
+Lazy representation helps control expression swell.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Black-Box Polynomials}
+\label{subsec:black-box-polynomials}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial may be accessible only through evaluation:
+
+\[
+\boxed{
+x
+\mapsto
+f(x).
+}
+\]
+
+The coefficient representation may be unknown or too large to store.
+
+Black-box algorithms operate using evaluations rather than explicit
+coefficients.
+
+This is useful in interpolation, identity testing, and sparse polynomial
+reconstruction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Interpolation Preview}
+\label{subsec:sparse-interpolation-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a polynomial has enormous degree but only a few nonzero terms.
+
+Dense interpolation would be wasteful.
+
+Sparse interpolation attempts to recover only the nonzero monomials and
+their coefficients from carefully chosen evaluations.
+
+This is an important example of adapting algorithms to algebraic
+structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symbolic-Numeric Algebra}
+\label{subsec:symbolic-numeric-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Exact algebraic algorithms may become prohibitively expensive.
+
+Numerical methods can provide approximate candidates.
+
+Then symbolic computation can reconstruct or verify exact structure.
+
+A common strategy is:
+
+\[
+\boxed{
+\text{numerical approximation}
+\rightarrow
+\text{exact reconstruction}
+\rightarrow
+\text{verification}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integer Relation Detection Preview}
+\label{subsec:integer-relation-detection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a high-precision numerical constant appears to satisfy a relation
+
+\[
+\boxed{
+a_0
++
+a_1\alpha_1
++
+\cdots
++
+a_n\alpha_n
+=
+0,
+}
+\]
+
+with small integers \(a_i\).
+
+Integer-relation algorithms search for such coefficient vectors.
+
+This can help identify exact formulas from high-precision numerical data.
+
+Any conjectured relation must then be verified independently.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Reconstruction From Floating Point}
+\label{subsec:exact-reconstruction-floating}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a numerical computation suggests
+
+\[
+x
+\approx
+0.333333333333.
+\]
+
+One may conjecture
+
+\[
+\boxed{
+x=\frac13.
+}
+\]
+
+Rational approximation algorithms can search for small numerator and
+denominator pairs.
+
+However, approximate agreement alone is not proof.
+
+Exact substitution or mathematical verification is required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algebraic Complexity}
+\label{subsec:algebraic-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computer algebra complexity depends on several dimensions:
+
+\[
+\boxed{
+\text{degree},
+}
+\]
+
+\[
+\boxed{
+\text{number of variables},
+}
+\]
+
+\[
+\boxed{
+\text{coefficient bit size},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{number of terms}.
+}
+\]
+
+A method efficient in one parameter may still become infeasible because
+another parameter grows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gröbner-Basis Complexity}
+\label{subsec:groebner-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gröbner-basis computation can be extremely expensive in the worst case.
+
+Intermediate polynomial degrees and term counts can grow dramatically.
+
+Practical performance depends strongly on:
+
+\[
+\boxed{
+\text{monomial ordering},
+}
+\]
+
+\[
+\boxed{
+\text{system structure},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{implementation strategy}.
+}
+\]
+
+Thus a mathematically equivalent reformulation can change runtime by orders
+of magnitude.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing Monomial Orders}
+\label{subsec:choosing-monomial-orders}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Lexicographic order is useful for elimination and triangular solving.
+
+Graded reverse lexicographic order is often computationally cheaper for
+basis construction.
+
+A common strategy is:
+
+\[
+\boxed{
+\text{compute in an efficient order}
+}
+\]
+
+then
+
+\[
+\boxed{
+\text{convert to an elimination-friendly order}.
+}
+\]
+
+Order choice is part of algorithm design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computer Algebra Workflow}
+\label{subsec:computer-algebra-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical computer-algebra workflow is:
+
+\begin{enumerate}
+    \item identify the exact algebraic domain;
+    \item preserve integers and rationals exactly;
+    \item choose dense or sparse representations;
+    \item choose monomial ordering for multivariate polynomials;
+    \item normalize input objects;
+    \item remove trivial common factors;
+    \item use primitive parts when working over the integers;
+    \item detect repeated factors;
+    \item choose direct, modular, or evaluation-based algorithms;
+    \item control intermediate coefficient growth;
+    \item exploit sparsity;
+    \item use finite-field images when useful;
+    \item reconstruct exact results;
+    \item verify reconstructed candidates;
+    \item avoid unnecessary expression expansion;
+    \item use Gröbner bases only when polynomial-ideal structure is needed;
+    \item choose elimination order carefully;
+    \item use symbolic-numeric hybrids when exact computation is too large;
+    \item document coefficient domains and assumptions;
+    \item independently verify important results.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Computer Algebra Strategy}
+\label{subsec:choosing-computer-algebra-strategy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For small univariate polynomials, direct exact algorithms are often
+appropriate.
+
+For large integer coefficients, consider:
+
+\[
+\boxed{
+\text{modular methods}.
+}
+\]
+
+For multivariate polynomial ideals, consider:
+
+\[
+\boxed{
+\text{Gröbner bases}.
+}
+\]
+
+For variable elimination, consider:
+
+\[
+\boxed{
+\text{resultants}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{lexicographic Gröbner bases}.
+}
+\]
+
+For huge sparse polynomials, consider:
+
+\[
+\boxed{
+\text{sparse and black-box methods}.
+}
+\]
+
+For large exact matrices, consider:
+
+\[
+\boxed{
+\text{fraction-free or modular linear algebra}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:computer-algebra-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Ignoring the Coefficient Domain}
+
+The polynomial
+
+\[
+x^2-2
+\]
+
+is irreducible over
+
+\[
+\mathbb{Q}
+\]
+
+but reducible over
+
+\[
+\mathbb{R}.
+\]
+
+Factorization questions are meaningless without specifying the domain.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Dense Representation for Extremely Sparse Polynomials}
+
+A polynomial like
+
+\[
+x^{1000000}+x+1
+\]
+
+should not require storage for one million zero coefficients.
+
+Choose a representation suited to sparsity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Sparse Representation for Dense Low-Degree Polynomials}
+
+Sparse structures add indexing overhead.
+
+Dense storage is often simpler and faster when most coefficients are
+nonzero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Performing Rational Arithmetic Without Reduction}
+
+Repeated fraction operations can produce unnecessarily huge numerators and
+denominators.
+
+Normalize fractions systematically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Expanding Before Factorization}
+
+Full expansion can cause expression swell.
+
+Preserve useful structure unless expansion is required by the algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Ordinary Division Over a Nonfield}
+
+Leading coefficients may not be invertible in rings such as
+
+\[
+\mathbb{Z}.
+\]
+
+Pseudo-division or domain conversion may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Primitive Parts}
+
+For integer polynomials, separating content from primitive part often
+reduces unnecessary coefficient growth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Repeated Factors Before Factorization}
+
+Square-free factorization is an important preprocessing step.
+
+Repeated factors can complicate later algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Bad Modular Prime}
+
+An unlucky prime can change degree, rank, or factor structure.
+
+Modular algorithms should detect inconsistent images.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reconstructing Before Enough Modular Information Is Available}
+
+Chinese Remainder reconstruction gives a result modulo \(M\).
+
+The modulus must be large enough relative to the possible exact answer.
+
+Bounds or verification are required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Numerical Guess Is Exact}
+
+A floating-point number that looks rational or algebraic may merely be
+close.
+
+Exact reconstruction must be verified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Gröbner Bases Without Choosing an Appropriate Monomial Order}
+
+Different monomial orders can produce dramatically different computation
+times and basis structures.
+
+The desired output should guide the order.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Multivariate Division Has a Unique Remainder}
+
+For arbitrary divisors, multivariate remainder can depend on reduction
+order.
+
+Uniqueness is obtained in the appropriate Gröbner-basis setting with fixed
+monomial order and reduction convention.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Gröbner Basis Is Reduced}
+
+A Gröbner basis need not be minimal or reduced.
+
+A reduced Gröbner basis has additional normalization properties and is
+unique for a fixed monomial order over a field.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Lexicographic Order for Every Gröbner Computation}
+
+Lex order is valuable for elimination but can be much more expensive than
+graded orders.
+
+A two-stage order strategy may be better.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Cofactor Expansion for Large Determinants}
+
+Cofactor expansion grows combinatorially.
+
+Use elimination, fraction-free, or modular determinant algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Exact Rational Gaussian Elimination Naively}
+
+Intermediate fractions can become enormous.
+
+Fraction-free or modular methods often perform much better.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Bit Complexity}
+
+An algorithm performing few operations on huge integers may be slower than
+one performing more operations on small modular values.
+
+Coefficient size matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Failing to Verify Randomized Algebra Results}
+
+Randomized methods may rely on probabilistic assumptions or random choices.
+
+Whenever possible, perform an exact final verification.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Computer Algebra With Numerical Algebra}
+
+An exact determinant computation and a floating-point determinant
+computation solve related but different computational problems.
+
+Their algorithms, errors, and complexity considerations differ.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:computer-algebra-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Abstract Algebra.}
+Computer algebra performs exact ring, field, polynomial, ideal, and module
+computations.
+
+\medskip
+
+\textbf{Number Theory.}
+Large-integer arithmetic, modular computation, factorization, algebraic
+numbers, and exact matrix normal forms are central computational tools.
+
+\medskip
+
+\textbf{Algebraic Geometry.}
+Gröbner bases, ideals, elimination, resultants, and polynomial systems are
+fundamental computational methods.
+
+\medskip
+
+\textbf{Cryptography.}
+Finite fields, polynomial arithmetic, modular arithmetic, and algebraic
+structures support many cryptographic algorithms.
+
+\medskip
+
+\textbf{Coding Theory.}
+Polynomial and finite-field calculations are used to construct and decode
+error-correcting codes.
+
+\medskip
+
+\textbf{Optimization.}
+Polynomial optimization and exact KKT elimination can use algebraic
+methods.
+
+\medskip
+
+\textbf{Geometry.}
+Exact intersections of algebraic curves and surfaces can be reduced to
+polynomial-system calculations.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Computer algebra derives exact formulas, Jacobians, reduced models, and
+code that can later be evaluated numerically.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:computer-algebra-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define computer algebra.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish symbolic computation from computer algebra.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a polynomial ring.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a monomial order.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the leading monomial of a polynomial.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a polynomial ideal.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a Gröbner basis.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an S-polynomial.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a resultant conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an algebraic number.
+\end{exercise}
+
+\begin{exercise}[2]
+Represent
+
+\[
+3x^5-2x+7
+\]
+
+using both dense and sparse representations.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine which representation is better for
+
+\[
+x^{10000}+x^2+1.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Add two polynomials using coefficient arrays.
+\end{exercise}
+
+\begin{exercise}[2]
+Multiply two small polynomials by coefficient convolution.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the naive polynomial multiplication cost with FFT-based
+multiplication conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform polynomial division over
+
+\[
+\mathbb{Q}[x].
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why ordinary polynomial division may fail over
+
+\[
+\mathbb{Z}[x].
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a simple pseudo-division.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute a polynomial gcd using the Euclidean algorithm.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the content and primitive part of an integer polynomial.
+\end{exercise}
+
+\begin{exercise}[3]
+Use
+
+\[
+\gcd(f,f')
+\]
+
+to detect repeated factors.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a square-free decomposition of a simple polynomial.
+\end{exercise}
+
+\begin{exercise}[3]
+Factor a polynomial modulo a small prime.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of finite-field factorization in integer polynomial
+factorization.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Hensel lifting conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Solve a system of congruences using the Chinese Remainder Theorem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how modular images can reduce coefficient growth.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain rational reconstruction.
+\end{exercise}
+
+\begin{exercise}[2]
+Find the minimal polynomial of
+
+\[
+\sqrt{3}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Reduce
+
+\[
+(1+\sqrt{3})^3
+\]
+
+to the basis
+
+\[
+1,\sqrt{3}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why
+
+\[
+\mathbb{Q}(\alpha)
+\cong
+\mathbb{Q}[x]/(m_\alpha(x)).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Compare monomials under lexicographic ordering.
+\end{exercise}
+
+\begin{exercise}[2]
+Compare monomials under graded lexicographic ordering.
+\end{exercise}
+
+\begin{exercise}[2]
+Compare monomials under graded reverse lexicographic ordering.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the leading monomial and leading term of a multivariate polynomial
+under a specified monomial order.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one multivariate polynomial reduction step.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why multivariate division can depend on divisor order.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an S-polynomial for two given polynomials.
+\end{exercise}
+
+\begin{exercise}[3]
+Reduce an S-polynomial by a given basis.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Buchberger's algorithm.
+\end{exercise}
+
+\begin{exercise}[3]
+Test ideal membership using a supplied Gröbner basis.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why lexicographic Gröbner bases support elimination.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a small triangular polynomial system.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the analogy between Gaussian elimination and Gröbner bases.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct the Sylvester matrix of two linear polynomials.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute their resultant.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a zero resultant indicates a common root under suitable
+conditions.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe exact real root isolation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the purpose of a Sturm sequence.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform exact Gaussian elimination on a rational matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Show how intermediate rational coefficients grow.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain fraction-free elimination.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a determinant modulo several primes.
+\end{exercise}
+
+\begin{exercise}[3]
+Reconstruct an integer determinant using the Chinese Remainder Theorem.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the Hadamard bound to estimate a determinant magnitude.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Hermite normal form.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Smith normal form.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the divisibility condition on Smith normal form diagonal entries.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why exact sparse elimination may create fill-in.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of coefficient growth in an exact computation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain bit complexity.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why large-integer multiplication matters in computer algebra.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the evaluation-interpolation strategy for polynomial
+multiplication.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain what an unlucky prime is.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a verification step after modular reconstruction.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish Las Vegas and Monte Carlo randomized algorithms.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe randomized polynomial identity testing.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the Schwartz--Zippel principle conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Draw or describe the architecture of a computer algebra system.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of the expression kernel.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of the algebraic-domain system.
+\end{exercise}
+
+\begin{exercise}[3]
+Give examples of automatic canonicalization.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why symbolic assumptions affect simplification.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the benefit of expression DAGs.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain memoization in a symbolic algorithm.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain lazy representation of
+
+\[
+(x+1)^{1000}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Describe a black-box polynomial.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain sparse polynomial interpolation conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain symbolic-numeric reconstruction.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a conjectured rational reconstruction requires verification.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Karatsuba integer multiplication.
+\end{exercise}
+
+\begin{exercise}[4]
+Study transform-based integer multiplication.
+\end{exercise}
+
+\begin{exercise}[4]
+Study fast polynomial multiplication.
+\end{exercise}
+
+\begin{exercise}[4]
+Study subresultant polynomial remainder sequences.
+\end{exercise}
+
+\begin{exercise}[4]
+Study modular gcd algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study finite-field polynomial factorization algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Hensel lifting in detail.
+\end{exercise}
+
+\begin{exercise}[4]
+Study rational reconstruction algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study exact algebraic-number arithmetic.
+\end{exercise}
+
+\begin{exercise}[4]
+Study primitive element representations of number fields.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Buchberger's criterion.
+\end{exercise}
+
+\begin{exercise}[4]
+Implement Buchberger's algorithm conceptually for a small polynomial
+system.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Gröbner-basis complexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study elimination ideals.
+\end{exercise}
+
+\begin{exercise}[4]
+Study change-of-order algorithms for Gröbner bases.
+\end{exercise}
+
+\begin{exercise}[4]
+Study resultant computation by subresultants.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Sturm root-counting algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study fraction-free Gaussian elimination.
+\end{exercise}
+
+\begin{exercise}[4]
+Study modular exact linear algebra.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Hermite normal form algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Smith normal form algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sparse exact matrix algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study randomized rank and determinant algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study polynomial identity testing.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sparse interpolation algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study integer-relation algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the design of a small computer algebra kernel.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:computer-algebra-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computer algebra develops exact algorithms for structured mathematical
+objects.
+
+Important coefficient domains include
+
+\[
+\boxed{
+\mathbb{Z},
+\quad
+\mathbb{Q},
+\quad
+\mathbb{F}_p,
+}
+\]
+
+and polynomial extensions.
+
+Polynomial computation includes:
+
+\[
+\boxed{
+\text{addition}
++
+\text{multiplication}
++
+\text{division}
++
+\text{gcd}
++
+\text{factorization}.
+}
+\]
+
+Modular methods use
+
+\[
+\boxed{
+\text{finite-field images}
+\rightarrow
+\text{exact reconstruction}.
+}
+\]
+
+Gröbner bases provide computational tools for
+
+\[
+\boxed{
+\text{ideals}
++
+\text{elimination}
++
+\text{multivariate polynomial systems}.
+}
+\]
+
+Exact linear algebra uses
+
+\[
+\boxed{
+\text{fraction-free elimination}
++
+\text{modular methods}
++
+\text{normal forms}.
+}
+\]
+
+Efficient computer algebra must control
+
+\[
+\boxed{
+\text{expression swell}
++
+\text{coefficient growth}
++
+\text{bit complexity}.
+}
+\]
+
+Modern systems combine deterministic, modular, randomized, symbolic, and
+numerical techniques.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:computer-algebra-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Computer Algebra provides the algorithmic foundation behind the symbolic
+operations introduced in Section~\ref{sec:symbolic-computation}.
+Polynomial arithmetic, modular computation, algebraic-number
+representation, Gröbner bases, resultants, exact linear algebra, and
+symbolic system architecture connect directly with the algebra and number
+theory developed earlier in the text. These algorithms also support exact
+preprocessing for numerical optimization, differential equations,
+algebraic geometry, coding theory, cryptography, and scientific computing.
+The next section, Mathematical Simulation, combines mathematical models
+with numerical algorithms to construct computational experiments for
+dynamic, stochastic, physical, biological, and engineering systems.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.9 Computer Algebra
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard computer algebra algorithms.
+%   - Standard exact polynomial and integer computation.
+%   - Standard Gröbner-basis, elimination, modular, and exact linear
+%     algebra methods.
+%
+% Used for:
+%   - computer algebra definition;
+%   - symbolic versus computer algebra distinction;
+%   - exact algebraic domains;
+%   - arbitrary-size integers and rationals;
+%   - normalization;
+%   - polynomial rings;
+%   - dense and sparse polynomial representations;
+%   - multivariate monomials;
+%   - monomial orderings;
+%   - lexicographic, graded lexicographic, and graded reverse
+%     lexicographic orders;
+%   - leading monomial and leading term;
+%   - polynomial addition and multiplication;
+%   - fast polynomial multiplication;
+%   - polynomial division and pseudo-division;
+%   - polynomial gcd;
+%   - primitive parts and content;
+%   - Gauss's lemma computationally;
+%   - subresultant PRS;
+%   - square-free factorization;
+%   - finite-field factorization;
+%   - modular polynomial factorization;
+%   - Hensel lifting preview;
+%   - Chinese Remainder reconstruction;
+%   - rational reconstruction;
+%   - modular algorithms;
+%   - algebraic numbers;
+%   - minimal polynomials;
+%   - algebraic number fields;
+%   - quotient representations;
+%   - polynomial ideals;
+%   - multivariate reduction;
+%   - Gröbner bases;
+%   - S-polynomials;
+%   - Buchberger's algorithm and criterion;
+%   - ideal membership;
+%   - elimination;
+%   - zero-dimensional systems preview;
+%   - resultants and Sylvester matrices;
+%   - exact real-root isolation;
+%   - Sturm sequence preview;
+%   - symbolic linear algebra;
+%   - fraction-free elimination;
+%   - exact and modular determinants;
+%   - Hadamard bound;
+%   - Hermite normal form;
+%   - Smith normal form;
+%   - sparse exact linear algebra;
+%   - expression swell and coefficient growth;
+%   - bit complexity;
+%   - fast integer arithmetic;
+%   - evaluation and interpolation;
+%   - modular images and unlucky primes;
+%   - exact verification;
+%   - randomized computer algebra;
+%   - Las Vegas and Monte Carlo algebra algorithms;
+%   - polynomial identity testing;
+%   - Schwartz--Zippel preview;
+%   - computer algebra system architecture;
+%   - parsers, expression kernels, domains, simplifiers, assumptions,
+%     pattern matching, hashing, DAGs, memoization, and lazy evaluation;
+%   - black-box polynomials;
+%   - sparse interpolation preview;
+%   - symbolic-numeric algebra;
+%   - integer-relation and reconstruction previews;
+%   - applications and exercises.
+%
+% Notes:
+%   - Mathematical Simulation is developed next in Section 11.10.
+%   - High-Performance Mathematical Computing follows in Section 11.11.
+%   - Symbolic Computation appears in Section 11.8.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,4012 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 12.7 TYPE THEORY
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Type Theory}
+\label{sec:type-theory}
+
+\prerequisite{
+Formal logic, proof theory, computability theory, recursion theory,
+functions, relations, sets, mathematical induction, and basic programming
+language concepts.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of type theory;
+    \item distinguish terms from types;
+    \item understand typing judgments;
+    \item recognize typing contexts;
+    \item understand formation, introduction, elimination, and computation
+          rules;
+    \item understand simple types;
+    \item recognize function types;
+    \item understand product types;
+    \item understand sum types;
+    \item recognize unit and empty types;
+    \item understand the Curry--Howard correspondence;
+    \item interpret propositions as types;
+    \item interpret proofs as terms;
+    \item understand implication as function type;
+    \item understand conjunction as product type;
+    \item understand disjunction as sum type;
+    \item understand falsity as an empty type;
+    \item recognize beta reduction;
+    \item recognize eta principles conceptually;
+    \item understand normalization;
+    \item recognize substitution in typed calculi;
+    \item understand variable binding;
+    \item recognize alpha conversion;
+    \item understand simply typed lambda calculus;
+    \item construct typed lambda terms;
+    \item derive typing judgments;
+    \item understand type safety conceptually;
+    \item distinguish static and dynamic notions conceptually;
+    \item understand dependent types;
+    \item recognize dependent function types;
+    \item recognize dependent pair types;
+    \item understand universal quantification as dependent function type;
+    \item understand existential quantification as dependent pair type;
+    \item recognize identity types;
+    \item understand equality proofs conceptually;
+    \item recognize inductive types;
+    \item understand natural numbers as an inductive type;
+    \item understand recursion and induction principles;
+    \item recognize lists and trees as inductive types;
+    \item understand structural recursion;
+    \item recognize propositions-as-types in constructive logic;
+    \item understand proof-relevant mathematics;
+    \item distinguish intensional and extensional equality conceptually;
+    \item recognize universes;
+    \item understand universe hierarchies;
+    \item recognize dependent type theory as a foundational system;
+    \item understand constructive content of proofs;
+    \item recognize normalization as computation;
+    \item understand canonicity conceptually;
+    \item recognize decidability of type checking in suitable systems;
+    \item understand definitional equality;
+    \item distinguish definitional and propositional equality;
+    \item recognize type inference conceptually;
+    \item understand polymorphism conceptually;
+    \item recognize parametric polymorphism;
+    \item understand System F conceptually;
+    \item recognize higher-order type systems;
+    \item understand propositions-as-types in proof assistants;
+    \item recognize proof terms and trusted kernels;
+    \item understand propositions versus data types;
+    \item recognize quotient-type difficulties conceptually;
+    \item understand subtypes and refinement types conceptually;
+    \item recognize homotopy type theory conceptually;
+    \item understand univalence conceptually;
+    \item recognize higher identity structure conceptually;
+    \item connect type theory with logic, proof theory, programming
+          languages, formal verification, constructive mathematics, and
+          mathematical foundations.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Type Theory?}
+\label{subsec:what-is-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type theory is a foundational framework in which mathematical objects are
+organized according to their types.
+
+Instead of beginning with one universal notion of set membership, type
+theory begins with judgments such as
+
+\[
+\boxed{
+a:A,
+}
+\]
+
+read:
+
+\[
+\boxed{
+\text{``\(a\) is a term of type \(A\).''}
+}
+\]
+
+Types control how expressions may be formed and combined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Terms and Types}
+\label{subsec:terms-and-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A \textbf{term} is an expression representing an object.
+
+A \textbf{type} classifies terms.
+
+For example,
+
+\[
+\boxed{
+3:\mathbb{N}
+}
+\]
+
+states that \(3\) is a natural number.
+
+Likewise,
+
+\[
+\boxed{
+f:A\to B
+}
+\]
+
+states that \(f\) is a function taking inputs of type \(A\) and producing
+outputs of type \(B\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Typing Judgments}
+\label{subsec:typing-judgments}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The basic judgment
+
+\[
+\boxed{
+a:A
+}
+\]
+
+is different from an ordinary proposition about set membership.
+
+It asserts that \(a\) is well formed as an object of type \(A\).
+
+More generally, under assumptions \(\Gamma\), one writes
+
+\[
+\boxed{
+\Gamma\vdash a:A.
+}
+\]
+
+This means that term \(a\) has type \(A\) in context \(\Gamma\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Contexts}
+\label{subsec:type-theoretic-contexts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A context is a list of typed variable declarations.
+
+For example,
+
+\[
+\boxed{
+\Gamma
+=
+x:A,
+y:B,
+f:A\to B.
+}
+\]
+
+A typing judgment such as
+
+\[
+\Gamma\vdash f(x):B
+\]
+
+is interpreted relative to those assumptions.
+
+Contexts play a role analogous to local assumptions in logic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Judgment Forms}
+\label{subsec:type-theory-judgment-forms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Typical judgments include:
+
+\[
+\boxed{
+A\ \text{type},
+}
+\]
+
+\[
+\boxed{
+a:A,
+}
+\]
+
+\[
+\boxed{
+A=B\ \text{type},
+}
+\]
+
+and
+
+\[
+\boxed{
+a=b:A.
+}
+\]
+
+Different type theories formalize these judgments in different ways.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Four Kinds of Rules}
+\label{subsec:type-theory-four-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A type constructor is often described by four kinds of rules:
+
+\[
+\boxed{
+\text{formation},
+}
+\]
+
+\[
+\boxed{
+\text{introduction},
+}
+\]
+
+\[
+\boxed{
+\text{elimination},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{computation}.
+}
+\]
+
+Formation says when a type exists.
+
+Introduction says how to construct its terms.
+
+Elimination says how to use those terms.
+
+Computation says how introduction and elimination interact.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function Types}
+\label{subsec:type-theory-function-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given types \(A\) and \(B\), the function type is
+
+\[
+\boxed{
+A\to B.
+}
+\]
+
+A term
+
+\[
+f:A\to B
+\]
+
+takes an input
+
+\[
+a:A
+\]
+
+and produces
+
+\[
+\boxed{
+f(a):B.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function Introduction}
+\label{subsec:function-type-introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose under assumption
+
+\[
+x:A
+\]
+
+we construct a term
+
+\[
+b:B.
+\]
+
+Then we obtain the function
+
+\[
+\boxed{
+\lambda x.\,b
+:
+A\to B.
+}
+\]
+
+The notation
+
+\[
+\lambda x.\,b
+\]
+
+represents a function taking \(x\) to \(b\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function Elimination}
+\label{subsec:function-type-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+f:A\to B
+\]
+
+and
+
+\[
+a:A,
+\]
+
+then function application gives
+
+\[
+\boxed{
+f(a):B.
+}
+\]
+
+Thus the elimination rule for a function type is ordinary function
+application.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Beta Reduction}
+\label{subsec:beta-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Applying a lambda abstraction to an argument performs substitution.
+
+The basic computation rule is
+
+\[
+\boxed{
+(\lambda x.\,b)(a)
+\longrightarrow
+b[a/x].
+}
+\]
+
+This is called beta reduction.
+
+It is one of the fundamental computation rules of lambda calculus and type
+theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Beta Reduction}
+\label{subsec:worked-beta-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Evaluating a Lambda Term}
+
+Consider
+
+\[
+(\lambda x.\,x+1)(4).
+\]
+
+Substitute
+
+\[
+4
+\]
+
+for \(x\):
+
+\[
+x+1
+\longmapsto
+4+1.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+(\lambda x.\,x+1)(4)
+\longrightarrow
+5.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simply Typed Lambda Calculus}
+\label{subsec:simply-typed-lambda-calculus}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simply typed lambda calculus begins with basic types and constructs new
+types using function types.
+
+Typical terms include:
+
+\[
+\boxed{
+x,
+}
+\]
+
+\[
+\boxed{
+\lambda x.\,t,
+}
+\]
+
+and
+
+\[
+\boxed{
+t\,u.
+}
+\]
+
+Typing rules prevent meaningless applications.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function Typing Rule}
+\label{subsec:function-typing-rule}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Lambda abstraction has typing rule
+
+\[
+\boxed{
+\frac{
+\Gamma,x:A
+\vdash
+b:B
+}{
+\Gamma
+\vdash
+\lambda x.\,b
+:
+A\to B
+}.
+}
+\]
+
+Application has rule
+
+\[
+\boxed{
+\frac{
+\Gamma\vdash f:A\to B
+\qquad
+\Gamma\vdash a:A
+}{
+\Gamma\vdash f(a):B
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Typed Identity Function}
+\label{subsec:worked-typed-identity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Identity Function}
+
+Assume
+
+\[
+x:A.
+\]
+
+Then trivially,
+
+\[
+x:A.
+\]
+
+By function introduction,
+
+\[
+\lambda x.\,x
+:
+A\to A.
+\]
+
+Thus
+
+\begin{answerbox}
+\[
+\boxed{
+\lambda x.\,x
+:
+A\to A.
+}
+\]
+\end{answerbox}
+
+This term represents the identity function on type \(A\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Product Types}
+\label{subsec:product-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given types \(A\) and \(B\), their product type is written
+
+\[
+\boxed{
+A\times B.
+}
+\]
+
+A term of this type is a pair
+
+\[
+\boxed{
+(a,b)
+}
+\]
+
+with
+
+\[
+a:A
+\]
+
+and
+
+\[
+b:B.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Product Introduction}
+\label{subsec:product-introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The introduction rule is
+
+\[
+\boxed{
+\frac{
+a:A
+\qquad
+b:B
+}{
+(a,b):A\times B
+}.
+}
+\]
+
+Thus a term of a product type contains both pieces of data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Product Elimination}
+\label{subsec:product-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given
+
+\[
+p:A\times B,
+\]
+
+one may extract the two components:
+
+\[
+\boxed{
+\pi_1(p):A,
+}
+\]
+
+and
+
+\[
+\boxed{
+\pi_2(p):B.
+}
+\]
+
+For a pair,
+
+\[
+\boxed{
+\pi_1(a,b)=a,
+}
+\]
+
+\[
+\boxed{
+\pi_2(a,b)=b.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sum Types}
+\label{subsec:sum-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given types \(A\) and \(B\), their sum type is
+
+\[
+\boxed{
+A+B.
+}
+\]
+
+A term of \(A+B\) is either:
+
+\[
+\boxed{
+\operatorname{inl}(a)
+}
+\]
+
+for
+
+\[
+a:A,
+\]
+
+or
+
+\[
+\boxed{
+\operatorname{inr}(b)
+}
+\]
+
+for
+
+\[
+b:B.
+\]
+
+The tags identify which side was used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sum Elimination}
+\label{subsec:sum-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To define a result from
+
+\[
+z:A+B,
+\]
+
+one provides:
+
+\[
+\boxed{
+\text{a rule for the \(A\)-case},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{a rule for the \(B\)-case}.
+}
+\]
+
+This is typed case analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unit Type}
+\label{subsec:unit-type}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The unit type, often written
+
+\[
+\boxed{
+\mathbf{1},
+}
+\]
+
+has exactly one canonical term, commonly written
+
+\[
+\boxed{
+\star:\mathbf{1}.
+}
+\]
+
+It represents a type containing no significant information beyond
+inhabitation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Empty Type}
+\label{subsec:empty-type}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The empty type, often written
+
+\[
+\boxed{
+\mathbf{0},
+}
+\]
+
+has no terms.
+
+Thus there is no term
+
+\[
+\boxed{
+a:\mathbf{0}.
+}
+\]
+
+From an impossible term of \(\mathbf{0}\), one can derive a term of any
+type.
+
+This corresponds logically to explosion from contradiction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Curry--Howard Correspondence}
+\label{subsec:type-theory-curry-howard}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Curry--Howard correspondence connects logic and type theory:
+
+\[
+\boxed{
+\text{propositions}
+\leftrightarrow
+\text{types},
+}
+\]
+
+\[
+\boxed{
+\text{proofs}
+\leftrightarrow
+\text{terms}.
+}
+\]
+
+Under this interpretation,
+
+\[
+\boxed{
+\text{proving proposition }P
+}
+\]
+
+means
+
+\[
+\boxed{
+\text{constructing a term }p:P.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implication as Function Type}
+\label{subsec:type-theory-implication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A proof of
+
+\[
+P\rightarrow Q
+\]
+
+takes a proof of \(P\) and transforms it into a proof of \(Q\).
+
+Thus
+
+\[
+\boxed{
+P\rightarrow Q
+}
+\]
+
+corresponds directly to the function type
+
+\[
+\boxed{
+P\to Q.
+}
+\]
+
+A proof is a function from evidence of \(P\) to evidence of \(Q\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conjunction as Product Type}
+\label{subsec:type-theory-conjunction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A proof of
+
+\[
+P\land Q
+\]
+
+contains:
+
+\[
+\boxed{
+p:P
+}
+\]
+
+and
+
+\[
+\boxed{
+q:Q.
+}
+\]
+
+Thus conjunction corresponds to
+
+\[
+\boxed{
+P\times Q.
+}
+\]
+
+The proof term is
+
+\[
+\boxed{
+(p,q):P\times Q.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Disjunction as Sum Type}
+\label{subsec:type-theory-disjunction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A constructive proof of
+
+\[
+P\lor Q
+\]
+
+must identify which alternative holds.
+
+Thus disjunction corresponds to
+
+\[
+\boxed{
+P+Q.
+}
+\]
+
+A proof is either
+
+\[
+\boxed{
+\operatorname{inl}(p)
+}
+\]
+
+or
+
+\[
+\boxed{
+\operatorname{inr}(q).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Falsity as Empty Type}
+\label{subsec:falsity-empty-type}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Falsity corresponds to the empty type:
+
+\[
+\boxed{
+\bot
+\leftrightarrow
+\mathbf{0}.
+}
+\]
+
+A proof of falsity would be a term
+
+\[
+\boxed{
+p:\mathbf{0}.
+}
+\]
+
+Because no such canonical term exists, the type represents impossibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Negation as Function Type}
+\label{subsec:type-theory-negation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Negation is interpreted as
+
+\[
+\boxed{
+\neg P
+=
+P\to\mathbf{0}.
+}
+\]
+
+Thus a proof of \(\neg P\) is a function that turns any proof of \(P\) into
+a contradiction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Proof as Program}
+\label{subsec:worked-proof-as-program}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Proof of \(P\land Q\rightarrow P\)}
+
+Suppose
+
+\[
+z:P\times Q.
+\]
+
+The first projection gives
+
+\[
+\pi_1(z):P.
+\]
+
+Therefore the function
+
+\[
+\lambda z.\,\pi_1(z)
+\]
+
+has type
+
+\[
+P\times Q\to P.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\lambda z.\,\pi_1(z)
+:
+P\times Q\to P.
+}
+\]
+\end{answerbox}
+
+Under Curry--Howard, this term is a proof of
+
+\[
+P\land Q\rightarrow P.
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Alpha Conversion}
+\label{subsec:alpha-conversion-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bound variable names do not affect the essential meaning of a lambda term.
+
+Thus
+
+\[
+\boxed{
+\lambda x.\,x
+}
+\]
+
+and
+
+\[
+\boxed{
+\lambda y.\,y
+}
+\]
+
+represent the same binding structure.
+
+Renaming bound variables is called alpha conversion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Capture-Avoiding Substitution}
+\label{subsec:type-theory-substitution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Substitution must avoid accidentally binding free variables.
+
+For example, substituting \(y\) into
+
+\[
+\lambda y.\,x
+\]
+
+for \(x\) requires renaming the bound variable first.
+
+One may rewrite
+
+\[
+\lambda y.\,x
+\]
+
+as
+
+\[
+\lambda z.\,x
+\]
+
+and then substitute:
+
+\[
+\boxed{
+(\lambda z.\,x)[y/x]
+=
+\lambda z.\,y.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Eta Principle}
+\label{subsec:eta-principle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A function \(f:A\to B\) is often considered extensionally equivalent to
+
+\[
+\boxed{
+\lambda x.\,f(x).
+}
+\]
+
+This is associated with the eta principle.
+
+Conceptually,
+
+\[
+\boxed{
+\lambda x.\,f(x)
+\approx
+f
+}
+\]
+
+when \(x\) does not occur freely in \(f\).
+
+Exact equality conventions depend on the type theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normalization}
+\label{subsec:type-theory-normalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Normalization repeatedly performs computation rules such as beta
+reduction.
+
+A term is in normal form when no permitted reduction step remains.
+
+For example,
+
+\[
+(\lambda x.\,x)(a)
+\]
+
+reduces to
+
+\[
+\boxed{
+a.
+}
+\]
+
+Normalization connects proof simplification with program evaluation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Normalization}
+\label{subsec:type-theory-strong-normalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A calculus is strongly normalizing if every valid reduction sequence
+eventually terminates.
+
+The simply typed lambda calculus is strongly normalizing.
+
+Thus well-typed simply typed lambda terms cannot reduce forever.
+
+This is a major structural property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Safety}
+\label{subsec:type-safety}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type safety means, informally, that well-typed terms do not encounter
+certain kinds of meaningless computation.
+
+Two important metatheoretic ideas are:
+
+\[
+\boxed{
+\text{preservation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{progress}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preservation}
+\label{subsec:type-preservation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Preservation states that reduction does not change a term's type.
+
+If
+
+\[
+\boxed{
+t:A
+}
+\]
+
+and
+
+\[
+\boxed{
+t\longrightarrow t',
+}
+\]
+
+then one expects
+
+\[
+\boxed{
+t':A.
+}
+\]
+
+This is also called subject reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Progress}
+\label{subsec:type-progress}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Progress states, in a suitable closed typed language, that a well-typed term
+is either:
+
+\[
+\boxed{
+\text{already a value},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{can take another computation step}.
+}
+\]
+
+It therefore does not become stuck because of a type mismatch.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dependent Types}
+\label{subsec:dependent-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In simple type theory, the output type of a function does not depend on the
+specific input value.
+
+Dependent type theory allows types to depend on terms.
+
+Thus one may have a family of types
+
+\[
+\boxed{
+B(x)
+}
+\]
+
+indexed by
+
+\[
+x:A.
+\]
+
+This greatly increases expressive power.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dependent Function Types}
+\label{subsec:dependent-function-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The dependent function type is written
+
+\[
+\boxed{
+\prod_{x:A}B(x).
+}
+\]
+
+It is also called a \(\Pi\)-type.
+
+A term
+
+\[
+f:
+\prod_{x:A}B(x)
+\]
+
+assigns to each
+
+\[
+x:A
+\]
+
+a term
+
+\[
+\boxed{
+f(x):B(x).
+}
+\]
+
+The codomain type may vary with \(x\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ordinary Functions as Special Pi Types}
+\label{subsec:ordinary-function-pi-type}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+B(x)=B
+\]
+
+does not actually depend on \(x\), then
+
+\[
+\boxed{
+\prod_{x:A}B
+}
+\]
+
+is simply the ordinary function type
+
+\[
+\boxed{
+A\to B.
+}
+\]
+
+Thus ordinary function types are special cases of dependent function types.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dependent Pair Types}
+\label{subsec:dependent-pair-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The dependent pair type is written
+
+\[
+\boxed{
+\sum_{x:A}B(x).
+}
+\]
+
+It is also called a \(\Sigma\)-type.
+
+A term has form
+
+\[
+\boxed{
+(a,b)
+}
+\]
+
+where
+
+\[
+a:A
+\]
+
+and
+
+\[
+b:B(a).
+\]
+
+The type of the second component depends on the first.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ordinary Products as Special Sigma Types}
+\label{subsec:ordinary-product-sigma-type}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(B(x)=B\) is constant, then
+
+\[
+\boxed{
+\sum_{x:A}B
+}
+\]
+
+behaves like
+
+\[
+\boxed{
+A\times B.
+}
+\]
+
+Thus ordinary products are special cases of dependent pair types.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universal Quantification as Pi Type}
+\label{subsec:forall-pi-type}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under Curry--Howard, the proposition
+
+\[
+\forall x:A\,P(x)
+\]
+
+corresponds to
+
+\[
+\boxed{
+\prod_{x:A}P(x).
+}
+\]
+
+A proof must assign to every
+
+\[
+a:A
+\]
+
+a proof
+
+\[
+\boxed{
+p(a):P(a).
+}
+\]
+
+Thus universal proof is a dependent function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Existential Quantification as Sigma Type}
+\label{subsec:exists-sigma-type}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The proposition
+
+\[
+\exists x:A\,P(x)
+\]
+
+corresponds constructively to
+
+\[
+\boxed{
+\sum_{x:A}P(x).
+}
+\]
+
+A proof contains:
+
+\[
+\boxed{
+\text{a witness }a:A
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{a proof }p:P(a).
+}
+\]
+
+Thus existential proof contains computationally meaningful data.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Existential Proof}
+\label{subsec:worked-existential-sigma}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Constructing a Witness}
+
+Consider the proposition
+
+\[
+\exists n:\mathbb{N}\,
+(n=4).
+\]
+
+A constructive proof supplies the witness
+
+\[
+4:\mathbb{N}
+\]
+
+together with evidence
+
+\[
+p:4=4.
+\]
+
+Thus the proof is represented by the dependent pair
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+(4,p)
+:
+\sum_{n:\mathbb{N}}
+(n=4).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Identity Types}
+\label{subsec:identity-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For terms
+
+\[
+a,b:A,
+\]
+
+dependent type theory may contain an identity type
+
+\[
+\boxed{
+a=_A b.
+}
+\]
+
+A term
+
+\[
+p:a=_A b
+\]
+
+is evidence that \(a\) and \(b\) are equal.
+
+Thus equality itself becomes a type with possible proof terms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reflexivity}
+\label{subsec:identity-reflexivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every term is equal to itself.
+
+Identity introduction therefore provides
+
+\[
+\boxed{
+\operatorname{refl}_a
+:
+a=_A a.
+}
+\]
+
+This is the canonical constructor for identity types.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equality Elimination}
+\label{subsec:identity-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The elimination principle for identity types says that proofs involving
+arbitrary equality evidence can be reduced to reasoning about reflexivity.
+
+This principle is often called
+
+\[
+\boxed{
+J
+}
+\]
+
+or path induction in homotopy-inspired terminology.
+
+It allows properties to be transported along equalities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transport}
+\label{subsec:type-theory-transport}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+P:A\to\mathcal{U}
+\]
+
+is a family of types and
+
+\[
+p:a=_A b.
+\]
+
+Then a term
+
+\[
+u:P(a)
+\]
+
+can be transported along \(p\) to obtain a term of
+
+\[
+\boxed{
+P(b).
+}
+\]
+
+Equality therefore supports substitution inside dependent types.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definitional Equality}
+\label{subsec:definitional-equality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Definitional equality means two expressions compute or simplify to the same
+term according to the formal reduction rules.
+
+For example,
+
+\[
+\boxed{
+(\lambda x.\,x)(a)
+\equiv
+a
+}
+\]
+
+by beta computation.
+
+This equality is usually checked by computation rather than by supplying a
+proof term.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Propositional Equality}
+\label{subsec:propositional-equality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Propositional equality is represented by an identity type.
+
+To establish
+
+\[
+a=_A b,
+\]
+
+one provides a term
+
+\[
+\boxed{
+p:a=_A b.
+}
+\]
+
+Thus definitional equality and propositional equality play different roles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Two Equalities}
+\label{subsec:worked-two-equalities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Computation Versus Proof}
+
+The expression
+
+\[
+(\lambda x.\,x)(3)
+\]
+
+reduces directly to
+
+\[
+3.
+\]
+
+This is definitional equality.
+
+By contrast, a theorem asserting equality between two mathematically
+derived expressions may require an explicit proof term.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{definitional equality}
+=
+\text{computation},
+}
+\]
+
+\[
+\boxed{
+\text{propositional equality}
+=
+\text{inhabited identity type}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inductive Types}
+\label{subsec:inductive-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An inductive type is specified by constructors that generate its canonical
+terms.
+
+The natural numbers provide the basic example.
+
+One declares constructors
+
+\[
+\boxed{
+0:\mathbb{N}
+}
+\]
+
+and
+
+\[
+\boxed{
+S:\mathbb{N}\to\mathbb{N}.
+}
+\]
+
+Every canonical natural number is generated from these constructors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Natural Number Recursion}
+\label{subsec:natural-number-recursion-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To define
+
+\[
+f:\mathbb{N}\to C,
+\]
+
+one provides:
+
+\[
+\boxed{
+c_0:C,
+}
+\]
+
+and
+
+\[
+\boxed{
+s:C\to C
+}
+\]
+
+in the simplest constant-family recursion setting.
+
+Then:
+
+\[
+\boxed{
+f(0)=c_0,
+}
+\]
+
+\[
+\boxed{
+f(Sn)=s(f(n)).
+}
+\]
+
+More general recursors may depend explicitly on \(n\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Natural Number Induction}
+\label{subsec:natural-number-induction-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+P:\mathbb{N}\to\mathcal{U}
+\]
+
+be a type family.
+
+To construct
+
+\[
+\boxed{
+\prod_{n:\mathbb{N}}P(n),
+}
+\]
+
+it is enough to construct:
+
+\[
+\boxed{
+p_0:P(0),
+}
+\]
+
+and
+
+\[
+\boxed{
+s:
+\prod_{n:\mathbb{N}}
+P(n)\to P(Sn).
+}
+\]
+
+This is the dependent induction principle for natural numbers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recursion Versus Induction}
+\label{subsec:type-theory-recursion-vs-induction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Recursion defines data or functions.
+
+Induction proves dependent properties.
+
+Recursion has a fixed output type \(C\).
+
+Induction allows the target type
+
+\[
+\boxed{
+P(n)
+}
+\]
+
+to vary with the natural number \(n\).
+
+Thus induction is a dependent generalization of recursion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lists}
+\label{subsec:type-theory-lists}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a type \(A\), the list type
+
+\[
+\boxed{
+\operatorname{List}(A)
+}
+\]
+
+may be generated by constructors
+
+\[
+\boxed{
+\operatorname{nil}
+:
+\operatorname{List}(A),
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{cons}
+:
+A
+\to
+\operatorname{List}(A)
+\to
+\operatorname{List}(A).
+}
+\]
+
+These constructors determine structural recursion on lists.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Structural Recursion}
+\label{subsec:structural-recursion-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A function on an inductively generated object can often be defined by
+specifying its behavior on each constructor.
+
+For lists:
+
+\[
+f(\operatorname{nil})
+=
+c,
+\]
+
+and
+
+\[
+f(\operatorname{cons}(a,\ell))
+=
+F(a,\ell,f(\ell)).
+\]
+
+Because recursive calls are made on structurally smaller data, termination
+is built into the definition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Trees}
+\label{subsec:type-theory-binary-trees}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A binary tree type may be generated by constructors such as
+
+\[
+\boxed{
+\operatorname{leaf}:A\to\operatorname{Tree}(A),
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{node}:
+\operatorname{Tree}(A)
+\to
+\operatorname{Tree}(A)
+\to
+\operatorname{Tree}(A).
+}
+\]
+
+Functions over trees are defined recursively according to this shape.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inductive Definitions and Termination}
+\label{subsec:inductive-definition-termination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Structural recursion on strictly smaller constructor components provides an
+intrinsic termination argument.
+
+Thus the type system may reject recursive definitions that cannot be shown
+to decrease structurally.
+
+This is important in systems where every accepted function must be total.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Canonicity}
+\label{subsec:type-theory-canonicity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Canonicity states, roughly, that every closed term of a basic data type
+computes to a canonical constructor form.
+
+For natural numbers, one expects every closed term
+
+\[
+n:\mathbb{N}
+\]
+
+to reduce to
+
+\[
+\boxed{
+0,
+\quad
+S0,
+\quad
+SS0,
+\quad
+\ldots.
+}
+\]
+
+This connects formal proof with effective computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normalization and Consistency}
+\label{subsec:type-theory-normalization-consistency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose every closed well-typed term normalizes.
+
+If there were a closed term
+
+\[
+p:\mathbf{0},
+\]
+
+it would normalize to a canonical term of the empty type.
+
+But the empty type has no constructors.
+
+Therefore, normalization and canonicity can support consistency proofs for
+appropriate type theories.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universes}
+\label{subsec:type-theory-universes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A universe is a type whose terms represent types.
+
+One may write
+
+\[
+\boxed{
+A:\mathcal{U}.
+}
+\]
+
+This means \(A\) is a small type belonging to universe \(\mathcal{U}\).
+
+Universes permit type theory to reason internally about collections of
+types.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Universe Hierarchy}
+\label{subsec:universe-hierarchy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Naively assuming
+
+\[
+\mathcal{U}:\mathcal{U}
+\]
+
+can lead to paradoxes in sufficiently expressive systems.
+
+A common solution uses a hierarchy
+
+\[
+\boxed{
+\mathcal{U}_0,
+\mathcal{U}_1,
+\mathcal{U}_2,
+\ldots
+}
+\]
+
+with
+
+\[
+\boxed{
+\mathcal{U}_0:\mathcal{U}_1,
+\qquad
+\mathcal{U}_1:\mathcal{U}_2,
+\quad\ldots.
+}
+\]
+
+This resembles size hierarchies in set theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type-Theoretic Paradoxes}
+\label{subsec:type-theoretic-paradoxes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Just as unrestricted set formation produces Russell's paradox, unrestricted
+self-referential type formation can create contradictions.
+
+Modern type theories carefully restrict universe formation and dependency
+to maintain consistency.
+
+Thus foundational design requires balancing:
+
+\[
+\boxed{
+\text{expressive power}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{logical safety}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intensional Type Theory}
+\label{subsec:intensional-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In intensional type theory, equality proofs carry structure and
+propositional equality is not automatically identified with definitional
+equality.
+
+Thus two terms may be propositionally equal without reducing to the same
+syntactic normal form.
+
+This distinction supports computational interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extensional Type Theory}
+\label{subsec:extensional-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Extensional approaches impose stronger principles identifying
+propositionally equal terms more directly.
+
+This can simplify mathematical reasoning but may complicate computation,
+normalization, or decidable type checking.
+
+Different foundational systems make different tradeoffs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function Extensionality}
+\label{subsec:function-extensionality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mathematically, one often expects:
+
+if
+
+\[
+\forall x:A,
+\quad
+f(x)=g(x),
+\]
+
+then
+
+\[
+\boxed{
+f=g.
+}
+\]
+
+In type theory this principle is called function extensionality.
+
+It may be derivable, assumed as an axiom, or obtained through stronger
+foundational principles depending on the system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof Relevance}
+\label{subsec:proof-relevance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under propositions-as-types, proofs are terms.
+
+Therefore two different proofs of the same proposition may be represented
+by different terms.
+
+This is called proof relevance.
+
+Some systems or mathematical interpretations intentionally identify more
+proofs than others.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof Irrelevance}
+\label{subsec:proof-irrelevance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Proof irrelevance is the principle that all proofs of a proposition are
+treated as indistinguishable for some purposes.
+
+Conceptually,
+
+\[
+p:P,
+\qquad
+q:P
+\]
+
+may be regarded as equivalent simply because they prove the same
+proposition.
+
+Whether this principle holds depends on the type-theoretic setting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polymorphism}
+\label{subsec:type-theory-polymorphism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polymorphic function can operate uniformly over many types.
+
+For example, the identity function may be represented schematically as
+
+\[
+\boxed{
+\operatorname{id}
+:
+\prod_{A:\mathcal{U}}
+A\to A.
+}
+\]
+
+For each type \(A\),
+
+\[
+\operatorname{id}_A
+\]
+
+acts as the identity on \(A\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric Polymorphism}
+\label{subsec:parametric-polymorphism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parametric polymorphism requires a term to work uniformly for all types.
+
+A polymorphic identity function cannot inspect arbitrary structure inside
+\(A\), because no such structure has been supplied.
+
+This uniformity leads to powerful reasoning principles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{System F Preview}
+\label{subsec:system-f-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+System F extends simply typed lambda calculus with universal quantification
+over types.
+
+A polymorphic identity term has type
+
+\[
+\boxed{
+\forall A.\,A\to A.
+}
+\]
+
+System F is important in:
+
+\[
+\boxed{
+\text{type theory},
+}
+\]
+
+\[
+\boxed{
+\text{programming languages},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{proof theory}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dependent Types and Specifications}
+\label{subsec:dependent-types-specifications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dependent types can encode precise program specifications.
+
+For example, one may describe vectors by both element type and length:
+
+\[
+\boxed{
+\operatorname{Vec}(A,n).
+}
+\]
+
+Then concatenation can have type
+
+\[
+\boxed{
+\operatorname{Vec}(A,m)
+\to
+\operatorname{Vec}(A,n)
+\to
+\operatorname{Vec}(A,m+n).
+}
+\]
+
+The type records the length theorem directly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Length-Indexed Vectors}
+\label{subsec:worked-length-indexed-vectors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Dimension in the Type}
+
+Suppose
+
+\[
+u:\operatorname{Vec}(\mathbb{R},3)
+\]
+
+and
+
+\[
+v:\operatorname{Vec}(\mathbb{R},2).
+\]
+
+A correctly typed concatenation operation produces
+
+\[
+\operatorname{append}(u,v)
+:
+\operatorname{Vec}(\mathbb{R},5).
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\operatorname{append}(u,v)
+:
+\operatorname{Vec}(\mathbb{R},3+2).
+}
+\]
+\end{answerbox}
+
+The dimension guarantee is encoded directly in the type.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Refinement Types}
+\label{subsec:refinement-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A refinement type describes elements satisfying an additional predicate.
+
+Conceptually,
+
+\[
+\boxed{
+\{x:A\mid P(x)\}.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+\{n:\mathbb{Z}\mid n>0\}
+}
+\]
+
+represents positive integers.
+
+Different type systems implement refinement types with different logical
+strength.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subtypes}
+\label{subsec:type-theory-subtypes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A subtype restricts an existing type to terms satisfying a property.
+
+Conceptually,
+
+\[
+B
+\subseteq
+A
+\]
+
+can be represented by pairing an element
+
+\[
+a:A
+\]
+
+with evidence that \(a\) satisfies the defining property of \(B\).
+
+Dependent pair types provide one way to encode this construction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quotients}
+\label{subsec:type-theory-quotients}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mathematics frequently forms quotients by equivalence relations.
+
+Examples include:
+
+\[
+\boxed{
+\mathbb{Z}/n\mathbb{Z},
+}
+\]
+
+and quotient spaces in topology.
+
+Representing quotient constructions computationally can be subtle because
+one must identify different representatives without losing useful
+computational structure.
+
+Some type theories include quotient types explicitly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Checking}
+\label{subsec:type-checking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type checking asks:
+
+\[
+\boxed{
+\text{Given }\Gamma,t,A,
+\text{ is }
+\Gamma\vdash t:A?
+}
+\]
+
+In many practical dependent type theories, type checking is designed to be
+decidable.
+
+The checker verifies that each term obeys the formal typing rules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Inference}
+\label{subsec:type-inference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type inference asks the system to determine a type from an expression.
+
+For example, from
+
+\[
+\lambda x.\,x,
+\]
+
+one may infer a sufficiently general identity type.
+
+Inference can be easy in some type systems and undecidable or
+computationally difficult in more expressive ones.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Checking Versus Proof Search}
+\label{subsec:type-checking-proof-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under Curry--Howard:
+
+\[
+\boxed{
+\text{type checking}
+}
+\]
+
+corresponds roughly to
+
+\[
+\boxed{
+\text{proof verification},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{constructing a term of type }P
+}
+\]
+
+corresponds to
+
+\[
+\boxed{
+\text{finding a proof of }P.
+}
+\]
+
+Checking is often substantially easier than search.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof Assistants}
+\label{subsec:type-theory-proof-assistants}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many proof assistants use type theory as their foundational language.
+
+A theorem is represented as a type.
+
+A formal proof is represented as a term inhabiting that type.
+
+The trusted kernel checks a judgment of the form
+
+\[
+\boxed{
+p:P.
+}
+\]
+
+Thus machine verification reduces to type checking.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trusted Kernels}
+\label{subsec:type-theory-trusted-kernels}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A proof assistant may have sophisticated automation for searching for proof
+terms.
+
+However, the final proof object is checked by a small kernel implementing
+the core type rules.
+
+This creates a separation between:
+
+\[
+\boxed{
+\text{untrusted proof search}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{trusted proof checking}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Executable Proof Content}
+\label{subsec:executable-proof-content}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Constructive proofs may contain computational data.
+
+For example, a proof of
+
+\[
+\boxed{
+\forall x:A
+\exists y:B
+\,
+R(x,y)
+}
+\]
+
+corresponds to a dependent function that takes \(x\) and returns a pair
+
+\[
+\boxed{
+(y,p)
+}
+\]
+
+where
+
+\[
+y:B
+\]
+
+and
+
+\[
+p:R(x,y).
+\]
+
+Thus the proof itself contains an algorithm for constructing witnesses.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Program Extraction}
+\label{subsec:program-extraction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In suitable constructive systems, computational content can be extracted
+from proofs.
+
+A theorem proving existence of a function may contain enough information to
+produce executable code.
+
+This creates a direct bridge between:
+
+\[
+\boxed{
+\text{mathematical proof}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{verified program}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Theory as a Foundation}
+\label{subsec:type-theory-foundation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dependent type theory can serve as an alternative foundation for
+mathematics.
+
+Instead of saying
+
+\[
+x\in A,
+\]
+
+one often begins with
+
+\[
+\boxed{
+x:A.
+}
+\]
+
+Mathematical structures are represented using types, functions, dependent
+pairs, inductive definitions, and identity types.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Set Theory Versus Type Theory}
+\label{subsec:set-theory-vs-type-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Set theory organizes mathematics around membership:
+
+\[
+\boxed{
+x\in A.
+}
+\]
+
+Type theory organizes mathematics around typing:
+
+\[
+\boxed{
+x:A.
+}
+\]
+
+Set-theoretic foundations emphasize one cumulative universe of sets.
+
+Type-theoretic foundations emphasize structured classes of terms and types.
+
+Both can formalize large portions of modern mathematics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantages of Type-Theoretic Foundations}
+\label{subsec:type-theory-foundational-advantages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type theory naturally combines:
+
+\[
+\boxed{
+\text{logic},
+}
+\]
+
+\[
+\boxed{
+\text{computation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{formal verification}.
+}
+\]
+
+Well-formedness is enforced syntactically by types.
+
+Constructive proofs can carry executable information.
+
+These features make type theory particularly suitable for mechanized
+mathematics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homotopy Type Theory Preview}
+\label{subsec:homotopy-type-theory-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Homotopy Type Theory, abbreviated HoTT, interprets types geometrically.
+
+Conceptually:
+
+\[
+\boxed{
+\text{types}
+\leftrightarrow
+\text{spaces},
+}
+\]
+
+\[
+\boxed{
+\text{terms}
+\leftrightarrow
+\text{points},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{identity proofs}
+\leftrightarrow
+\text{paths}.
+}
+\]
+
+This gives equality higher-dimensional structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Higher Identity Structure}
+\label{subsec:higher-identity-structure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+p,q:a=_A b,
+\]
+
+one may ask whether
+
+\[
+p=q
+\]
+
+inside another identity type.
+
+Then one may compare proofs of that equality, and continue.
+
+Thus identity types naturally form a hierarchy of higher identifications.
+
+This is the origin of the homotopical interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Univalence Preview}
+\label{subsec:univalence-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The univalence principle connects equality of types with equivalence of
+types.
+
+Informally,
+
+\[
+\boxed{
+A=B
+}
+\]
+
+is closely related to
+
+\[
+\boxed{
+A\simeq B,
+}
+\]
+
+where
+
+\[
+A\simeq B
+\]
+
+means that \(A\) and \(B\) are equivalent.
+
+Univalence makes the principle
+
+\[
+\boxed{
+\text{equivalent structures may be identified}
+}
+\]
+
+part of the foundational theory itself.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equivalence of Types}
+\label{subsec:type-equivalence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A function
+
+\[
+f:A\to B
+\]
+
+is an equivalence when it has an appropriate inverse up to the equality
+notion of the theory.
+
+Thus type equivalence generalizes ordinary bijection or isomorphism.
+
+In homotopy type theory, equivalence is more fundamental than literal
+syntactic equality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Propositions as Special Types}
+\label{subsec:propositions-special-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In homotopy-inspired type theory, propositions can be characterized as
+types whose inhabitants carry no essential higher distinction.
+
+Informally, a proposition is a type in which any two inhabitants are equal.
+
+Thus propositions form a special class of types within a broader universe
+of mathematical structures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sets as Special Types}
+\label{subsec:sets-special-types}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A set-like type is one whose identity proofs themselves behave
+propositionally.
+
+Thus ordinary sets can be recovered as a certain level of the hierarchy of
+types.
+
+This viewpoint embeds set-like mathematics inside a richer theory of
+higher structures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Theory and Category Theory}
+\label{subsec:type-theory-category-theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type theory has deep connections with category theory.
+
+Function types resemble exponentials.
+
+Product and sum types resemble categorical products and coproducts.
+
+Dependent types correspond to fibrational and indexed categorical
+structures.
+
+The relationship is especially important in categorical logic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Theory and Programming Languages}
+\label{subsec:type-theory-programming-languages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Programming-language type systems borrow heavily from mathematical type
+theory.
+
+Types can enforce properties such as:
+
+\[
+\boxed{
+\text{input/output structure},
+}
+\]
+
+\[
+\boxed{
+\text{data invariants},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{legal program composition}.
+}
+\]
+
+More expressive type systems can encode stronger specifications.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Theory and Formal Verification}
+\label{subsec:type-theory-formal-verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A verified program may be represented by a term whose type expresses its
+specification.
+
+For example, a sorting function may carry a type expressing that its output
+is:
+
+\[
+\boxed{
+\text{sorted},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{a permutation of the input}.
+}
+\]
+
+Constructing the program then simultaneously proves correctness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type Theory and Constructive Mathematics}
+\label{subsec:type-theory-constructive-mathematics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type theory naturally supports constructive mathematics because proofs have
+explicit computational content.
+
+A proof of existence gives a witness.
+
+A proof of disjunction identifies a case.
+
+A proof of implication is a transformation.
+
+These ideas are developed further in the next section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type-Theoretic Workflow}
+\label{subsec:type-theory-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When analyzing a type-theoretic construction:
+
+\begin{enumerate}
+    \item specify the available primitive types;
+    \item state the typing context;
+    \item verify formation rules;
+    \item identify constructors for the desired type;
+    \item identify elimination principles;
+    \item state computation rules;
+    \item distinguish terms from types;
+    \item distinguish typing judgments from propositions about sets;
+    \item apply capture-avoiding substitution;
+    \item normalize terms when possible;
+    \item track definitional equality separately from propositional
+          equality;
+    \item interpret logical propositions through Curry--Howard when
+          appropriate;
+    \item use product types for paired data;
+    \item use sum types for alternatives;
+    \item use function types for transformations;
+    \item use \(\Pi\)-types when the output type depends on the input;
+    \item use \(\Sigma\)-types when later data depend on earlier data;
+    \item use identity types for explicit equality evidence;
+    \item use inductive types to define recursively generated data;
+    \item use structural recursion for terminating definitions;
+    \item use dependent induction for properties of inductive objects;
+    \item check universe levels in polymorphic constructions;
+    \item distinguish proof search from type checking;
+    \item identify which parts of a proof contain executable data;
+    \item verify all final proof terms with the formal type checker.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:type-theory-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Confusing Membership and Typing}
+
+The judgment
+
+\[
+x:A
+\]
+
+is not simply another notation for
+
+\[
+x\in A.
+\]
+
+Typing is primitive in type theory and obeys its own formal rules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Types as Arbitrary Sets}
+
+A type may have computational or higher equality structure not captured by
+a naive set interpretation.
+
+Set semantics can be useful, but it is not always definitionally identical
+to the type-theoretic viewpoint.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Context}
+
+The judgment
+
+\[
+t:A
+\]
+
+may only be valid under assumptions.
+
+One should write
+
+\[
+\boxed{
+\Gamma\vdash t:A
+}
+\]
+
+when context matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Variable Capture}
+
+Substitution inside lambda terms must be capture avoiding.
+
+Bound variables should be renamed before substitution when necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Beta Reduction With Mathematical Equality in General}
+
+Beta reduction is a specific computation rule:
+
+\[
+(\lambda x.\,b)(a)
+\longrightarrow
+b[a/x].
+\]
+
+Not every mathematical equality is a beta reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Definitional and Propositional Equality}
+
+Definitional equality is recognized computationally by the formal system.
+
+Propositional equality requires a term of an identity type.
+
+These need not coincide.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Type Theory Uses the Same Equality Rules}
+
+Different theories may adopt:
+
+\[
+\boxed{
+\text{intensional equality},
+}
+\]
+
+\[
+\boxed{
+\text{extensional principles},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{univalence}.
+}
+\]
+
+The exact system must be specified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Curry--Howard Means Every Programming Language Is a Logic}
+
+Curry--Howard relates particular logical calculi to corresponding typed
+computational systems.
+
+The exact correspondence depends on the systems involved.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Product Types and Sum Types}
+
+A term of
+
+\[
+A\times B
+\]
+
+contains both an \(A\)-term and a \(B\)-term.
+
+A term of
+
+\[
+A+B
+\]
+
+contains one side together with a tag indicating which side.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Ordinary and Dependent Functions}
+
+In
+
+\[
+A\to B,
+\]
+
+the codomain is fixed.
+
+In
+
+\[
+\prod_{x:A}B(x),
+\]
+
+the output type may depend on the input.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Product and Dependent Pair Types}
+
+In
+
+\[
+A\times B,
+\]
+
+the second type is fixed.
+
+In
+
+\[
+\sum_{x:A}B(x),
+\]
+
+the second component has type depending on the first component.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Existential Proofs as Mere Truth Values}
+
+Constructively, a proof of
+
+\[
+\exists x:A\,P(x)
+\]
+
+contains both:
+
+\[
+\boxed{
+\text{a witness}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{evidence for the property}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Recursive Definition Is Accepted}
+
+In strongly normalizing dependent type theories, recursive definitions must
+often satisfy a structural or well-founded termination condition.
+
+Arbitrary general recursion may destroy normalization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Universe Levels}
+
+Expressions that quantify over all types can create universe-size problems.
+
+A universe hierarchy prevents certain circular definitions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming \(\mathcal{U}:\mathcal{U}\) Is Always Safe}
+
+Unrestricted self-typing of universes can create paradoxes.
+
+Modern systems usually impose stratification or other restrictions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Type Checking and Type Inference Are the Same}
+
+Type checking verifies a supplied type.
+
+Type inference attempts to discover one.
+
+The latter can be significantly harder.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Type Safety Means All Programs Are Correct}
+
+Type safety prevents specified classes of type errors.
+
+It does not automatically guarantee that a program satisfies every desired
+mathematical or application-level property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Strong Normalization Holds in Every Programming Language}
+
+General-purpose programming languages usually permit nontermination.
+
+Strong normalization is a property of restricted typed calculi, not all
+computational systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Proof Irrelevance With Uniqueness of Proof Syntax}
+
+Proof irrelevance is a mathematical principle about treating proofs as
+indistinguishable in a certain sense.
+
+Different syntactic proof expressions may still exist.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Univalence Means Isomorphic Objects Are Literally the Same String}
+
+Univalence concerns equality inside the type-theoretic universe and its
+relationship with equivalence.
+
+It is not syntactic identity of expressions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:type-theory-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Foundations of Mathematics.}
+Dependent type theory provides an alternative foundational framework to
+axiomatic set theory.
+
+\medskip
+
+\textbf{Proof Theory.}
+The Curry--Howard correspondence identifies formal proofs with typed terms
+and normalization with computation.
+
+\medskip
+
+\textbf{Programming Languages.}
+Typed lambda calculi provide mathematical models for type systems,
+polymorphism, abstraction, and safe program composition.
+
+\medskip
+
+\textbf{Formal Verification.}
+Dependent types can encode precise specifications directly in program and
+proof types.
+
+\medskip
+
+\textbf{Proof Assistants.}
+Machine-checked mathematics can represent theorems as types and proofs as
+terms verified by a small trusted kernel.
+
+\medskip
+
+\textbf{Constructive Mathematics.}
+Existence proofs produce witnesses, disjunction proofs produce cases, and
+universal proofs produce functions.
+
+\medskip
+
+\textbf{Category Theory.}
+Products, sums, exponentials, dependent types, and universes have strong
+categorical interpretations.
+
+\medskip
+
+\textbf{Homotopy Type Theory.}
+Types can be interpreted as spaces, terms as points, and identity proofs as
+paths, leading to higher-dimensional foundations.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:type-theory-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a typing judgment.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a typing context.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a function type.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a product type.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a sum type.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the unit type conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the empty type conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+State the Curry--Howard correspondence.
+\end{exercise}
+
+\begin{exercise}[1]
+Define beta reduction.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a dependent type.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive
+
+\[
+\lambda x.\,x:A\to A.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Type the term
+
+\[
+\lambda x.\,\lambda y.\,x.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Beta reduce
+
+\[
+(\lambda x.\,x)(a).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Beta reduce
+
+\[
+(\lambda x.\,\lambda y.\,x)(a)(b).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain alpha conversion.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example where naive substitution causes variable capture.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform capture-avoiding substitution in that example.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct a term of type
+
+\[
+A\times B
+\]
+
+from terms
+
+\[
+a:A
+\]
+
+and
+
+\[
+b:B.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Use projections to construct a function
+
+\[
+A\times B\to A.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Construct a term of type
+
+\[
+A+B
+\]
+
+from a term \(a:A\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain elimination for a sum type.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the empty type corresponds to falsity.
+\end{exercise}
+
+\begin{exercise}[2]
+Translate
+
+\[
+P\rightarrow Q
+\]
+
+into a type.
+\end{exercise}
+
+\begin{exercise}[2]
+Translate
+
+\[
+P\land Q
+\]
+
+into a type.
+\end{exercise}
+
+\begin{exercise}[2]
+Translate
+
+\[
+P\lor Q
+\]
+
+into a type.
+\end{exercise}
+
+\begin{exercise}[2]
+Translate
+
+\[
+\neg P
+\]
+
+into a type.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a proof term for
+
+\[
+P\land Q\rightarrow Q.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a proof term for
+
+\[
+P\rightarrow(Q\rightarrow P).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a proof term for
+
+\[
+P\rightarrow P\lor Q.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain normalization.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain strong normalization.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain preservation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain progress.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why preservation and progress support type safety.
+\end{exercise}
+
+\begin{exercise}[2]
+Define a dependent function type.
+\end{exercise}
+
+\begin{exercise}[2]
+Define a dependent pair type.
+\end{exercise}
+
+\begin{exercise}[3]
+Show how
+
+\[
+A\to B
+\]
+
+is a special case of
+
+\[
+\prod_{x:A}B(x).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show how
+
+\[
+A\times B
+\]
+
+is a special case of
+
+\[
+\sum_{x:A}B(x).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Translate
+
+\[
+\forall x:A\,P(x)
+\]
+
+into a dependent type.
+\end{exercise}
+
+\begin{exercise}[3]
+Translate
+
+\[
+\exists x:A\,P(x)
+\]
+
+into a dependent type.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why existential proofs contain witnesses.
+\end{exercise}
+
+\begin{exercise}[2]
+Define an identity type.
+\end{exercise}
+
+\begin{exercise}[2]
+State the reflexivity constructor.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain transport along equality.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish definitional and propositional equality.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of definitional equality by beta computation.
+\end{exercise}
+
+\begin{exercise}[2]
+Describe the natural numbers as an inductive type.
+\end{exercise}
+
+\begin{exercise}[3]
+State a recursion principle for natural numbers.
+\end{exercise}
+
+\begin{exercise}[3]
+State an induction principle for natural numbers.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish recursion from induction.
+\end{exercise}
+
+\begin{exercise}[2]
+Describe the constructors of a list type.
+\end{exercise}
+
+\begin{exercise}[3]
+Define list length by structural recursion.
+\end{exercise}
+
+\begin{exercise}[3]
+Define list append by structural recursion.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe a binary tree inductively.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why structural recursion supports termination.
+\end{exercise}
+
+\begin{exercise}[3]
+Define canonicity conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how canonicity for \(\mathbb{N}\) gives computational meaning to a
+closed natural-number term.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how normalization can support consistency.
+\end{exercise}
+
+\begin{exercise}[2]
+Define a universe conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why universe hierarchies are used.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why unrestricted
+
+\[
+\mathcal{U}:\mathcal{U}
+\]
+
+can be problematic.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish intensional and extensional type theory conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+State function extensionality conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain proof relevance.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain proof irrelevance.
+\end{exercise}
+
+\begin{exercise}[2]
+Define polymorphism conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Give a polymorphic type for the identity function.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain parametric polymorphism.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe System F conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Define a length-indexed vector type conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Give a type for vector concatenation preserving lengths.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain a refinement type.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how a subtype can be represented using dependent pairs.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why quotient constructions can be subtle computationally.
+\end{exercise}
+
+\begin{exercise}[2]
+Define type checking.
+\end{exercise}
+
+\begin{exercise}[2]
+Define type inference.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why proof checking corresponds to type checking under
+Curry--Howard.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the trusted-kernel model of proof assistants.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain program extraction.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how a constructive proof of
+
+\[
+\forall x:A\exists y:B\,R(x,y)
+\]
+
+contains an algorithm.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare set-theoretic membership with type-theoretic typing.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why dependent type theory can serve as a foundation of mathematics.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the homotopy interpretation of types conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret identity proofs as paths.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain higher identity types conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain univalence conceptually.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish type equivalence from syntactic equality.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove preservation for the simply typed lambda calculus.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove progress for the simply typed lambda calculus.
+\end{exercise}
+
+\begin{exercise}[4]
+Study strong normalization of the simply typed lambda calculus.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Church--Rosser theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study normalization by evaluation conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Curry--Howard correspondence formally.
+\end{exercise}
+
+\begin{exercise}[4]
+Develop typing rules for products and sums.
+\end{exercise}
+
+\begin{exercise}[4]
+Develop dependent \(\Pi\)- and \(\Sigma\)-types formally.
+\end{exercise}
+
+\begin{exercise}[4]
+Study identity elimination and the \(J\)-rule.
+\end{exercise}
+
+\begin{exercise}[4]
+Study inductive families.
+\end{exercise}
+
+\begin{exercise}[4]
+Study dependent pattern matching.
+\end{exercise}
+
+\begin{exercise}[4]
+Study universe polymorphism.
+\end{exercise}
+
+\begin{exercise}[4]
+Study impredicative polymorphism and System F.
+\end{exercise}
+
+\begin{exercise}[4]
+Study refinement types.
+\end{exercise}
+
+\begin{exercise}[4]
+Study quotient types.
+\end{exercise}
+
+\begin{exercise}[4]
+Study proof irrelevance and propositional truncation conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Study categorical semantics of type theory.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Martin-Löf dependent type theory.
+\end{exercise}
+
+\begin{exercise}[4]
+Study homotopy type theory.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the univalence axiom.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:type-theory-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Type theory organizes mathematics through judgments such as
+
+\[
+\boxed{
+a:A.
+}
+\]
+
+Types specify which terms are meaningful and how they may be combined.
+
+Function types,
+
+\[
+\boxed{
+A\to B,
+}
+\]
+
+represent transformations.
+
+Product types,
+
+\[
+\boxed{
+A\times B,
+}
+\]
+
+represent paired data.
+
+Sum types,
+
+\[
+\boxed{
+A+B,
+}
+\]
+
+represent alternatives.
+
+Under Curry--Howard,
+
+\[
+\boxed{
+\text{propositions}
+\leftrightarrow
+\text{types},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{proofs}
+\leftrightarrow
+\text{terms}.
+}
+\]
+
+Dependent types extend this framework:
+
+\[
+\boxed{
+\prod_{x:A}B(x)
+}
+\]
+
+represents dependent functions, while
+
+\[
+\boxed{
+\sum_{x:A}B(x)
+}
+\]
+
+represents dependent pairs.
+
+Identity types represent equality evidence.
+
+Inductive types provide structured data together with recursion and
+induction principles.
+
+Normalization gives computation meaning to proofs, while canonicity ensures
+closed data terms reduce to canonical values in suitable systems.
+
+Universes organize types by size.
+
+Modern dependent type theory therefore combines
+
+\[
+\boxed{
+\text{logic}
++
+\text{mathematics}
++
+\text{computation}
++
+\text{formal verification}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:type-theory-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Type Theory develops the proof-as-computation perspective introduced in
+Section~\ref{sec:proof-theory}. Computability Theory and Recursion Theory
+formalized effective procedures externally through machines and recursive
+functions, while Type Theory internalizes computation into the structure of
+terms and proofs. The Curry--Howard correspondence identifies propositions
+with types and proofs with programs, while dependent types extend this
+connection to quantified statements, specifications, equality, and
+inductive mathematics. The next section, Constructive Mathematics, develops
+the broader mathematical philosophy and methodology in which proofs are
+expected to provide explicit witnesses, algorithms, and computational
+content rather than relying unrestrictedly on classical principles.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 12.7 Type Theory
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard simply typed lambda calculus.
+%   - Standard Curry--Howard correspondence.
+%   - Standard dependent type theory.
+%   - Standard inductive types, universes, identity types,
+%     proof-assistant foundations, and introductory homotopy type theory.
+%
+% Used for:
+%   - terms and types;
+%   - typing judgments;
+%   - contexts;
+%   - formation, introduction, elimination, and computation rules;
+%   - function types;
+%   - lambda abstraction;
+%   - application;
+%   - beta reduction;
+%   - simply typed lambda calculus;
+%   - product types;
+%   - sum types;
+%   - unit and empty types;
+%   - Curry--Howard correspondence;
+%   - implication as function;
+%   - conjunction as product;
+%   - disjunction as sum;
+%   - falsity and negation;
+%   - alpha conversion;
+%   - substitution;
+%   - eta principles;
+%   - normalization;
+%   - strong normalization;
+%   - type safety;
+%   - preservation and progress;
+%   - dependent types;
+%   - Pi types;
+%   - Sigma types;
+%   - quantified propositions;
+%   - identity types;
+%   - reflexivity;
+%   - equality elimination;
+%   - transport;
+%   - definitional and propositional equality;
+%   - inductive types;
+%   - natural-number recursion and induction;
+%   - lists and trees;
+%   - structural recursion;
+%   - canonicity;
+%   - normalization and consistency;
+%   - universes;
+%   - universe hierarchies;
+%   - intensional and extensional type theory;
+%   - function extensionality;
+%   - proof relevance and irrelevance;
+%   - polymorphism;
+%   - System F preview;
+%   - dependent specifications;
+%   - length-indexed vectors;
+%   - refinement and subtype concepts;
+%   - quotient types;
+%   - type checking and inference;
+%   - proof assistants;
+%   - trusted kernels;
+%   - program extraction;
+%   - type theory as foundation;
+%   - relation to set theory;
+%   - homotopy type theory preview;
+%   - higher identities;
+%   - univalence preview;
+%   - applications and exercises.
+%
+% Notes:
+%   - Constructive Mathematics is developed next in Section 12.8.
+%   - Proof Theory appears in Section 12.4.
+%   - Computability Theory appears in Section 12.5.
+%   - Recursion Theory appears in Section 12.6.
+%   - Philosophy and Foundations follows in Section 12.9.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,3733 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.7 DYNAMIC PROGRAMMING
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Dynamic Programming}
+\label{sec:dynamic-programming}
+
+\prerequisite{
+Optimization fundamentals, combinatorial optimization, recursion,
+sequences, discrete mathematics, probability, graph theory, basic
+algorithms, and elementary stochastic processes.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define dynamic programming;
+    \item identify optimal substructure;
+    \item identify overlapping subproblems;
+    \item distinguish recursive search from dynamic programming;
+    \item define states, actions, stages, and transitions;
+    \item formulate deterministic finite-horizon dynamic programs;
+    \item derive Bellman recursions;
+    \item explain the principle of optimality;
+    \item distinguish top-down memoization and bottom-up tabulation;
+    \item understand state-space design;
+    \item recognize dimensionality of state spaces;
+    \item formulate shortest-path problems as dynamic programs;
+    \item solve the \(0\)-\(1\) knapsack problem by dynamic programming;
+    \item solve resource-allocation problems by dynamic programming;
+    \item formulate sequence and alignment problems;
+    \item understand longest common subsequence recurrences;
+    \item understand edit-distance recurrences;
+    \item recognize interval dynamic programming;
+    \item understand matrix-chain multiplication;
+    \item recognize subset dynamic programming;
+    \item formulate the Held--Karp algorithm for the traveling salesperson
+          problem;
+    \item understand pseudo-polynomial complexity;
+    \item distinguish polynomial and pseudo-polynomial algorithms;
+    \item understand infinite-horizon dynamic programming conceptually;
+    \item formulate deterministic Bellman equations;
+    \item formulate stochastic Bellman equations;
+    \item understand expected-value recursions;
+    \item recognize Markov decision processes;
+    \item distinguish state-value and action-value functions;
+    \item understand discounted dynamic programming;
+    \item understand finite-horizon stochastic control;
+    \item understand policy evaluation and policy improvement conceptually;
+    \item recognize value iteration conceptually;
+    \item understand the curse of dimensionality;
+    \item recognize state aggregation and approximation methods;
+    \item understand approximate dynamic programming conceptually;
+    \item connect dynamic programming with optimal control,
+          reinforcement learning, shortest paths, scheduling, inventory,
+          and stochastic optimization.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Dynamic Programming?}
+\label{subsec:what-is-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming is an optimization framework for problems that can be
+decomposed into smaller, related subproblems.
+
+Rather than solving every possible sequence of decisions independently,
+dynamic programming stores and reuses the values of recurring
+subproblems.
+
+A general idea is
+
+\[
+\boxed{
+\text{large optimization problem}
+\rightarrow
+\text{smaller optimization problems}
+\rightarrow
+\text{Bellman recursion}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two Fundamental Properties}
+\label{subsec:dynamic-programming-properties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming is especially useful when a problem has:
+
+\[
+\boxed{
+\text{optimal substructure},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{overlapping subproblems}.
+}
+\]
+
+Optimal substructure means an optimal solution can be constructed from
+optimal solutions to smaller problems.
+
+Overlapping subproblems means the same smaller problems appear repeatedly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Substructure}
+\label{subsec:optimal-substructure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the best solution from state \(s\) begins with action \(a\).
+
+After taking that action, the remaining decisions must form an optimal
+solution for the resulting state.
+
+Otherwise the original solution could be improved.
+
+This principle is the foundation of Bellman's principle of optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Overlapping Subproblems}
+\label{subsec:overlapping-subproblems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A naive recursion may solve the same subproblem many times.
+
+For example, Fibonacci recursion uses
+
+\[
+F_n
+=
+F_{n-1}
++
+F_{n-2}.
+\]
+
+Computing \(F_{n-1}\) and \(F_{n-2}\) recursively causes many repeated
+evaluations.
+
+Dynamic programming stores already-computed values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memoization}
+\label{subsec:dynamic-programming-memoization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Memoization is the top-down form of dynamic programming.
+
+One writes the recursive problem naturally and stores the value of each
+state after it is first computed.
+
+If that state appears again, the stored value is reused.
+
+Thus,
+
+\[
+\boxed{
+\text{recursion}
++
+\text{memory}
+=
+\text{memoization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tabulation}
+\label{subsec:dynamic-programming-tabulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Tabulation is the bottom-up form of dynamic programming.
+
+One identifies an order in which smaller states can be solved before larger
+states.
+
+The value table is filled iteratively.
+
+Thus,
+
+\[
+\boxed{
+\text{small states}
+\rightarrow
+\text{larger states}
+\rightarrow
+\text{final solution}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memoization Versus Tabulation}
+\label{subsec:memoization-versus-tabulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Memoization:
+
+\[
+\boxed{
+\text{top-down},
+}
+\]
+
+and computes only states actually reached.
+
+Tabulation:
+
+\[
+\boxed{
+\text{bottom-up},
+}
+\]
+
+and often computes states in a regular predetermined order.
+
+Both implement the same underlying recurrence when formulated correctly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State}
+\label{subsec:dynamic-programming-state}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A state contains all information from the past that is needed to make
+optimal future decisions.
+
+A state should summarize the relevant history without storing unnecessary
+detail.
+
+Examples include:
+
+\[
+\boxed{
+\text{current location},
+}
+\]
+
+\[
+\boxed{
+\text{remaining capacity},
+}
+\]
+
+\[
+\boxed{
+\text{time period},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{current inventory}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Actions}
+\label{subsec:dynamic-programming-actions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At state \(s\), the decision maker chooses an action
+
+\[
+\boxed{
+a\in A(s),
+}
+\]
+
+where \(A(s)\) is the feasible action set.
+
+The action determines:
+
+\[
+\boxed{
+\text{immediate cost or reward},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{next state}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transition Function}
+\label{subsec:dynamic-programming-transition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In a deterministic problem, the next state can be written
+
+\[
+\boxed{
+s'
+=
+T(s,a).
+}
+\]
+
+Thus a dynamic decision has the form
+
+\[
+\boxed{
+s
+\xrightarrow{a}
+T(s,a).
+}
+\]
+
+In stochastic problems, the next state is random.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stage}
+\label{subsec:dynamic-programming-stage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many dynamic programs evolve through stages
+
+\[
+\boxed{
+t=0,1,\ldots,T.
+}
+\]
+
+The stage may represent:
+
+\[
+\boxed{
+\text{time},
+}
+\]
+
+\[
+\boxed{
+\text{position in a sequence},
+}
+\]
+
+\[
+\boxed{
+\text{number of items processed},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{decision depth}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Value Function}
+\label{subsec:dynamic-programming-value-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The value function records the best achievable future objective from a
+given state.
+
+For minimization,
+
+\[
+\boxed{
+V_t(s)
+=
+\text{minimum future cost from state }s\text{ at stage }t.
+}
+\]
+
+For maximization,
+
+\[
+\boxed{
+V_t(s)
+=
+\text{maximum future reward from state }s.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bellman's Principle of Optimality}
+\label{subsec:bellman-principle-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Bellman's Principle of Optimality}
+An optimal policy has the property that, regardless of the initial state
+and first decision, the remaining decisions must constitute an optimal
+policy for the state resulting from that first decision.
+\end{definitionbox}
+
+This principle permits a global optimization problem to be written
+recursively.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Horizon Bellman Recursion}
+\label{subsec:finite-horizon-bellman-recursion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose:
+
+\[
+c_t(s,a)
+=
+\text{cost at stage }t,
+\]
+
+and
+
+\[
+s'
+=
+T_t(s,a).
+\]
+
+Then a deterministic finite-horizon recursion is
+
+\[
+\boxed{
+V_t(s)
+=
+\min_{a\in A_t(s)}
+\left[
+c_t(s,a)
++
+V_{t+1}
+\left(
+T_t(s,a)
+\right)
+\right].
+}
+\]
+
+A terminal cost may be
+
+\[
+\boxed{
+V_T(s)=g(s).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Induction}
+\label{subsec:backward-induction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finite-horizon dynamic programming is usually solved backward.
+
+First compute
+
+\[
+V_T.
+\]
+
+Then compute
+
+\[
+V_{T-1},
+\]
+
+followed by
+
+\[
+V_{T-2},
+\]
+
+until reaching
+
+\[
+V_0.
+\]
+
+This is called backward induction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Recovering the Optimal Policy}
+\label{subsec:recovering-optimal-policy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Bellman recursion gives the optimal objective value.
+
+To recover the decisions, store an optimizer:
+
+\[
+\boxed{
+\pi_t^*(s)
+\in
+\operatorname*{arg\,min}_{a\in A_t(s)}
+\left[
+c_t(s,a)
++
+V_{t+1}
+(
+T_t(s,a)
+)
+\right].
+}
+\]
+
+The mapping
+
+\[
+\pi_t^*
+\]
+
+is an optimal policy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Two-Stage Decision}
+\label{subsec:worked-two-stage-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Simple Backward Induction}
+
+Suppose at the final stage the costs are
+
+\[
+V_2(A)=3,
+\qquad
+V_2(B)=7.
+\]
+
+At stage \(1\), from state \(S\), there are two actions.
+
+Action \(a_1\) costs \(4\) and moves to \(A\).
+
+Action \(a_2\) costs \(1\) and moves to \(B\).
+
+Then
+
+\[
+V_1(S)
+=
+\min
+\{
+4+3,
+1+7
+\}.
+\]
+
+Thus,
+
+\[
+V_1(S)
+=
+\min
+\{
+7,8
+\}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+V_1(S)=7,
+}
+\]
+
+and the optimal action is
+
+\[
+\boxed{
+a_1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State-Space Graph Interpretation}
+\label{subsec:state-space-graph}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dynamic program can often be represented as a directed graph.
+
+Each vertex represents a state.
+
+Each directed edge represents a feasible transition.
+
+An edge may have cost
+
+\[
+\boxed{
+c(s,a).
+}
+\]
+
+Then dynamic programming finds an optimal path through the state-space
+graph.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acyclic State Graphs}
+\label{subsec:acyclic-state-graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the state-space graph is acyclic, states can be processed in
+topological order.
+
+The value recurrence becomes
+
+\[
+\boxed{
+V(v)
+=
+\min_{(v,w)\in E}
+\left[
+c_{vw}+V(w)
+\right].
+}
+\]
+
+This is a shortest-path dynamic program on a directed acyclic graph.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest Path as Dynamic Programming}
+\label{subsec:shortest-path-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+V(v)
+\]
+
+denote the shortest remaining distance from vertex \(v\) to destination
+\(t\).
+
+Then
+
+\[
+\boxed{
+V(t)=0,
+}
+\]
+
+and
+
+\[
+\boxed{
+V(v)
+=
+\min_{(v,w)\in E}
+\left[
+c_{vw}+V(w)
+\right].
+}
+\]
+
+This is precisely a Bellman recursion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bellman--Ford Connection}
+\label{subsec:bellman-ford-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+V_k(v)
+\]
+
+denote the minimum cost of a path from source \(s\) to \(v\) using at most
+\(k\) edges.
+
+Then
+
+\[
+\boxed{
+V_k(v)
+=
+\min
+\left\{
+V_{k-1}(v),
+\;
+\min_{(u,v)\in E}
+[
+V_{k-1}(u)+c_{uv}
+]
+\right\}.
+}
+\]
+
+This recurrence underlies the Bellman--Ford shortest-path algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resource-Allocation Dynamic Programming}
+\label{subsec:resource-allocation-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(B\) units of a resource must be allocated among \(n\) activities.
+
+Let
+
+\[
+x_i
+\]
+
+be the amount assigned to activity \(i\), and let
+
+\[
+r_i(x_i)
+\]
+
+be its reward.
+
+We seek
+
+\[
+\boxed{
+\max
+\sum_{i=1}^{n}
+r_i(x_i)
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+x_i
+\leq
+B.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Resource-Allocation Recurrence}
+\label{subsec:resource-allocation-recurrence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+V_i(b)
+\]
+
+be the best reward obtained from the first \(i\) activities using at most
+\(b\) units.
+
+Then
+
+\[
+\boxed{
+V_i(b)
+=
+\max_{0\leq x_i\leq b}
+\left[
+r_i(x_i)
++
+V_{i-1}(b-x_i)
+\right].
+}
+\]
+
+The boundary condition is
+
+\[
+\boxed{
+V_0(b)=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{0--1 Knapsack Dynamic Programming}
+\label{subsec:knapsack-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose item \(i\) has value \(v_i\) and integer weight \(w_i\).
+
+Let
+
+\[
+V(i,b)
+\]
+
+be the maximum value obtainable using the first \(i\) items with capacity
+\(b\).
+
+If
+
+\[
+w_i>b,
+\]
+
+item \(i\) cannot be selected:
+
+\[
+\boxed{
+V(i,b)
+=
+V(i-1,b).
+}
+\]
+
+If
+
+\[
+w_i\leq b,
+\]
+
+then
+
+\[
+\boxed{
+V(i,b)
+=
+\max
+\left\{
+V(i-1,b),
+\;
+v_i
++
+V(i-1,b-w_i)
+\right\}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Knapsack Boundary Conditions}
+\label{subsec:knapsack-boundary-conditions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The base cases are
+
+\[
+\boxed{
+V(0,b)=0
+}
+\]
+
+for every \(b\), and
+
+\[
+\boxed{
+V(i,0)=0.
+}
+\]
+
+The final optimal value is
+
+\[
+\boxed{
+V(n,W).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: 0--1 Knapsack}
+\label{subsec:worked-knapsack-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Knapsack Recurrence}
+
+Suppose three items have
+
+\[
+(w_1,v_1)=(2,4),
+\]
+
+\[
+(w_2,v_2)=(3,5),
+\]
+
+\[
+(w_3,v_3)=(4,7),
+\]
+
+with capacity
+
+\[
+W=5.
+\]
+
+For the first two items,
+
+\[
+V(2,5)
+=
+\max
+\{
+V(1,5),
+5+V(1,2)
+\}.
+\]
+
+Since
+
+\[
+V(1,5)=4,
+\]
+
+and
+
+\[
+V(1,2)=4,
+\]
+
+we obtain
+
+\[
+V(2,5)=9.
+\]
+
+For item \(3\),
+
+\[
+V(3,5)
+=
+\max
+\{
+V(2,5),
+7+V(2,1)
+\}.
+\]
+
+Since
+
+\[
+V(2,1)=0,
+\]
+
+\[
+V(3,5)
+=
+\max
+\{
+9,7
+\}
+=
+9.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+V(3,5)=9.
+}
+\]
+
+The optimal choice uses items \(1\) and \(2\).
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Knapsack Complexity}
+\label{subsec:knapsack-dp-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The table contains approximately
+
+\[
+nW
+\]
+
+states.
+
+Each state requires constant work.
+
+Thus the time complexity is
+
+\[
+\boxed{
+O(nW).
+}
+\]
+
+The memory complexity is also
+
+\[
+\boxed{
+O(nW)
+}
+\]
+
+for the full table.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pseudo-Polynomial Complexity}
+\label{subsec:dynamic-programming-pseudo-polynomial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Although
+
+\[
+O(nW)
+\]
+
+looks polynomial, the input contains \(W\) in binary.
+
+The number of bits required to represent \(W\) is approximately
+
+\[
+\log_2W.
+\]
+
+Thus the running time is not polynomial in the formal input length.
+
+It is called
+
+\[
+\boxed{
+\text{pseudo-polynomial}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memory Reduction in Knapsack}
+\label{subsec:knapsack-memory-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The recurrence uses only the previous item row.
+
+Therefore the table can be reduced from
+
+\[
+O(nW)
+\]
+
+memory to
+
+\[
+\boxed{
+O(W).
+}
+\]
+
+For \(0\)-\(1\) knapsack, capacities should be updated in decreasing order
+when using one array so that an item is not accidentally used multiple
+times.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unbounded Knapsack}
+\label{subsec:unbounded-knapsack-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If each item can be selected repeatedly, the recurrence changes.
+
+One form is
+
+\[
+\boxed{
+V(b)
+=
+\max_{i:w_i\leq b}
+\left[
+v_i+V(b-w_i)
+\right].
+}
+\]
+
+This illustrates an important principle:
+
+\[
+\boxed{
+\text{state recurrence depends on whether decisions can be reused}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Longest Common Subsequence}
+\label{subsec:longest-common-subsequence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given sequences
+
+\[
+X=x_1x_2\cdots x_m
+\]
+
+and
+
+\[
+Y=y_1y_2\cdots y_n,
+\]
+
+a common subsequence appears in both sequences while preserving order.
+
+Let
+
+\[
+L(i,j)
+\]
+
+be the length of the longest common subsequence of the prefixes
+
+\[
+x_1\cdots x_i
+\]
+
+and
+
+\[
+y_1\cdots y_j.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LCS Recurrence}
+\label{subsec:lcs-recurrence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+x_i=y_j,
+\]
+
+then
+
+\[
+\boxed{
+L(i,j)
+=
+1+L(i-1,j-1).
+}
+\]
+
+If
+
+\[
+x_i\neq y_j,
+\]
+
+then
+
+\[
+\boxed{
+L(i,j)
+=
+\max
+\{
+L(i-1,j),
+L(i,j-1)
+\}.
+}
+\]
+
+Boundary conditions are
+
+\[
+\boxed{
+L(i,0)=L(0,j)=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LCS Complexity}
+\label{subsec:lcs-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There are
+
+\[
+(m+1)(n+1)
+\]
+
+states.
+
+Each state requires constant work.
+
+Thus the basic dynamic program runs in
+
+\[
+\boxed{
+O(mn)
+}
+\]
+
+time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Edit Distance}
+\label{subsec:edit-distance-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Edit distance measures the minimum number or cost of operations needed to
+transform one string into another.
+
+Common operations include:
+
+\[
+\boxed{
+\text{insertion},
+}
+\]
+
+\[
+\boxed{
+\text{deletion},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{substitution}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Edit-Distance Recurrence}
+\label{subsec:edit-distance-recurrence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+D(i,j)
+\]
+
+be the edit distance between prefixes of lengths \(i\) and \(j\).
+
+With unit costs,
+
+\[
+\boxed{
+D(i,j)
+=
+\min
+\begin{cases}
+D(i-1,j)+1,\\
+D(i,j-1)+1,\\
+D(i-1,j-1)+\delta_{ij},
+\end{cases}
+}
+\]
+
+where
+
+\[
+\boxed{
+\delta_{ij}
+=
+\begin{cases}
+0,
+&
+x_i=y_j,
+\\
+1,
+&
+x_i\neq y_j.
+\end{cases}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Edit-Distance Boundary Conditions}
+\label{subsec:edit-distance-boundary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Transforming the first \(i\) symbols into an empty string requires \(i\)
+deletions:
+
+\[
+\boxed{
+D(i,0)=i.
+}
+\]
+
+Transforming an empty string into the first \(j\) symbols requires \(j\)
+insertions:
+
+\[
+\boxed{
+D(0,j)=j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequence Alignment}
+\label{subsec:sequence-alignment-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sequence alignment generalizes edit distance by assigning application-
+specific scores or penalties to:
+
+\[
+\boxed{
+\text{matches},
+}
+\]
+
+\[
+\boxed{
+\text{mismatches},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{gaps}.
+}
+\]
+
+Dynamic programming is fundamental in computational biology for aligning
+DNA, RNA, and protein sequences.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix-Chain Multiplication}
+\label{subsec:matrix-chain-multiplication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose matrices
+
+\[
+A_1A_2\cdots A_n
+\]
+
+must be multiplied.
+
+Matrix multiplication is associative, but different parenthesizations
+require different numbers of scalar multiplications.
+
+Dynamic programming finds the cheapest parenthesization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix-Chain State}
+\label{subsec:matrix-chain-state}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose matrix \(A_i\) has dimensions
+
+\[
+p_{i-1}\times p_i.
+\]
+
+Let
+
+\[
+M(i,j)
+\]
+
+be the minimum number of scalar multiplications required to compute
+
+\[
+A_iA_{i+1}\cdots A_j.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix-Chain Recurrence}
+\label{subsec:matrix-chain-recurrence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Split the product between \(A_k\) and \(A_{k+1}\).
+
+Then
+
+\[
+\boxed{
+M(i,j)
+=
+\min_{i\leq k<j}
+\left[
+M(i,k)
++
+M(k+1,j)
++
+p_{i-1}p_kp_j
+\right].
+}
+\]
+
+The boundary condition is
+
+\[
+\boxed{
+M(i,i)=0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interval Dynamic Programming}
+\label{subsec:interval-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Matrix-chain multiplication is an example of interval dynamic programming.
+
+The state describes an interval
+
+\[
+[i,j].
+\]
+
+The recurrence chooses a split point
+
+\[
+k.
+\]
+
+Other interval-DP problems include:
+
+\[
+\boxed{
+\text{polygon triangulation},
+}
+\]
+
+and certain
+
+\[
+\boxed{
+\text{parsing problems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Binary Search Tree Preview}
+\label{subsec:optimal-binary-search-tree-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose keys have different search probabilities.
+
+An optimal binary search tree minimizes expected search cost.
+
+The recurrence chooses a root for each interval of keys.
+
+Thus the problem has the generic interval structure
+
+\[
+\boxed{
+\text{best interval solution}
+=
+\min_{\text{split}}
+[
+\text{left}
++
+\text{right}
++
+\text{root cost}
+].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subset Dynamic Programming}
+\label{subsec:subset-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some dynamic programs use a subset itself as part of the state.
+
+For a ground set of \(n\) elements, there are
+
+\[
+\boxed{
+2^n
+}
+\]
+
+possible subsets.
+
+Subset DP is therefore exponential, but can still be much faster than
+enumerating all permutations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Held--Karp Dynamic Programming for TSP}
+\label{subsec:held-karp-tsp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fix starting vertex \(1\).
+
+Let
+
+\[
+V(S,j)
+\]
+
+be the minimum cost of a path that:
+
+\begin{itemize}
+    \item starts at vertex \(1\);
+    \item visits exactly the vertices in \(S\);
+    \item ends at vertex \(j\in S\).
+\end{itemize}
+
+Then
+
+\[
+\boxed{
+V(S,j)
+=
+\min_{i\in S\setminus\{j\}}
+\left[
+V(S\setminus\{j\},i)
++
+c_{ij}
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Held--Karp Boundary Condition}
+\label{subsec:held-karp-boundary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a singleton destination,
+
+\[
+\boxed{
+V(\{j\},j)
+=
+c_{1j}.
+}
+\]
+
+After all nonstarting vertices have been visited, return to vertex \(1\):
+
+\[
+\boxed{
+C^*
+=
+\min_j
+\left[
+V(V\setminus\{1\},j)
++
+c_{j1}
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Held--Karp Complexity}
+\label{subsec:held-karp-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Held--Karp algorithm uses roughly
+
+\[
+\boxed{
+O(n2^n)
+}
+\]
+
+states and examines up to \(n\) predecessors per state.
+
+Its time complexity is therefore approximately
+
+\[
+\boxed{
+O(n^2 2^n).
+}
+\]
+
+This is exponential, but far better than enumerating
+
+\[
+\boxed{
+(n-1)!
+}
+\]
+
+possible tours.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Design}
+\label{subsec:dynamic-programming-state-design}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The most important modeling question in dynamic programming is often:
+
+\[
+\boxed{
+\text{What information must the state remember?}
+}
+\]
+
+A valid state must preserve enough information for optimal future
+decisions.
+
+A poor state may:
+
+\[
+\boxed{
+\text{omit necessary history},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{store unnecessary detail}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Principle of Sufficient State}
+\label{subsec:sufficient-state}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Two histories can be treated as the same state if they have identical
+effects on all future feasible decisions and future objective values.
+
+Thus the state is a compressed summary of relevant past information.
+
+This is closely related to the Markov property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State-Space Size}
+\label{subsec:dynamic-programming-state-space-size}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a state contains \(d\) components, each taking \(m\) possible
+values.
+
+The number of possible states can be as large as
+
+\[
+\boxed{
+m^d.
+}
+\]
+
+Thus even dynamic programming can become computationally difficult in high
+dimension.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Curse of Dimensionality}
+\label{subsec:curse-of-dimensionality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The rapid growth of the state space with dimension is called the curse of
+dimensionality.
+
+If each of \(d\) state variables is discretized into \(m\) values, then
+
+\[
+\boxed{
+\text{number of states}
+=
+m^d.
+}
+\]
+
+This exponential dependence on \(d\) is a major limitation of classical
+dynamic programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Dominance}
+\label{subsec:state-dominance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some states can be discarded if another state is guaranteed to be at
+least as good in all relevant future respects.
+
+This is a dominance rule.
+
+Dominance can reduce computation by eliminating states that cannot lead to
+an optimal solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Horizon Deterministic Control}
+\label{subsec:finite-horizon-deterministic-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+x_{t+1}
+=
+f_t(x_t,u_t),
+}
+\]
+
+where
+
+\[
+x_t
+=
+\text{state},
+\]
+
+and
+
+\[
+u_t
+=
+\text{control}.
+\]
+
+Suppose the total cost is
+
+\[
+\boxed{
+\sum_{t=0}^{T-1}
+\ell_t(x_t,u_t)
++
+g(x_T).
+}
+\]
+
+Then
+
+\[
+\boxed{
+V_T(x)=g(x),
+}
+\]
+
+and
+
+\[
+\boxed{
+V_t(x)
+=
+\min_u
+\left[
+\ell_t(x,u)
++
+V_{t+1}
+(
+f_t(x,u)
+)
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Policy}
+\label{subsec:dynamic-programming-policy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A policy specifies what action should be taken in each state.
+
+A deterministic policy has form
+
+\[
+\boxed{
+u_t
+=
+\pi_t(x_t).
+}
+\]
+
+An optimal policy satisfies
+
+\[
+\boxed{
+\pi_t^*(x)
+\in
+\operatorname*{arg\,min}_u
+\left[
+\ell_t(x,u)
++
+V_{t+1}(f_t(x,u))
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Open-Loop Versus Feedback Decisions}
+\label{subsec:open-loop-feedback}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An open-loop plan chooses the full decision sequence in advance.
+
+A feedback policy chooses decisions based on the current state.
+
+Dynamic programming naturally produces feedback policies:
+
+\[
+\boxed{
+u_t=\pi_t(x_t).
+}
+\]
+
+This is especially valuable when disturbances or uncertainty can change
+the state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Dynamic Programming}
+\label{subsec:stochastic-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the next state depends on random information \(\xi_t\):
+
+\[
+\boxed{
+x_{t+1}
+=
+f_t
+(
+x_t,
+u_t,
+\xi_t
+).
+}
+\]
+
+Then the Bellman recursion uses expected future value:
+
+\[
+\boxed{
+V_t(x)
+=
+\min_u
+\left[
+\ell_t(x,u)
++
+\mathbb{E}
+\left[
+V_{t+1}
+(
+f_t(x,u,\xi_t)
+)
+\right]
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Stochastic Transition Probabilities}
+\label{subsec:stochastic-transition-probabilities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+P(s'|s,a)
+\]
+
+is the probability of moving from state \(s\) to \(s'\) after action
+\(a\).
+
+Then
+
+\[
+\boxed{
+V_t(s)
+=
+\min_{a\in A(s)}
+\left[
+c_t(s,a)
++
+\sum_{s'}
+P(s'|s,a)
+V_{t+1}(s')
+\right].
+}
+\]
+
+This is the basic finite-horizon stochastic Bellman recursion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Markov Decision Processes}
+\label{subsec:markov-decision-processes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Markov decision process, abbreviated MDP, is characterized by:
+
+\[
+\boxed{
+\text{states},
+}
+\]
+
+\[
+\boxed{
+\text{actions},
+}
+\]
+
+\[
+\boxed{
+\text{transition probabilities},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{rewards or costs}.
+}
+\]
+
+A standard notation is
+
+\[
+\boxed{
+(\mathcal{S},\mathcal{A},P,r).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Markov Property}
+\label{subsec:mdp-markov-property}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Markov property means that conditional on the present state and
+action, the distribution of the next state does not depend on the earlier
+history.
+
+Symbolically,
+
+\[
+\boxed{
+P
+(
+S_{t+1}
+\mid
+S_t,A_t,S_{t-1},A_{t-1},\ldots
+)
+=
+P
+(
+S_{t+1}
+\mid
+S_t,A_t
+).
+}
+\]
+
+This is precisely why the state is sufficient for future decision making.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Reward Formulation}
+\label{subsec:mdp-expected-reward}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For reward maximization,
+
+\[
+r(s,a)
+\]
+
+denotes immediate expected reward.
+
+A finite-horizon recursion is
+
+\[
+\boxed{
+V_t(s)
+=
+\max_{a\in A(s)}
+\left[
+r_t(s,a)
++
+\sum_{s'}
+P(s'|s,a)
+V_{t+1}(s')
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discounted Infinite-Horizon Objective}
+\label{subsec:discounted-infinite-horizon}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an infinite horizon, a common objective is
+
+\[
+\boxed{
+\mathbb{E}
+\left[
+\sum_{t=0}^{\infty}
+\gamma^t
+r(S_t,A_t)
+\right],
+}
+\]
+
+where
+
+\[
+\boxed{
+0\leq\gamma<1
+}
+\]
+
+is the discount factor.
+
+Future rewards are weighted by powers of \(\gamma\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bellman Optimality Equation}
+\label{subsec:bellman-optimality-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a discounted MDP,
+
+\[
+\boxed{
+V^*(s)
+=
+\max_{a}
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^*(s')
+\right].
+}
+\]
+
+This is the Bellman optimality equation.
+
+It is a fixed-point equation for the optimal value function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bellman Operator}
+\label{subsec:bellman-operator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define the Bellman optimality operator \(T\) by
+
+\[
+\boxed{
+(TV)(s)
+=
+\max_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V(s')
+\right].
+}
+\]
+
+Then the optimal value satisfies
+
+\[
+\boxed{
+V^*=TV^*.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Contraction Property}
+\label{subsec:bellman-contraction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For discounted finite-state MDPs with
+
+\[
+0\leq\gamma<1,
+\]
+
+the Bellman operator is a contraction in the sup norm:
+
+\[
+\boxed{
+\|TV-TW\|_\infty
+\leq
+\gamma
+\|V-W\|_\infty.
+}
+\]
+
+Therefore it has a unique fixed point.
+
+This provides the basis for value iteration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Value Iteration}
+\label{subsec:value-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Value iteration repeatedly applies the Bellman operator:
+
+\[
+\boxed{
+V_{k+1}
+=
+TV_k.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+V_{k+1}(s)
+=
+\max_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V_k(s')
+\right].
+}
+\]
+
+For finite discounted MDPs, this converges to \(V^*\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Policy Evaluation}
+\label{subsec:policy-evaluation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose policy \(\pi\) is fixed.
+
+Its value function satisfies
+
+\[
+\boxed{
+V^\pi(s)
+=
+r(s,\pi(s))
++
+\gamma
+\sum_{s'}
+P
+(
+s'|s,\pi(s)
+)
+V^\pi(s').
+}
+\]
+
+This is a linear system when the state space is finite.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Policy Improvement}
+\label{subsec:policy-improvement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given \(V^\pi\), define an improved policy by
+
+\[
+\boxed{
+\pi_{\mathrm{new}}(s)
+\in
+\operatorname*{arg\,max}_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^\pi(s')
+\right].
+}
+\]
+
+This chooses actions greedily with respect to the current policy value.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Policy Iteration}
+\label{subsec:policy-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Policy iteration alternates:
+
+\[
+\boxed{
+\text{policy evaluation}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{policy improvement}.
+}
+\]
+
+The process continues until the policy no longer changes.
+
+For finite discounted MDPs, policy iteration reaches an optimal policy in
+finitely many policy improvements.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Action-Value Function}
+\label{subsec:action-value-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The action-value function is
+
+\[
+\boxed{
+Q^\pi(s,a)
+=
+\text{expected discounted return when action }a
+\text{ is taken in state }s
+}
+\]
+
+followed by policy \(\pi\).
+
+For the optimal function,
+
+\[
+\boxed{
+Q^*(s,a)
+=
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^*(s').
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relation Between \(V^*\) and \(Q^*\)}
+\label{subsec:v-q-relation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The optimal state value is
+
+\[
+\boxed{
+V^*(s)
+=
+\max_a
+Q^*(s,a).
+}
+\]
+
+An optimal policy can therefore choose
+
+\[
+\boxed{
+\pi^*(s)
+\in
+\operatorname*{arg\,max}_a
+Q^*(s,a).
+}
+\]
+
+This connection leads directly to reinforcement-learning methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: One-Step Stochastic Decision}
+\label{subsec:worked-stochastic-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Expected Future Cost}
+
+Suppose from state \(s\), action \(a_1\) has immediate cost \(2\).
+
+It moves to state \(A\) with probability
+
+\[
+0.75
+\]
+
+and to state \(B\) with probability
+
+\[
+0.25.
+\]
+
+Suppose
+
+\[
+V_{t+1}(A)=4,
+\qquad
+V_{t+1}(B)=10.
+\]
+
+Then the total expected cost of choosing \(a_1\) is
+
+\[
+2
++
+0.75(4)
++
+0.25(10).
+\]
+
+Therefore,
+
+\[
+2+3+2.5
+=
+7.5.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+Q_t(s,a_1)=7.5.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inventory Control}
+\label{subsec:inventory-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Inventory systems are natural dynamic programs.
+
+Let
+
+\[
+x_t
+=
+\text{inventory before ordering},
+\]
+
+and
+
+\[
+u_t
+=
+\text{order quantity}.
+\]
+
+If demand is \(D_t\), then a simple transition is
+
+\[
+\boxed{
+x_{t+1}
+=
+x_t
++
+u_t
+-
+D_t.
+}
+\]
+
+Costs may include ordering, holding, and shortage penalties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inventory Bellman Equation}
+\label{subsec:inventory-bellman}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For finite horizon,
+
+\[
+\boxed{
+V_t(x)
+=
+\min_{u\geq0}
+\left[
+c_{\mathrm{order}}(u)
++
+\mathbb{E}
+\left[
+c_{\mathrm{hold}}
+(
+x+u-D_t
+)
++
+V_{t+1}
+(
+x+u-D_t
+)
+\right]
+\right].
+}
+\]
+
+This is developed more deeply in the later Inventory Theory section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equipment Replacement}
+\label{subsec:equipment-replacement-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose equipment becomes more expensive to maintain as it ages.
+
+At each period, choose:
+
+\[
+\boxed{
+\text{keep}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{replace}.
+}
+\]
+
+The state may be equipment age.
+
+Dynamic programming compares immediate replacement cost with expected
+future maintenance cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scheduling Connection}
+\label{subsec:scheduling-dp-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scheduling problems can sometimes be solved by dynamic programming when a
+small state captures:
+
+\[
+\boxed{
+\text{completed jobs},
+}
+\]
+
+\[
+\boxed{
+\text{current time},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{remaining resources}.
+}
+\]
+
+Subset DP can be useful when the number of jobs is modest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control Connection}
+\label{subsec:optimal-control-dp-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming is one of the principal foundations of optimal
+control.
+
+For continuous-state systems, the discrete-time Bellman recursion has a
+continuous-time analogue known as the Hamilton--Jacobi--Bellman equation.
+
+That theory is developed later in Section~\ref{sec:optimal-control}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continuous-State Dynamic Programming}
+\label{subsec:continuous-state-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A state need not be discrete.
+
+Suppose
+
+\[
+x_t\in\mathbb{R}^n.
+\]
+
+Then
+
+\[
+\boxed{
+V_t(x)
+=
+\min_u
+\left[
+\ell_t(x,u)
++
+V_{t+1}(f_t(x,u))
+\right].
+}
+\]
+
+The difficulty is that \(V_t\) is now a function over a continuous state
+space.
+
+Exact tabulation may be impossible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discretization of Continuous States}
+\label{subsec:dp-state-discretization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One approach approximates a continuous state space by a finite grid.
+
+For example,
+
+\[
+x\in[0,1]
+\]
+
+might be replaced by
+
+\[
+\boxed{
+\left\{
+0,
+\frac1N,
+\frac2N,
+\ldots,
+1
+\right\}.
+}
+\]
+
+A finer grid improves resolution but greatly increases computational
+cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximate Dynamic Programming}
+\label{subsec:approximate-dynamic-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When exact value functions are too expensive to store, one may approximate
+
+\[
+\boxed{
+V(s)
+\approx
+\widehat{V}(s;\theta).
+}
+\]
+
+The approximation may use:
+
+\[
+\boxed{
+\text{basis functions},
+}
+\]
+
+\[
+\boxed{
+\text{regression},
+}
+\]
+
+\[
+\boxed{
+\text{trees},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{neural networks}.
+}
+\]
+
+This is called approximate dynamic programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Value-Function Approximation}
+\label{subsec:value-function-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A linear approximation may have form
+
+\[
+\boxed{
+\widehat{V}(s)
+=
+\theta_1\phi_1(s)
++
+\cdots
++
+\theta_k\phi_k(s),
+}
+\]
+
+where
+
+\[
+\phi_i(s)
+\]
+
+are chosen features.
+
+Instead of storing one value for every state, only the coefficients
+\(\theta_i\) are stored.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Aggregation}
+\label{subsec:state-aggregation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+State aggregation groups several similar states into one approximate
+state.
+
+If the original state space is huge,
+
+\[
+\mathcal{S},
+\]
+
+replace it by a smaller set
+
+\[
+\boxed{
+\widetilde{\mathcal{S}}.
+}
+\]
+
+This reduces computation at the cost of approximation error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rolling-Horizon Decisions}
+\label{subsec:rolling-horizon-dp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A long planning horizon may be approximated by repeatedly solving a
+shorter-horizon problem.
+
+At each time:
+
+\begin{enumerate}
+    \item solve a finite-horizon problem;
+    \item implement only the first action;
+    \item observe the new state;
+    \item solve again.
+\end{enumerate}
+
+This is a rolling-horizon strategy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming Versus Greedy Methods}
+\label{subsec:dp-versus-greedy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A greedy algorithm commits immediately to a locally best action.
+
+Dynamic programming evaluates the effect of an action on the optimal
+future value.
+
+Thus greedy reasoning uses
+
+\[
+\boxed{
+\text{immediate benefit},
+}
+\]
+
+while dynamic programming uses
+
+\[
+\boxed{
+\text{immediate benefit}
++
+\text{optimal future benefit}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming Versus Branch-and-Bound}
+\label{subsec:dp-versus-branch-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming identifies and merges equivalent subproblems.
+
+Branch-and-bound keeps different subproblems separate but prunes them
+using bounds.
+
+Thus:
+
+\[
+\boxed{
+\text{DP exploits repeated states},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{branch-and-bound exploits bounds}.
+}
+\]
+
+Some algorithms combine both ideas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming Versus Divide and Conquer}
+\label{subsec:dp-versus-divide-conquer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Divide-and-conquer also decomposes a problem.
+
+The distinction is that divide-and-conquer usually creates independent
+subproblems.
+
+Dynamic programming is most useful when subproblems overlap.
+
+Thus:
+
+\[
+\boxed{
+\text{independent subproblems}
+\rightarrow
+\text{divide and conquer},
+}
+\]
+
+\[
+\boxed{
+\text{overlapping subproblems}
+\rightarrow
+\text{dynamic programming}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming Versus Linear Programming}
+\label{subsec:dp-versus-lp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming and linear programming are different mathematical
+frameworks, but important problems can sometimes be formulated using
+either.
+
+For example:
+
+\[
+\boxed{
+\text{shortest path}
+}
+\]
+
+can be solved by:
+
+\[
+\boxed{
+\text{graph algorithms},
+}
+\]
+
+\[
+\boxed{
+\text{dynamic programming},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{linear programming}.
+}
+\]
+
+Different formulations reveal different structures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Complexity of DP}
+\label{subsec:dynamic-programming-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common complexity estimate is
+
+\[
+\boxed{
+\text{number of states}
+\times
+\text{work per state}.
+}
+\]
+
+If there are \(N\) states and at most \(A\) actions per state, then a
+simple finite-horizon computation may require approximately
+
+\[
+\boxed{
+O(NA).
+}
+\]
+
+The challenge is often that \(N\) itself can be enormous.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse State Exploration}
+\label{subsec:sparse-state-exploration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Memoization can be advantageous if only a small portion of the theoretical
+state space is reachable.
+
+Rather than filling every table entry, compute only states reached from
+the initial state.
+
+This can save substantial time and memory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Compression}
+\label{subsec:state-compression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sometimes a state can be represented more compactly.
+
+For example, if only the parity of a count matters, storing the full count
+is unnecessary.
+
+Good state compression can reduce both:
+
+\[
+\boxed{
+\text{memory},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{running time}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reconstructing Solutions}
+\label{subsec:reconstructing-dp-solutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computing the optimal value alone may not identify the actual solution.
+
+To reconstruct decisions, store:
+
+\[
+\boxed{
+\text{parent states},
+}
+\]
+
+\[
+\boxed{
+\text{chosen actions},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{split locations}.
+}
+\]
+
+Then trace backward from the final state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tie Handling}
+\label{subsec:dynamic-programming-ties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Several actions can produce the same optimal value.
+
+Then
+
+\[
+\operatorname*{arg\,min}
+\]
+
+or
+
+\[
+\operatorname*{arg\,max}
+\]
+
+may contain multiple actions.
+
+A solver may:
+
+\[
+\boxed{
+\text{return one optimum},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{record all optimal choices}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Issues}
+\label{subsec:dynamic-programming-numerical-issues}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When costs are floating-point numbers, numerical comparisons can be
+sensitive to rounding.
+
+In stochastic problems, repeated expectations can also accumulate
+roundoff.
+
+Practical implementations may require:
+
+\[
+\boxed{
+\text{tolerances},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stable summation or scaling}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming Workflow}
+\label{subsec:dynamic-programming-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the stages or recursive structure;
+    \item define the state;
+    \item verify that the state contains sufficient information;
+    \item define feasible actions;
+    \item define immediate cost or reward;
+    \item define the transition law;
+    \item specify terminal or boundary conditions;
+    \item derive the Bellman recurrence;
+    \item determine a valid computation order;
+    \item estimate the number of states;
+    \item estimate work per state;
+    \item decide between memoization and tabulation;
+    \item store decisions if solution reconstruction is required;
+    \item exploit dominance and state compression;
+    \item verify the recurrence on small instances;
+    \item analyze time and memory complexity.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Dynamic Programming Formulation}
+\label{subsec:choosing-dp-formulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sequential decisions, use a stage-state formulation.
+
+For string problems, use:
+
+\[
+\boxed{
+\text{prefix states}.
+}
+\]
+
+For interval problems, use:
+
+\[
+\boxed{
+(i,j)
+\text{ states}.
+}
+\]
+
+For resource constraints, include:
+
+\[
+\boxed{
+\text{remaining capacity or budget}.
+}
+\]
+
+For path-dependent discrete problems, consider:
+
+\[
+\boxed{
+\text{subset states}.
+}
+\]
+
+For stochastic decisions, include enough information to obtain the Markov
+property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:dynamic-programming-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Defining a State That Omits Relevant History}
+
+If two histories produce different future possibilities, they cannot be
+merged into the same state.
+
+The Bellman recursion would then be invalid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Storing Too Much History}
+
+A state that stores the entire decision history may be correct but
+computationally disastrous.
+
+The goal is a sufficient but compact state.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Writing a Recurrence Without Base Cases}
+
+A recursive equation is incomplete without terminal or boundary values.
+
+For example,
+
+\[
+V(0,b)=0
+\]
+
+is essential in knapsack.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Future Values Before They Are Available}
+
+Bottom-up tabulation requires a computation order compatible with the
+recurrence.
+
+Dependencies must already be solved.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Greedy Choice with Bellman Optimization}
+
+Dynamic programming compares:
+
+\[
+\boxed{
+\text{current cost}
++
+\text{optimal future cost}.
+}
+\]
+
+Choosing only the smallest immediate cost can be incorrect.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reusing an Item in 0--1 Knapsack}
+
+When using a one-dimensional capacity table, updating capacities in
+increasing order can accidentally allow repeated use of the same item.
+
+For \(0\)-\(1\) knapsack, update capacity in decreasing order.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Calling \(O(nW)\) Polynomial Without Qualification}
+
+For binary-encoded \(W\),
+
+\[
+O(nW)
+\]
+
+is pseudo-polynomial.
+
+Formal complexity is measured in input bits.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Dynamic Programming Is Always Efficient}
+
+Dynamic programming can still require exponentially many states.
+
+Subset DP and high-dimensional control are important examples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Curse of Dimensionality}
+
+A continuous or multivariable state space can make direct tabulation
+impossible.
+
+Approximation may be necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Expectation in the Wrong Order}
+
+In stochastic dynamic programming, the Bellman equation optimizes over
+actions while accounting for the expectation of future value.
+
+The order depends on when uncertainty is observed.
+
+Information timing must be modeled correctly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Future Information in a Policy}
+
+A valid decision at stage \(t\) may only depend on information available
+at stage \(t\).
+
+Using future random outcomes creates a nonimplementable policy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing State Value and Action Value}
+
+\[
+V(s)
+\]
+
+values a state under optimal or specified future behavior.
+
+\[
+Q(s,a)
+\]
+
+values taking a particular action from that state and then continuing.
+
+They are related but not identical.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting the Discount Factor}
+
+In discounted infinite-horizon models,
+
+\[
+0\leq\gamma<1
+\]
+
+is part of the Bellman equation.
+
+Omitting it changes the optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Approximate DP Gives Exact Optimality}
+
+Function approximation, state aggregation, and sampling reduce
+computation but introduce approximation error.
+
+Their solutions need not be exactly optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:dynamic-programming-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Routing.}
+Shortest-path and constrained-path problems can be formulated through
+Bellman recursions.
+
+\medskip
+
+\textbf{Inventory.}
+Ordering decisions depend on current stock, uncertain demand, and future
+costs.
+
+\medskip
+
+\textbf{Scheduling.}
+Dynamic programs can optimize sequences of jobs when the state dimension
+remains manageable.
+
+\medskip
+
+\textbf{Finance.}
+Sequential investment, consumption, and portfolio decisions can be
+modeled using state-dependent value functions.
+
+\medskip
+
+\textbf{Control Theory.}
+Dynamic programming constructs optimal feedback policies for deterministic
+and stochastic dynamical systems.
+
+\medskip
+
+\textbf{Machine Learning.}
+Reinforcement learning generalizes dynamic-programming ideas when
+transition models or value functions must be learned from data.
+
+\medskip
+
+\textbf{Computational Biology.}
+Sequence alignment, edit distance, and biological string comparison use
+dynamic-programming tables.
+
+\medskip
+
+\textbf{Operations Research.}
+Resource allocation, replacement, inventory, routing, and multistage
+decision problems are classical dynamic-programming applications.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:dynamic-programming-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define dynamic programming.
+\end{exercise}
+
+\begin{exercise}[1]
+Define optimal substructure.
+\end{exercise}
+
+\begin{exercise}[1]
+Define overlapping subproblems.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a state.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an action.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a value function.
+\end{exercise}
+
+\begin{exercise}[1]
+State Bellman's principle of optimality.
+\end{exercise}
+
+\begin{exercise}[1]
+Distinguish memoization from tabulation.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a Bellman recursion for a deterministic finite-horizon problem with
+transition
+
+\[
+s_{t+1}=T(s_t,a_t).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why backward induction is natural for finite-horizon dynamic
+programming.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the shortest-path Bellman recursion.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the \(0\)-\(1\) knapsack recurrence.
+\end{exercise}
+
+\begin{exercise}[2]
+State the knapsack base cases.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why \(0\)-\(1\) knapsack memory can be reduced to \(O(W)\).
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why capacities must be processed downward in the one-array
+\(0\)-\(1\) knapsack implementation.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the longest common subsequence recurrence.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the edit-distance recurrence.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the matrix-chain multiplication recurrence.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a four-item \(0\)-\(1\) knapsack problem by constructing the full
+dynamic-programming table.
+\end{exercise}
+
+\begin{exercise}[3]
+Recover the selected items from the knapsack table.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare full-table and one-dimensional knapsack memory requirements.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a resource-allocation problem with three activities and a budget of
+five units.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the LCS length of
+
+\[
+X=\texttt{ABCBDAB}
+\]
+
+and
+
+\[
+Y=\texttt{BDCABA}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an edit-distance table for two short strings.
+\end{exercise}
+
+\begin{exercise}[3]
+Use dynamic programming to determine the optimal parenthesization of four
+matrices.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the time complexity of matrix-chain dynamic programming.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the Held--Karp recurrence for a four-city TSP.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Held--Karp improves on complete permutation enumeration.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the approximate \(O(n^2 2^n)\) time complexity of Held--Karp.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a finite-horizon deterministic control problem and derive its
+Bellman recursion.
+\end{exercise}
+
+\begin{exercise}[3]
+Given a small transition table, compute an optimal policy by backward
+induction.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a finite-horizon stochastic Bellman equation using transition
+probabilities.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute one Bellman update for a two-state stochastic problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the discounted Bellman optimality equation for a finite MDP.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform two iterations of value iteration on a small MDP.
+\end{exercise}
+
+\begin{exercise}[3]
+Evaluate a fixed policy by solving its Bellman equations.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one policy-improvement step.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the relationship
+
+\[
+V^*(s)=\max_aQ^*(s,a).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a simple inventory-control model as a dynamic program.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate an equipment-replacement model.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between open-loop and feedback decisions.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of a state that contains unnecessary history and compress
+it.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example where omitting a state variable invalidates the Bellman
+recursion.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the curse of dimensionality using a state with six components and
+ten possible values per component.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare dynamic programming and branch-and-bound for a discrete problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare dynamic programming and greedy optimization.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why memoization may outperform tabulation when many states are
+unreachable.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove Bellman's principle of optimality for a finite deterministic control
+problem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study shortest paths as linear programming and dynamic programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove correctness of the \(0\)-\(1\) knapsack recurrence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the FPTAS for \(0\)-\(1\) knapsack.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Hirschberg's memory-efficient algorithm for longest common
+subsequence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sequence alignment with affine gap penalties.
+\end{exercise}
+
+\begin{exercise}[4]
+Study interval dynamic programming for optimal binary search trees.
+\end{exercise}
+
+\begin{exercise}[4]
+Study subset dynamic programming for Steiner-tree problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Held--Karp algorithm carefully.
+\end{exercise}
+
+\begin{exercise}[4]
+Study state-dominance rules in resource-constrained dynamic programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stochastic shortest-path dynamic programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove that the discounted Bellman operator is a contraction in the sup
+norm.
+\end{exercise}
+
+\begin{exercise}[4]
+Use the contraction mapping theorem to prove uniqueness of \(V^*\).
+\end{exercise}
+
+\begin{exercise}[4]
+Prove convergence of value iteration for finite discounted MDPs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study finite termination of policy iteration for finite discounted MDPs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study average-cost dynamic programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stochastic shortest-path MDPs without discounting.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Hamilton--Jacobi--Bellman equation as a continuous-time limit.
+\end{exercise}
+
+\begin{exercise}[4]
+Study approximate value iteration.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate state aggregation error.
+\end{exercise}
+
+\begin{exercise}[4]
+Study fitted value iteration.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate approximate policy iteration.
+\end{exercise}
+
+\begin{exercise}[4]
+Study rollout algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the relationship between dynamic programming and reinforcement
+learning.
+\end{exercise}
+
+\begin{exercise}[4]
+Study dynamic programming on tree decompositions.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:dynamic-programming-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming solves optimization problems by decomposing them into
+smaller state-dependent problems.
+
+The key objects are
+
+\[
+\boxed{
+\text{state}
++
+\text{action}
++
+\text{transition}
++
+\text{value}.
+}
+\]
+
+For deterministic finite-horizon optimization,
+
+\[
+\boxed{
+V_t(s)
+=
+\min_{a\in A_t(s)}
+\left[
+c_t(s,a)
++
+V_{t+1}
+(
+T_t(s,a)
+)
+\right].
+}
+\]
+
+This is the Bellman recursion.
+
+Important discrete examples include:
+
+\[
+\boxed{
+\text{shortest path},
+}
+\]
+
+\[
+\boxed{
+\text{knapsack},
+}
+\]
+
+\[
+\boxed{
+\text{sequence alignment},
+}
+\]
+
+\[
+\boxed{
+\text{matrix-chain multiplication},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{TSP subset DP}.
+}
+\]
+
+For stochastic systems,
+
+\[
+\boxed{
+V_t(s)
+=
+\min_a
+\left[
+c_t(s,a)
++
+\sum_{s'}
+P(s'|s,a)V_{t+1}(s')
+\right].
+}
+\]
+
+For discounted infinite-horizon reward maximization,
+
+\[
+\boxed{
+V^*(s)
+=
+\max_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^*(s')
+\right].
+}
+\]
+
+Dynamic programming can dramatically reduce repeated computation, but its
+state space can grow exponentially with dimension.
+
+Thus dynamic programming combines
+
+\[
+\boxed{
+\text{optimization}
++
+\text{recursion}
++
+\text{algorithms}
++
+\text{probability}
++
+\text{control}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:dynamic-programming-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Dynamic Programming develops recursive optimization through Bellman's
+principle of optimality. It connects the discrete search problems of
+Section~\ref{sec:combinatorial-optimization} with sequential decision
+making, stochastic systems, and feedback control. Knapsack, shortest
+paths, sequence problems, and subset optimization illustrate deterministic
+dynamic programming, while Markov decision processes introduce stochastic
+Bellman equations. These ideas become especially important in later
+sections on Stochastic Optimization, Scheduling Theory, Inventory Theory,
+Decision Theory, and Optimal Control. The next section, Stochastic
+Optimization, develops optimization models in which uncertain quantities
+enter objectives, constraints, or future decisions explicitly.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.7 Dynamic Programming
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard dynamic-programming theory.
+%   - Standard algorithms and discrete optimization methods.
+%   - Standard finite-horizon and Markov decision-process theory.
+%
+% Used for:
+%   - optimal substructure;
+%   - overlapping subproblems;
+%   - memoization and tabulation;
+%   - states, actions, stages, and transitions;
+%   - value functions;
+%   - Bellman's principle of optimality;
+%   - finite-horizon Bellman recursions;
+%   - backward induction;
+%   - policy reconstruction;
+%   - state-space graph interpretation;
+%   - shortest-path dynamic programming;
+%   - Bellman--Ford connection;
+%   - resource allocation;
+%   - 0--1 and unbounded knapsack;
+%   - pseudo-polynomial complexity;
+%   - longest common subsequence;
+%   - edit distance;
+%   - sequence alignment;
+%   - matrix-chain multiplication;
+%   - interval dynamic programming;
+%   - subset dynamic programming;
+%   - Held--Karp TSP dynamic programming;
+%   - state design and state compression;
+%   - curse of dimensionality;
+%   - deterministic control;
+%   - policies and feedback;
+%   - stochastic dynamic programming;
+%   - transition probabilities;
+%   - Markov decision processes;
+%   - discounted infinite-horizon objectives;
+%   - Bellman optimality operators;
+%   - contraction property;
+%   - value iteration;
+%   - policy evaluation and policy iteration;
+%   - state-value and action-value functions;
+%   - inventory and replacement applications;
+%   - continuous-state problems;
+%   - state discretization;
+%   - approximate dynamic programming;
+%   - value-function approximation;
+%   - state aggregation;
+%   - computational complexity;
+%   - applications and exercises.
+%
+% Notes:
+%   - Stochastic Optimization is developed next in Section 10.8.
+%   - Inventory Theory is developed later in Section 10.13.
+%   - Decision Theory is developed in Section 10.14.
+%   - Optimal Control is developed in Section 10.16.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

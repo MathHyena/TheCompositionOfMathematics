@@ -1,0 +1,3614 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.5 INTEGER PROGRAMMING
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Integer Programming}
+\label{sec:integer-programming}
+
+\prerequisite{
+Optimization fundamentals, linear programming, convex optimization,
+linear algebra, systems of inequalities, polyhedra, LP duality,
+basic feasible solutions, and mathematical modeling.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define integer programming;
+    \item distinguish pure integer, binary, and mixed-integer programs;
+    \item explain why integrality fundamentally changes optimization;
+    \item formulate logical decisions using binary variables;
+    \item model either-or conditions and fixed-charge decisions;
+    \item formulate assignment, selection, knapsack, facility-location,
+          and basic scheduling models;
+    \item define the LP relaxation of an integer program;
+    \item use LP relaxations to produce bounds;
+    \item understand the integrality gap;
+    \item recognize integer hulls;
+    \item understand why rounding an LP solution may fail;
+    \item explain branch-and-bound;
+    \item construct branching subproblems;
+    \item use incumbent solutions and node bounds;
+    \item understand pruning by infeasibility, bounds, and integrality;
+    \item distinguish depth-first and best-bound search conceptually;
+    \item understand optimality gaps;
+    \item recognize cutting planes;
+    \item understand valid inequalities;
+    \item recognize Gomory cuts conceptually;
+    \item formulate cover inequalities for binary knapsack constraints;
+    \item understand branch-and-cut;
+    \item understand Big-\(M\) formulations and their numerical dangers;
+    \item recognize indicator constraints conceptually;
+    \item formulate implications using binary variables;
+    \item model mutually exclusive choices;
+    \item model cardinality constraints;
+    \item model piecewise and fixed-cost decisions conceptually;
+    \item understand symmetry in integer programs;
+    \item recognize symmetry-breaking constraints;
+    \item understand preprocessing and bound tightening;
+    \item recognize total unimodularity and automatic integrality;
+    \item understand Lagrangian relaxation conceptually;
+    \item understand decomposition ideas conceptually;
+    \item distinguish heuristic solutions from optimality certificates;
+    \item understand primal and dual bounds in mixed-integer optimization;
+    \item interpret solver optimality gaps;
+    \item connect integer programming with combinatorial optimization,
+          logistics, scheduling, network design, and operations research.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Integer Programming?}
+\label{subsec:what-is-integer-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An integer program is an optimization problem in which some or all
+decision variables are required to take integer values.
+
+A basic integer linear program has form
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+\mathbf{c}^T\mathbf{x}
+\\
+\text{subject to}
+\quad&
+A\mathbf{x}\leq\mathbf{b},
+\\
+&
+\mathbf{x}\in\mathbb{Z}^n.
+\end{aligned}
+}
+\]
+
+The objective and constraints may be linear while the integrality
+restriction makes the feasible set discrete.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Integrality Changes the Problem}
+\label{subsec:why-integrality-changes-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In linear programming, one may move continuously through a convex
+polyhedron.
+
+In integer programming, only selected lattice points are feasible.
+
+Thus
+
+\[
+\boxed{
+\text{continuous feasible region}
+}
+\]
+
+is replaced by
+
+\[
+\boxed{
+\text{discrete feasible points}.
+}
+\]
+
+The resulting feasible set is generally nonconvex.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pure Integer Programming}
+\label{subsec:pure-integer-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A pure integer program requires every decision variable to be integral:
+
+\[
+\boxed{
+x_j\in\mathbb{Z},
+\qquad
+j=1,\ldots,n.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+\begin{aligned}
+\max
+\quad&
+4x_1+7x_2
+\\
+\text{subject to}
+\quad&
+3x_1+2x_2\leq20,
+\\
+&
+x_1,x_2\in\mathbb{Z}_{\geq0}.
+\end{aligned}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Integer Programming}
+\label{subsec:binary-integer-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A binary variable satisfies
+
+\[
+\boxed{
+x_j\in\{0,1\}.
+}
+\]
+
+Binary variables naturally encode:
+
+\[
+\boxed{
+0=\text{no},
+\qquad
+1=\text{yes}.
+}
+\]
+
+They are used for:
+
+\[
+\boxed{
+\text{selection},
+}
+\]
+
+\[
+\boxed{
+\text{activation},
+}
+\]
+
+\[
+\boxed{
+\text{assignment},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{logical decisions}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mixed-Integer Programming}
+\label{subsec:mixed-integer-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A mixed-integer program contains both integer and continuous variables.
+
+A mixed-integer linear program, abbreviated MILP, may be written
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x},\mathbf{y}}
+\quad&
+\mathbf{c}^T\mathbf{x}
++
+\mathbf{d}^T\mathbf{y}
+\\
+\text{subject to}
+\quad&
+A\mathbf{x}
++
+B\mathbf{y}
+\leq
+\mathbf{b},
+\\
+&
+\mathbf{x}\in\mathbb{Z}^p,
+\\
+&
+\mathbf{y}\in\mathbb{R}^q.
+\end{aligned}
+}
+\]
+
+MILPs are among the most widely used operations-research models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integer Lattice}
+\label{subsec:integer-lattice}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The integer lattice in \(\mathbb{R}^n\) is
+
+\[
+\boxed{
+\mathbb{Z}^n.
+}
+\]
+
+An integer-programming feasible set can often be viewed as
+
+\[
+\boxed{
+P\cap\mathbb{Z}^n,
+}
+\]
+
+where \(P\) is a polyhedron.
+
+The continuous polyhedron provides geometric information, while the
+integer lattice imposes discreteness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LP Relaxation}
+\label{subsec:integer-lp-relaxation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The LP relaxation of an integer program is obtained by removing the
+integrality restrictions.
+
+For
+
+\[
+\boxed{
+\begin{aligned}
+\max
+\quad&
+c^Tx
+\\
+\text{subject to}
+\quad&
+Ax\leq b,
+\\
+&
+x\in\mathbb{Z}_{\geq0}^n,
+\end{aligned}
+}
+\]
+
+the LP relaxation is
+
+\[
+\boxed{
+\begin{aligned}
+\max
+\quad&
+c^Tx
+\\
+\text{subject to}
+\quad&
+Ax\leq b,
+\\
+&
+x\geq0.
+\end{aligned}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relaxation Bounds}
+\label{subsec:integer-relaxation-bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a maximization problem, the LP relaxation has a larger feasible set.
+
+Therefore,
+
+\[
+\boxed{
+z_{\mathrm{IP}}^*
+\leq
+z_{\mathrm{LP}}^*.
+}
+\]
+
+Thus the LP relaxation provides an upper bound.
+
+For a minimization problem,
+
+\[
+\boxed{
+z_{\mathrm{LP}}^*
+\leq
+z_{\mathrm{IP}}^*.
+}
+\]
+
+Thus the LP relaxation provides a lower bound.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: LP Relaxation}
+\label{subsec:worked-ip-relaxation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Fractional LP Solution}
+
+Consider
+
+\[
+\begin{aligned}
+\max
+\quad&
+x+y
+\\
+\text{subject to}
+\quad&
+2x+2y\leq5,
+\\
+&
+x,y\in\mathbb{Z}_{\geq0}.
+\end{aligned}
+\]
+
+The LP relaxation allows real variables:
+
+\[
+x,y\geq0.
+\]
+
+Its boundary is
+
+\[
+x+y\leq\frac52.
+\]
+
+Therefore,
+
+\[
+z_{\mathrm{LP}}^*
+=
+\frac52.
+\]
+
+For integer variables,
+
+\[
+x+y
+\]
+
+must be an integer and cannot exceed \(2.5\), so
+
+\[
+z_{\mathrm{IP}}^*=2.
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+z_{\mathrm{LP}}^*
+=
+2.5,
+\qquad
+z_{\mathrm{IP}}^*
+=
+2.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integrality Gap}
+\label{subsec:integrality-gap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The difference between an integer optimum and the optimum of a relaxation
+measures the quality of the relaxation.
+
+For a minimization problem, one may examine
+
+\[
+\boxed{
+z_{\mathrm{IP}}^*
+-
+z_{\mathrm{LP}}^*.
+}
+\]
+
+A relative gap can also be used.
+
+The exact definition depends on whether the problem is minimization or
+maximization and on the normalization convention.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Strong Relaxations Matter}
+\label{subsec:strong-relaxations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A relaxation is strong when its optimal value is close to the integer
+optimal value.
+
+Strong relaxations help because they:
+
+\[
+\boxed{
+\text{produce tighter bounds},
+}
+\]
+
+\[
+\boxed{
+\text{reduce branch-and-bound search},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{improve optimality certificates}.
+}
+\]
+
+Formulation quality can therefore be as important as solver choice.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integer Hull}
+\label{subsec:integer-hull}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+S
+=
+P\cap\mathbb{Z}^n.
+\]
+
+The integer hull is
+
+\[
+\boxed{
+\operatorname{conv}(S).
+}
+\]
+
+It is the convex hull of all integer feasible points.
+
+Optimizing a linear objective over the integer hull gives the same optimal
+value as optimizing over the original integer points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ideal Formulations}
+\label{subsec:ideal-integer-formulations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A formulation is especially strong if the extreme points of its LP
+relaxation are already integral.
+
+Such a formulation can be called ideal in an appropriate modeling sense.
+
+Then solving the LP relaxation may already solve the integer problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Simple Rounding Can Fail}
+\label{subsec:why-rounding-can-fail}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an LP relaxation gives
+
+\[
+x_1=1.7,
+\qquad
+x_2=2.6.
+\]
+
+Rounding gives
+
+\[
+x_1=2,
+\qquad
+x_2=3.
+\]
+
+However, the rounded point may violate the constraints.
+
+Even if it remains feasible, it may be far from optimal.
+
+Therefore,
+
+\[
+\boxed{
+\text{solve LP and round}
+}
+\]
+
+is not a general integer-programming algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Rounding Failure}
+\label{subsec:worked-rounding-failure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Rounding Can Destroy Feasibility}
+
+Suppose
+
+\[
+x+y\leq3,
+\]
+
+with
+
+\[
+x,y\in\mathbb{Z}_{\geq0}.
+\]
+
+Assume an LP solution is
+
+\[
+x=1.6,
+\qquad
+y=1.4.
+\]
+
+This point satisfies
+
+\[
+x+y=3.
+\]
+
+Rounding each component upward gives
+
+\[
+x=2,
+\qquad
+y=2.
+\]
+
+Then
+
+\[
+2+2=4>3.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\text{componentwise rounding can produce an infeasible solution}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Selection Models}
+\label{subsec:binary-selection-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose project \(j\) is either selected or not selected.
+
+Define
+
+\[
+\boxed{
+x_j
+=
+\begin{cases}
+1,
+&
+\text{project }j\text{ is selected},
+\\
+0,
+&
+\text{otherwise}.
+\end{cases}
+}
+\]
+
+If project \(j\) provides value \(v_j\), then total value is
+
+\[
+\boxed{
+\sum_j
+v_jx_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cardinality Constraints}
+\label{subsec:cardinality-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If at most \(k\) items may be selected,
+
+\[
+\boxed{
+\sum_{j=1}^{n}
+x_j
+\leq
+k,
+}
+\]
+
+where
+
+\[
+x_j\in\{0,1\}.
+\]
+
+If exactly \(k\) items must be selected,
+
+\[
+\boxed{
+\sum_{j=1}^{n}
+x_j
+=
+k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{At Least and At Most One}
+\label{subsec:at-least-at-most-one}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For binary variables:
+
+At most one choice:
+
+\[
+\boxed{
+\sum_jx_j\leq1.
+}
+\]
+
+Exactly one choice:
+
+\[
+\boxed{
+\sum_jx_j=1.
+}
+\]
+
+At least one choice:
+
+\[
+\boxed{
+\sum_jx_j\geq1.
+}
+\]
+
+These simple constraints encode many logical decisions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logical Implication}
+\label{subsec:binary-logical-implication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+x,y\in\{0,1\},
+\]
+
+and selecting \(x\) requires selecting \(y\).
+
+The implication
+
+\[
+\boxed{
+x=1
+\Rightarrow
+y=1
+}
+\]
+
+is modeled by
+
+\[
+\boxed{
+x\leq y.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mutual Exclusion}
+\label{subsec:binary-mutual-exclusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose choices \(x\) and \(y\) cannot both occur.
+
+Then
+
+\[
+\boxed{
+x+y\leq1.
+}
+\]
+
+For several mutually exclusive options,
+
+\[
+\boxed{
+\sum_jx_j\leq1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Either-Or Logic}
+\label{subsec:either-or-logic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose exactly one of two alternatives must be chosen.
+
+Using
+
+\[
+y\in\{0,1\},
+\]
+
+one may let:
+
+\[
+\boxed{
+y=0
+\rightarrow
+\text{alternative A},
+}
+\]
+
+and
+
+\[
+\boxed{
+y=1
+\rightarrow
+\text{alternative B}.
+}
+\]
+
+Conditional constraints can then be activated using indicator constraints
+or sufficiently strong Big-\(M\) formulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Big-\(M\) Implication}
+\label{subsec:big-m-implication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+y\in\{0,1\}
+\]
+
+and we want
+
+\[
+\boxed{
+y=1
+\Rightarrow
+a^Tx\leq b.
+}
+\]
+
+A Big-\(M\) formulation is
+
+\[
+\boxed{
+a^Tx
+\leq
+b
++
+M(1-y).
+}
+\]
+
+If
+
+\[
+y=1,
+\]
+
+the original constraint is enforced.
+
+If
+
+\[
+y=0,
+\]
+
+the constraint becomes relaxed by \(M\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing Big-\(M\)}
+\label{subsec:choosing-big-m}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The constant \(M\) must be large enough to make the constraint inactive
+when intended.
+
+However, choosing \(M\) excessively large can cause:
+
+\[
+\boxed{
+\text{weak LP relaxations},
+}
+\]
+
+\[
+\boxed{
+\text{poor numerical conditioning},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{slow branch-and-bound}.
+}
+\]
+
+Therefore one should use the smallest valid \(M\) that can be justified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Indicator Constraints}
+\label{subsec:indicator-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many modern solvers support logical conditions directly:
+
+\[
+\boxed{
+y=1
+\Rightarrow
+a^Tx\leq b.
+}
+\]
+
+These are called indicator constraints.
+
+They can avoid manually selecting Big-\(M\) values, although the solver
+still needs an internal mathematical representation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fixed-Charge Models}
+\label{subsec:fixed-charge-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose using an activity incurs:
+
+\[
+\boxed{
+\text{fixed cost }F
+}
+\]
+
+plus
+
+\[
+\boxed{
+\text{variable cost }cx.
+}
+\]
+
+Let
+
+\[
+y\in\{0,1\}
+\]
+
+indicate whether the activity is used.
+
+Then the objective contains
+
+\[
+\boxed{
+Fy+cx.
+}
+\]
+
+To link \(x\) and \(y\), use
+
+\[
+\boxed{
+0\leq x\leq Uy,
+}
+\]
+
+where \(U\) is a valid upper bound.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Fixed Setup Cost}
+\label{subsec:worked-fixed-charge}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Activating Production}
+
+Suppose production quantity \(x\) has variable cost \(3x\) and a setup
+cost of \(100\) if any production occurs.
+
+Let
+
+\[
+y\in\{0,1\}
+\]
+
+indicate whether production is active.
+
+If capacity is at most \(50\), impose
+
+\[
+0\leq x\leq50y.
+\]
+
+The total cost is
+
+\[
+3x+100y.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+\begin{aligned}
+\min_{x,y}
+\quad&
+3x+100y
+\\
+\text{subject to}
+\quad&
+0\leq x\leq50y,
+\\
+&
+y\in\{0,1\}.
+\end{aligned}
+}
+\]
+\end{answerbox}
+
+If \(x>0\), then necessarily \(y=1\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Knapsack Problem}
+\label{subsec:integer-knapsack-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose item \(j\) has:
+
+\[
+v_j
+=
+\text{value},
+\]
+
+and
+
+\[
+w_j
+=
+\text{weight}.
+\]
+
+Let
+
+\[
+x_j\in\{0,1\}
+\]
+
+indicate whether the item is selected.
+
+Then the binary knapsack problem is
+
+\[
+\boxed{
+\begin{aligned}
+\max
+\quad&
+\sum_{j=1}^{n}
+v_jx_j
+\\
+\text{subject to}
+\quad&
+\sum_{j=1}^{n}
+w_jx_j
+\leq
+W,
+\\
+&
+x_j\in\{0,1\}.
+\end{aligned}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Binary Knapsack}
+\label{subsec:worked-binary-knapsack}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Selecting Projects}
+
+Suppose three projects have values
+
+\[
+8,\ 11,\ 6
+\]
+
+and costs
+
+\[
+4,\ 6,\ 3.
+\]
+
+The budget is \(9\).
+
+Let
+
+\[
+x_j\in\{0,1\}.
+\]
+
+Then
+
+\[
+\boxed{
+\begin{aligned}
+\max
+\quad&
+8x_1+11x_2+6x_3
+\\
+\text{subject to}
+\quad&
+4x_1+6x_2+3x_3
+\leq9.
+\end{aligned}
+}
+\]
+
+Checking feasible combinations:
+
+\[
+(1,0,1)
+\]
+
+has cost \(7\) and value \(14\).
+
+\[
+(0,1,1)
+\]
+
+has cost \(9\) and value \(17\).
+
+\[
+(1,1,0)
+\]
+
+has cost \(10\) and is infeasible.
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+(x_1,x_2,x_3)
+=
+(0,1,1)
+}
+\]
+
+with
+
+\[
+\boxed{
+z^*=17.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Assignment Problem}
+\label{subsec:integer-assignment-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose workers \(i\) must be assigned to jobs \(j\).
+
+Define
+
+\[
+\boxed{
+x_{ij}
+=
+\begin{cases}
+1,
+&
+\text{worker }i\text{ performs job }j,
+\\
+0,
+&
+\text{otherwise}.
+\end{cases}
+}
+\]
+
+If \(c_{ij}\) is assignment cost, then
+
+\[
+\boxed{
+\min
+\sum_i
+\sum_j
+c_{ij}x_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Assignment Constraints}
+\label{subsec:assignment-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If each worker receives exactly one job,
+
+\[
+\boxed{
+\sum_j
+x_{ij}
+=
+1
+}
+\]
+
+for every worker \(i\).
+
+If each job receives exactly one worker,
+
+\[
+\boxed{
+\sum_i
+x_{ij}
+=
+1
+}
+\]
+
+for every job \(j\).
+
+Thus,
+
+\[
+\boxed{
+x_{ij}\in\{0,1\}.
+}
+\]
+
+The assignment problem has special structure that often makes its LP
+relaxation integral.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Facility Location}
+\label{subsec:facility-location}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose potential facility \(j\) has fixed opening cost \(F_j\).
+
+Define
+
+\[
+\boxed{
+y_j
+=
+\begin{cases}
+1,
+&
+\text{facility }j\text{ is opened},
+\\
+0,
+&
+\text{otherwise}.
+\end{cases}
+}
+\]
+
+Let
+
+\[
+x_{ij}
+\]
+
+represent service from facility \(j\) to customer \(i\).
+
+Linking constraints ensure customers can only be served from open
+facilities.
+
+A common form is
+
+\[
+\boxed{
+x_{ij}\leq y_j.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Capacitated Facility Location}
+\label{subsec:capacitated-facility-location}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If facility \(j\) has capacity \(U_j\),
+
+\[
+\boxed{
+\sum_i
+d_i x_{ij}
+\leq
+U_j y_j.
+}
+\]
+
+When
+
+\[
+y_j=0,
+\]
+
+the right side is zero and no demand can be assigned there.
+
+When
+
+\[
+y_j=1,
+\]
+
+capacity becomes available.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Scheduling Variables}
+\label{subsec:integer-scheduling-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Binary variables can encode whether job \(j\) is assigned to machine
+\(m\):
+
+\[
+\boxed{
+x_{jm}
+\in
+\{0,1\}.
+}
+\]
+
+An assignment constraint may be
+
+\[
+\boxed{
+\sum_m
+x_{jm}
+=
+1.
+}
+\]
+
+Scheduling models may also require integer start times, precedence
+relations, or sequencing variables.
+
+More detailed scheduling theory appears later in Chapter 10.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Precedence Constraints}
+\label{subsec:integer-precedence-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If job \(i\) must finish before job \(j\) starts, and
+
+\[
+s_i
+=
+\text{start time of job }i,
+\]
+
+with processing time \(p_i\), then
+
+\[
+\boxed{
+s_j
+\geq
+s_i+p_i.
+}
+\]
+
+If \(s_i\) are continuous, the model can still be mixed-integer because
+binary variables may determine sequencing decisions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequencing with Binary Variables}
+\label{subsec:sequencing-binary-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose jobs \(i\) and \(j\) cannot overlap.
+
+Define
+
+\[
+y_{ij}
+=
+1
+\]
+
+if \(i\) occurs before \(j\).
+
+A Big-\(M\) formulation can use
+
+\[
+\boxed{
+s_i+p_i
+\leq
+s_j+M(1-y_{ij}),
+}
+\]
+
+and
+
+\[
+\boxed{
+s_j+p_j
+\leq
+s_i+My_{ij}.
+}
+\]
+
+Exactly one ordering is enforced when \(M\) is valid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branch-and-Bound}
+\label{subsec:branch-and-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Branch-and-bound is a general method for solving integer programs.
+
+It combines:
+
+\[
+\boxed{
+\text{relaxation},
+}
+\]
+
+\[
+\boxed{
+\text{branching},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{bounding}.
+}
+\]
+
+The method systematically partitions the feasible set while using bounds
+to eliminate regions that cannot contain an improved solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Root Relaxation}
+\label{subsec:branch-bound-root}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The process usually begins by solving the LP relaxation.
+
+This is the root node of the search tree.
+
+If the LP solution is already integral, then the integer problem may be
+solved immediately.
+
+Otherwise, one selects a fractional integer variable for branching.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branching on a Fractional Variable}
+\label{subsec:branching-fractional-variable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the LP relaxation gives
+
+\[
+\boxed{
+x_j^*=3.7,
+}
+\]
+
+where \(x_j\) must be integer.
+
+Then every integer solution satisfies either
+
+\[
+\boxed{
+x_j\leq3
+}
+\]
+
+or
+
+\[
+\boxed{
+x_j\geq4.
+}
+\]
+
+Thus create two child nodes:
+
+\[
+\boxed{
+x_j\leq\lfloor3.7\rfloor=3,
+}
+\]
+
+and
+
+\[
+\boxed{
+x_j\geq\lceil3.7\rceil=4.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branch-and-Bound Tree}
+\label{subsec:branch-and-bound-tree}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Each node represents the original model plus additional branching
+constraints.
+
+Solving the node relaxation gives:
+
+\[
+\boxed{
+\text{a bound},
+}
+\]
+
+and sometimes
+
+\[
+\boxed{
+\text{an integer feasible solution}.
+}
+\]
+
+The tree continues only where further exploration may improve the current
+best integer solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incumbent Solution}
+\label{subsec:integer-incumbent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The best integer feasible solution found so far is called the incumbent.
+
+For minimization, let
+
+\[
+\boxed{
+U
+=
+\text{incumbent objective value}.
+}
+\]
+
+Then \(U\) is an upper bound on the unknown optimal integer objective.
+
+For maximization, the incumbent provides a lower bound.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Node Bounds}
+\label{subsec:integer-node-bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a minimization problem, the LP relaxation at a node gives a lower
+bound:
+
+\[
+\boxed{
+L_{\text{node}}
+\leq
+z_{\text{IP,node}}^*.
+}
+\]
+
+If
+
+\[
+L_{\text{node}}
+\geq
+U,
+\]
+
+where \(U\) is the incumbent value, that node cannot improve the incumbent.
+
+It may therefore be pruned.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pruning by Infeasibility}
+\label{subsec:pruning-infeasibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a node's LP relaxation is infeasible, then the corresponding integer
+subproblem is also infeasible.
+
+Therefore the node can be removed immediately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pruning by Integrality}
+\label{subsec:pruning-integrality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the LP relaxation solution at a node satisfies all required integrality
+conditions, then it is feasible for the integer problem.
+
+The incumbent can be updated if the objective is better.
+
+No further branching is needed at that node.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pruning by Bound}
+\label{subsec:pruning-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For minimization, suppose the best known integer objective is \(U\).
+
+If a node relaxation gives
+
+\[
+\boxed{
+L_{\text{node}}\geq U,
+}
+\]
+
+then every integer solution in that node has objective at least \(U\).
+
+The node cannot improve the incumbent and is pruned.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Branching}
+\label{subsec:worked-branching}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Creating Two Child Nodes}
+
+Suppose an LP relaxation of an integer minimization problem gives
+
+\[
+x_1=2.4.
+\]
+
+Because
+
+\[
+x_1\in\mathbb{Z},
+\]
+
+branch on \(x_1\).
+
+The first child adds
+
+\[
+x_1\leq2.
+\]
+
+The second child adds
+
+\[
+x_1\geq3.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+\text{Child 1: }x_1\leq2,
+}
+\]
+
+\[
+\boxed{
+\text{Child 2: }x_1\geq3.
+}
+\]
+\end{answerbox}
+
+Every integer feasible point belongs to one of these two branches.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Global Bounds}
+\label{subsec:integer-global-bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For minimization, suppose:
+
+\[
+U
+=
+\text{best incumbent objective},
+\]
+
+and
+
+\[
+L
+=
+\text{best valid lower bound from unexplored nodes}.
+\]
+
+Then
+
+\[
+\boxed{
+L
+\leq
+z_{\mathrm{IP}}^*
+\leq
+U.
+}
+\]
+
+As the search progresses, the interval narrows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Absolute Optimality Gap}
+\label{subsec:absolute-mip-gap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For minimization, an absolute gap is
+
+\[
+\boxed{
+U-L.
+}
+\]
+
+If
+
+\[
+\boxed{
+U-L=0,
+}
+\]
+
+then the incumbent is proven globally optimal.
+
+Numerical solvers generally use tolerances rather than requiring exact
+floating-point equality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relative Optimality Gap}
+\label{subsec:relative-mip-gap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common relative-gap form is
+
+\[
+\boxed{
+\frac{
+|U-L|
+}{
+\max
+\{
+1,|U|
+\}
+}.
+}
+\]
+
+Exact solver conventions vary.
+
+A solver may stop when the relative gap is below a user-specified
+tolerance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Node Selection}
+\label{subsec:branch-bound-node-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A branch-and-bound algorithm must decide which open node to explore next.
+
+Common strategies include:
+
+\[
+\boxed{
+\text{depth-first search},
+}
+\]
+
+\[
+\boxed{
+\text{breadth-oriented strategies},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{best-bound search}.
+}
+\]
+
+Different strategies trade memory use, incumbent discovery, and bound
+improvement.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branching Rules}
+\label{subsec:branching-rules}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The choice of branching variable can strongly affect search-tree size.
+
+Possible strategies include:
+
+\[
+\boxed{
+\text{most fractional branching},
+}
+\]
+
+\[
+\boxed{
+\text{strong branching},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{pseudocost branching}.
+}
+\]
+
+Modern solvers combine several sophisticated branching ideas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Branching Preview}
+\label{subsec:strong-branching-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Strong branching temporarily evaluates several possible branch choices by
+partially solving their child relaxations.
+
+The variable producing the most promising bound improvement is selected.
+
+This can reduce the search tree but increases work per branching decision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cutting Planes}
+\label{subsec:cutting-planes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A cutting plane is a valid inequality that removes fractional solutions
+without removing any feasible integer solution.
+
+Suppose the current LP relaxation contains a fractional optimum.
+
+Add an inequality
+
+\[
+\boxed{
+a^Tx\leq b
+}
+\]
+
+such that:
+
+\[
+\boxed{
+\text{every integer feasible point satisfies it},
+}
+\]
+
+but
+
+\[
+\boxed{
+\text{the current fractional point violates it}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Valid Inequalities}
+\label{subsec:valid-inequalities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An inequality is valid for an integer feasible set \(S\) if
+
+\[
+\boxed{
+a^Tx\leq b
+}
+\]
+
+for every
+
+\[
+x\in S.
+\]
+
+Adding valid inequalities does not change the integer feasible solutions.
+
+It only strengthens the continuous relaxation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Meaning of a Cut}
+\label{subsec:geometric-cutting-plane}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The LP relaxation may contain fractional vertices outside the integer
+hull.
+
+A cutting plane removes part of the relaxation while preserving
+
+\[
+\boxed{
+\operatorname{conv}
+(
+P\cap\mathbb{Z}^n
+).
+}
+\]
+
+Ideally, repeated cuts make the relaxation increasingly resemble the
+integer hull.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gomory Cuts Preview}
+\label{subsec:gomory-cuts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gomory cutting planes can be derived from fractional rows of a simplex
+tableau.
+
+The basic idea is to exploit the fact that certain variables must be
+integer.
+
+Fractional relationships imply additional valid inequalities that exclude
+the current fractional basic solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cover Inequalities}
+\label{subsec:cover-inequalities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider a binary knapsack constraint
+
+\[
+\boxed{
+\sum_{j=1}^{n}
+a_jx_j
+\leq
+b,
+}
+\]
+
+with
+
+\[
+x_j\in\{0,1\}.
+\]
+
+A set \(C\) is a cover if
+
+\[
+\boxed{
+\sum_{j\in C}
+a_j
+>
+b.
+}
+\]
+
+All items in \(C\) cannot be selected simultaneously.
+
+Therefore,
+
+\[
+\boxed{
+\sum_{j\in C}
+x_j
+\leq
+|C|-1
+}
+\]
+
+is a valid inequality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Cover Cut}
+\label{subsec:worked-cover-cut}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Binary Knapsack Cover}
+
+Consider
+
+\[
+6x_1+5x_2+4x_3\leq10,
+\]
+
+with
+
+\[
+x_j\in\{0,1\}.
+\]
+
+The set
+
+\[
+C=\{1,2\}
+\]
+
+is a cover because
+
+\[
+6+5=11>10.
+\]
+
+Therefore \(x_1\) and \(x_2\) cannot both equal \(1\).
+
+A valid cover inequality is
+
+\begin{answerbox}
+\[
+\boxed{
+x_1+x_2\leq1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branch-and-Cut}
+\label{subsec:branch-and-cut}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modern MILP solvers combine branch-and-bound with cutting planes.
+
+The resulting framework is called branch-and-cut.
+
+At nodes, the solver may:
+
+\[
+\boxed{
+\text{solve an LP relaxation},
+}
+\]
+
+\[
+\boxed{
+\text{generate cuts},
+}
+\]
+
+\[
+\boxed{
+\text{search for integer solutions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{branch if needed}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cut Separation}
+\label{subsec:cut-separation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A cut-separation problem asks:
+
+\[
+\boxed{
+\text{Does the current fractional solution violate a useful valid inequality?}
+}
+\]
+
+If so, generate one or more such inequalities.
+
+Efficient separation algorithms are important for many structured
+integer programs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal Heuristics}
+\label{subsec:integer-primal-heuristics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A primal heuristic attempts to find good integer feasible solutions
+quickly.
+
+Examples include:
+
+\[
+\boxed{
+\text{rounding heuristics},
+}
+\]
+
+\[
+\boxed{
+\text{repair heuristics},
+}
+\]
+
+\[
+\boxed{
+\text{local search},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{relaxation-guided heuristics}.
+}
+\]
+
+A heuristic solution provides an incumbent but not, by itself, a proof of
+optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Feasibility Pump Preview}
+\label{subsec:feasibility-pump-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The feasibility pump alternates between:
+
+\[
+\boxed{
+\text{solutions of an LP-type relaxation}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{nearby integer points}.
+}
+\]
+
+Its goal is to find an integer feasible point rapidly.
+
+It is a heuristic and therefore does not independently certify global
+optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Branching Preview}
+\label{subsec:local-branching-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given an incumbent binary solution \(\bar{x}\), local branching restricts
+search to solutions differing in only a limited number of binary
+components.
+
+A Hamming-distance neighborhood can be imposed using a constraint of the
+form
+
+\[
+\boxed{
+\sum_{j:\bar{x}_j=0}
+x_j
++
+\sum_{j:\bar{x}_j=1}
+(1-x_j)
+\leq
+k.
+}
+\]
+
+This defines a neighborhood around the incumbent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Presolve}
+\label{subsec:integer-presolve}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Presolve simplifies the model before and during optimization.
+
+Possible reductions include:
+
+\[
+\boxed{
+\text{fixing variables},
+}
+\]
+
+\[
+\boxed{
+\text{removing redundant constraints},
+}
+\]
+
+\[
+\boxed{
+\text{tightening bounds},
+}
+\]
+
+\[
+\boxed{
+\text{detecting implied relations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{detecting infeasibility}.
+}
+\]
+
+Presolve can dramatically reduce search-tree size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bound Tightening}
+\label{subsec:integer-bound-tightening}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+x\leq100
+\]
+
+is initially known.
+
+Other constraints may imply the stronger bound
+
+\[
+x\leq17.
+\]
+
+Replacing \(100\) by \(17\) can improve the LP relaxation and any Big-\(M\)
+constraints involving \(x\).
+
+Tight bounds are highly valuable in mixed-integer modeling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implied Bounds}
+\label{subsec:implied-bounds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An implied bound follows from other constraints.
+
+For example, if
+
+\[
+2x+3y\leq12,
+\]
+
+and
+
+\[
+y\geq0,
+\]
+
+then
+
+\[
+\boxed{
+x\leq6.
+}
+\]
+
+If \(x\) must be integer,
+
+\[
+\boxed{
+x\leq6
+}
+\]
+
+remains valid and may strengthen later formulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetry}
+\label{subsec:integer-symmetry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An integer program has symmetry when several assignments of variables
+represent mathematically equivalent solutions.
+
+Symmetry can cause branch-and-bound to explore many redundant portions of
+the search tree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetry-Breaking Constraints}
+\label{subsec:symmetry-breaking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose identical facilities have binary variables
+
+\[
+y_1,y_2,\ldots,y_m.
+\]
+
+One may impose
+
+\[
+\boxed{
+y_1\geq y_2\geq\cdots\geq y_m
+}
+\]
+
+when this ordering does not remove genuinely distinct solutions.
+
+This can eliminate equivalent permutations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Unimodularity}
+\label{subsec:integer-total-unimodularity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Recall that a matrix is totally unimodular if every square subdeterminant
+belongs to
+
+\[
+\boxed{
+\{-1,0,1\}.
+}
+\]
+
+For important linear systems, total unimodularity combined with integral
+right-hand-side data guarantees integral extreme points.
+
+Thus an integer restriction may become unnecessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Automatic Integrality}
+\label{subsec:automatic-integrality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+A
+\]
+
+is totally unimodular and
+
+\[
+b
+\]
+
+is integral.
+
+Under suitable standard-form assumptions, vertices of
+
+\[
+\boxed{
+\{
+x:
+Ax\leq b
+\}
+}
+\]
+
+are integral.
+
+This explains why many:
+
+\[
+\boxed{
+\text{network-flow},
+}
+\]
+
+\[
+\boxed{
+\text{assignment},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{transportation}
+}
+\]
+
+problems can be solved efficiently as linear programs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extended Formulations}
+\label{subsec:integer-extended-formulations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sometimes adding variables and constraints produces a higher-dimensional
+formulation with a much stronger LP relaxation.
+
+This is called an extended formulation.
+
+Although it contains more variables, it may greatly reduce
+branch-and-bound effort.
+
+Thus:
+
+\[
+\boxed{
+\text{larger formulation}
+}
+\]
+
+can sometimes mean
+
+\[
+\boxed{
+\text{easier optimization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Formulation Strength}
+\label{subsec:integer-formulation-strength}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Two MILP formulations may represent exactly the same integer feasible
+solutions but have different LP relaxations.
+
+A stronger formulation generally excludes more fractional points.
+
+Therefore formulation comparison should examine:
+
+\[
+\boxed{
+\text{relaxation bounds},
+}
+\]
+
+not merely the number of constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrangian Relaxation}
+\label{subsec:lagrangian-relaxation-integer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose certain constraints make an integer problem difficult.
+
+For minimization,
+
+\[
+Ax=b
+\]
+
+may be moved into the objective using multipliers \(\lambda\):
+
+\[
+\boxed{
+L(x,\lambda)
+=
+c^Tx
++
+\lambda^T(Ax-b).
+}
+\]
+
+The resulting relaxed problem may decompose into easier subproblems.
+
+Optimizing over the multipliers can produce useful bounds.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lagrangian Bounds}
+\label{subsec:lagrangian-bounds-integer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a minimization problem, a properly constructed Lagrangian relaxation
+typically provides a lower bound on the original optimum.
+
+The multipliers are then adjusted to maximize this lower bound.
+
+This produces a nonsmooth dual optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decomposition Preview}
+\label{subsec:integer-decomposition-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large integer programs may contain separable structure.
+
+Decomposition techniques attempt to exploit this by dividing the problem
+into:
+
+\[
+\boxed{
+\text{master decisions}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{subproblems}.
+}
+\]
+
+Important approaches include:
+
+\[
+\boxed{
+\text{Dantzig--Wolfe decomposition},
+}
+\]
+
+\[
+\boxed{
+\text{column generation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Benders decomposition}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Benders Decomposition Preview}
+\label{subsec:benders-decomposition-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose binary design variables \(y\) interact with continuous operating
+variables \(x\).
+
+A Benders approach may separate:
+
+\[
+\boxed{
+\text{master problem in }y
+}
+\]
+
+from
+
+\[
+\boxed{
+\text{continuous subproblem in }x.
+}
+\]
+
+Information from the subproblem is returned to the master through Benders
+cuts.
+
+This structure is especially useful in facility and network design.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Column Generation Preview}
+\label{subsec:integer-column-generation-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some formulations contain an enormous number of possible variables.
+
+Column generation begins with only a small subset.
+
+A pricing subproblem searches for a new variable with attractive reduced
+cost.
+
+This idea becomes the foundation of branch-and-price when integrality is
+also required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branch-and-Price Preview}
+\label{subsec:branch-and-price-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Branch-and-price combines:
+
+\[
+\boxed{
+\text{branch-and-bound}
+}
+\]
+
+with
+
+\[
+\boxed{
+\text{column generation}.
+}
+\]
+
+It is useful when the natural LP relaxation has too many columns to list
+explicitly.
+
+Applications include:
+
+\[
+\boxed{
+\text{vehicle routing},
+}
+\]
+
+\[
+\boxed{
+\text{crew scheduling},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{cutting-stock problems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complexity of Integer Programming}
+\label{subsec:integer-programming-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+General integer programming is computationally much harder than linear
+programming.
+
+Many important integer-programming problems are NP-hard.
+
+Therefore large instances may require:
+
+\[
+\boxed{
+\text{strong formulations},
+}
+\]
+
+\[
+\boxed{
+\text{good bounds},
+}
+\]
+
+\[
+\boxed{
+\text{problem-specific cuts},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{effective heuristics}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pseudo-Polynomial Algorithms}
+\label{subsec:pseudo-polynomial-integer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some integer problems admit dynamic-programming algorithms whose running
+time depends on the numerical size of the data rather than only on the
+number of input bits.
+
+The classical knapsack problem has such algorithms.
+
+These are called pseudo-polynomial algorithms.
+
+This distinction becomes important in computational complexity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal and Dual Information}
+\label{subsec:mip-primal-dual-information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In MILP terminology:
+
+\[
+\boxed{
+\text{primal solution}
+=
+\text{integer feasible solution},
+}
+\]
+
+while a relaxation gives a bound analogous to dual information.
+
+For minimization,
+
+\[
+\boxed{
+\text{incumbent}
+=
+\text{upper bound},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{best node bound}
+=
+\text{lower bound}.
+}
+\]
+
+Optimization ends when these bounds are sufficiently close.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimality Certificate}
+\label{subsec:mip-optimality-certificate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Finding a feasible integer solution does not prove optimality.
+
+An optimality certificate requires a valid global bound.
+
+For minimization, if
+
+\[
+\boxed{
+U=L,
+}
+\]
+
+where \(U\) is the incumbent value and \(L\) is the global lower bound,
+then
+
+\[
+\boxed{
+z_{\mathrm{IP}}^*=U=L.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time Limits and MIP Gaps}
+\label{subsec:mip-time-limit-gap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large MILPs may be stopped before exact optimality is proven.
+
+Suppose a minimization solver stops with
+
+\[
+U=102,
+\]
+
+and
+
+\[
+L=100.
+\]
+
+Then the true optimum satisfies
+
+\[
+\boxed{
+100
+\leq
+z^*
+\leq
+102.
+}
+\]
+
+Even without an exact proof, the bound quantifies solution quality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Bound Interpretation}
+\label{subsec:worked-mip-bound-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Reading Solver Bounds}
+
+Suppose a minimization MILP has:
+
+\[
+\text{incumbent}=500,
+\]
+
+and
+
+\[
+\text{best bound}=490.
+\]
+
+Then
+
+\[
+490
+\leq
+z^*
+\leq
+500.
+\]
+
+The absolute gap is
+
+\[
+500-490=10.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+490
+\leq
+z^*
+\leq
+500.
+}
+\]
+\end{answerbox}
+
+The incumbent is feasible, while the lower bound certifies that no
+solution below \(490\) can exist.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modeling Workflow}
+\label{subsec:integer-programming-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical integer-programming workflow is:
+
+\begin{enumerate}
+    \item identify which decisions are inherently discrete;
+    \item define integer and binary variables clearly;
+    \item formulate the objective;
+    \item write physical and resource constraints;
+    \item encode logical relations;
+    \item derive tight variable bounds;
+    \item avoid unnecessary Big-\(M\) constants;
+    \item inspect the LP relaxation;
+    \item strengthen the formulation when possible;
+    \item exploit known structure such as networks or assignments;
+    \item solve with branch-and-bound or branch-and-cut;
+    \item inspect the incumbent and global bound;
+    \item inspect the optimality gap;
+    \item analyze sensitivity carefully;
+    \item interpret the integer solution in application terms.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing an Integer-Programming Approach}
+\label{subsec:choosing-integer-programming-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For general MILPs, use:
+
+\[
+\boxed{
+\text{branch-and-cut}.
+}
+\]
+
+For strong network structure, consider:
+
+\[
+\boxed{
+\text{specialized network algorithms}.
+}
+\]
+
+For enormous variable sets, consider:
+
+\[
+\boxed{
+\text{column generation or branch-and-price}.
+}
+\]
+
+For complicating linking constraints, consider:
+
+\[
+\boxed{
+\text{Lagrangian or Benders decomposition}.
+}
+\]
+
+For small structured problems, dynamic programming may be effective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:integer-programming-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Using Integer Variables When They Are Not Necessary}
+
+If a model's LP structure already guarantees integral extreme points,
+explicit integer restrictions can create unnecessary computational cost.
+
+Check for network or total-unimodular structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Binary Variables as Continuous Probabilities}
+
+A binary decision variable represents
+
+\[
+\boxed{
+0
+\text{ or }
+1,
+}
+\]
+
+not an arbitrary fraction between them.
+
+Fractional values arise only in relaxations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Rounding Without Checking Feasibility}
+
+An LP solution cannot generally be rounded componentwise.
+
+The rounded point may violate constraints or destroy solution quality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Invalid Big-\(M\)}
+
+If \(M\) is too small, valid feasible solutions may be incorrectly
+removed.
+
+The formulation is then mathematically wrong.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Excessively Large Big-\(M\)}
+
+If \(M\) is far larger than necessary, the LP relaxation becomes weak and
+numerical conditioning can deteriorate.
+
+Use tight valid bounds.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forgetting to Link Binary and Continuous Variables}
+
+A fixed-charge variable \(y\) has no effect unless constraints such as
+
+\[
+\boxed{
+x\leq Uy
+}
+\]
+
+connect it to the activity quantity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Feasible Integer Solutions with Optimal Solutions}
+
+A heuristic may find a good feasible solution quickly.
+
+Without a matching global bound, it does not prove optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing LP Bounds in Minimization and Maximization}
+
+For minimization,
+
+\[
+\boxed{
+z_{\mathrm{LP}}^*
+\leq
+z_{\mathrm{IP}}^*.
+}
+\]
+
+For maximization,
+
+\[
+\boxed{
+z_{\mathrm{IP}}^*
+\leq
+z_{\mathrm{LP}}^*.
+}
+\]
+
+The direction of the bound reverses.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Branching Without Covering All Integer Possibilities}
+
+If
+
+\[
+x_j^*=3.7,
+\]
+
+the correct branches are
+
+\[
+x_j\leq3
+\]
+
+and
+
+\[
+x_j\geq4.
+\]
+
+Together they include every integer possibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Pruning a Node Without a Valid Bound}
+
+A node may only be discarded by a logically valid reason such as:
+
+\[
+\boxed{
+\text{infeasibility},
+}
+\]
+
+\[
+\boxed{
+\text{integrality},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a bound proving it cannot improve the incumbent}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Constraints Always Make a Model Worse}
+
+Useful valid inequalities can make the model easier by strengthening the
+LP relaxation.
+
+Constraint count alone is not a measure of formulation quality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Symmetry}
+
+Equivalent binary configurations can create enormous redundant search
+trees.
+
+Symmetry-breaking constraints may dramatically improve performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Solver Gap as Constraint Violation}
+
+The MIP optimality gap compares the incumbent objective with a global
+bound.
+
+It is not the same thing as primal constraint violation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting a Time-Limited Incumbent as Proven Optimal}
+
+A time-limited solver may return an excellent feasible solution without
+closing the global bound.
+
+Always inspect the reported gap and termination status.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:integer-programming-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Facility Location.}
+Binary variables determine which warehouses, plants, hospitals, or
+service centers should be opened.
+
+\medskip
+
+\textbf{Scheduling.}
+Integer decisions assign jobs to machines, workers to shifts, and tasks
+to time periods.
+
+\medskip
+
+\textbf{Transportation and Logistics.}
+Mixed-integer models determine routes, fleets, shipment choices, and
+distribution-network designs.
+
+\medskip
+
+\textbf{Production Planning.}
+Setup decisions, minimum batch sizes, capacity expansion, and product
+selection naturally require binary or integer variables.
+
+\medskip
+
+\textbf{Finance.}
+Portfolio models may include minimum transaction sizes, cardinality
+limits, or discrete asset-selection decisions.
+
+\medskip
+
+\textbf{Energy Systems.}
+Unit commitment determines which generators are switched on or off over
+time.
+
+\medskip
+
+\textbf{Telecommunications.}
+Network design chooses discrete links, capacities, and equipment
+placements.
+
+\medskip
+
+\textbf{Public Planning.}
+Emergency facilities, staffing levels, school locations, and resource
+deployment can be modeled using MILPs.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:integer-programming-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define an integer program.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a binary variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a mixed-integer linear program.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an LP relaxation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the integer hull.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an incumbent.
+\end{exercise}
+
+\begin{exercise}[1]
+Define branch-and-bound.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a valid inequality.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a cutting plane.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the integrality gap conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a binary constraint requiring exactly one of
+
+\[
+x_1,x_2,x_3
+\]
+
+to equal \(1\).
+\end{exercise}
+
+\begin{exercise}[2]
+Write a constraint requiring at most two of five binary variables to equal
+\(1\).
+\end{exercise}
+
+\begin{exercise}[2]
+Model
+
+\[
+x=1
+\Rightarrow
+y=1
+\]
+
+using binary variables.
+\end{exercise}
+
+\begin{exercise}[2]
+Model mutual exclusion between binary variables \(x\) and \(y\).
+\end{exercise}
+
+\begin{exercise}[2]
+Formulate a fixed-charge relation between continuous variable \(q\) and
+binary variable \(y\) when
+
+\[
+0\leq q\leq100
+\]
+
+whenever the activity is enabled.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the LP relaxation of
+
+\[
+\begin{aligned}
+\max\quad&
+5x_1+4x_2
+\\
+\text{subject to}\quad&
+3x_1+2x_2\leq9,
+\\
+&
+x_1,x_2\in\mathbb{Z}_{\geq0}.
+\end{aligned}
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why the LP relaxation gives an upper bound for the previous
+maximization problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose an LP relaxation gives
+
+\[
+x_1=4.3.
+\]
+
+Write the two standard branch constraints.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain three reasons a branch-and-bound node may be pruned.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a binary knapsack model with four items.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a small binary knapsack problem by complete enumeration.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the integer optimum with the LP-relaxation optimum for the
+previous problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an assignment model for three workers and three jobs.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a facility-location problem with two possible facilities and
+three customers.
+\end{exercise}
+
+\begin{exercise}[3]
+Add capacity constraints to the previous model.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a setup-cost production model.
+\end{exercise}
+
+\begin{exercise}[3]
+Model the implication
+
+\[
+y=1
+\Rightarrow
+2x_1+3x_2\leq10
+\]
+
+using Big-\(M\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how a valid upper bound on \(x_1,x_2\) can be used to derive a
+tight \(M\).
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate two nonoverlapping jobs using one binary sequencing variable.
+\end{exercise}
+
+\begin{exercise}[3]
+For a minimization problem with incumbent value \(80\) and node lower
+bound \(85\), determine whether the node can be pruned.
+\end{exercise}
+
+\begin{exercise}[3]
+For a minimization problem with incumbent \(120\) and global lower bound
+\(114\), compute the absolute gap.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a fractional LP solution can still provide valuable
+information.
+\end{exercise}
+
+\begin{exercise}[3]
+Find a cover inequality for
+
+\[
+7x_1+6x_2+4x_3\leq10,
+\]
+
+with binary variables.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how a cutting plane can improve branch-and-bound.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between a primal heuristic and a cutting plane.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of symmetry in a binary model.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a symmetry-breaking constraint for three interchangeable
+facilities.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how bound tightening improves a Big-\(M\) formulation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why the assignment problem can often be solved using its LP
+relaxation.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret a solver report with incumbent \(250\) and best lower bound
+\(247\) for a minimization problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why stopping with a small MIP gap may be acceptable in a large
+practical model.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the integer hull of a two-dimensional integer program.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Gomory fractional cuts from a simplex tableau.
+\end{exercise}
+
+\begin{exercise}[4]
+Study mixed-integer rounding cuts.
+\end{exercise}
+
+\begin{exercise}[4]
+Study lifted cover inequalities.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate branch-and-cut algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Compare branching-variable selection strategies.
+\end{exercise}
+
+\begin{exercise}[4]
+Study strong branching and pseudocost branching.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate node-selection strategies in branch-and-bound.
+\end{exercise}
+
+\begin{exercise}[4]
+Study total unimodularity and integral polyhedra.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove integrality of the assignment polytope.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Lagrangian relaxation for integer programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive a Lagrangian dual bound for a knapsack-type model.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Benders decomposition for facility-location models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Dantzig--Wolfe decomposition.
+\end{exercise}
+
+\begin{exercise}[4]
+Study column generation for cutting-stock problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate branch-and-price.
+\end{exercise}
+
+\begin{exercise}[4]
+Study symmetry detection and orbital branching.
+\end{exercise}
+
+\begin{exercise}[4]
+Compare weak and strong MILP formulations for the same logical model.
+\end{exercise}
+
+\begin{exercise}[4]
+Study extended formulations and polyhedral complexity.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate computational complexity of general integer programming.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:integer-programming-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An integer program imposes restrictions such as
+
+\[
+\boxed{
+x_j\in\mathbb{Z},
+}
+\]
+
+or
+
+\[
+\boxed{
+x_j\in\{0,1\}.
+}
+\]
+
+A mixed-integer linear program combines integer and continuous variables:
+
+\[
+\boxed{
+\begin{aligned}
+\min
+\quad&
+c^Tx+d^Ty
+\\
+\text{subject to}
+\quad&
+Ax+By\leq b,
+\\
+&
+x\in\mathbb{Z}^p,
+\\
+&
+y\in\mathbb{R}^q.
+\end{aligned}
+}
+\]
+
+Removing integrality gives the LP relaxation.
+
+For minimization,
+
+\[
+\boxed{
+z_{\mathrm{LP}}^*
+\leq
+z_{\mathrm{IP}}^*.
+}
+\]
+
+For maximization,
+
+\[
+\boxed{
+z_{\mathrm{IP}}^*
+\leq
+z_{\mathrm{LP}}^*.
+}
+\]
+
+Branch-and-bound repeatedly:
+
+\[
+\boxed{
+\text{relaxes},
+}
+\]
+
+\[
+\boxed{
+\text{branches},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{prunes}.
+}
+\]
+
+Cutting planes strengthen relaxations by removing fractional points while
+preserving all integer feasible points.
+
+Modern MILP methods combine these ideas through
+
+\[
+\boxed{
+\text{branch-and-cut}.
+}
+\]
+
+Binary variables allow optimization models to represent:
+
+\[
+\boxed{
+\text{selection}
++
+\text{logic}
++
+\text{activation}
++
+\text{sequencing}.
+}
+\]
+
+Integer programming therefore combines
+
+\[
+\boxed{
+\text{linear programming}
++
+\text{discrete mathematics}
++
+\text{polyhedral geometry}
++
+\text{algorithms}
++
+\text{decision modeling}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:integer-programming-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Integer Programming extends the continuous optimization framework of
+Sections~\ref{sec:linear-programming} and
+\ref{sec:convex-optimization} by imposing discrete decisions. LP
+relaxations, integer hulls, branch-and-bound, cutting planes, and
+branch-and-cut show how continuous optimization can be used to solve
+discrete problems. Binary variables also provide a mathematical language
+for logical and structural decisions. The next section, Combinatorial
+Optimization, develops optimization directly over discrete structures
+such as subsets, permutations, matchings, paths, trees, and graphs, and
+connects these models with graph theory, complexity, approximation, and
+specialized algorithms.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.5 Integer Programming
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard integer and mixed-integer programming theory.
+%   - Standard branch-and-bound and cutting-plane methods.
+%   - Standard operations-research integer modeling.
+%
+% Used for:
+%   - pure integer programs;
+%   - binary integer programs;
+%   - mixed-integer linear programming;
+%   - integer lattices;
+%   - LP relaxations;
+%   - relaxation bounds;
+%   - integrality gaps;
+%   - integer hulls;
+%   - ideal and strong formulations;
+%   - rounding limitations;
+%   - binary selection and cardinality models;
+%   - logical implications;
+%   - mutual exclusion;
+%   - either-or conditions;
+%   - Big-M formulations;
+%   - indicator constraints;
+%   - fixed-charge models;
+%   - knapsack models;
+%   - assignment models;
+%   - facility-location models;
+%   - scheduling and sequencing formulations;
+%   - branch-and-bound;
+%   - branching rules;
+%   - incumbents and node bounds;
+%   - pruning;
+%   - global and relative optimality gaps;
+%   - cutting planes;
+%   - valid inequalities;
+%   - Gomory cuts preview;
+%   - cover inequalities;
+%   - branch-and-cut;
+%   - cut separation;
+%   - primal heuristics;
+%   - feasibility pump and local branching previews;
+%   - presolve;
+%   - bound tightening;
+%   - symmetry and symmetry breaking;
+%   - total unimodularity;
+%   - automatic integrality;
+%   - extended formulations;
+%   - Lagrangian relaxation;
+%   - decomposition;
+%   - Benders decomposition preview;
+%   - column generation and branch-and-price previews;
+%   - complexity;
+%   - primal and dual bounds;
+%   - solver-gap interpretation;
+%   - applications and exercises.
+%
+% Notes:
+%   - Combinatorial Optimization is developed next in Section 10.6.
+%   - Dynamic Programming is developed in Section 10.7.
+%   - Network Optimization is developed in Section 10.10.
+%   - Scheduling Theory is developed in Section 10.12.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

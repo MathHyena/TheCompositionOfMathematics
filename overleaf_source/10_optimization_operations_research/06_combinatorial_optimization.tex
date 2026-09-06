@@ -1,0 +1,3850 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.6 COMBINATORIAL OPTIMIZATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Combinatorial Optimization}
+\label{sec:combinatorial-optimization}
+
+\prerequisite{
+Discrete mathematics, graph theory, combinatorics, linear programming,
+integer programming, sets, permutations, algorithms, asymptotic
+complexity, and basic probability.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a combinatorial optimization problem;
+    \item recognize optimization over subsets, permutations, paths,
+          trees, matchings, and discrete structures;
+    \item distinguish explicit and implicit feasible sets;
+    \item understand why enumeration becomes computationally impossible;
+    \item formulate discrete problems using binary variables;
+    \item recognize graph-based optimization models;
+    \item understand shortest-path optimization;
+    \item understand spanning-tree optimization;
+    \item understand matching and assignment problems;
+    \item formulate the traveling salesperson problem;
+    \item understand subtour-elimination constraints;
+    \item formulate set-covering and set-packing problems;
+    \item understand independent-set, clique, and vertex-cover models;
+    \item recognize coloring as a combinatorial optimization problem;
+    \item understand knapsack as a combinatorial problem;
+    \item recognize matroid optimization;
+    \item understand the greedy algorithm for weighted matroid bases;
+    \item distinguish exact algorithms from heuristics;
+    \item understand dynamic-programming approaches conceptually;
+    \item understand branch-and-bound approaches;
+    \item understand cutting-plane and branch-and-cut approaches;
+    \item use relaxations to obtain bounds;
+    \item recognize polyhedral formulations;
+    \item understand integrality and total unimodularity conceptually;
+    \item distinguish polynomial-time and NP-hard optimization problems;
+    \item understand decision versus optimization formulations;
+    \item recognize reductions between combinatorial problems;
+    \item define approximation algorithms;
+    \item understand approximation ratios;
+    \item recognize greedy approximation for set cover;
+    \item understand metric TSP approximation conceptually;
+    \item understand local-search methods;
+    \item recognize randomized algorithms conceptually;
+    \item understand submodular optimization;
+    \item recognize submodular maximization under constraints;
+    \item understand decomposition and problem structure;
+    \item connect combinatorial optimization with networks, scheduling,
+          logistics, computer science, and operations research.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Combinatorial Optimization?}
+\label{subsec:what-is-combinatorial-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Combinatorial optimization studies optimization problems whose feasible
+solutions are discrete objects.
+
+A general problem can be written
+
+\[
+\boxed{
+\min_{x\in\mathcal{F}}
+c(x),
+}
+\]
+
+where
+
+\[
+\mathcal{F}
+\]
+
+is a finite or discrete family of feasible structures.
+
+Examples include:
+
+\[
+\boxed{
+\text{subsets},
+}
+\]
+
+\[
+\boxed{
+\text{permutations},
+}
+\]
+
+\[
+\boxed{
+\text{paths},
+}
+\]
+
+\[
+\boxed{
+\text{trees},
+}
+\]
+
+\[
+\boxed{
+\text{matchings},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{partitions}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Feasible Structures}
+\label{subsec:discrete-feasible-structures}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Unlike continuous optimization, a combinatorial problem often chooses
+among distinct structures.
+
+For example, if \(n\) items may each be selected or not selected, then
+there are
+
+\[
+\boxed{
+2^n
+}
+\]
+
+possible subsets.
+
+If \(n\) objects may be arranged in any order, there are
+
+\[
+\boxed{
+n!
+}
+\]
+
+possible permutations.
+
+These quantities grow extremely rapidly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Combinatorial Explosion}
+\label{subsec:combinatorial-explosion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose there are \(50\) binary choices.
+
+Then the number of possible subsets is
+
+\[
+\boxed{
+2^{50}.
+}
+\]
+
+This is more than
+
+\[
+10^{15}.
+\]
+
+Thus complete enumeration can be computationally impossible even for
+moderate problem sizes.
+
+Combinatorial optimization seeks mathematical structure that avoids
+testing every possible solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Explicit and Implicit Feasible Sets}
+\label{subsec:explicit-implicit-feasible-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A feasible set may be listed explicitly:
+
+\[
+\mathcal{F}
+=
+\{
+x^{(1)},\ldots,x^{(N)}
+\}.
+\]
+
+More commonly, the feasible set is described implicitly through rules or
+constraints.
+
+For example,
+
+\[
+\boxed{
+\mathcal{F}
+=
+\{
+S\subseteq V:
+|S|=k
+\}
+}
+\]
+
+contains all \(k\)-element subsets of \(V\).
+
+The number of feasible objects may be enormous even when the mathematical
+description is short.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Vector Representation}
+\label{subsec:binary-vector-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A subset
+
+\[
+S\subseteq\{1,\ldots,n\}
+\]
+
+can be represented by its incidence vector
+
+\[
+\boxed{
+x_i
+=
+\begin{cases}
+1,
+&
+i\in S,
+\\
+0,
+&
+i\notin S.
+\end{cases}
+}
+\]
+
+Thus combinatorial problems can often be written as integer programs.
+
+For example,
+
+\[
+|S|\leq k
+\]
+
+becomes
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+x_i
+\leq
+k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Combinatorial Optimization on Graphs}
+\label{subsec:combinatorial-graph-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many combinatorial optimization problems are naturally defined on a graph
+
+\[
+\boxed{
+G=(V,E),
+}
+\]
+
+where:
+
+\[
+V
+=
+\text{vertex set},
+\]
+
+and
+
+\[
+E
+=
+\text{edge set}.
+\]
+
+Possible optimization objects include:
+
+\[
+\boxed{
+\text{paths},
+}
+\]
+
+\[
+\boxed{
+\text{cycles},
+}
+\]
+
+\[
+\boxed{
+\text{trees},
+}
+\]
+
+\[
+\boxed{
+\text{matchings},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{cuts}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Graphs}
+\label{subsec:weighted-graphs-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assign a cost
+
+\[
+c_e
+\]
+
+to each edge
+
+\[
+e\in E.
+\]
+
+For a selected edge set
+
+\[
+F\subseteq E,
+\]
+
+its total cost is
+
+\[
+\boxed{
+c(F)
+=
+\sum_{e\in F}
+c_e.
+}
+\]
+
+Many graph optimization problems minimize or maximize such sums subject to
+structural restrictions on \(F\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest-Path Problem}
+\label{subsec:combinatorial-shortest-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given a weighted graph and vertices \(s\) and \(t\), the shortest-path
+problem asks for an \(s\)-to-\(t\) path of minimum total edge cost.
+
+If
+
+\[
+P
+\]
+
+is a path, then its cost is
+
+\[
+\boxed{
+c(P)
+=
+\sum_{e\in P}
+c_e.
+}
+\]
+
+The optimization problem is
+
+\[
+\boxed{
+\min_{P\in\mathcal{P}_{st}}
+\sum_{e\in P}
+c_e.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shortest-Path Algorithms}
+\label{subsec:shortest-path-algorithms-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Important exact algorithms include:
+
+\[
+\boxed{
+\text{Dijkstra's algorithm}
+}
+\]
+
+for nonnegative edge weights,
+
+and
+
+\[
+\boxed{
+\text{Bellman--Ford}
+}
+\]
+
+when negative edge weights may occur but reachable negative cycles must be
+handled appropriately.
+
+Shortest-path problems are examples of combinatorial problems that can be
+solved efficiently in polynomial time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Shortest Path}
+\label{subsec:worked-shortest-path-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Comparing Candidate Paths}
+
+Suppose three routes from \(A\) to \(D\) have costs
+
+\[
+A\to B\to D:
+\qquad
+3+4=7,
+\]
+
+\[
+A\to C\to D:
+\qquad
+2+8=10,
+\]
+
+and
+
+\[
+A\to B\to C\to D:
+\qquad
+3+1+2=6.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+A\to B\to C\to D
+}
+\]
+
+is the shortest among these routes, with cost
+
+\[
+\boxed{
+6.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum Spanning Tree}
+\label{subsec:minimum-spanning-tree}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A spanning tree of a connected graph includes every vertex and contains
+no cycles.
+
+A minimum spanning tree, abbreviated MST, solves
+
+\[
+\boxed{
+\min_{T}
+\sum_{e\in T}
+c_e
+}
+\]
+
+over all spanning trees \(T\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Properties of Trees}
+\label{subsec:tree-properties-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A tree on \(n\) vertices has exactly
+
+\[
+\boxed{
+n-1
+}
+\]
+
+edges.
+
+A connected graph with \(n-1\) edges is a tree if and only if it has no
+cycles.
+
+These structural properties are fundamental to spanning-tree algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kruskal's Algorithm}
+\label{subsec:kruskals-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Kruskal's algorithm:
+
+\begin{enumerate}
+    \item sorts edges by nondecreasing weight;
+    \item scans the edges in that order;
+    \item adds an edge if doing so does not create a cycle;
+    \item stops after \(n-1\) edges have been selected.
+\end{enumerate}
+
+The result is a minimum spanning tree.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Prim's Algorithm}
+\label{subsec:prims-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Prim's algorithm grows one connected tree.
+
+Starting from a vertex, repeatedly choose a minimum-cost edge connecting
+the current tree to a new vertex.
+
+The algorithm continues until every vertex is included.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cut Property for MSTs}
+\label{subsec:mst-cut-property}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a cut partitions the vertices into two sets.
+
+A minimum-weight edge crossing the cut is safe for some minimum spanning
+tree under the standard cut-property conditions.
+
+This property provides the theoretical basis for greedy MST algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greedy Algorithms}
+\label{subsec:greedy-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A greedy algorithm repeatedly makes a locally attractive choice and never
+reverses it.
+
+A generic structure is:
+
+\begin{enumerate}
+    \item identify the locally best available choice;
+    \item accept it if feasibility is preserved;
+    \item repeat until a complete solution is formed.
+\end{enumerate}
+
+Greedy methods can be optimal for some combinatorial structures and fail
+badly for others.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Greedy Methods Need Proof}
+\label{subsec:why-greedy-needs-proof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A locally best choice need not lead to a globally optimal solution.
+
+Therefore a greedy algorithm requires a structural argument such as:
+
+\[
+\boxed{
+\text{exchange property},
+}
+\]
+
+\[
+\boxed{
+\text{cut property},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{matroid structure}.
+}
+\]
+
+Without such structure, greedy behavior is only heuristic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matching}
+\label{subsec:matching-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matching is a set of edges such that no two selected edges share a
+vertex.
+
+A maximum-cardinality matching solves
+
+\[
+\boxed{
+\max
+|M|
+}
+\]
+
+over all matchings \(M\).
+
+A weighted matching solves
+
+\[
+\boxed{
+\max_{M}
+\sum_{e\in M}
+w_e.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bipartite Matching}
+\label{subsec:bipartite-matching}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A graph is bipartite if
+
+\[
+V
+=
+U\cup W,
+\]
+
+where every edge joins a vertex in \(U\) to one in \(W\).
+
+Bipartite matching models:
+
+\[
+\boxed{
+\text{workers to jobs},
+}
+\]
+
+\[
+\boxed{
+\text{students to projects},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{resources to tasks}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Assignment as Matching}
+\label{subsec:assignment-as-matching}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The assignment problem is a weighted perfect matching problem in a
+bipartite graph.
+
+Let
+
+\[
+x_{ij}\in\{0,1\}
+\]
+
+indicate whether agent \(i\) receives task \(j\).
+
+Then
+
+\[
+\boxed{
+\sum_jx_{ij}=1
+}
+\]
+
+for each agent,
+
+and
+
+\[
+\boxed{
+\sum_ix_{ij}=1
+}
+\]
+
+for each task.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hungarian Algorithm Preview}
+\label{subsec:hungarian-algorithm-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The assignment problem has specialized polynomial-time algorithms.
+
+One classical approach is the Hungarian algorithm.
+
+Its existence illustrates an important theme:
+
+\[
+\boxed{
+\text{special combinatorial structure}
+\rightarrow
+\text{special efficient algorithm}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hall's Marriage Theorem Connection}
+\label{subsec:hall-matching-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a bipartite graph with parts \(U\) and \(W\), Hall's theorem gives a
+criterion for a matching that covers every vertex of \(U\).
+
+For every subset
+
+\[
+S\subseteq U,
+\]
+
+the neighborhood must satisfy
+
+\[
+\boxed{
+|N(S)|
+\geq
+|S|.
+}
+\]
+
+This is a structural existence theorem rather than an optimization
+algorithm, but it is closely connected with matching theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Traveling Salesperson Problem}
+\label{subsec:traveling-salesperson-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The traveling salesperson problem, abbreviated TSP, asks for a
+minimum-cost tour that visits every vertex exactly once and returns to the
+starting point.
+
+If edge \((i,j)\) has cost \(c_{ij}\), define
+
+\[
+x_{ij}
+=
+\begin{cases}
+1,
+&
+\text{edge }(i,j)\text{ is used},
+\\
+0,
+&
+\text{otherwise}.
+\end{cases}
+\]
+
+The objective is
+
+\[
+\boxed{
+\min
+\sum_{i}
+\sum_{j}
+c_{ij}x_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Degree Constraints for TSP}
+\label{subsec:tsp-degree-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a directed formulation, each vertex must have one outgoing and one
+incoming selected arc:
+
+\[
+\boxed{
+\sum_{j\neq i}
+x_{ij}
+=
+1,
+}
+\]
+
+and
+
+\[
+\boxed{
+\sum_{j\neq i}
+x_{ji}
+=
+1.
+}
+\]
+
+These conditions alone do not guarantee a single tour.
+
+They can produce several disconnected cycles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subtours}
+\label{subsec:tsp-subtours}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A subtour is a cycle containing only a proper subset of the vertices.
+
+For example, the selected arcs might create:
+
+\[
+\boxed{
+1\to2\to1
+}
+\]
+
+and separately
+
+\[
+\boxed{
+3\to4\to5\to3.
+}
+\]
+
+Every vertex has the correct degree, but there is no single Hamiltonian
+tour.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subtour-Elimination Constraints}
+\label{subsec:subtour-elimination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a directed TSP, one family of subtour-elimination constraints is
+
+\[
+\boxed{
+\sum_{i\in S}
+\sum_{j\in S}
+x_{ij}
+\leq
+|S|-1
+}
+\]
+
+for every nonempty proper subset
+
+\[
+S\subsetneq V
+\]
+
+with at least two vertices.
+
+These inequalities prevent a closed tour contained entirely inside
+\(S\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential Number of TSP Constraints}
+\label{subsec:tsp-exponential-constraints}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+There are exponentially many possible subsets \(S\).
+
+Therefore listing every subtour-elimination inequality in advance can be
+impractical.
+
+Instead, modern approaches often:
+
+\[
+\boxed{
+\text{solve a relaxation},
+}
+\]
+
+\[
+\boxed{
+\text{detect violated subtours},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{add cuts as needed}.
+}
+\]
+
+This is a cutting-plane strategy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Detecting a Subtour}
+\label{subsec:worked-detecting-subtour}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Disconnected TSP Solution}
+
+Suppose a candidate solution contains the cycle
+
+\[
+1\to2\to3\to1.
+\]
+
+Let
+
+\[
+S=\{1,2,3\}.
+\]
+
+The three selected arcs lie entirely inside \(S\), so
+
+\[
+\sum_{i\in S}
+\sum_{j\in S}
+x_{ij}
+=
+3.
+\]
+
+But the subtour inequality requires
+
+\[
+\sum_{i\in S}
+\sum_{j\in S}
+x_{ij}
+\leq
+|S|-1
+=
+2.
+\]
+
+Thus the candidate violates the cut.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{The cycle on }\{1,2,3\}\text{ is eliminated.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hamiltonian Problems}
+\label{subsec:hamiltonian-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Hamiltonian cycle visits every vertex exactly once before returning to
+the start.
+
+Finding whether one exists is already computationally difficult in
+general.
+
+The TSP adds costs and asks for the best such cycle.
+
+Thus optimization can be harder than merely checking feasibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Set Cover}
+\label{subsec:set-cover}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let the universe be
+
+\[
+U
+=
+\{1,\ldots,m\}.
+\]
+
+Suppose subsets
+
+\[
+S_1,\ldots,S_n
+\subseteq U
+\]
+
+are available.
+
+The set-cover problem chooses subsets whose union covers \(U\).
+
+Let
+
+\[
+x_j\in\{0,1\}
+\]
+
+indicate whether \(S_j\) is chosen.
+
+Then
+
+\[
+\boxed{
+\min
+\sum_{j=1}^{n}
+c_jx_j
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\sum_{j:i\in S_j}
+x_j
+\geq
+1
+}
+\]
+
+for each element
+
+\[
+i\in U.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Set Packing}
+\label{subsec:set-packing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Set packing chooses a collection of mutually compatible subsets.
+
+A common binary formulation is
+
+\[
+\boxed{
+\max
+\sum_j
+w_jx_j
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\sum_{j:i\in S_j}
+x_j
+\leq
+1
+}
+\]
+
+for each underlying element \(i\).
+
+Thus no element may appear in more than one selected set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Set Partitioning}
+\label{subsec:set-partitioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Set partitioning requires each element to be covered exactly once:
+
+\[
+\boxed{
+\sum_{j:i\in S_j}
+x_j
+=
+1.
+}
+\]
+
+This structure appears in:
+
+\[
+\boxed{
+\text{crew scheduling},
+}
+\]
+
+\[
+\boxed{
+\text{vehicle routing},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{partitioning problems}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vertex Cover}
+\label{subsec:vertex-cover}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A vertex cover is a set of vertices touching every edge.
+
+Let
+
+\[
+x_v\in\{0,1\}
+\]
+
+indicate whether vertex \(v\) is chosen.
+
+A minimum weighted vertex-cover model is
+
+\[
+\boxed{
+\min
+\sum_{v\in V}
+w_vx_v
+}
+\]
+
+subject to
+
+\[
+\boxed{
+x_u+x_v\geq1
+}
+\]
+
+for every edge
+
+\[
+(u,v)\in E.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent Set}
+\label{subsec:independent-set-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An independent set contains no adjacent vertices.
+
+Let
+
+\[
+x_v\in\{0,1\}.
+\]
+
+Then
+
+\[
+\boxed{
+x_u+x_v\leq1
+}
+\]
+
+for every edge
+
+\[
+(u,v)\in E.
+\]
+
+The maximum weighted independent-set problem is
+
+\[
+\boxed{
+\max
+\sum_{v\in V}
+w_vx_v.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vertex Cover and Independent Set}
+\label{subsec:vertex-cover-independent-set}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an unweighted graph,
+
+\[
+C
+\subseteq V
+\]
+
+is a vertex cover if and only if
+
+\[
+V\setminus C
+\]
+
+is an independent set.
+
+Therefore,
+
+\[
+\boxed{
+\tau(G)+\alpha(G)=|V|,
+}
+\]
+
+where
+
+\[
+\tau(G)
+=
+\text{minimum vertex-cover size},
+\]
+
+and
+
+\[
+\alpha(G)
+=
+\text{maximum independent-set size}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Clique}
+\label{subsec:clique-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A clique is a set of pairwise adjacent vertices.
+
+A clique in graph \(G\) is an independent set in the complement graph
+
+\[
+\overline{G}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\omega(G)
+=
+\alpha(\overline{G}),
+}
+\]
+
+where \(\omega(G)\) is the maximum clique size.
+
+This gives a direct relationship among several difficult graph
+optimization problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graph Coloring}
+\label{subsec:graph-coloring-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Graph coloring assigns colors to vertices so adjacent vertices receive
+different colors.
+
+The optimization problem seeks the minimum number of colors:
+
+\[
+\boxed{
+\chi(G)
+=
+\text{chromatic number of }G.
+}
+\]
+
+Coloring models:
+
+\[
+\boxed{
+\text{scheduling conflicts},
+}
+\]
+
+\[
+\boxed{
+\text{frequency assignment},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{resource incompatibilities}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Binary Coloring Formulation}
+\label{subsec:binary-coloring-formulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+x_{vc}
+=
+1
+\]
+
+if vertex \(v\) receives color \(c\).
+
+Then every vertex receives exactly one color:
+
+\[
+\boxed{
+\sum_c
+x_{vc}
+=
+1.
+}
+\]
+
+For every edge \((u,v)\),
+
+\[
+\boxed{
+x_{uc}+x_{vc}
+\leq1
+}
+\]
+
+for each color \(c\).
+
+Additional variables can indicate whether a color is used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Cut}
+\label{subsec:maximum-cut}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A cut partitions
+
+\[
+V
+=
+S\cup(V\setminus S).
+\]
+
+An edge crosses the cut when its endpoints lie on opposite sides.
+
+The maximum-cut problem seeks a partition maximizing the total weight of
+crossing edges:
+
+\[
+\boxed{
+\max
+\sum_{e\in\delta(S)}
+w_e.
+}
+\]
+
+This is a fundamental NP-hard combinatorial optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Knapsack Revisited}
+\label{subsec:knapsack-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The \(0\)-\(1\) knapsack problem is
+
+\[
+\boxed{
+\begin{aligned}
+\max
+\quad&
+\sum_j
+v_jx_j
+\\
+\text{subject to}
+\quad&
+\sum_j
+w_jx_j
+\leq
+W,
+\\
+&
+x_j\in\{0,1\}.
+\end{aligned}
+}
+\]
+
+It illustrates several major combinatorial ideas:
+
+\[
+\boxed{
+\text{binary modeling},
+}
+\]
+
+\[
+\boxed{
+\text{dynamic programming},
+}
+\]
+
+\[
+\boxed{
+\text{branch-and-bound},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{approximation algorithms}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroids}
+\label{subsec:matroids-combinatorial-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matroid is a pair
+
+\[
+\boxed{
+M=(E,\mathcal{I}),
+}
+\]
+
+where \(E\) is a finite ground set and \(\mathcal{I}\) is a family of
+independent subsets satisfying matroid axioms.
+
+Matroids abstract independence from:
+
+\[
+\boxed{
+\text{linear algebra},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{graph forests}.
+}
+\]
+
+They provide a precise setting in which greedy optimization is optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Independence Axioms}
+\label{subsec:matroid-independence-axioms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A standard independence formulation requires:
+
+\[
+\boxed{
+\varnothing\in\mathcal{I},
+}
+\]
+
+and hereditary closure:
+
+\[
+\boxed{
+A\in\mathcal{I},
+\quad
+B\subseteq A
+\Rightarrow
+B\in\mathcal{I}.
+}
+\]
+
+The exchange property states that if
+
+\[
+A,B\in\mathcal{I}
+\]
+
+and
+
+\[
+|A|<|B|,
+\]
+
+then there exists
+
+\[
+e\in B\setminus A
+\]
+
+such that
+
+\[
+\boxed{
+A\cup\{e\}\in\mathcal{I}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matroid Bases}
+\label{subsec:matroid-bases-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basis is a maximal independent set.
+
+All bases of a matroid have the same cardinality.
+
+Given weights
+
+\[
+w_e,
+\]
+
+the maximum-weight basis problem is
+
+\[
+\boxed{
+\max_{B\text{ basis}}
+\sum_{e\in B}
+w_e.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greedy Algorithm for Matroid Bases}
+\label{subsec:matroid-greedy-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To find a maximum-weight basis:
+
+\begin{enumerate}
+    \item order the elements so that
+    \[
+    w_{e_1}\geq w_{e_2}\geq\cdots\geq w_{e_m};
+    \]
+    \item begin with \(S=\varnothing\);
+    \item scan elements in that order;
+    \item add \(e_i\) whenever
+    \[
+    S\cup\{e_i\}\in\mathcal{I};
+    \]
+    \item stop when a basis is obtained.
+\end{enumerate}
+
+The matroid exchange property guarantees optimality.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Graphic Matroid}
+\label{subsec:graphic-matroid-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a graph \(G=(V,E)\), define an edge set to be independent if it
+contains no cycle.
+
+Then
+
+\[
+\boxed{
+(E,\mathcal{I})
+}
+\]
+
+forms the graphic matroid.
+
+Its bases are spanning forests, and for a connected graph, spanning
+trees.
+
+Thus Kruskal's algorithm is an instance of matroid greedy optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greedy Failure Outside Matroids}
+\label{subsec:greedy-failure-outside-matroids}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider the \(0\)-\(1\) knapsack problem.
+
+Selecting items greedily by largest value does not always work.
+
+Selecting by largest value-to-weight ratio also does not always produce
+the optimal \(0\)-\(1\) solution.
+
+Therefore:
+
+\[
+\boxed{
+\text{greedy success depends on structure}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Algorithms}
+\label{subsec:exact-combinatorial-algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An exact algorithm guarantees an optimal solution.
+
+Examples include:
+
+\[
+\boxed{
+\text{specialized polynomial algorithms},
+}
+\]
+
+\[
+\boxed{
+\text{dynamic programming},
+}
+\]
+
+\[
+\boxed{
+\text{branch-and-bound},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{branch-and-cut}.
+}
+\]
+
+The computational cost may vary from polynomial to exponential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Enumeration}
+\label{subsec:enumeration-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simplest exact method is complete enumeration:
+
+\[
+\boxed{
+\text{evaluate every feasible solution}.
+}
+\]
+
+If there are \(2^n\) subsets, this requires exponential work in the worst
+case.
+
+Enumeration is therefore useful mainly for:
+
+\[
+\boxed{
+\text{small instances},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{benchmarking other methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming Preview}
+\label{subsec:dynamic-programming-combinatorial-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dynamic programming breaks a problem into overlapping subproblems.
+
+It is effective when the problem has:
+
+\[
+\boxed{
+\text{optimal substructure},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{repeated subproblems}.
+}
+\]
+
+Instead of solving the same subproblem repeatedly, its solution is stored
+and reused.
+
+Dynamic Programming is developed in detail in
+Section~\ref{sec:dynamic-programming}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branch-and-Bound in Combinatorial Optimization}
+\label{subsec:branch-and-bound-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Branch-and-bound partitions the discrete feasible set into subproblems.
+
+For each subproblem:
+
+\begin{enumerate}
+    \item compute a relaxation bound;
+    \item compare the bound with the incumbent;
+    \item prune if improvement is impossible;
+    \item otherwise branch further.
+\end{enumerate}
+
+This framework applies far beyond generic integer programming.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relaxations}
+\label{subsec:combinatorial-relaxations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A relaxation replaces a difficult feasible set \(\mathcal{F}\) by an
+easier superset \(\mathcal{R}\):
+
+\[
+\boxed{
+\mathcal{F}
+\subseteq
+\mathcal{R}.
+}
+\]
+
+For minimization,
+
+\[
+\boxed{
+\min_{x\in\mathcal{R}}
+f(x)
+\leq
+\min_{x\in\mathcal{F}}
+f(x).
+}
+\]
+
+Thus the relaxation gives a lower bound.
+
+For maximization, it gives an upper bound.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Relaxations}
+\label{subsec:common-combinatorial-relaxations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Important relaxation types include:
+
+\[
+\boxed{
+\text{linear-programming relaxations},
+}
+\]
+
+\[
+\boxed{
+\text{Lagrangian relaxations},
+}
+\]
+
+\[
+\boxed{
+\text{semidefinite relaxations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{problem-specific combinatorial bounds}.
+}
+\]
+
+A good relaxation should be both strong and computationally manageable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polyhedral Approach}
+\label{subsec:polyhedral-combinatorial-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Represent each feasible combinatorial object by a binary incidence vector.
+
+If
+
+\[
+X
+\subseteq
+\{0,1\}^n
+\]
+
+is the set of feasible incidence vectors, study the polytope
+
+\[
+\boxed{
+P
+=
+\operatorname{conv}(X).
+}
+\]
+
+A perfect linear description of \(P\) would allow linear programming to
+solve the combinatorial problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Facet-Defining Inequalities}
+\label{subsec:facet-defining-inequalities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Strong linear inequalities defining high-dimensional faces of a
+combinatorial polytope are called facet-defining inequalities when they
+define facets.
+
+Finding such inequalities is central to polyhedral combinatorics.
+
+Strong facets can substantially improve branch-and-cut algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Separation Problem}
+\label{subsec:combinatorial-separation-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given a point \(\bar{x}\), the separation problem asks:
+
+\[
+\boxed{
+\text{Is }\bar{x}\in P?
+}
+\]
+
+If not, find a valid inequality
+
+\[
+\boxed{
+a^Tx\leq b
+}
+\]
+
+satisfied by every point in \(P\) but violated by \(\bar{x}\).
+
+Separation is the algorithmic counterpart of cutting-plane generation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimization and Separation}
+\label{subsec:optimization-separation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A deep principle in combinatorial optimization is that, under suitable
+conditions, polynomial-time linear optimization over a rational polytope
+and polynomial-time separation over that polytope are closely related.
+
+This connects geometric descriptions with algorithms.
+
+The full equivalence is developed in advanced polyhedral optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integrality}
+\label{subsec:combinatorial-integrality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polyhedron is integral if every extreme point is integral.
+
+If the feasible relaxation polyhedron is integral, then
+
+\[
+\boxed{
+\text{linear programming solves the discrete problem directly}.
+}
+\]
+
+Examples occur in:
+
+\[
+\boxed{
+\text{shortest paths},
+}
+\]
+
+\[
+\boxed{
+\text{network flows},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{bipartite matching}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Unimodularity Connection}
+\label{subsec:combinatorial-total-unimodularity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Total unimodularity provides one important sufficient condition for
+integrality.
+
+If
+
+\[
+A
+\]
+
+is totally unimodular and
+
+\[
+b
+\]
+
+is integral, then under appropriate standard formulations the polyhedron
+
+\[
+\boxed{
+\{
+x:
+Ax\leq b
+\}
+}
+\]
+
+has integral vertices.
+
+This explains why certain discrete problems have unusually tractable LP
+formulations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Complexity}
+\label{subsec:combinatorial-complexity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Combinatorial optimization problems differ dramatically in computational
+difficulty.
+
+Some admit polynomial-time algorithms.
+
+Others are NP-hard.
+
+Examples of polynomially solvable problems include:
+
+\[
+\boxed{
+\text{shortest path},
+}
+\]
+
+\[
+\boxed{
+\text{minimum spanning tree},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{bipartite matching}.
+}
+\]
+
+Examples of NP-hard problems include:
+
+\[
+\boxed{
+\text{general TSP},
+}
+\]
+
+\[
+\boxed{
+\text{maximum clique},
+}
+\]
+
+\[
+\boxed{
+\text{graph coloring},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{set cover}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decision Problems}
+\label{subsec:decision-problems-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An optimization problem can often be associated with a yes-or-no decision
+problem.
+
+For example, instead of asking for the minimum TSP tour length, ask:
+
+\[
+\boxed{
+\text{Is there a tour of cost at most }B?
+}
+\]
+
+Decision versions are central to computational-complexity theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Class P}
+\label{subsec:class-p-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The class \(P\) contains decision problems solvable in polynomial time by
+a deterministic algorithm.
+
+Informally, these are problems for which an algorithm exists whose running
+time is bounded by
+
+\[
+\boxed{
+O(n^k)
+}
+\]
+
+for some fixed constant \(k\), measured in the appropriate input size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Class NP}
+\label{subsec:class-np-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The class \(NP\) contains decision problems for which a proposed
+yes-certificate can be verified in polynomial time.
+
+For example, given a proposed TSP tour, one can check:
+
+\[
+\boxed{
+\text{whether every vertex appears exactly once},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{whether its cost is at most }B
+}
+\]
+
+in polynomial time.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{NP-Complete Problems}
+\label{subsec:np-complete-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A decision problem is NP-complete if:
+
+\begin{enumerate}
+    \item it belongs to \(NP\); and
+    \item every problem in \(NP\) can be reduced to it in polynomial time.
+\end{enumerate}
+
+NP-complete problems are among the hardest problems in \(NP\) under
+polynomial-time reductions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{NP-Hard Optimization Problems}
+\label{subsec:np-hard-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An optimization problem is NP-hard if solving it efficiently would allow
+one to solve an NP-hard or NP-complete decision problem efficiently.
+
+NP-hardness does not imply that every instance is difficult.
+
+It describes worst-case computational complexity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial-Time Reductions}
+\label{subsec:polynomial-time-reductions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial-time reduction transforms instances of problem \(A\) into
+instances of problem \(B\) so that solving \(B\) solves \(A\).
+
+Symbolically,
+
+\[
+\boxed{
+A
+\leq_P
+B.
+}
+\]
+
+If \(A\) is known to be hard and
+
+\[
+A\leq_P B,
+\]
+
+then \(B\) is at least as hard as \(A\) in the reduction sense.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Complexity Classification Matters}
+\label{subsec:why-complexity-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Complexity guides algorithm selection.
+
+If a problem is polynomially solvable, seek an exact specialized
+algorithm.
+
+If it is NP-hard, one may need:
+
+\[
+\boxed{
+\text{branch-and-bound},
+}
+\]
+
+\[
+\boxed{
+\text{approximations},
+}
+\]
+
+\[
+\boxed{
+\text{heuristics},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{problem-specific structure}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation Algorithms}
+\label{subsec:approximation-algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An approximation algorithm runs efficiently and guarantees a solution
+within a known factor of optimal.
+
+For a minimization problem, an algorithm is a \(\rho\)-approximation if
+
+\[
+\boxed{
+C_{\mathrm{alg}}
+\leq
+\rho
+C^*
+}
+\]
+
+for every instance, where
+
+\[
+\rho\geq1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation Ratio for Maximization}
+\label{subsec:maximization-approximation-ratio}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For maximization, a common guarantee is
+
+\[
+\boxed{
+C_{\mathrm{alg}}
+\geq
+\alpha
+C^*,
+}
+\]
+
+where
+
+\[
+0<\alpha\leq1.
+\]
+
+Equivalent ratio conventions are also used.
+
+The convention should always be stated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation Versus Heuristic}
+\label{subsec:approximation-versus-heuristic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A heuristic aims to find good solutions but may have no proven
+worst-case guarantee.
+
+An approximation algorithm provides a theorem such as
+
+\[
+\boxed{
+C_{\mathrm{alg}}
+\leq
+2C^*.
+}
+\]
+
+Thus:
+
+\[
+\boxed{
+\text{heuristic}
+\neq
+\text{approximation algorithm}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Greedy Set Cover}
+\label{subsec:greedy-set-cover}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For unweighted set cover, a natural greedy algorithm repeatedly chooses
+the set covering the largest number of currently uncovered elements.
+
+For weighted set cover, choose a set with favorable cost per newly covered
+element:
+
+\[
+\boxed{
+\frac{
+c_j
+}{
+\text{number of newly covered elements}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Set-Cover Approximation Guarantee}
+\label{subsec:set-cover-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The greedy set-cover algorithm has a logarithmic approximation guarantee.
+
+For a universe of size \(m\), the approximation factor can be bounded by a
+harmonic-number quantity
+
+\[
+\boxed{
+H_m
+=
+1+\frac12+\frac13+\cdots+\frac1m,
+}
+\]
+
+with
+
+\[
+\boxed{
+H_m
+\leq
+1+\ln m.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metric TSP}
+\label{subsec:metric-tsp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A TSP instance is metric if edge costs satisfy:
+
+\[
+\boxed{
+c_{ij}\geq0,
+}
+\]
+
+\[
+\boxed{
+c_{ij}=c_{ji},
+}
+\]
+
+and the triangle inequality
+
+\[
+\boxed{
+c_{ij}
+\leq
+c_{ik}+c_{kj}.
+}
+\]
+
+Metric structure permits approximation guarantees that are unavailable
+for arbitrary TSP costs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Double-Tree Approximation for Metric TSP}
+\label{subsec:double-tree-tsp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic metric-TSP approximation proceeds as follows:
+
+\begin{enumerate}
+    \item compute a minimum spanning tree;
+    \item duplicate every tree edge;
+    \item form an Eulerian tour;
+    \item shortcut repeated vertices.
+\end{enumerate}
+
+By the triangle inequality, shortcutting does not increase cost.
+
+The resulting tour has cost at most
+
+\[
+\boxed{
+2C^*.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why the Double-Tree Bound Works}
+\label{subsec:double-tree-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Removing one edge from an optimal TSP tour produces a spanning tree.
+
+Therefore,
+
+\[
+\boxed{
+C_{\mathrm{MST}}
+\leq
+C^*_{\mathrm{TSP}}.
+}
+\]
+
+Duplicating the MST gives cost
+
+\[
+2C_{\mathrm{MST}}
+\leq
+2C^*_{\mathrm{TSP}}.
+\]
+
+Metric shortcutting preserves the upper bound.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Christofides Algorithm Preview}
+\label{subsec:christofides-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For symmetric metric TSP, Christofides' algorithm combines:
+
+\[
+\boxed{
+\text{minimum spanning tree},
+}
+\]
+
+\[
+\boxed{
+\text{minimum-weight matching on odd-degree vertices},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Eulerian shortcutting}.
+}
+\]
+
+Its classical approximation factor is
+
+\[
+\boxed{
+\frac32.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vertex-Cover Approximation Preview}
+\label{subsec:vertex-cover-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple algorithm for unweighted vertex cover chooses both endpoints of
+edges in a maximal matching.
+
+If \(M\) is the matching, the resulting cover has size
+
+\[
+2|M|.
+\]
+
+Every vertex cover must contain at least one endpoint of every matching
+edge.
+
+Thus
+
+\[
+\boxed{
+|C|
+\leq
+2|C^*|.
+}
+\]
+
+This gives a \(2\)-approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local Search}
+\label{subsec:local-search-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Local search begins from a feasible discrete solution and repeatedly moves
+to a neighboring solution with improved objective value.
+
+A generic scheme is:
+
+\begin{enumerate}
+    \item construct an initial feasible solution;
+    \item define a neighborhood;
+    \item search for an improving neighbor;
+    \item move to that neighbor;
+    \item stop when no improving move is found.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neighborhood Structures}
+\label{subsec:combinatorial-neighborhoods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Examples include:
+
+\[
+\boxed{
+\text{swap one selected item},
+}
+\]
+
+\[
+\boxed{
+\text{reverse part of a route},
+}
+\]
+
+\[
+\boxed{
+\text{move one job between machines},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{exchange two assignments}.
+}
+\]
+
+Neighborhood design determines what local optima mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{2-Opt for TSP}
+\label{subsec:two-opt-tsp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A \(2\)-opt move removes two tour edges and reconnects the resulting paths
+in a different way.
+
+If the new tour is shorter, accept the move.
+
+Repeated \(2\)-opt improvement can produce good tours quickly.
+
+However, a \(2\)-opt local optimum need not be globally optimal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metaheuristics Preview}
+\label{subsec:metaheuristics-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+More advanced heuristic frameworks include:
+
+\[
+\boxed{
+\text{simulated annealing},
+}
+\]
+
+\[
+\boxed{
+\text{tabu search},
+}
+\]
+
+\[
+\boxed{
+\text{genetic algorithms},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{variable-neighborhood search}.
+}
+\]
+
+These methods can be effective in practice but generally do not provide
+global optimality certificates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomized Algorithms}
+\label{subsec:randomized-combinatorial-algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A randomized algorithm makes random choices during computation.
+
+Its performance may be analyzed through:
+
+\[
+\boxed{
+\text{expected running time},
+}
+\]
+
+\[
+\boxed{
+\text{probability of success},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{expected approximation quality}.
+}
+\]
+
+Randomization can simplify algorithms or improve practical performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomized Rounding Preview}
+\label{subsec:randomized-rounding-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an LP relaxation gives fractional values
+
+\[
+0\leq x_i^*\leq1.
+\]
+
+Randomized rounding may set
+
+\[
+X_i
+=
+1
+\]
+
+with probability
+
+\[
+\boxed{
+x_i^*.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbb{E}[X_i]
+=
+x_i^*.
+}
+\]
+
+The challenge is controlling feasibility and concentration around expected
+values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Probabilistic Method Connection}
+\label{subsec:probabilistic-method-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sometimes random selection proves that a good combinatorial object must
+exist.
+
+If a randomly generated solution has positive probability of satisfying
+a desired property, then at least one such deterministic object exists.
+
+This connects combinatorial optimization with probabilistic combinatorics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Submodular Functions}
+\label{subsec:submodular-functions-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A set function
+
+\[
+f:2^V\to\mathbb{R}
+\]
+
+is submodular if it has diminishing returns.
+
+One equivalent condition is
+
+\[
+\boxed{
+f(A\cup\{e\})-f(A)
+\geq
+f(B\cup\{e\})-f(B)
+}
+\]
+
+whenever
+
+\[
+A\subseteq B
+\]
+
+and
+
+\[
+e\notin B.
+\]
+
+The marginal value of adding \(e\) decreases as the selected set grows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Examples of Submodularity}
+\label{subsec:examples-submodularity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Submodular functions arise in:
+
+\[
+\boxed{
+\text{coverage},
+}
+\]
+
+\[
+\boxed{
+\text{information gain},
+}
+\]
+
+\[
+\boxed{
+\text{sensor placement},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{influence maximization}.
+}
+\]
+
+They are often viewed as discrete analogues of convex or concave
+structure, depending on whether one studies minimization or maximization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monotone Submodular Maximization}
+\label{subsec:monotone-submodular-maximization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(f\) is monotone submodular and one may select at most \(k\)
+elements:
+
+\[
+\boxed{
+\max
+f(S)
+}
+\]
+
+subject to
+
+\[
+\boxed{
+|S|\leq k.
+}
+\]
+
+The greedy algorithm repeatedly adds the element with largest marginal
+gain.
+
+This greedy method has a strong approximation guarantee.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Submodular Greedy Guarantee}
+\label{subsec:submodular-greedy-guarantee}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonnegative monotone submodular maximization under a cardinality
+constraint, the standard greedy algorithm achieves at least
+
+\[
+\boxed{
+1-\frac1e
+}
+\]
+
+of the optimal value.
+
+Thus,
+
+\[
+\boxed{
+f(S_{\mathrm{greedy}})
+\geq
+\left(
+1-\frac1e
+\right)
+f(S^*).
+}
+\]
+
+This is one of the most important approximation results in discrete
+optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Submodular Minimization Preview}
+\label{subsec:submodular-minimization-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Unconstrained submodular minimization can be solved in polynomial time.
+
+This is striking because submodular maximization can be difficult.
+
+Thus the direction of optimization matters greatly even for the same
+function class.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic Programming and State Spaces}
+\label{subsec:combinatorial-dp-state-spaces}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrete optimization problem may be represented by states
+
+\[
+s
+\]
+
+and decisions
+
+\[
+a.
+\]
+
+The optimal value may satisfy a recurrence such as
+
+\[
+\boxed{
+V(s)
+=
+\min_{a\in A(s)}
+\left[
+c(s,a)
++
+V(T(s,a))
+\right].
+}
+\]
+
+This turns combinatorial search into recursive optimization.
+
+The full framework is developed in the next section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Memoization}
+\label{subsec:combinatorial-memoization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If many solution paths reach the same subproblem, solving that subproblem
+once and storing the answer avoids repeated computation.
+
+This is memoization.
+
+It can reduce exponential recursive enumeration to a much smaller state
+space when repeated subproblems are abundant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pseudo-Polynomial Dynamic Programming}
+\label{subsec:combinatorial-pseudo-polynomial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For integer knapsack, a dynamic program can depend on capacity \(W\).
+
+Its complexity may be polynomial in \(W\) but not in the number of bits
+required to encode \(W\).
+
+Such an algorithm is pseudo-polynomial rather than polynomial in the
+formal input length.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximation Schemes Preview}
+\label{subsec:approximation-schemes-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A polynomial-time approximation scheme, abbreviated PTAS, produces for
+each fixed
+
+\[
+\varepsilon>0
+\]
+
+a solution within a factor such as
+
+\[
+\boxed{
+1+\varepsilon
+}
+\]
+
+of optimal for a minimization problem, with polynomial running time for
+fixed \(\varepsilon\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{FPTAS Preview}
+\label{subsec:fptas-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A fully polynomial-time approximation scheme, abbreviated FPTAS, has
+running time polynomial in both:
+
+\[
+\boxed{
+\text{input size},
+}
+\]
+
+and
+
+\[
+\boxed{
+\frac1\varepsilon.
+}
+\]
+
+The \(0\)-\(1\) knapsack problem admits an FPTAS.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parameterization Preview}
+\label{subsec:parameterized-complexity-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some hard problems become manageable when a structural parameter \(k\) is
+small.
+
+A fixed-parameter tractable algorithm has running time of the form
+
+\[
+\boxed{
+f(k)n^{O(1)}.
+}
+\]
+
+This separates the potentially expensive dependence on \(k\) from the
+polynomial dependence on the overall input size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Treewidth Preview}
+\label{subsec:treewidth-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Treewidth measures how close a graph is to a tree in a structural sense.
+
+Many graph problems that are difficult in general become tractable on
+graphs of bounded treewidth using dynamic programming over a tree
+decomposition.
+
+This is an important example of exploiting combinatorial structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decomposition}
+\label{subsec:combinatorial-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large problems may contain weakly coupled components.
+
+If the problem separates into parts, one can solve smaller subproblems and
+combine their information.
+
+Decomposition ideas include:
+
+\[
+\boxed{
+\text{dynamic programming},
+}
+\]
+
+\[
+\boxed{
+\text{Lagrangian relaxation},
+}
+\]
+
+\[
+\boxed{
+\text{Benders decomposition},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{column generation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Column Generation and Combinatorial Subproblems}
+\label{subsec:column-generation-combinatorial}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In column generation, the master problem may contain an enormous family of
+possible combinatorial objects.
+
+For example, one variable may represent:
+
+\[
+\boxed{
+\text{an entire route},
+}
+\]
+
+\[
+\boxed{
+\text{a schedule},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a cutting pattern}.
+}
+\]
+
+A pricing problem searches for a new object with attractive reduced cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Combinatorial Optimization Workflow}
+\label{subsec:combinatorial-optimization-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the discrete object to be selected;
+    \item determine whether the object is a subset, path, tree, matching,
+          permutation, partition, or another structure;
+    \item define the objective;
+    \item write feasibility rules clearly;
+    \item search for known special structure;
+    \item determine whether a polynomial-time exact algorithm is known;
+    \item formulate a binary or integer model when useful;
+    \item examine LP or convex relaxations;
+    \item strengthen the relaxation using valid inequalities;
+    \item consider dynamic programming for recursive structure;
+    \item consider branch-and-bound for exact general search;
+    \item consider approximation algorithms for NP-hard problems;
+    \item consider heuristics when exact methods are too expensive;
+    \item use bounds to evaluate solution quality;
+    \item exploit symmetry and decomposition;
+    \item verify feasibility;
+    \item distinguish empirical quality from proven guarantees.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Combinatorial Method}
+\label{subsec:choosing-combinatorial-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For shortest paths, consider:
+
+\[
+\boxed{
+\text{specialized graph algorithms}.
+}
+\]
+
+For minimum spanning trees, use:
+
+\[
+\boxed{
+\text{Kruskal or Prim}.
+}
+\]
+
+For bipartite assignment, use:
+
+\[
+\boxed{
+\text{matching or assignment algorithms}.
+}
+\]
+
+For recursive problems with manageable state spaces, use:
+
+\[
+\boxed{
+\text{dynamic programming}.
+}
+\]
+
+For general integer formulations, use:
+
+\[
+\boxed{
+\text{branch-and-cut}.
+}
+\]
+
+For large NP-hard problems where exact optimization is impractical,
+consider:
+
+\[
+\boxed{
+\text{approximation algorithms or heuristics}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:combinatorial-optimization-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Assuming Every Discrete Problem Requires Enumeration}
+
+Many combinatorial problems have specialized polynomial-time algorithms.
+
+Always identify structure before using brute force.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Greedy Algorithms Are Automatically Optimal}
+
+Greedy choice is not a proof.
+
+Optimality requires structure such as matroid exchange properties or an
+appropriate graph theorem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing a Heuristic with an Approximation Algorithm}
+
+A heuristic may work well experimentally.
+
+An approximation algorithm additionally has a proven worst-case
+performance guarantee.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Relaxation Direction}
+
+For minimization, enlarging the feasible set gives a lower bound.
+
+For maximization, enlarging the feasible set gives an upper bound.
+
+The bound direction must be interpreted correctly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Fractional LP Solutions Are Useless}
+
+Fractional solutions can provide:
+
+\[
+\boxed{
+\text{bounds},
+}
+\]
+
+\[
+\boxed{
+\text{branching information},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{cut-generation information}.
+}
+\]
+
+They are central to modern discrete optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Degree Constraints Alone for TSP}
+
+Degree constraints can produce multiple disconnected subtours.
+
+Connectivity or subtour-elimination conditions are also required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Paths, Trails, and Cycles}
+
+These graph structures have different restrictions.
+
+An optimization formulation must model the intended object precisely.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming All Graph Problems Have Similar Complexity}
+
+Shortest path and minimum spanning tree are polynomially solvable.
+
+Maximum clique and general TSP are NP-hard.
+
+Superficially similar graph problems can have very different
+computational complexity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing NP-Hard with Impossible}
+
+NP-hard problems can often be solved exactly for moderate instances.
+
+The classification concerns worst-case complexity, not impossibility.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming NP-Hard Means Exponential Time Has Been Proven Necessary}
+
+NP-hardness does not currently prove that every exact algorithm must take
+exponential time.
+
+Such a conclusion would depend on unresolved complexity assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Approximation Ratios Without Stating the Convention}
+
+For minimization and maximization, approximation guarantees are often
+written differently.
+
+Always state what the ratio means.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying Metric-TSP Guarantees to Nonmetric Costs}
+
+Algorithms such as double-tree and Christofides rely on the triangle
+inequality.
+
+Their guarantees do not automatically hold for arbitrary TSP instances.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Local Search Finds the Global Optimum}
+
+A locally optimal solution depends on the chosen neighborhood.
+
+Different neighborhoods can have very different local optima.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Symmetry}
+
+Equivalent combinatorial solutions can create enormous redundant search.
+
+Symmetry-breaking or canonical representations may improve algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:combinatorial-optimization-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Transportation and Routing.}
+Shortest paths, vehicle routing, TSP variants, and network design are
+central combinatorial optimization problems.
+
+\medskip
+
+\textbf{Scheduling.}
+Jobs must be assigned, ordered, and timed while satisfying resource and
+precedence restrictions.
+
+\medskip
+
+\textbf{Telecommunications.}
+Network topology, routing, frequency assignment, and infrastructure
+placement involve discrete choices.
+
+\medskip
+
+\textbf{Computer Science.}
+Graph algorithms, compiler optimization, memory allocation, clustering,
+and data structures often lead to combinatorial optimization.
+
+\medskip
+
+\textbf{Logistics.}
+Warehouse selection, fleet assignment, packing, and distribution planning
+combine discrete structures with cost optimization.
+
+\medskip
+
+\textbf{Biology.}
+Sequence alignment, phylogenetic trees, network reconstruction, and
+molecular structure problems contain combinatorial components.
+
+\medskip
+
+\textbf{Machine Learning.}
+Feature selection, clustering, subset selection, structured prediction,
+and experimental design can involve discrete optimization.
+
+\medskip
+
+\textbf{Public Planning.}
+Facility placement, districting, emergency response, and infrastructure
+design frequently require optimization over discrete alternatives.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:combinatorial-optimization-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define combinatorial optimization.
+\end{exercise}
+
+\begin{exercise}[1]
+Give three examples of discrete feasible structures.
+\end{exercise}
+
+\begin{exercise}[1]
+How many subsets does an \(n\)-element set have?
+\end{exercise}
+
+\begin{exercise}[1]
+How many permutations are there of \(n\) distinct objects?
+\end{exercise}
+
+\begin{exercise}[1]
+Define a matching.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a spanning tree.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a vertex cover.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an independent set.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a clique.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an approximation algorithm.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a submodular function conceptually.
+\end{exercise}
+
+\begin{exercise}[2]
+Represent a subset of five items using binary variables.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a constraint selecting exactly three of eight items.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the cost of a path whose edge weights are
+
+\[
+2,\ 7,\ 4,\ 1.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+How many edges does a spanning tree on \(12\) vertices contain?
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether a given edge set is a matching.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether a given vertex set is independent.
+\end{exercise}
+
+\begin{exercise}[2]
+Write binary constraints for a vertex-cover problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Write binary constraints for an independent-set problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a set-cover model for a universe with four elements.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a set-partitioning constraint requiring every element to be covered
+exactly once.
+\end{exercise}
+
+\begin{exercise}[3]
+Use Dijkstra's algorithm on a small nonnegative weighted graph.
+\end{exercise}
+
+\begin{exercise}[3]
+Use Kruskal's algorithm to construct a minimum spanning tree.
+\end{exercise}
+
+\begin{exercise}[3]
+Use Prim's algorithm on the same graph and compare the result.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that a tree on \(n\) vertices has \(n-1\) edges.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a weighted bipartite matching problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a three-agent, three-task assignment problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Write degree constraints for a four-city directed TSP.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example showing that TSP degree constraints can produce two
+subtours.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a subtour-elimination constraint for a specified subset \(S\).
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a minimum vertex-cover problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a maximum independent-set problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that the complement of a vertex cover is an independent set.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove
+
+\[
+\tau(G)+\alpha(G)=|V|.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that a clique in \(G\) is an independent set in \(\overline{G}\).
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate graph coloring using binary assignment variables.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a maximum-cut formulation for a small graph.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example where greedy \(0\)-\(1\) knapsack by value-to-weight ratio
+is not optimal.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply the matroid greedy algorithm to a weighted graphic matroid.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Kruskal's algorithm is a matroid greedy algorithm.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an LP relaxation for a combinatorial problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain whether its relaxation gives an upper or lower bound.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare an integer feasible solution with the relaxation bound.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how branch-and-bound can solve a combinatorial problem exactly.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a valid inequality that removes a given fractional point.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between an integer hull and an LP relaxation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why integrality of a polyhedron is algorithmically valuable.
+\end{exercise}
+
+\begin{exercise}[3]
+Classify shortest path, MST, and TSP according to known computational
+difficulty.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the decision version of the traveling salesperson problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between \(P\), \(NP\), NP-complete, and NP-hard.
+\end{exercise}
+
+\begin{exercise}[3]
+Show why a proposed TSP tour can be verified in polynomial time.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply the greedy set-cover algorithm to a small instance.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute
+
+\[
+H_5
+=
+1+\frac12+\frac13+\frac14+\frac15.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a minimum spanning tree provides a lower bound on the metric
+TSP optimum.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the factor-\(2\) guarantee of the double-tree metric-TSP method.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply the maximal-matching \(2\)-approximation for vertex cover.
+\end{exercise}
+
+\begin{exercise}[3]
+Define a \(2\)-opt neighborhood for TSP.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of a local optimum that is not globally optimal.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify submodularity of a simple coverage function.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply greedy cardinality-constrained submodular maximization to a small
+coverage problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between polynomial and pseudo-polynomial running
+time.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain what a PTAS guarantees.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain what an FPTAS guarantees.
+\end{exercise}
+
+\begin{exercise}[4]
+Study polyhedral descriptions of the spanning-tree polytope.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the bipartite matching polytope.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove integrality of the bipartite matching formulation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Edmonds' matching algorithm for general graphs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the minimum-cost perfect matching problem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study TSP subtour-elimination polytopes.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate comb inequalities for the TSP.
+\end{exercise}
+
+\begin{exercise}[4]
+Study branch-and-cut methods for the TSP.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the set-cover polyhedron.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the greedy logarithmic approximation guarantee for set cover.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the \(2\)-approximation guarantee for vertex cover.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Christofides' algorithm and prove its
+\(\frac32\)-approximation guarantee.
+\end{exercise}
+
+\begin{exercise}[4]
+Study approximation hardness for general TSP.
+\end{exercise}
+
+\begin{exercise}[4]
+Study semidefinite relaxations for maximum cut.
+\end{exercise}
+
+\begin{exercise}[4]
+Study randomized rounding for a covering problem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study concentration inequalities used in randomized rounding.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the matroid greedy theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study matroid intersection.
+\end{exercise}
+
+\begin{exercise}[4]
+Study weighted matroid intersection.
+\end{exercise}
+
+\begin{exercise}[4]
+Study submodular minimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the
+\[
+1-\frac1e
+\]
+guarantee for greedy monotone submodular maximization under a cardinality
+constraint.
+\end{exercise}
+
+\begin{exercise}[4]
+Study approximation algorithms under matroid constraints.
+\end{exercise}
+
+\begin{exercise}[4]
+Study fixed-parameter algorithms for vertex cover.
+\end{exercise}
+
+\begin{exercise}[4]
+Study dynamic programming on bounded-treewidth graphs.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the equivalence between optimization and separation for rational
+polyhedra.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate column generation for set-partitioning models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study decomposition methods for large combinatorial optimization models.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:combinatorial-optimization-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Combinatorial optimization solves problems of the form
+
+\[
+\boxed{
+\min_{x\in\mathcal{F}}
+c(x),
+}
+\]
+
+where \(\mathcal{F}\) is a discrete family of structures.
+
+Typical objects include
+
+\[
+\boxed{
+\text{subsets}
++
+\text{paths}
++
+\text{trees}
++
+\text{matchings}
++
+\text{tours}.
+}
+\]
+
+Some important combinatorial problems have polynomial-time exact
+algorithms:
+
+\[
+\boxed{
+\text{shortest path},
+}
+\]
+
+\[
+\boxed{
+\text{minimum spanning tree},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{bipartite matching}.
+}
+\]
+
+Others are NP-hard:
+
+\[
+\boxed{
+\text{TSP},
+}
+\]
+
+\[
+\boxed{
+\text{maximum clique},
+}
+\]
+
+\[
+\boxed{
+\text{set cover},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{graph coloring}.
+}
+\]
+
+Relaxations provide bounds:
+
+\[
+\boxed{
+\mathcal{F}
+\subseteq
+\mathcal{R}.
+}
+\]
+
+Exact algorithms may use:
+
+\[
+\boxed{
+\text{dynamic programming},
+}
+\]
+
+\[
+\boxed{
+\text{branch-and-bound},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{branch-and-cut}.
+}
+\]
+
+When exact optimization is too expensive, one may use approximation
+algorithms with provable performance guarantees or heuristics aimed at
+high-quality practical solutions.
+
+Combinatorial optimization therefore combines
+
+\[
+\boxed{
+\text{discrete mathematics}
++
+\text{graph theory}
++
+\text{integer programming}
++
+\text{algorithms}
++
+\text{complexity theory}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:combinatorial-optimization-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Combinatorial Optimization builds on the discrete structures developed in
+Chapter~6 and the integer-programming framework of
+Section~\ref{sec:integer-programming}. Graph algorithms, matroids,
+polyhedral formulations, relaxations, approximation methods, and
+complexity theory explain why some discrete optimization problems admit
+efficient exact solutions while others require exponential search,
+approximation, or heuristics. The next section, Dynamic Programming,
+develops one of the central exact optimization methods for problems with
+sequential decisions, optimal substructure, and repeated subproblems.
+Dynamic programming will later connect directly with stochastic
+optimization, scheduling, control, and decision theory.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.6 Combinatorial Optimization
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard combinatorial optimization theory.
+%   - Standard graph algorithms and discrete optimization methods.
+%   - Standard computational complexity and approximation theory.
+%
+% Used for:
+%   - discrete feasible structures;
+%   - combinatorial explosion;
+%   - binary incidence representations;
+%   - weighted graph optimization;
+%   - shortest paths;
+%   - minimum spanning trees;
+%   - Kruskal and Prim algorithms;
+%   - greedy algorithms;
+%   - matching and assignment;
+%   - TSP modeling;
+%   - degree constraints and subtours;
+%   - subtour-elimination constraints;
+%   - set cover, packing, and partitioning;
+%   - vertex cover;
+%   - independent sets;
+%   - cliques;
+%   - graph coloring;
+%   - maximum cut;
+%   - knapsack;
+%   - matroids;
+%   - matroid greedy optimization;
+%   - exact algorithms;
+%   - dynamic-programming preview;
+%   - branch-and-bound;
+%   - relaxations;
+%   - polyhedral combinatorics;
+%   - facets and separation;
+%   - integrality;
+%   - total unimodularity;
+%   - P, NP, NP-completeness, and NP-hardness;
+%   - polynomial reductions;
+%   - approximation algorithms;
+%   - greedy set-cover approximation;
+%   - metric-TSP approximation;
+%   - Christofides preview;
+%   - vertex-cover approximation;
+%   - local search;
+%   - metaheuristics;
+%   - randomized algorithms and rounding;
+%   - submodular functions;
+%   - submodular maximization;
+%   - approximation schemes;
+%   - parameterized complexity;
+%   - treewidth;
+%   - decomposition and column-generation connections;
+%   - applications and exercises.
+%
+% Notes:
+%   - Dynamic Programming is developed next in Section 10.7.
+%   - Network Optimization is developed in Section 10.10.
+%   - Scheduling Theory is developed in Section 10.12.
+%   - Graph-theoretic foundations are developed canonically in Chapter 6.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

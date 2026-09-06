@@ -1,0 +1,2968 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10.9 MULTIOBJECTIVE OPTIMIZATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Multiobjective Optimization}
+\label{sec:multiobjective-optimization}
+
+\prerequisite{
+Optimization fundamentals, convex optimization, nonlinear programming,
+linear programming, vectors, inequalities, feasible sets, and basic
+decision theory.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a multiobjective optimization problem;
+    \item distinguish single-objective and multiobjective optimization;
+    \item identify conflicting objectives;
+    \item define dominance and Pareto dominance;
+    \item define Pareto-optimal and weakly Pareto-optimal solutions;
+    \item distinguish decision space and objective space;
+    \item define the Pareto set and Pareto frontier;
+    \item recognize dominated and nondominated solutions;
+    \item understand tradeoffs among objectives;
+    \item define ideal and reference objective vectors;
+    \item understand the nadir point conceptually;
+    \item normalize objectives with different scales;
+    \item formulate weighted-sum scalarizations;
+    \item understand limitations of weighted sums;
+    \item understand supported and unsupported Pareto points;
+    \item formulate epsilon-constraint problems;
+    \item formulate goal-programming models;
+    \item understand lexicographic optimization;
+    \item formulate reference-point and achievement scalarizing models;
+    \item recognize compromise programming;
+    \item understand Chebyshev scalarization;
+    \item formulate multiobjective linear programs;
+    \item formulate multiobjective convex programs;
+    \item understand first-order Pareto optimality conceptually;
+    \item understand weighted KKT conditions conceptually;
+    \item recognize proper efficiency conceptually;
+    \item understand decision-maker preferences;
+    \item distinguish a posteriori, a priori, and interactive methods;
+    \item understand generation of Pareto frontiers;
+    \item recognize evolutionary multiobjective optimization conceptually;
+    \item understand hypervolume and diversity conceptually;
+    \item identify sensitivity of solutions to objective weights;
+    \item understand fairness and competing stakeholder objectives;
+    \item connect multiobjective optimization with engineering,
+          economics, finance, planning, sustainability, and operations
+          research.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Multiobjective Optimization?}
+\label{subsec:what-is-multiobjective-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multiobjective optimization problem has more than one objective function
+to optimize simultaneously.
+
+A general form is
+
+\[
+\boxed{
+\min_{\mathbf{x}\in\mathcal{F}}
+\begin{pmatrix}
+f_1(\mathbf{x})\\
+f_2(\mathbf{x})\\
+\vdots\\
+f_k(\mathbf{x})
+\end{pmatrix}.
+}
+\]
+
+Here,
+
+\[
+\mathbf{x}
+\]
+
+is the decision vector,
+
+\[
+\mathcal{F}
+\]
+
+is the feasible set, and
+
+\[
+f_1,\ldots,f_k
+\]
+
+are the objectives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conflicting Objectives}
+\label{subsec:conflicting-objectives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If every objective were minimized by the same feasible point, the problem
+would effectively reduce to a single decision.
+
+The interesting case occurs when objectives conflict.
+
+For example, one may want to:
+
+\[
+\boxed{
+\text{minimize cost}
+}
+\]
+
+while also
+
+\[
+\boxed{
+\text{maximize quality}.
+}
+\]
+
+Improving one objective may worsen another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Examples of Multiple Objectives}
+\label{subsec:examples-multiple-objectives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Common competing objectives include:
+
+\[
+\boxed{
+\text{cost}
+}
+\quad\text{versus}\quad
+\boxed{
+\text{performance},
+}
+\]
+
+\[
+\boxed{
+\text{return}
+}
+\quad\text{versus}\quad
+\boxed{
+\text{risk},
+}
+\]
+
+\[
+\boxed{
+\text{speed}
+}
+\quad\text{versus}\quad
+\boxed{
+\text{energy use},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{profit}
+}
+\quad\text{versus}\quad
+\boxed{
+\text{environmental impact}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vector-Valued Objective}
+\label{subsec:vector-valued-objective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define the objective vector
+
+\[
+\boxed{
+\mathbf{f}(\mathbf{x})
+=
+\begin{pmatrix}
+f_1(\mathbf{x})\\
+\vdots\\
+f_k(\mathbf{x})
+\end{pmatrix}.
+}
+\]
+
+Unlike ordinary scalar optimization, vectors do not generally possess a
+natural total ordering.
+
+For example,
+
+\[
+(2,7)
+\]
+
+and
+
+\[
+(4,3)
+\]
+
+cannot be ranked without additional preference information if both
+components are to be minimized.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Decision Space and Objective Space}
+\label{subsec:decision-objective-space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The decision vector
+
+\[
+\mathbf{x}
+\]
+
+belongs to decision space.
+
+Its image
+
+\[
+\mathbf{f}(\mathbf{x})
+\]
+
+belongs to objective space.
+
+Thus,
+
+\[
+\boxed{
+\mathbf{x}
+\in
+\mathcal{F}
+}
+\]
+
+is a feasible decision, while
+
+\[
+\boxed{
+\mathbf{f}(\mathbf{x})
+}
+\]
+
+is its objective vector.
+
+The set
+
+\[
+\boxed{
+\mathcal{Y}
+=
+\{
+\mathbf{f}(\mathbf{x}):
+\mathbf{x}\in\mathcal{F}
+\}
+}
+\]
+
+is the attainable objective set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pareto Dominance}
+\label{subsec:pareto-dominance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assume all objectives are minimized.
+
+A feasible point \(\mathbf{x}\) dominates another feasible point
+\(\mathbf{y}\) if
+
+\[
+\boxed{
+f_i(\mathbf{x})
+\leq
+f_i(\mathbf{y})
+\qquad
+\text{for every }i,
+}
+\]
+
+and
+
+\[
+\boxed{
+f_j(\mathbf{x})
+<
+f_j(\mathbf{y})
+}
+\]
+
+for at least one objective \(j\).
+
+Thus \(\mathbf{x}\) is no worse in every objective and strictly better in
+at least one.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dominated Solutions}
+\label{subsec:dominated-solutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A feasible solution is dominated if another feasible solution improves at
+least one objective without worsening any other objective.
+
+Dominated solutions are usually unattractive because one can move to a
+strictly better alternative.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pareto-Optimal Solution}
+\label{subsec:pareto-optimal-solution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Pareto-Optimal Solution}
+A feasible point \(\mathbf{x}^*\) is Pareto optimal if no feasible point
+dominates it.
+\end{definitionbox}
+
+Equivalently, there is no feasible \(\mathbf{x}\) such that
+
+\[
+f_i(\mathbf{x})
+\leq
+f_i(\mathbf{x}^*)
+\]
+
+for every \(i\), with strict inequality for at least one objective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pareto Set}
+\label{subsec:pareto-set}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Pareto set is the set of all Pareto-optimal decisions:
+
+\[
+\boxed{
+\mathcal{P}
+=
+\{
+\mathbf{x}\in\mathcal{F}:
+\mathbf{x}
+\text{ is Pareto optimal}
+\}.
+}
+\]
+
+This set lies in decision space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pareto Frontier}
+\label{subsec:pareto-frontier}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Pareto frontier, also called the Pareto front, is the image of the
+Pareto set in objective space:
+
+\[
+\boxed{
+\mathcal{F}_P
+=
+\{
+\mathbf{f}(\mathbf{x}):
+\mathbf{x}\in\mathcal{P}
+\}.
+}
+\]
+
+Each point on the frontier represents a different tradeoff among
+objectives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Dominance}
+\label{subsec:worked-dominance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Comparing Objective Vectors}
+
+Suppose both objectives are minimized.
+
+Consider
+
+\[
+A=(4,7),
+\]
+
+\[
+B=(5,9),
+\]
+
+and
+
+\[
+C=(3,10).
+\]
+
+Compare \(A\) and \(B\):
+
+\[
+4<5,
+\]
+
+and
+
+\[
+7<9.
+\]
+
+Therefore \(A\) dominates \(B\).
+
+Compare \(A\) and \(C\):
+
+\[
+3<4
+\]
+
+for the first objective, but
+
+\[
+10>7
+\]
+
+for the second.
+
+Neither dominates the other.
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+A\text{ dominates }B,
+}
+\]
+
+while
+
+\[
+\boxed{
+A\text{ and }C\text{ are incomparable by Pareto dominance}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weak Pareto Optimality}
+\label{subsec:weak-pareto-optimality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A feasible point \(\mathbf{x}^*\) is weakly Pareto optimal if there is no
+feasible point \(\mathbf{x}\) satisfying
+
+\[
+\boxed{
+f_i(\mathbf{x})
+<
+f_i(\mathbf{x}^*)
+}
+\]
+
+for every objective \(i\).
+
+Thus no point can strictly improve all objectives simultaneously.
+
+Every Pareto-optimal solution is weakly Pareto optimal, but the converse
+need not hold.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tradeoffs}
+\label{subsec:multiobjective-tradeoffs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Moving along a Pareto frontier typically improves one objective while
+worsening another.
+
+For two objectives,
+
+\[
+f_1
+\]
+
+and
+
+\[
+f_2,
+\]
+
+a tradeoff may be interpreted as
+
+\[
+\boxed{
+\text{amount of }f_2
+\text{ sacrificed to improve }f_1.
+}
+\]
+
+Multiobjective optimization does not remove such tradeoffs.
+
+It makes them mathematically explicit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ideal Objective Vector}
+\label{subsec:ideal-objective-vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For minimization, define the ideal component
+
+\[
+\boxed{
+f_i^{\mathrm{ideal}}
+=
+\min_{\mathbf{x}\in\mathcal{F}}
+f_i(\mathbf{x}).
+}
+\]
+
+The ideal objective vector is
+
+\[
+\boxed{
+\mathbf{z}^{\mathrm{ideal}}
+=
+\begin{pmatrix}
+f_1^{\mathrm{ideal}}\\
+\vdots\\
+f_k^{\mathrm{ideal}}
+\end{pmatrix}.
+}
+\]
+
+Each component is individually best possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ideal Point May Be Unattainable}
+\label{subsec:ideal-point-unattainable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The ideal point is constructed by minimizing each objective separately.
+
+Those separate minima may occur at different decisions.
+
+Therefore,
+
+\[
+\boxed{
+\mathbf{z}^{\mathrm{ideal}}
+}
+\]
+
+need not belong to the attainable objective set.
+
+It is often used as a reference rather than an attainable solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nadir Point}
+\label{subsec:nadir-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The nadir objective vector is conceptually formed from the worst objective
+values occurring among Pareto-optimal solutions.
+
+For minimization,
+
+\[
+\boxed{
+z_i^{\mathrm{nadir}}
+=
+\max_{\mathbf{x}\in\mathcal{P}}
+f_i(\mathbf{x}).
+}
+\]
+
+The nadir point is often difficult to calculate exactly.
+
+It is useful for scaling and visualization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Utopia Point}
+\label{subsec:utopia-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sometimes a reference point slightly better than the ideal point is used.
+
+For minimization,
+
+\[
+\boxed{
+z_i^{\mathrm{utopia}}
+<
+z_i^{\mathrm{ideal}}.
+}
+\]
+
+This point is intentionally unattainable and can be useful in certain
+scalarization methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normalization}
+\label{subsec:multiobjective-normalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one objective has values around
+
+\[
+10^6,
+\]
+
+while another has values around
+
+\[
+10.
+\]
+
+Directly weighting these objectives can produce misleading results.
+
+A normalized objective may be
+
+\[
+\boxed{
+\widetilde{f}_i(\mathbf{x})
+=
+\frac{
+f_i(\mathbf{x})
+-
+z_i^{\mathrm{ideal}}
+}{
+z_i^{\mathrm{nadir}}
+-
+z_i^{\mathrm{ideal}}
+}.
+}
+\]
+
+This places objectives on comparable scales when suitable estimates are
+available.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scalarization}
+\label{subsec:multiobjective-scalarization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Scalarization converts a vector optimization problem into a scalar
+optimization problem.
+
+A scalarizing function
+
+\[
+\phi
+\]
+
+produces
+
+\[
+\boxed{
+\min_{\mathbf{x}\in\mathcal{F}}
+\phi
+(
+f_1(\mathbf{x}),
+\ldots,
+f_k(\mathbf{x})
+).
+}
+\]
+
+Different scalarizations represent different notions of preference and
+tradeoff.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted-Sum Method}
+\label{subsec:weighted-sum-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Choose nonnegative weights
+
+\[
+w_i\geq0,
+\]
+
+typically with
+
+\[
+\boxed{
+\sum_{i=1}^{k}
+w_i=1.
+}
+\]
+
+Then solve
+
+\[
+\boxed{
+\min_{\mathbf{x}\in\mathcal{F}}
+\sum_{i=1}^{k}
+w_i
+f_i(\mathbf{x}).
+}
+\]
+
+Larger \(w_i\) places greater emphasis on objective \(i\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted-Sum Pareto Property}
+\label{subsec:weighted-sum-pareto-property}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If all weights satisfy
+
+\[
+\boxed{
+w_i>0,
+}
+\]
+
+then any optimizer of the weighted-sum problem is Pareto optimal under
+standard assumptions on feasibility and finite objective values.
+
+If some weights are zero, the solution is generally guaranteed only to be
+weakly Pareto optimal without additional conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Weighted Sum}
+\label{subsec:worked-weighted-sum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Balancing Cost and Time}
+
+Suppose two feasible plans have objective vectors
+
+\[
+A=(100,8),
+\]
+
+and
+
+\[
+B=(120,5),
+\]
+
+where the first component is cost and the second is time.
+
+Use
+
+\[
+w_1=0.4,
+\qquad
+w_2=0.6.
+\]
+
+The weighted scores are
+
+\[
+S_A
+=
+0.4(100)
++
+0.6(8)
+=
+44.8,
+\]
+
+and
+
+\[
+S_B
+=
+0.4(120)
++
+0.6(5)
+=
+51.
+\]
+
+Thus, under these unnormalized weights,
+
+\begin{answerbox}
+\[
+\boxed{
+A
+}
+\]
+
+has the smaller weighted score.
+\end{answerbox}
+
+This example also illustrates why normalization may be important when
+objectives use different units.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Supported Pareto Points}
+\label{subsec:supported-pareto-points}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A supported Pareto point is a Pareto-optimal objective vector that solves
+a weighted-sum problem for some nonnegative weight vector.
+
+Geometrically, it lies on a supporting hyperplane of the attainable
+objective set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unsupported Pareto Points}
+\label{subsec:unsupported-pareto-points}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the attainable objective set is nonconvex, some Pareto-optimal points
+may not minimize any weighted sum.
+
+These are unsupported Pareto points.
+
+Thus,
+
+\[
+\boxed{
+\text{varying weighted sums may fail to generate the entire Pareto front}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convex Objective Sets}
+\label{subsec:convex-objective-sets}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When the relevant attainable objective region has suitable convexity,
+weighted-sum scalarization can recover supported Pareto solutions broadly.
+
+In nonconvex multiobjective problems, additional scalarization techniques
+are necessary to reveal unsupported tradeoffs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Epsilon-Constraint Method}
+\label{subsec:epsilon-constraint-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Choose one objective as the primary objective.
+
+Convert the remaining objectives into constraints.
+
+For example,
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f_1(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+f_2(\mathbf{x})
+\leq
+\varepsilon_2,
+\\
+&
+\vdots
+\\
+&
+f_k(\mathbf{x})
+\leq
+\varepsilon_k,
+\\
+&
+\mathbf{x}\in\mathcal{F}.
+\end{aligned}
+}
+\]
+
+Changing the \(\varepsilon_i\) values generates different tradeoffs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Advantages of the Epsilon-Constraint Method}
+\label{subsec:epsilon-constraint-advantages}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The epsilon-constraint method can:
+
+\[
+\boxed{
+\text{generate unsupported Pareto points},
+}
+\]
+
+\[
+\boxed{
+\text{preserve the units of the primary objective},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{express explicit acceptable limits on secondary objectives}.
+}
+\]
+
+It is especially useful when one objective is naturally primary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Epsilon Constraint}
+\label{subsec:worked-epsilon-constraint}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Minimum Cost Subject to Emission Limit}
+
+Suppose
+
+\[
+C(x)
+=
+\text{cost},
+\]
+
+and
+
+\[
+E(x)
+=
+\text{emissions}.
+\]
+
+Instead of combining them with arbitrary weights, solve
+
+\[
+\boxed{
+\begin{aligned}
+\min_x
+\quad&
+C(x)
+\\
+\text{subject to}
+\quad&
+E(x)\leq\varepsilon,
+\\
+&
+x\in\mathcal{F}.
+\end{aligned}
+}
+\]
+
+Reducing \(\varepsilon\) imposes a stricter emissions requirement.
+
+The resulting sequence of solutions traces the cost--emissions tradeoff.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lexicographic Optimization}
+\label{subsec:lexicographic-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Lexicographic optimization ranks objectives by priority.
+
+First optimize
+
+\[
+f_1.
+\]
+
+Among all solutions optimal for \(f_1\), optimize
+
+\[
+f_2.
+\]
+
+Then optimize \(f_3\), and so on.
+
+Thus
+
+\[
+\boxed{
+f_1
+\succ
+f_2
+\succ
+\cdots
+\succ
+f_k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lexicographic Formulation}
+\label{subsec:lexicographic-formulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+f_1^*
+=
+\min_{\mathbf{x}\in\mathcal{F}}
+f_1(\mathbf{x}).
+\]
+
+The second problem is
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&
+f_2(\mathbf{x})
+\\
+\text{subject to}
+\quad&
+f_1(\mathbf{x})
+=
+f_1^*,
+\\
+&
+\mathbf{x}\in\mathcal{F}.
+\end{aligned}
+}
+\]
+
+This process continues through the ordered objectives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Priority Tolerances}
+\label{subsec:lexicographic-tolerances}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In practice, requiring exact preservation of a higher-priority objective
+may be unnecessarily rigid.
+
+One may allow
+
+\[
+\boxed{
+f_1(\mathbf{x})
+\leq
+f_1^*+\delta_1,
+}
+\]
+
+where \(\delta_1\) is an acceptable degradation.
+
+This creates controlled tradeoffs while retaining priority structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Goal Programming}
+\label{subsec:goal-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Goal programming specifies desired target values for objectives.
+
+Suppose objective \(i\) has target
+
+\[
+g_i.
+\]
+
+Introduce deviations
+
+\[
+d_i^-\geq0,
+\qquad
+d_i^+\geq0,
+\]
+
+such that
+
+\[
+\boxed{
+f_i(\mathbf{x})
++
+d_i^-
+-
+d_i^+
+=
+g_i.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Meaning of Goal Deviations}
+\label{subsec:goal-deviations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The variable
+
+\[
+d_i^-
+\]
+
+measures underachievement relative to the target.
+
+The variable
+
+\[
+d_i^+
+\]
+
+measures overachievement.
+
+Depending on the objective, one or both deviations may be undesirable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Goal Programming}
+\label{subsec:weighted-goal-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A weighted goal-programming objective may be
+
+\[
+\boxed{
+\min
+\sum_{i=1}^{k}
+\left(
+w_i^-d_i^-
++
+w_i^+d_i^+
+\right).
+}
+\]
+
+The weights specify the relative penalty associated with missing different
+targets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Goal Programming}
+\label{subsec:worked-goal-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Production Targets}
+
+Suppose desired profit is at least
+
+\[
+100,
+\]
+
+while desired overtime is at most
+
+\[
+20.
+\]
+
+Introduce deviations satisfying
+
+\[
+P(x)
++
+d_1^-
+-
+d_1^+
+=
+100,
+\]
+
+and
+
+\[
+O(x)
++
+d_2^-
+-
+d_2^+
+=
+20.
+\]
+
+If missing the profit target and exceeding overtime are undesirable, an
+objective can penalize
+
+\[
+\boxed{
+d_1^-
+}
+\]
+
+and
+
+\[
+\boxed{
+d_2^+.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+\min
+5d_1^-
++
+2d_2^+.
+}
+\]
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preemptive Goal Programming}
+\label{subsec:preemptive-goal-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Preemptive goal programming assigns priority levels.
+
+A higher-priority goal is optimized before any lower-priority goal is
+considered.
+
+This resembles lexicographic optimization.
+
+It is useful when objectives are not merely weighted differently but have
+strict institutional priorities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reference-Point Methods}
+\label{subsec:reference-point-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A decision maker may specify a desired objective vector
+
+\[
+\boxed{
+\mathbf{r}
+=
+(r_1,\ldots,r_k).
+}
+\]
+
+Optimization then seeks a feasible objective vector close to
+\(\mathbf{r}\).
+
+A simple model is
+
+\[
+\boxed{
+\min_{\mathbf{x}\in\mathcal{F}}
+\|
+\mathbf{f}(\mathbf{x})
+-
+\mathbf{r}
+\|.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reference Points Need Not Be Feasible}
+\label{subsec:reference-points-feasibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The reference vector may represent aspirations.
+
+It need not be attainable.
+
+Optimization identifies a feasible compromise near the desired target.
+
+This makes reference-point approaches useful in interactive decision
+support.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Compromise Programming}
+\label{subsec:compromise-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compromise programming minimizes distance from the ideal objective vector.
+
+A weighted \(p\)-norm formulation is
+
+\[
+\boxed{
+\min_{\mathbf{x}\in\mathcal{F}}
+\left[
+\sum_{i=1}^{k}
+w_i
+\left|
+\frac{
+f_i(\mathbf{x})
+-
+z_i^{\mathrm{ideal}}
+}{
+s_i
+}
+\right|^p
+\right]^{1/p},
+}
+\]
+
+where \(s_i\) are scaling factors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chebyshev Scalarization}
+\label{subsec:chebyshev-scalarization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using the infinity norm gives a weighted Chebyshev scalarization:
+
+\[
+\boxed{
+\min_{\mathbf{x}\in\mathcal{F}}
+\max_i
+\left\{
+w_i
+\left|
+f_i(\mathbf{x})
+-
+z_i^{\mathrm{ref}}
+\right|
+\right\}.
+}
+\]
+
+This minimizes the largest weighted deviation from the reference point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Epigraph Form of Chebyshev Scalarization}
+\label{subsec:chebyshev-epigraph}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Introduce variable \(t\).
+
+Then
+
+\[
+\boxed{
+\begin{aligned}
+\min_{\mathbf{x},t}
+\quad&
+t
+\\
+\text{subject to}
+\quad&
+w_i
+\left[
+f_i(\mathbf{x})
+-
+z_i^{\mathrm{ref}}
+\right]
+\leq
+t,
+\qquad
+i=1,\ldots,k,
+\\
+&
+\mathbf{x}\in\mathcal{F},
+\end{aligned}
+}
+\]
+
+for an appropriate one-sided minimization formulation.
+
+This converts the maximum into explicit constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Achievement Scalarizing Functions}
+\label{subsec:achievement-scalarizing-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An achievement scalarizing function measures how well a feasible solution
+achieves aspiration levels.
+
+A common structure combines:
+
+\[
+\boxed{
+\text{maximum weighted deviation}
+}
+\]
+
+with
+
+\[
+\boxed{
+\text{a small augmentation term}.
+}
+\]
+
+The augmentation helps avoid weakly Pareto-optimal solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiobjective Linear Programming}
+\label{subsec:multiobjective-linear-programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multiobjective linear program has linear objectives and linear
+constraints:
+
+\[
+\boxed{
+\min
+\begin{pmatrix}
+c_1^Tx\\
+c_2^Tx\\
+\vdots\\
+c_k^Tx
+\end{pmatrix}
+}
+\]
+
+subject to
+
+\[
+\boxed{
+Ax\leq b.
+}
+\]
+
+Weighted sums produce ordinary linear programs.
+
+Epsilon-constraint formulations also remain linear.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two-Objective Linear Example}
+\label{subsec:two-objective-linear-example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+\min
+\begin{pmatrix}
+2x+y\\
+x+3y
+\end{pmatrix}
+}
+\]
+
+subject to
+
+\[
+x+y\geq4,
+\]
+
+\[
+x,y\geq0.
+\]
+
+A weighted sum with
+
+\[
+w\in[0,1]
+\]
+
+becomes
+
+\[
+\boxed{
+\min
+\left[
+w(2x+y)
++
+(1-w)(x+3y)
+\right].
+}
+\]
+
+Different \(w\) values produce different efficient solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiobjective Convex Optimization}
+\label{subsec:multiobjective-convex-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose:
+
+\[
+\mathcal{F}
+\]
+
+is convex and each
+
+\[
+f_i
+\]
+
+is convex.
+
+Then the problem is a convex multiobjective optimization problem.
+
+Weighted sums with nonnegative weights produce convex scalar optimization
+problems.
+
+This gives strong computational advantages.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pareto Optimality in Convex Problems}
+\label{subsec:pareto-convex-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under suitable convexity assumptions, Pareto-optimal points can often be
+characterized using positive weighted combinations of objective
+gradients.
+
+This connects multiobjective optimization with KKT theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{First-Order Pareto Condition}
+\label{subsec:first-order-pareto-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an unconstrained differentiable problem, a necessary condition for a
+local Pareto optimum under suitable regularity is existence of weights
+
+\[
+\lambda_i\geq0,
+\]
+
+not all zero, such that
+
+\[
+\boxed{
+\sum_{i=1}^{k}
+\lambda_i
+\nabla f_i(\mathbf{x}^*)
+=
+0.
+}
+\]
+
+The condition says there is no common first-order direction improving all
+objectives.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normalized Objective Weights}
+\label{subsec:normalized-objective-weights}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The weights may be normalized so that
+
+\[
+\boxed{
+\lambda_i\geq0,
+\qquad
+\sum_i\lambda_i=1.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\sum_i
+\lambda_i
+\nabla f_i(\mathbf{x}^*)
+=
+0.
+}
+\]
+
+This resembles stationarity of a weighted scalar objective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constrained Multiobjective KKT Condition}
+\label{subsec:multiobjective-kkt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider constraints
+
+\[
+g_j(x)\leq0,
+\]
+
+and
+
+\[
+h_\ell(x)=0.
+\]
+
+A multiobjective first-order condition can take form
+
+\[
+\boxed{
+\sum_i
+\lambda_i
+\nabla f_i(x^*)
++
+\sum_j
+\mu_j
+\nabla g_j(x^*)
++
+\sum_\ell
+\nu_\ell
+\nabla h_\ell(x^*)
+=
+0,
+}
+\]
+
+with
+
+\[
+\boxed{
+\lambda_i\geq0,
+}
+\]
+
+\[
+\boxed{
+\mu_j\geq0,
+}
+\]
+
+and complementary slackness
+
+\[
+\boxed{
+\mu_jg_j(x^*)=0.
+}
+\]
+
+Suitable regularity conditions are required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Marginal Tradeoff Interpretation}
+\label{subsec:marginal-tradeoff}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two smooth objectives along a differentiable Pareto frontier, one may
+study the local tradeoff
+
+\[
+\boxed{
+\frac{
+df_2
+}{
+df_1
+}.
+}
+\]
+
+This measures how much one objective changes per unit change in another.
+
+Such rates can support decision-maker interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proper Efficiency}
+\label{subsec:proper-efficiency}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some Pareto points involve extreme tradeoffs.
+
+For example, an arbitrarily small improvement in one objective may require
+an arbitrarily large deterioration in another.
+
+Proper efficiency concepts exclude certain unbounded tradeoff behavior.
+
+Several formal definitions exist, including Geoffrion proper efficiency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preference Information}
+\label{subsec:preference-information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Mathematics can identify feasible tradeoffs.
+
+It does not determine automatically which tradeoff a decision maker should
+prefer.
+
+Preference information may include:
+
+\[
+\boxed{
+\text{weights},
+}
+\]
+
+\[
+\boxed{
+\text{priorities},
+}
+\]
+
+\[
+\boxed{
+\text{targets},
+}
+\]
+
+\[
+\boxed{
+\text{acceptable thresholds},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{utility functions}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Priori Methods}
+\label{subsec:a-priori-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In an a priori method, preferences are specified before optimization.
+
+Examples include:
+
+\[
+\boxed{
+\text{weighted sums},
+}
+\]
+
+\[
+\boxed{
+\text{lexicographic priorities},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{goal-programming weights}.
+}
+\]
+
+The optimization then produces one preferred compromise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Posteriori Methods}
+\label{subsec:a-posteriori-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In an a posteriori method, optimization first generates many Pareto
+solutions.
+
+The decision maker then examines the tradeoff set and selects a preferred
+solution.
+
+This approach is useful when preferences are difficult to specify in
+advance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interactive Methods}
+\label{subsec:interactive-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interactive methods alternate between:
+
+\[
+\boxed{
+\text{optimization}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{preference feedback}.
+}
+\]
+
+The decision maker may adjust aspirations, weights, or acceptable
+tradeoffs after seeing intermediate solutions.
+
+This can reduce the number of Pareto points that must be generated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generating a Pareto Frontier}
+\label{subsec:generating-pareto-frontier}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For two objectives, a common strategy is:
+
+\begin{enumerate}
+    \item solve each objective separately;
+    \item determine the objective ranges;
+    \item select a sequence of weights or epsilon values;
+    \item solve the corresponding scalar problems;
+    \item discard dominated or duplicate points;
+    \item order the remaining solutions along the Pareto frontier.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pareto Frontier Resolution}
+\label{subsec:pareto-frontier-resolution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A coarse set of scalarization parameters may miss important regions of the
+frontier.
+
+A very fine grid may require many optimization solves.
+
+Adaptive procedures focus additional computations where the frontier
+changes rapidly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Knee Points}
+\label{subsec:knee-points}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A knee point is an informal term for a Pareto solution where a small
+improvement in one objective requires a large deterioration in another.
+
+Such points can be attractive compromise solutions.
+
+However, the precise definition of a knee depends on scaling and the
+chosen geometry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Multiobjective Optimization}
+\label{subsec:discrete-multiobjective-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If decisions are integer or combinatorial, the Pareto frontier may consist
+of isolated objective vectors.
+
+For example,
+
+\[
+\boxed{
+\min
+\begin{pmatrix}
+c^Tx\\
+d^Tx
+\end{pmatrix}
+}
+\]
+
+subject to
+
+\[
+\boxed{
+Ax\leq b,
+\qquad
+x\in\{0,1\}^n
+}
+\]
+
+is a multiobjective binary optimization problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nondominated Set Enumeration}
+\label{subsec:nondominated-set-enumeration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For discrete problems, one may seek every nondominated objective vector.
+
+The number of such points can itself be very large.
+
+Therefore full enumeration may be computationally expensive even when
+each scalar subproblem is manageable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Evolutionary Multiobjective Optimization}
+\label{subsec:evolutionary-multiobjective-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Evolutionary algorithms maintain a population of candidate solutions.
+
+Instead of converging toward one objective value, they attempt to maintain
+a diverse set of nondominated solutions.
+
+Important algorithm families include methods based on:
+
+\[
+\boxed{
+\text{nondominated sorting},
+}
+\]
+
+\[
+\boxed{
+\text{crowding measures},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{reference directions}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nondominated Sorting}
+\label{subsec:nondominated-sorting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given a population of objective vectors, the first nondominated front
+contains all points not dominated by any other point.
+
+Remove those points.
+
+The next nondominated set forms the second front.
+
+Repeating produces dominance levels.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diversity}
+\label{subsec:pareto-diversity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An approximate Pareto set should ideally have both:
+
+\[
+\boxed{
+\text{good convergence toward the true frontier},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{good coverage across the frontier}.
+}
+\]
+
+A cluster of nearly identical solutions may approximate only a small
+portion of the tradeoff space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hypervolume Indicator}
+\label{subsec:hypervolume-indicator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The hypervolume indicator measures the region of objective space dominated
+by a set of nondominated solutions relative to a chosen reference point.
+
+Larger hypervolume generally indicates some combination of:
+
+\[
+\boxed{
+\text{better objective quality}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{broader Pareto-front coverage}.
+}
+\]
+
+Its value depends on the reference point and scaling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Sum Sensitivity}
+\label{subsec:weight-sensitivity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A small change in weights can sometimes produce a large change in the
+chosen solution.
+
+This is especially common when:
+
+\[
+\boxed{
+\text{the Pareto front is sharply curved},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{the feasible decisions are discrete}.
+}
+\]
+
+Weight sensitivity should therefore be examined rather than reporting a
+single arbitrary weight vector.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Objective Scaling and Units}
+\label{subsec:objective-scaling-units}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose cost is measured in dollars and time in hours.
+
+Then the expression
+
+\[
+\boxed{
+0.5
+(\text{cost})
++
+0.5
+(\text{time})
+}
+\]
+
+does not automatically imply equal importance.
+
+The numerical scales and units differ.
+
+Normalization or explicit economic conversion may be required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fairness as a Multiobjective Problem}
+\label{subsec:fairness-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some allocation problems must balance:
+
+\[
+\boxed{
+\text{efficiency}
+}
+\]
+
+against
+
+\[
+\boxed{
+\text{fairness}.
+}
+\]
+
+Alternatively, different groups may have separate performance objectives.
+
+A multiobjective model makes these competing criteria explicit instead of
+hiding them inside one scalar score.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Max--Min Fairness Preview}
+\label{subsec:max-min-fairness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose each stakeholder receives utility
+
+\[
+u_i(x).
+\]
+
+A max--min fairness objective is
+
+\[
+\boxed{
+\max_x
+\min_i
+u_i(x).
+}
+\]
+
+Introduce \(t\) and write
+
+\[
+\boxed{
+\begin{aligned}
+\max_{x,t}
+\quad&
+t
+\\
+\text{subject to}
+\quad&
+u_i(x)\geq t,
+\qquad
+i=1,\ldots,k.
+\end{aligned}
+}
+\]
+
+This emphasizes the worst-off stakeholder.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sustainability Optimization}
+\label{subsec:sustainability-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sustainability planning often balances:
+
+\[
+\boxed{
+\text{economic cost},
+}
+\]
+
+\[
+\boxed{
+\text{environmental impact},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{social outcomes}.
+}
+\]
+
+A multiobjective model can expose the tradeoffs among these criteria rather
+than requiring an arbitrary single conversion factor.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Portfolio Tradeoff}
+\label{subsec:portfolio-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Portfolio selection naturally contains competing objectives:
+
+\[
+\boxed{
+\text{maximize expected return},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{minimize risk}.
+}
+\]
+
+One formulation is
+
+\[
+\boxed{
+\min_w
+\begin{pmatrix}
+-w^T\mu\\
+w^T\Sigma w
+\end{pmatrix}
+}
+\]
+
+subject to
+
+\[
+\boxed{
+\mathbf{1}^Tw=1.
+}
+\]
+
+The resulting Pareto frontier corresponds to an efficient risk--return
+frontier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Engineering Design Tradeoffs}
+\label{subsec:engineering-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An engineering design may simultaneously seek to minimize:
+
+\[
+\boxed{
+\text{mass},
+}
+\]
+
+\[
+\boxed{
+\text{cost},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{energy consumption},
+}
+\]
+
+while maximizing:
+
+\[
+\boxed{
+\text{reliability}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{performance}.
+}
+\]
+
+Multiobjective optimization helps identify designs where no criterion can
+be improved without sacrificing another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Operations Research Applications}
+\label{subsec:or-multiobjective}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Operations-research models may balance:
+
+\[
+\boxed{
+\text{service quality},
+}
+\]
+
+\[
+\boxed{
+\text{operating cost},
+}
+\]
+
+\[
+\boxed{
+\text{risk},
+}
+\]
+
+\[
+\boxed{
+\text{travel distance},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{resource utilization}.
+}
+\]
+
+These objectives frequently represent different stakeholders.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiobjective Optimization Workflow}
+\label{subsec:multiobjective-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item define the decision variables;
+    \item define the feasible set;
+    \item identify all meaningful objectives;
+    \item determine which objectives are minimized and which are
+          maximized;
+    \item convert directions consistently if needed;
+    \item solve each objective individually;
+    \item estimate ideal and objective-range information;
+    \item normalize objectives when scales differ substantially;
+    \item choose a scalarization or frontier-generation method;
+    \item generate candidate Pareto solutions;
+    \item remove dominated solutions;
+    \item visualize objective tradeoffs when dimension permits;
+    \item perform sensitivity analysis on weights or thresholds;
+    \item obtain preference information from the decision maker;
+    \item select a final compromise;
+    \item report both the selected solution and the alternatives sacrificed.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Multiobjective Method}
+\label{subsec:choosing-multiobjective-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When clear numerical tradeoff weights exist, consider:
+
+\[
+\boxed{
+\text{weighted-sum scalarization}.
+}
+\]
+
+When one objective is primary and others have limits, consider:
+
+\[
+\boxed{
+\text{epsilon-constraint optimization}.
+}
+\]
+
+When goals have explicit targets, consider:
+
+\[
+\boxed{
+\text{goal programming}.
+}
+\]
+
+When objectives have strict priorities, consider:
+
+\[
+\boxed{
+\text{lexicographic optimization}.
+}
+\]
+
+When preferences are not known initially, consider:
+
+\[
+\boxed{
+\text{Pareto-front generation}
+}
+\]
+
+or an interactive method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:multiobjective-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Looking for One Solution That Minimizes Every Objective}
+
+Conflicting objectives generally do not possess a common individual
+minimizer.
+
+The goal is usually to find Pareto-efficient tradeoffs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Pareto Optimality with a Unique Best Solution}
+
+Many Pareto-optimal solutions can exist.
+
+Pareto optimality removes dominated alternatives but does not by itself
+select one final solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Optimization Direction}
+
+Dominance definitions depend on whether objectives are minimized or
+maximized.
+
+A convenient approach is to convert all objectives to a common direction
+before comparing them.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Weights Without Normalization}
+
+If objectives differ greatly in magnitude, their numerical scales may
+dominate the weighted sum regardless of intended preference.
+
+Normalization should be considered.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Weights as Percent Importance Automatically}
+
+Weights in
+
+\[
+\sum_iw_if_i(x)
+\]
+
+interact with units and objective scales.
+
+A weight of \(0.5\) does not necessarily mean an objective has exactly
+\(50\%\) practical importance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Weighted Sums Find Every Pareto Point}
+
+For nonconvex objective sets, weighted sums can miss unsupported Pareto
+points.
+
+Use methods such as epsilon constraints when full frontier coverage is
+important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Weak Pareto Optimality with Pareto Optimality}
+
+Weak Pareto optimality only prevents simultaneous strict improvement in
+every objective.
+
+Pareto optimality is stronger.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming the Ideal Point Is Feasible}
+
+The ideal vector combines separate single-objective optima.
+
+Those values may not be attainable simultaneously.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using an Inaccurate Nadir Point for Scaling}
+
+Nadir estimates can influence normalized tradeoffs significantly.
+
+Poor estimates may distort the apparent geometry of the frontier.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Duplicate Objective Vectors}
+
+Different decisions can produce the same objective vector.
+
+A Pareto frontier in objective space need not uniquely identify the
+decision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Pareto Points Always Means a Better Approximation}
+
+A large number of points concentrated in one region may provide poor
+coverage.
+
+Both convergence and diversity matter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Hypervolume Without Stating the Reference Point}
+
+Hypervolume depends on the chosen reference point.
+
+Results are not meaningful without specifying that reference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Choosing a Final Solution Without Preference Information}
+
+Optimization can reveal efficient tradeoffs.
+
+Selecting among them generally requires values, priorities, or preferences
+from the relevant decision maker.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:multiobjective-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Engineering Design.}
+Designers balance weight, cost, reliability, performance, energy use, and
+safety.
+
+\medskip
+
+\textbf{Finance.}
+Portfolio decisions balance expected return, variance, liquidity, and
+tail risk.
+
+\medskip
+
+\textbf{Transportation.}
+Routing and network decisions may balance cost, travel time, emissions,
+and service quality.
+
+\medskip
+
+\textbf{Supply Chains.}
+Planning can simultaneously address cost, resilience, delivery time, and
+environmental impact.
+
+\medskip
+
+\textbf{Healthcare.}
+Resource-allocation decisions may balance cost, patient outcomes, access,
+and waiting time.
+
+\medskip
+
+\textbf{Energy Systems.}
+Power-system planning may balance cost, reliability, emissions, and
+renewable penetration.
+
+\medskip
+
+\textbf{Environmental Planning.}
+Land, water, and conservation decisions commonly require tradeoffs between
+economic and ecological objectives.
+
+\medskip
+
+\textbf{Public Policy.}
+Government decisions often involve several stakeholders with competing
+objectives rather than one universally accepted scalar measure.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:multiobjective-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define multiobjective optimization.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Pareto dominance.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a Pareto-optimal solution.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the Pareto set.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the Pareto frontier.
+\end{exercise}
+
+\begin{exercise}[1]
+Define weak Pareto optimality.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the ideal objective vector.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the nadir objective vector conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define scalarization.
+\end{exercise}
+
+\begin{exercise}[1]
+Define goal programming.
+\end{exercise}
+
+\begin{exercise}[2]
+Assume both objectives are minimized. Determine whether
+
+\[
+(2,5)
+\]
+
+dominates
+
+\[
+(3,6).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether either of the objective vectors
+
+\[
+(2,7)
+\]
+
+and
+
+\[
+(5,4)
+\]
+
+dominates the other.
+\end{exercise}
+
+\begin{exercise}[2]
+From the objective vectors
+
+\[
+(2,8),
+\quad
+(3,5),
+\quad
+(4,7),
+\quad
+(6,3),
+\]
+
+identify all nondominated vectors.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain why the ideal objective vector may be infeasible.
+\end{exercise}
+
+\begin{exercise}[2]
+Normalize an objective value using given ideal and nadir estimates.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a weighted-sum scalarization for three objectives.
+\end{exercise}
+
+\begin{exercise}[2]
+Write an epsilon-constraint formulation with one primary objective and two
+secondary objectives.
+\end{exercise}
+
+\begin{exercise}[2]
+Write a lexicographic optimization sequence for three objectives.
+\end{exercise}
+
+\begin{exercise}[2]
+Write goal-programming deviation equations for two target values.
+\end{exercise}
+
+\begin{exercise}[3]
+For three feasible alternatives with two objectives, identify the Pareto
+frontier.
+\end{exercise}
+
+\begin{exercise}[3]
+Evaluate a weighted-sum objective using several different weight vectors.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that a strictly positive weighted-sum optimum is Pareto optimal.
+\end{exercise}
+
+\begin{exercise}[3]
+Give a geometric example of an unsupported Pareto point.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why weighted sums may fail on a nonconvex objective set.
+\end{exercise}
+
+\begin{exercise}[3]
+Generate several Pareto solutions using the epsilon-constraint method.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the solutions obtained from weighted-sum and epsilon-constraint
+scalarizations.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a biobjective linear program.
+\end{exercise}
+
+\begin{exercise}[3]
+Convert the previous model into a weighted linear program.
+\end{exercise}
+
+\begin{exercise}[3]
+Convert the same model into an epsilon-constraint linear program.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a goal-programming model with profit, overtime, and emissions
+targets.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a lexicographic model in which safety has higher priority than
+cost.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a Chebyshev scalarization for two normalized objectives.
+\end{exercise}
+
+\begin{exercise}[3]
+Convert a max-deviation objective into epigraph form.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the ideal point for a two-objective problem by solving the two
+single-objective problems.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how an inaccurate scaling range can distort weighted objectives.
+\end{exercise}
+
+\begin{exercise}[3]
+For a differentiable unconstrained two-objective problem, write the
+weighted first-order Pareto stationarity condition.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the constrained multiobjective KKT stationarity equation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between a priori and a posteriori methods.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the advantage of interactive multiobjective optimization.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a mean--variance portfolio problem as a two-objective model.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an engineering model minimizing both mass and cost.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a transportation model minimizing cost and emissions.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a max--min fairness problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why fairness and efficiency may conflict.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain what a knee point represents.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why different decisions can map to the same Pareto objective
+vector.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a Pareto frontier alone may not determine the final decision.
+\end{exercise}
+
+\begin{exercise}[4]
+Study existence of Pareto-optimal solutions under compactness and
+continuity assumptions.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove that every Pareto-optimal point is weakly Pareto optimal.
+\end{exercise}
+
+\begin{exercise}[4]
+Give an example showing the converse fails.
+\end{exercise}
+
+\begin{exercise}[4]
+Study scalarization theorems for convex multiobjective optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Characterize supported and unsupported efficient points geometrically.
+\end{exercise}
+
+\begin{exercise}[4]
+Study proper efficiency in the sense of Geoffrion.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive multiobjective KKT conditions using scalarization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study second-order conditions for local Pareto optimality.
+\end{exercise}
+
+\begin{exercise}[4]
+Study achievement scalarizing functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate reference-point methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Benson-type algorithms for multiobjective linear programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Study epsilon-constraint enumeration for discrete Pareto sets.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate multiobjective branch-and-bound.
+\end{exercise}
+
+\begin{exercise}[4]
+Study multiobjective dynamic programming.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate evolutionary multiobjective optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study nondominated sorting algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the hypervolume indicator.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate diversity metrics for approximate Pareto fronts.
+\end{exercise}
+
+\begin{exercise}[4]
+Study robust multiobjective optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stochastic multiobjective optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate preference elicitation for multiobjective decision support.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:multiobjective-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A multiobjective optimization problem has vector objective
+
+\[
+\boxed{
+\mathbf{f}(x)
+=
+\begin{pmatrix}
+f_1(x)\\
+\vdots\\
+f_k(x)
+\end{pmatrix}.
+}
+\]
+
+A feasible point is Pareto optimal when no other feasible point improves
+one objective without worsening another.
+
+The Pareto set lies in decision space:
+
+\[
+\boxed{
+\mathcal{P}
+=
+\{
+x:
+x\text{ is Pareto optimal}
+\}.
+}
+\]
+
+Its image in objective space is the Pareto frontier.
+
+Important scalarization methods include:
+
+\[
+\boxed{
+\text{weighted sums},
+}
+\]
+
+\[
+\boxed{
+\text{epsilon constraints},
+}
+\]
+
+\[
+\boxed{
+\text{goal programming},
+}
+\]
+
+\[
+\boxed{
+\text{lexicographic optimization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{reference-point methods}.
+}
+\]
+
+Weighted sums solve
+
+\[
+\boxed{
+\min_x
+\sum_i
+w_if_i(x).
+}
+\]
+
+Epsilon constraints solve one objective while bounding the others.
+
+The ideal vector contains each objective's individual optimum, but is not
+generally feasible.
+
+Multiobjective optimization therefore combines
+
+\[
+\boxed{
+\text{optimization}
++
+\text{tradeoff analysis}
++
+\text{preference modeling}
++
+\text{decision support}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:multiobjective-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Multiobjective Optimization extends the single-objective framework of
+Sections~\ref{sec:optimization-fundamentals},
+\ref{sec:convex-optimization}, and
+\ref{sec:stochastic-optimization} to problems where several competing
+performance criteria must be considered simultaneously. Pareto dominance
+replaces ordinary scalar comparison, while weighted sums, epsilon
+constraints, goal programming, lexicographic methods, and reference-point
+methods provide mechanisms for selecting compromises. These ideas connect
+directly with Decision Theory later in Chapter~10. The next section,
+Network Optimization, develops optimization problems whose feasible
+structures are paths, flows, cuts, and networks, including shortest paths,
+maximum flow, minimum-cost flow, transportation, and network-design
+models.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 10.9 Multiobjective Optimization
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard multiobjective optimization theory.
+%   - Standard vector optimization and Pareto-efficiency concepts.
+%   - Standard multiple-criteria decision-making methods.
+%
+% Used for:
+%   - vector-valued objectives;
+%   - conflicting objectives;
+%   - decision and objective spaces;
+%   - Pareto dominance;
+%   - dominated and nondominated solutions;
+%   - Pareto optimality;
+%   - weak Pareto optimality;
+%   - Pareto sets and Pareto frontiers;
+%   - tradeoff interpretation;
+%   - ideal, nadir, and utopia reference points;
+%   - objective normalization;
+%   - scalarization;
+%   - weighted-sum methods;
+%   - supported and unsupported Pareto points;
+%   - epsilon-constraint methods;
+%   - lexicographic optimization;
+%   - goal programming;
+%   - reference-point methods;
+%   - compromise programming;
+%   - Chebyshev scalarization;
+%   - multiobjective LP and convex optimization;
+%   - first-order Pareto conditions;
+%   - multiobjective KKT conditions;
+%   - proper efficiency;
+%   - preference information;
+%   - a priori, a posteriori, and interactive methods;
+%   - Pareto-front generation;
+%   - knee points;
+%   - discrete multiobjective optimization;
+%   - evolutionary multiobjective optimization preview;
+%   - nondominated sorting;
+%   - diversity and hypervolume;
+%   - weight sensitivity;
+%   - fairness;
+%   - sustainability;
+%   - portfolio and engineering applications;
+%   - exercises.
+%
+% Notes:
+%   - Network Optimization is developed next in Section 10.10.
+%   - Decision Theory is developed in Section 10.14.
+%   - Stochastic multiobjective models connect with Section 10.8.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

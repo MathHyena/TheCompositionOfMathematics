@@ -1,0 +1,3951 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.6 MONTE CARLO METHODS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Monte Carlo Methods}
+\label{sec:monte-carlo-methods}
+
+\prerequisite{
+Probability, random variables, expectation, variance, probability
+distributions, laws of large numbers, central limit theorems, numerical
+integration, statistics, stochastic processes, and basic programming.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the basic Monte Carlo principle;
+    \item estimate expectations using random samples;
+    \item understand why Monte Carlo error decreases at rate \(N^{-1/2}\);
+    \item distinguish bias from sampling variance;
+    \item construct Monte Carlo estimators;
+    \item estimate the standard error of a Monte Carlo estimate;
+    \item construct approximate Monte Carlo confidence intervals;
+    \item approximate definite integrals using random sampling;
+    \item approximate multidimensional integrals;
+    \item recognize the dimensional advantages of Monte Carlo integration;
+    \item simulate common probability distributions;
+    \item understand pseudorandom number generation;
+    \item distinguish pseudorandom and truly random sequences;
+    \item understand reproducibility through random seeds;
+    \item apply inverse-transform sampling;
+    \item apply acceptance--rejection sampling;
+    \item recognize transformation methods for simulation;
+    \item understand importance sampling;
+    \item derive importance-sampling estimators;
+    \item understand variance reduction;
+    \item apply antithetic variates conceptually;
+    \item apply control variates;
+    \item understand stratified sampling;
+    \item recognize Latin hypercube sampling conceptually;
+    \item understand common random numbers conceptually;
+    \item estimate rare-event probabilities;
+    \item understand why naive Monte Carlo is inefficient for rare events;
+    \item recognize sequential Monte Carlo conceptually;
+    \item understand Markov chain Monte Carlo;
+    \item identify stationary and target distributions;
+    \item understand the Metropolis--Hastings algorithm;
+    \item understand Gibbs sampling conceptually;
+    \item distinguish independent Monte Carlo from MCMC;
+    \item understand burn-in and initialization issues;
+    \item recognize autocorrelation in Markov-chain samples;
+    \item understand effective sample size conceptually;
+    \item understand Monte Carlo diagnostics;
+    \item recognize quasi-Monte Carlo methods;
+    \item understand low-discrepancy sequences conceptually;
+    \item distinguish Monte Carlo from quasi-Monte Carlo;
+    \item understand bootstrap simulation conceptually;
+    \item recognize Monte Carlo methods for stochastic differential
+          equations;
+    \item estimate expectations from simulated SDE paths;
+    \item understand nested simulation;
+    \item recognize uncertainty quantification;
+    \item perform convergence studies for stochastic simulation;
+    \item connect Monte Carlo methods with probability, statistics,
+          optimization, finance, physics, engineering, Bayesian inference,
+          and scientific computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is a Monte Carlo Method?}
+\label{subsec:what-is-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Monte Carlo methods use random sampling to approximate mathematical
+quantities.
+
+The basic idea is:
+
+\[
+\boxed{
+\text{random samples}
+\longrightarrow
+\text{sample average}
+\longrightarrow
+\text{approximation}.
+}
+\]
+
+Monte Carlo methods are especially useful when direct deterministic
+computation is difficult.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expectation as the Central Quantity}
+\label{subsec:monte-carlo-expectation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+X
+\]
+
+is a random variable and we want to compute
+
+\[
+\boxed{
+\mu
+=
+\mathbb{E}[g(X)].
+}
+\]
+
+If
+
+\[
+X_1,\ldots,X_N
+\]
+
+are independent samples from the distribution of \(X\), define
+
+\[
+\boxed{
+\widehat{\mu}_N
+=
+\frac1N
+\sum_{i=1}^{N}
+g(X_i).
+}
+\]
+
+This is the standard Monte Carlo estimator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unbiasedness}
+\label{subsec:monte-carlo-unbiasedness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\mathbb{E}[|g(X)|]<\infty,
+\]
+
+then
+
+\[
+\mathbb{E}
+[
+\widehat{\mu}_N
+]
+=
+\frac1N
+\sum_{i=1}^{N}
+\mathbb{E}[g(X_i)].
+\]
+
+Since the samples have identical distributions,
+
+\[
+\boxed{
+\mathbb{E}
+[
+\widehat{\mu}_N
+]
+=
+\mu.
+}
+\]
+
+Thus the ordinary sample-average Monte Carlo estimator is unbiased.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of the Monte Carlo Estimator}
+\label{subsec:mc-estimator-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assume
+
+\[
+\operatorname{Var}(g(X))
+=
+\sigma^2
+<
+\infty.
+\]
+
+For independent samples,
+
+\[
+\operatorname{Var}
+(
+\widehat{\mu}_N
+)
+=
+\frac1{N^2}
+\sum_{i=1}^{N}
+\sigma^2.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{\mu}_N
+)
+=
+\frac{
+\sigma^2
+}{
+N
+}.
+}
+\]
+
+The standard deviation is
+
+\[
+\boxed{
+\frac{\sigma}{\sqrt{N}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Convergence Rate}
+\label{subsec:mc-convergence-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The characteristic Monte Carlo error scale is
+
+\[
+\boxed{
+O(N^{-1/2}).
+}
+\]
+
+To reduce standard error by a factor of \(2\), the sample size must be
+multiplied by approximately
+
+\[
+\boxed{
+4.
+}
+\]
+
+To reduce error by a factor of \(10\), one generally needs about
+
+\[
+\boxed{
+100
+}
+\]
+
+times as many independent samples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Law of Large Numbers}
+\label{subsec:mc-law-large-numbers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under standard assumptions, the Law of Large Numbers implies
+
+\[
+\boxed{
+\widehat{\mu}_N
+\to
+\mu
+}
+\]
+
+as
+
+\[
+N\to\infty.
+\]
+
+Thus the sample average converges to the desired expectation.
+
+The Law of Large Numbers gives the basic consistency of Monte Carlo
+estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Central Limit Theorem}
+\label{subsec:mc-central-limit-theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under suitable finite-variance assumptions,
+
+\[
+\boxed{
+\sqrt{N}
+\left(
+\widehat{\mu}_N-\mu
+\right)
+\overset{d}{\longrightarrow}
+N(0,\sigma^2).
+}
+\]
+
+Therefore, for large \(N\),
+
+\[
+\widehat{\mu}_N
+\]
+
+is approximately normally distributed around \(\mu\).
+
+This allows approximate confidence intervals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Standard Error}
+\label{subsec:mc-standard-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The population variance \(\sigma^2\) is usually unknown.
+
+Estimate it using
+
+\[
+\boxed{
+s^2
+=
+\frac1{N-1}
+\sum_{i=1}^{N}
+\left(
+g(X_i)-\widehat{\mu}_N
+\right)^2.
+}
+\]
+
+Then the estimated Monte Carlo standard error is
+
+\[
+\boxed{
+\widehat{\operatorname{SE}}
+(
+\widehat{\mu}_N
+)
+=
+\frac{s}{\sqrt{N}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximate Confidence Interval}
+\label{subsec:mc-confidence-interval}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For sufficiently large independent samples, an approximate confidence
+interval is
+
+\[
+\boxed{
+\widehat{\mu}_N
+\pm
+z_{1-\alpha/2}
+\frac{s}{\sqrt{N}}.
+}
+\]
+
+For an approximate \(95\%\) interval,
+
+\[
+z_{0.975}
+\approx1.96.
+\]
+
+Thus,
+
+\[
+\boxed{
+\widehat{\mu}_N
+\pm
+1.96
+\frac{s}{\sqrt{N}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Monte Carlo Mean}
+\label{subsec:worked-mc-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Estimating an Expectation}
+
+Suppose the simulated values of \(g(X)\) are
+
+\[
+2,\quad4,\quad3,\quad5,\quad6.
+\]
+
+Then
+
+\[
+\widehat{\mu}_5
+=
+\frac{
+2+4+3+5+6
+}{
+5
+}.
+\]
+
+Therefore,
+
+\[
+\widehat{\mu}_5
+=
+4.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\mu}_5=4.
+}
+\]
+\end{answerbox}
+
+The estimate would become more reliable as the number of independent
+samples increases.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bias and Variance}
+\label{subsec:mc-bias-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The mean-squared error satisfies
+
+\[
+\boxed{
+\operatorname{MSE}
+(
+\widehat{\theta}
+)
+=
+\operatorname{Var}
+(
+\widehat{\theta}
+)
++
+\operatorname{Bias}
+(
+\widehat{\theta}
+)^2.
+}
+\]
+
+Standard sample-average Monte Carlo is often unbiased.
+
+Other simulation methods may introduce bias in exchange for lower variance
+or computational efficiency.
+
+Examples include:
+
+\[
+\boxed{
+\text{time discretization of SDEs},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{finite burn-in or approximation in MCMC}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Integration}
+\label{subsec:monte-carlo-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+I
+=
+\int_a^b
+f(x)\,dx.
+\]
+
+Let
+
+\[
+U
+\sim
+\operatorname{Uniform}(a,b).
+\]
+
+Then
+
+\[
+\mathbb{E}[f(U)]
+=
+\frac1{b-a}
+\int_a^b
+f(x)\,dx.
+\]
+
+Therefore,
+
+\[
+\boxed{
+I
+=
+(b-a)
+\mathbb{E}[f(U)].
+}
+\]
+
+A Monte Carlo estimator is
+
+\[
+\boxed{
+\widehat{I}_N
+=
+\frac{
+b-a
+}{
+N
+}
+\sum_{i=1}^{N}
+f(U_i).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Monte Carlo Integral}
+\label{subsec:worked-mc-integral}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Estimating \(\int_0^1 x^2\,dx\)}
+
+Let
+
+\[
+U\sim\operatorname{Uniform}(0,1).
+\]
+
+Then
+
+\[
+\int_0^1x^2\,dx
+=
+\mathbb{E}[U^2].
+\]
+
+Therefore,
+
+\[
+\widehat{I}_N
+=
+\frac1N
+\sum_{i=1}^{N}
+U_i^2.
+\]
+
+The exact value is
+
+\[
+\frac13.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{I}_N
+=
+\frac1N
+\sum_{i=1}^{N}
+U_i^2
+\to
+\frac13.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integration Over General Domains}
+\label{subsec:mc-general-domain-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(D\subset\mathbb{R}^d\) has finite volume
+
+\[
+|D|.
+\]
+
+If
+
+\[
+X\sim\operatorname{Uniform}(D),
+\]
+
+then
+
+\[
+\boxed{
+\int_D
+f(x)\,dx
+=
+|D|
+\mathbb{E}[f(X)].
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\widehat{I}_N
+=
+\frac{
+|D|
+}{
+N
+}
+\sum_{i=1}^{N}
+f(X_i).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{High-Dimensional Integration}
+\label{subsec:mc-high-dimensional-integration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Traditional grid-based quadrature suffers from the curse of
+dimensionality.
+
+If \(m\) points are used in each of \(d\) dimensions, then the grid
+contains
+
+\[
+\boxed{
+m^d
+}
+\]
+
+points.
+
+Monte Carlo convergence remains approximately
+
+\[
+\boxed{
+O(N^{-1/2})
+}
+\]
+
+regardless of dimension.
+
+The constant may still depend strongly on the integrand and dimension, but
+the exponent does not deteriorate directly with \(d\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimating Area and Volume}
+\label{subsec:mc-area-volume}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose region \(A\) lies inside an easy-to-sample region \(B\).
+
+If
+
+\[
+X\sim\operatorname{Uniform}(B),
+\]
+
+then
+
+\[
+\boxed{
+P(X\in A)
+=
+\frac{
+|A|
+}{
+|B|
+}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+|A|
+=
+|B|
+P(X\in A).
+}
+\]
+
+Estimate the probability using the fraction of sampled points falling in
+\(A\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimating \(\pi\)}
+\label{subsec:mc-estimating-pi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sample uniformly from the square
+
+\[
+[-1,1]^2.
+\]
+
+The unit disk has area
+
+\[
+\pi,
+\]
+
+while the square has area
+
+\[
+4.
+\]
+
+Therefore,
+
+\[
+P(X^2+Y^2\leq1)
+=
+\frac{\pi}{4}.
+\]
+
+Hence,
+
+\[
+\boxed{
+\pi
+=
+4
+P(X^2+Y^2\leq1).
+}
+\]
+
+The Monte Carlo estimator is
+
+\[
+\boxed{
+\widehat{\pi}
+=
+4
+\frac{
+\#\{
+i:
+X_i^2+Y_i^2\leq1
+\}
+}{
+N
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Indicator Variables}
+\label{subsec:mc-indicator-variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For event \(A\), define
+
+\[
+\boxed{
+\mathbf{1}_A(X)
+=
+\begin{cases}
+1,
+&
+X\in A,
+\\
+0,
+&
+X\notin A.
+\end{cases}
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbb{E}
+[
+\mathbf{1}_A(X)
+]
+=
+P(A).
+}
+\]
+
+Thus event probabilities can always be written as expectations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Probability Estimation}
+\label{subsec:mc-probability-estimation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+X_i
+\]
+
+are independent samples, estimate
+
+\[
+p=P(A)
+\]
+
+using
+
+\[
+\boxed{
+\widehat{p}
+=
+\frac1N
+\sum_{i=1}^{N}
+\mathbf{1}_A(X_i).
+}
+\]
+
+Since the indicator is Bernoulli,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{p}
+)
+=
+\frac{
+p(1-p)
+}{
+N
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Number Generation}
+\label{subsec:random-number-generation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computer simulations usually rely on pseudorandom numbers.
+
+A pseudorandom number generator produces a deterministic sequence designed
+to imitate important statistical properties of random samples.
+
+Given an initial internal state or seed, the sequence is reproducible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Random Seeds}
+\label{subsec:random-seeds}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A random seed initializes a pseudorandom generator.
+
+Using the same generator and seed generally reproduces the same sequence,
+subject to implementation details.
+
+This is useful for:
+
+\[
+\boxed{
+\text{debugging},
+}
+\]
+
+\[
+\boxed{
+\text{reproducibility},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{method comparison}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uniform Random Variables}
+\label{subsec:uniform-random-generation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many simulation algorithms begin with
+
+\[
+\boxed{
+U\sim\operatorname{Uniform}(0,1).
+}
+\]
+
+More complicated distributions are then generated by transforming one or
+more uniform random variables.
+
+Thus uniform pseudorandom generation is a fundamental computational
+primitive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse-Transform Sampling}
+\label{subsec:inverse-transform-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a continuous distribution has cumulative distribution function
+
+\[
+F(x).
+\]
+
+If
+
+\[
+U\sim\operatorname{Uniform}(0,1),
+\]
+
+then
+
+\[
+\boxed{
+X
+=
+F^{-1}(U)
+}
+\]
+
+has cumulative distribution function \(F\), assuming the inverse is
+interpreted appropriately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Exponential Simulation}
+\label{subsec:worked-exponential-simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Inverse Transform for an Exponential Variable}
+
+Let
+
+\[
+X\sim\operatorname{Exponential}(\lambda).
+\]
+
+Its CDF is
+
+\[
+F(x)
+=
+1-e^{-\lambda x},
+\qquad
+x\geq0.
+\]
+
+Set
+
+\[
+U=F(X).
+\]
+
+Then
+
+\[
+U
+=
+1-e^{-\lambda X}.
+\]
+
+Thus,
+
+\[
+e^{-\lambda X}
+=
+1-U.
+\]
+
+Taking logarithms,
+
+\[
+X
+=
+-\frac1\lambda
+\ln(1-U).
+\]
+
+Since \(1-U\) is also uniform on \((0,1)\), one may equivalently use
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+X
+=
+-\frac1\lambda
+\ln U.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transformation Method}
+\label{subsec:mc-transformation-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a random variable \(X\) has an easy-to-simulate distribution and
+
+\[
+Y=g(X),
+\]
+
+then samples of \(Y\) can be obtained by evaluating
+
+\[
+\boxed{
+Y_i=g(X_i).
+}
+\]
+
+Transformation methods are useful when the desired distribution can be
+constructed from simpler distributions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acceptance--Rejection Sampling}
+\label{subsec:acceptance-rejection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose target density \(f\) is difficult to sample from directly.
+
+Choose an easy proposal density \(g\) and constant \(M\) such that
+
+\[
+\boxed{
+f(x)
+\leq
+Mg(x)
+}
+\]
+
+for all relevant \(x\).
+
+Then:
+
+\begin{enumerate}
+    \item sample \(Y\sim g\);
+    \item sample \(U\sim\operatorname{Uniform}(0,1)\);
+    \item accept \(Y\) if
+    \[
+    U
+    \leq
+    \frac{
+    f(Y)
+    }{
+    Mg(Y)
+    }.
+    \]
+\end{enumerate}
+
+Accepted values follow the target distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acceptance Probability}
+\label{subsec:acceptance-probability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(f\) is normalized and
+
+\[
+f(x)\leq Mg(x),
+\]
+
+then the average acceptance probability is
+
+\[
+\boxed{
+\frac1M.
+}
+\]
+
+Thus a large \(M\) produces many rejected samples.
+
+A good proposal should closely match the target.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance Reduction}
+\label{subsec:variance-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The standard Monte Carlo error decreases only as
+
+\[
+N^{-1/2}.
+\]
+
+Rather than increasing \(N\), one can sometimes reduce the variance of the
+estimator.
+
+Variance reduction seeks
+
+\[
+\boxed{
+\text{same expectation}
++
+\text{smaller variance}.
+}
+\]
+
+Important techniques include:
+
+\[
+\boxed{
+\text{importance sampling},
+}
+\]
+
+\[
+\boxed{
+\text{control variates},
+}
+\]
+
+\[
+\boxed{
+\text{antithetic variates},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{stratification}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Importance Sampling}
+\label{subsec:importance-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\mu
+=
+\int
+g(x)
+p(x)\,dx.
+\]
+
+Choose another density \(q(x)\) satisfying
+
+\[
+q(x)>0
+\]
+
+whenever
+
+\[
+g(x)p(x)\neq0.
+\]
+
+Then
+
+\[
+\mu
+=
+\int
+g(x)
+\frac{
+p(x)
+}{
+q(x)
+}
+q(x)\,dx.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mu
+=
+\mathbb{E}_q
+\left[
+g(X)
+\frac{
+p(X)
+}{
+q(X)
+}
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Importance Weights}
+\label{subsec:importance-weights}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define the importance weight
+
+\[
+\boxed{
+w(x)
+=
+\frac{
+p(x)
+}{
+q(x)
+}.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\widehat{\mu}_{IS}
+=
+\frac1N
+\sum_{i=1}^{N}
+g(X_i)
+w(X_i),
+\qquad
+X_i\sim q.
+}
+\]
+
+A good proposal places more probability in regions contributing strongly
+to the expectation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Importance-Sampling Variance}
+\label{subsec:importance-sampling-variance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The variance is
+
+\[
+\boxed{
+\operatorname{Var}_q
+\left(
+g(X)\frac{p(X)}{q(X)}
+\right).
+}
+\]
+
+A poor proposal can make this variance extremely large or even infinite.
+
+Thus importance sampling is powerful but can perform much worse than
+ordinary Monte Carlo if the proposal is badly chosen.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rare Events}
+\label{subsec:rare-event-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+p=P(A)
+\]
+
+is very small.
+
+The naive estimator is
+
+\[
+\widehat{p}
+=
+\frac1N
+\sum_{i=1}^{N}
+\mathbf{1}_A(X_i).
+\]
+
+Its relative standard error is approximately
+
+\[
+\boxed{
+\frac{
+\sqrt{p(1-p)/N}
+}{
+p
+}
+=
+\sqrt{
+\frac{
+1-p
+}{
+Np
+}
+}.
+}
+\]
+
+For very small \(p\), this is large unless
+
+\[
+Np
+\]
+
+is itself large.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Importance Sampling for Rare Events}
+\label{subsec:importance-sampling-rare-events}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rare-event importance sampling changes the sampling distribution so the
+rare event occurs much more frequently.
+
+The likelihood ratio
+
+\[
+\boxed{
+\frac{p(x)}{q(x)}
+}
+\]
+
+then corrects for the altered sampling distribution.
+
+A successful proposal substantially reduces estimator variance while
+remaining unbiased under standard conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control Variates}
+\label{subsec:control-variates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose we want
+
+\[
+\mu_X
+=
+\mathbb{E}[X],
+\]
+
+and have another correlated variable \(Y\) with known expectation
+
+\[
+\mu_Y.
+\]
+
+Define
+
+\[
+\boxed{
+Z
+=
+X
+-
+c
+(
+Y-\mu_Y
+).
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbb{E}[Z]
+=
+\mu_X.
+}
+\]
+
+Thus \(Z\) is another unbiased estimator target.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimal Control-Variate Coefficient}
+\label{subsec:optimal-control-variate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The variance is minimized by
+
+\[
+\boxed{
+c^*
+=
+\frac{
+\operatorname{Cov}(X,Y)
+}{
+\operatorname{Var}(Y)
+}
+}
+\]
+
+when
+
+\[
+\operatorname{Var}(Y)>0.
+\]
+
+Then
+
+\[
+\boxed{
+\operatorname{Var}(Z)
+=
+\operatorname{Var}(X)
+\left(
+1-\rho_{XY}^2
+\right),
+}
+\]
+
+where \(\rho_{XY}\) is the correlation.
+
+Strong correlation can produce major variance reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Control Variate}
+\label{subsec:worked-control-variate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Using a Known Mean}
+
+Suppose \(X\) is expensive to simulate and is positively correlated with
+\(Y\), where
+
+\[
+\mathbb{E}[Y]=10.
+\]
+
+Choose coefficient \(c=2\).
+
+Then use
+
+\[
+Z
+=
+X
+-
+2(Y-10).
+\]
+
+Because
+
+\[
+\mathbb{E}[Y-10]=0,
+\]
+
+we have
+
+\[
+\mathbb{E}[Z]
+=
+\mathbb{E}[X].
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{\mu}_{CV}
+=
+\frac1N
+\sum_{i=1}^{N}
+\left[
+X_i-2(Y_i-10)
+\right].
+}
+\]
+\end{answerbox}
+
+If \(X\) and \(Y\) are strongly correlated, the estimator may have much
+smaller variance than the ordinary sample mean of \(X\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Antithetic Variates}
+\label{subsec:antithetic-variates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+U\sim\operatorname{Uniform}(0,1).
+\]
+
+Then
+
+\[
+1-U
+\]
+
+has the same distribution.
+
+Instead of using only
+
+\[
+g(U),
+\]
+
+form the pair
+
+\[
+\boxed{
+g(U),
+\qquad
+g(1-U).
+}
+\]
+
+The antithetic estimator is
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\frac1N
+\sum_{i=1}^{N}
+\frac{
+g(U_i)+g(1-U_i)
+}{
+2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Antithetic Variates Can Help}
+\label{subsec:why-antithetic-helps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+g(U)
+\]
+
+and
+
+\[
+g(1-U)
+\]
+
+are negatively correlated, averaging them reduces variance.
+
+The method is especially natural for monotone transformations of uniform
+random variables.
+
+Negative correlation is the key mechanism.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stratified Sampling}
+\label{subsec:stratified-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Divide the sample space into disjoint strata
+
+\[
+A_1,\ldots,A_K.
+\]
+
+Then
+
+\[
+\boxed{
+\mathbb{E}[g(X)]
+=
+\sum_{k=1}^{K}
+P(A_k)
+\mathbb{E}
+[
+g(X)
+\mid
+A_k
+].
+}
+\]
+
+Estimate each conditional expectation separately.
+
+This ensures that important portions of the sample space receive
+representation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stratified Estimator}
+\label{subsec:stratified-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+p_k=P(A_k).
+\]
+
+If \(N_k\) samples are drawn within stratum \(k\), then
+
+\[
+\boxed{
+\widehat{\mu}_{strat}
+=
+\sum_{k=1}^{K}
+p_k
+\widehat{\mu}_k,
+}
+\]
+
+where
+
+\[
+\boxed{
+\widehat{\mu}_k
+=
+\frac1{N_k}
+\sum_{i=1}^{N_k}
+g(X_{ki}).
+}
+\]
+
+The allocation \(N_k\) affects variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Latin Hypercube Sampling Preview}
+\label{subsec:latin-hypercube}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Latin hypercube sampling divides each input dimension into intervals of
+equal probability.
+
+Samples are arranged so that each interval is represented exactly once in
+each dimension.
+
+This provides more uniform coverage than ordinary independent random
+sampling in many uncertainty-quantification problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Random Numbers}
+\label{subsec:common-random-numbers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose two systems are compared using simulated performance
+
+\[
+Y_A
+\]
+
+and
+
+\[
+Y_B.
+\]
+
+Use the same underlying random inputs when simulating both systems.
+
+Then estimate
+
+\[
+\boxed{
+\mathbb{E}
+[
+Y_A-Y_B
+].
+}
+\]
+
+If the outputs respond similarly to common randomness, their difference
+may have substantially reduced variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo for Optimization}
+\label{subsec:monte-carlo-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an objective is
+
+\[
+\boxed{
+F(x)
+=
+\mathbb{E}
+[
+f(x,\xi)
+].
+}
+\]
+
+Monte Carlo replaces the expectation with a sample average:
+
+\[
+\boxed{
+\widehat{F}_N(x)
+=
+\frac1N
+\sum_{i=1}^{N}
+f(x,\xi_i).
+}
+\]
+
+Then solve
+
+\[
+\boxed{
+\min_x
+\widehat{F}_N(x).
+}
+\]
+
+This is a Sample Average Approximation approach.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Gradient Estimation}
+\label{subsec:monte-carlo-gradients}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If differentiation and expectation can be interchanged under appropriate
+regularity conditions,
+
+\[
+\boxed{
+\nabla F(x)
+=
+\mathbb{E}
+[
+\nabla_x f(x,\xi)
+].
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\widehat{\nabla F}_N(x)
+=
+\frac1N
+\sum_{i=1}^{N}
+\nabla_x f(x,\xi_i).
+}
+\]
+
+This connects Monte Carlo directly with stochastic gradient methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Markov Chain Monte Carlo}
+\label{subsec:markov-chain-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary Monte Carlo often assumes independent samples.
+
+Sometimes direct independent sampling from a complicated target density
+
+\[
+\pi(x)
+\]
+
+is difficult.
+
+Markov Chain Monte Carlo, abbreviated MCMC, constructs a Markov chain
+
+\[
+X_0,X_1,X_2,\ldots
+\]
+
+whose stationary distribution is the desired target \(\pi\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stationary Distribution}
+\label{subsec:mcmc-stationary-distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A distribution \(\pi\) is stationary for transition kernel \(P\) if
+
+\[
+\boxed{
+\pi P=\pi
+}
+\]
+
+in discrete notation.
+
+If
+
+\[
+X_n\sim\pi,
+\]
+
+then
+
+\[
+X_{n+1}\sim\pi.
+\]
+
+A properly designed MCMC algorithm attempts to approach this stationary
+distribution as the chain evolves.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MCMC Estimator}
+\label{subsec:mcmc-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After generating
+
+\[
+X_1,\ldots,X_N,
+\]
+
+estimate
+
+\[
+\mathbb{E}_\pi[g(X)]
+\]
+
+using
+
+\[
+\boxed{
+\widehat{\mu}
+=
+\frac1N
+\sum_{i=1}^{N}
+g(X_i).
+}
+\]
+
+Unlike ordinary independent Monte Carlo, the samples are generally
+correlated.
+
+Appropriate ergodic conditions replace the ordinary independent-sample
+Law of Large Numbers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metropolis--Hastings Algorithm}
+\label{subsec:metropolis-hastings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the current state is
+
+\[
+X_n=x.
+\]
+
+Choose a proposal distribution
+
+\[
+\boxed{
+q(y\mid x).
+}
+\]
+
+Generate candidate
+
+\[
+Y\sim q(\cdot\mid x).
+\]
+
+Accept the candidate with probability
+
+\[
+\boxed{
+\alpha(x,y)
+=
+\min
+\left\{
+1,
+\frac{
+\pi(y)q(x\mid y)
+}{
+\pi(x)q(y\mid x)
+}
+\right\}.
+}
+\]
+
+If rejected, remain at \(x\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metropolis--Hastings Update}
+\label{subsec:metropolis-hastings-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Generate
+
+\[
+U\sim\operatorname{Uniform}(0,1).
+\]
+
+Then
+
+\[
+\boxed{
+X_{n+1}
+=
+\begin{cases}
+Y,
+&
+U\leq\alpha(x,Y),
+\\
+x,
+&
+U>\alpha(x,Y).
+\end{cases}
+}
+\]
+
+Repeated application produces a dependent sequence of states.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetric Proposal}
+\label{subsec:symmetric-mh-proposal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+q(y\mid x)
+=
+q(x\mid y),
+\]
+
+then the proposal terms cancel.
+
+The acceptance probability becomes
+
+\[
+\boxed{
+\alpha(x,y)
+=
+\min
+\left\{
+1,
+\frac{
+\pi(y)
+}{
+\pi(x)
+}
+\right\}.
+}
+\]
+
+This is the classical Metropolis form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unnormalized Target Densities}
+\label{subsec:unnormalized-mcmc-target}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\pi(x)
+=
+\frac{
+\widetilde{\pi}(x)
+}{
+Z
+},
+\]
+
+where normalizing constant \(Z\) is unknown.
+
+In the Metropolis--Hastings ratio,
+
+\[
+Z
+\]
+
+cancels.
+
+Thus MCMC can sample from many distributions known only up to a
+multiplicative constant.
+
+This is especially important in Bayesian inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Metropolis Acceptance}
+\label{subsec:worked-metropolis-acceptance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Computing an Acceptance Probability}
+
+Suppose a symmetric proposal is used and
+
+\[
+\pi(x)=0.20,
+\]
+
+while the proposed state's target density is
+
+\[
+\pi(y)=0.10.
+\]
+
+Then
+
+\[
+\alpha(x,y)
+=
+\min
+\left\{
+1,
+\frac{0.10}{0.20}
+\right\}.
+\]
+
+Therefore,
+
+\[
+\begin{answerbox}
+\[
+\boxed{
+\alpha(x,y)=0.5.
+}
+\]
+\end{answerbox}
+
+The proposed move is accepted with probability \(0.5\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Detailed Balance}
+\label{subsec:detailed-balance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A sufficient condition for stationarity is detailed balance:
+
+\[
+\boxed{
+\pi(x)
+P(x,dy)
+=
+\pi(y)
+P(y,dx).
+}
+\]
+
+This expresses reversible probability flow between states.
+
+Metropolis--Hastings is designed so that the target distribution satisfies
+this condition under standard assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gibbs Sampling}
+\label{subsec:gibbs-sampling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+X
+=
+(X_1,\ldots,X_d)
+\]
+
+has a complicated joint distribution, but conditional distributions are
+easy to sample.
+
+Gibbs sampling updates components sequentially from
+
+\[
+\boxed{
+X_j
+\sim
+\pi
+(
+x_j
+\mid
+x_{-j}
+).
+}
+\]
+
+A full sweep updates each component using its current conditional
+distribution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gibbs Sampling as MCMC}
+\label{subsec:gibbs-as-mcmc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gibbs sampling is a special MCMC method.
+
+Each conditional update leaves the target distribution invariant under
+appropriate conditions.
+
+Unlike general Metropolis--Hastings, Gibbs updates are accepted
+automatically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Burn-In}
+\label{subsec:mcmc-burn-in}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The initial MCMC state
+
+\[
+X_0
+\]
+
+may be far from typical regions of the target distribution.
+
+Early iterations are sometimes discarded as burn-in.
+
+Burn-in does not by itself guarantee convergence.
+
+The more important issue is whether the chain has reached representative
+target behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MCMC Autocorrelation}
+\label{subsec:mcmc-autocorrelation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MCMC samples are correlated.
+
+For a scalar quantity
+
+\[
+Y_n=g(X_n),
+\]
+
+define lag-\(k\) autocorrelation
+
+\[
+\boxed{
+\rho_k
+=
+\operatorname{Corr}
+(
+Y_n,Y_{n+k}
+).
+}
+\]
+
+Strong positive autocorrelation means the chain produces less information
+than the same number of independent samples.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integrated Autocorrelation Time}
+\label{subsec:integrated-autocorrelation-time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common measure is
+
+\[
+\boxed{
+\tau_{\mathrm{int}}
+=
+1
++
+2
+\sum_{k=1}^{\infty}
+\rho_k,
+}
+\]
+
+when the sum is well defined.
+
+The variance of the MCMC average is inflated approximately by this factor
+relative to independent sampling.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Effective Sample Size}
+\label{subsec:effective-sample-size}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An approximate effective sample size is
+
+\[
+\boxed{
+N_{\mathrm{eff}}
+\approx
+\frac{
+N
+}{
+\tau_{\mathrm{int}}
+}.
+}
+\]
+
+If
+
+\[
+N=10000
+\]
+
+but
+
+\[
+\tau_{\mathrm{int}}=20,
+\]
+
+then
+
+\[
+N_{\mathrm{eff}}
+\approx500.
+\]
+
+Thus chain length alone does not measure information content.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{MCMC Mixing}
+\label{subsec:mcmc-mixing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A chain mixes well if it explores the target distribution efficiently.
+
+Poor mixing may appear as:
+
+\[
+\boxed{
+\text{long periods in one region},
+}
+\]
+
+\[
+\boxed{
+\text{high autocorrelation},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{failure to move between important modes}.
+}
+\]
+
+Proposal design strongly affects mixing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acceptance Rate}
+\label{subsec:mcmc-acceptance-rate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If proposals are extremely small, acceptance may be high but exploration
+slow.
+
+If proposals are extremely large, many moves may be rejected.
+
+Thus acceptance rate alone is not a sufficient diagnostic.
+
+A good algorithm balances movement and acceptance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Chains}
+\label{subsec:mcmc-multiple-chains}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Running several chains from different starting points can reveal whether
+the simulation explores similar regions of the target distribution.
+
+Agreement across chains provides useful evidence of convergence.
+
+Disagreement may indicate poor mixing, multimodality, or inadequate run
+length.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trace Plots}
+\label{subsec:mcmc-trace-plots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A trace plot displays
+
+\[
+g(X_n)
+\]
+
+against iteration number \(n\).
+
+A well-mixing chain often shows repeated movement through its typical
+range without long systematic drifts.
+
+Trace plots are useful but should not be the only diagnostic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent Monte Carlo Versus MCMC}
+\label{subsec:independent-mc-vs-mcmc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Independent Monte Carlo uses
+
+\[
+\boxed{
+X_i
+\overset{\mathrm{iid}}{\sim}
+\pi.
+}
+\]
+
+MCMC uses
+
+\[
+\boxed{
+X_{i+1}
+\sim
+P(\cdot\mid X_i),
+}
+\]
+
+with stationary distribution \(\pi\).
+
+Independent sampling simplifies variance analysis.
+
+MCMC allows access to difficult target distributions at the price of
+dependence and more complex diagnostics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequential Monte Carlo Preview}
+\label{subsec:sequential-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sequential Monte Carlo represents a distribution using a collection of
+weighted particles:
+
+\[
+\boxed{
+\{
+X_i,w_i
+\}_{i=1}^{N}.
+}
+\]
+
+As the target distribution changes, particles are:
+
+\[
+\boxed{
+\text{propagated},
+}
+\]
+
+\[
+\boxed{
+\text{reweighted},
+}
+\]
+
+and sometimes
+
+\[
+\boxed{
+\text{resampled}.
+}
+\]
+
+These methods are useful in filtering and dynamic Bayesian models.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Particle Degeneracy}
+\label{subsec:particle-degeneracy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After repeated weighting, a small number of particles may contain nearly
+all the total weight.
+
+This is called weight degeneracy.
+
+Resampling removes low-weight particles and replicates high-weight
+particles.
+
+However, excessive resampling can reduce diversity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap}
+\label{subsec:bootstrap-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The bootstrap approximates the sampling distribution of a statistic by
+resampling observed data.
+
+Given observations
+
+\[
+X_1,\ldots,X_n,
+\]
+
+construct a bootstrap sample
+
+\[
+X_1^*,\ldots,X_n^*
+\]
+
+by sampling with replacement from the observed values.
+
+Compute the statistic
+
+\[
+\boxed{
+T^*
+=
+T(X_1^*,\ldots,X_n^*).
+}
+\]
+
+Repeat many times.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bootstrap Standard Error}
+\label{subsec:bootstrap-standard-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose bootstrap statistics are
+
+\[
+T_1^*,\ldots,T_B^*.
+\]
+
+Their sample standard deviation estimates the standard error of the
+original statistic:
+
+\[
+\boxed{
+\widehat{\operatorname{SE}}_{\mathrm{boot}}
+=
+\sqrt{
+\frac1{B-1}
+\sum_{b=1}^{B}
+\left(
+T_b^*
+-
+\overline{T}^*
+\right)^2
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric and Nonparametric Bootstrap}
+\label{subsec:parametric-nonparametric-bootstrap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The nonparametric bootstrap resamples directly from the empirical data.
+
+The parametric bootstrap fits a probability model and simulates new data
+from the fitted distribution.
+
+Thus:
+
+\[
+\boxed{
+\text{nonparametric}
+\rightarrow
+\text{resample observations},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{parametric}
+\rightarrow
+\text{simulate fitted model}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quasi-Monte Carlo}
+\label{subsec:quasi-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Quasi-Monte Carlo replaces pseudorandom independent points with
+deterministic low-discrepancy point sets.
+
+The goal is to cover
+
+\[
+[0,1]^d
+\]
+
+more uniformly than random sampling.
+
+A quasi-Monte Carlo integral has form
+
+\[
+\boxed{
+\widehat{I}_N
+=
+\frac1N
+\sum_{i=1}^{N}
+f(x_i),
+}
+\]
+
+where the \(x_i\) are carefully constructed deterministic points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrepancy}
+\label{subsec:quasi-monte-carlo-discrepancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Discrepancy measures how uniformly a finite set of points covers a domain.
+
+Low-discrepancy sequences avoid the random clustering and empty gaps that
+naturally occur in independent Monte Carlo sampling.
+
+Examples include:
+
+\[
+\boxed{
+\text{Halton-type sequences},
+}
+\]
+
+\[
+\boxed{
+\text{Sobol-type sequences},
+}
+\]
+
+and other digital nets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Versus Quasi-Monte Carlo}
+\label{subsec:mc-vs-qmc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary Monte Carlo is randomized and has a familiar probabilistic error
+scale of
+
+\[
+O(N^{-1/2}).
+\]
+
+Quasi-Monte Carlo is deterministic and can converge faster for sufficiently
+regular low-effective-dimensional integrands.
+
+However, its error theory is different and depends on discrepancy and
+integrand variation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Randomized Quasi-Monte Carlo}
+\label{subsec:randomized-qmc}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Low-discrepancy point sets can be randomized while preserving their
+uniformity properties.
+
+This allows:
+
+\[
+\boxed{
+\text{replicated estimates},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{empirical error assessment}.
+}
+\]
+
+Randomized quasi-Monte Carlo combines deterministic space-filling
+structure with probabilistic uncertainty estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo for Stochastic Differential Equations}
+\label{subsec:mc-sdes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+dX_t
+=
+a(X_t,t)\,dt
++
+b(X_t,t)\,dW_t.
+}
+\]
+
+If the quantity of interest is
+
+\[
+\boxed{
+\mathbb{E}
+[
+g(X_T)
+],
+}
+\]
+
+simulate many approximate sample paths and average:
+
+\[
+\boxed{
+\widehat{\mu}_N
+=
+\frac1N
+\sum_{i=1}^{N}
+g
+(
+X_T^{(i)}
+).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler--Maruyama Method}
+\label{subsec:euler-maruyama}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic numerical method for SDEs is
+
+\[
+\boxed{
+X_{n+1}
+=
+X_n
++
+a(X_n,t_n)\Delta t
++
+b(X_n,t_n)\Delta W_n,
+}
+\]
+
+where
+
+\[
+\boxed{
+\Delta W_n
+\sim
+N(0,\Delta t).
+}
+\]
+
+This is the Euler--Maruyama scheme.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Error and Time-Discretization Error}
+\label{subsec:mc-sde-two-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+SDE simulation introduces at least two numerical errors:
+
+\[
+\boxed{
+\text{Monte Carlo sampling error}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{time-discretization error}.
+}
+\]
+
+Thus increasing the number of paths cannot eliminate bias caused by a
+coarse time discretization.
+
+Both
+
+\[
+N
+\]
+
+and
+
+\[
+\Delta t
+\]
+
+must be controlled.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong and Weak SDE Accuracy Preview}
+\label{subsec:strong-weak-sde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Strong convergence concerns approximation of individual sample paths, for
+example
+
+\[
+\boxed{
+\mathbb{E}
+[
+|X_T-X_T^{\Delta t}|
+].
+}
+\]
+
+Weak convergence concerns expectations:
+
+\[
+\boxed{
+\left|
+\mathbb{E}[g(X_T)]
+-
+\mathbb{E}[g(X_T^{\Delta t})]
+\right|.
+}
+\]
+
+Monte Carlo pricing and expectation estimation often care primarily about
+weak accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nested Monte Carlo}
+\label{subsec:nested-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some problems involve expectations inside expectations.
+
+For example,
+
+\[
+\boxed{
+\mathbb{E}
+\left[
+\phi
+\left(
+\mathbb{E}
+[
+Y
+\mid
+X
+]
+\right)
+\right].
+}
+\]
+
+An outer simulation samples \(X\).
+
+For each outer sample, an inner simulation estimates the conditional
+expectation.
+
+This can be computationally expensive because total work is roughly the
+product of outer and inner sample counts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uncertainty Quantification}
+\label{subsec:monte-carlo-uq}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a model output is
+
+\[
+Y
+=
+M(\Theta),
+\]
+
+where \(\Theta\) contains uncertain parameters.
+
+Monte Carlo simulation propagates uncertainty through the model:
+
+\[
+\boxed{
+\Theta_i
+\longrightarrow
+Y_i
+=
+M(\Theta_i).
+}
+\]
+
+The output samples can estimate:
+
+\[
+\boxed{
+\text{mean},
+}
+\]
+
+\[
+\boxed{
+\text{variance},
+}
+\]
+
+\[
+\boxed{
+\text{quantiles},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{tail probabilities}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity Analysis With Monte Carlo}
+\label{subsec:mc-sensitivity-analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Monte Carlo samples can be used to study how uncertainty in inputs affects
+uncertainty in outputs.
+
+Methods may examine:
+
+\[
+\boxed{
+\text{correlations},
+}
+\]
+
+\[
+\boxed{
+\text{variance decomposition},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{conditional output changes}.
+}
+\]
+
+More advanced global sensitivity methods estimate the contribution of
+individual parameters and their interactions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallelism}
+\label{subsec:mc-parallelism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Independent Monte Carlo samples can usually be computed independently.
+
+Therefore simulation is naturally parallel:
+
+\[
+\boxed{
+\text{sample }1
+\parallel
+\text{sample }2
+\parallel
+\cdots
+\parallel
+\text{sample }N.
+}
+\]
+
+This makes Monte Carlo attractive on multicore, cluster, and distributed
+systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parallel Random Streams}
+\label{subsec:parallel-random-streams}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Parallel simulation must avoid unintended overlap between pseudorandom
+streams.
+
+Good implementations use properly designed independent or separated
+streams.
+
+Simply giving neighboring processors poorly chosen seeds may not guarantee
+statistical independence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Convergence Study}
+\label{subsec:mc-convergence-study}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To verify the expected statistical rate, run simulations at increasing
+sample sizes such as
+
+\[
+N,
+\quad
+4N,
+\quad
+16N.
+\]
+
+Because standard error scales approximately as
+
+\[
+N^{-1/2},
+\]
+
+multiplying \(N\) by \(4\) should reduce sampling error by about a factor of
+\(2\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Replicated Simulations}
+\label{subsec:replicated-monte-carlo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rather than performing one very large run, one may perform several
+independent replications.
+
+If estimates are
+
+\[
+\widehat{\mu}_1,
+\ldots,
+\widehat{\mu}_R,
+\]
+
+their variability provides empirical information about simulation error.
+
+Replications are especially useful for checking theoretical standard-error
+calculations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stopping by Desired Standard Error}
+\label{subsec:mc-stopping-standard-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the target standard error is
+
+\[
+\varepsilon.
+\]
+
+Since
+
+\[
+\operatorname{SE}
+\approx
+\frac{\sigma}{\sqrt{N}},
+\]
+
+a rough required sample size is
+
+\[
+\boxed{
+N
+\approx
+\left(
+\frac{
+\sigma
+}{
+\varepsilon
+}
+\right)^2.
+}
+\]
+
+A pilot simulation can estimate \(\sigma\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relative Monte Carlo Error}
+\label{subsec:relative-mc-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When the target mean \(\mu\neq0\), a relative Monte Carlo standard error is
+
+\[
+\boxed{
+\frac{
+\widehat{\operatorname{SE}}
+}{
+|\widehat{\mu}|
+}.
+}
+\]
+
+This is useful when quantities vary greatly in scale.
+
+It becomes unstable when the true mean is close to zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Monte Carlo Workflow}
+\label{subsec:monte-carlo-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the quantity of interest;
+    \item express it as an expectation when possible;
+    \item determine the probability distribution to sample;
+    \item choose an appropriate random-number generator;
+    \item set and record seeds for reproducibility;
+    \item generate a pilot sample;
+    \item estimate variance;
+    \item determine whether naive Monte Carlo is efficient;
+    \item select variance-reduction methods if useful;
+    \item determine sample size;
+    \item generate samples;
+    \item compute the estimator;
+    \item estimate Monte Carlo standard error;
+    \item construct uncertainty intervals;
+    \item repeat using independent replications when useful;
+    \item check convergence as \(N\) increases;
+    \item inspect rare-event behavior;
+    \item distinguish sampling error from discretization or model error;
+    \item document the simulation configuration;
+    \item verify results against known cases or alternative methods.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Monte Carlo Method}
+\label{subsec:choosing-monte-carlo-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a directly simulatable expectation, use:
+
+\[
+\boxed{
+\text{ordinary independent Monte Carlo}.
+}
+\]
+
+For rare events, consider:
+
+\[
+\boxed{
+\text{importance sampling}.
+}
+\]
+
+For a correlated auxiliary variable with known mean, consider:
+
+\[
+\boxed{
+\text{control variates}.
+}
+\]
+
+For smooth integrals on a unit cube, consider:
+
+\[
+\boxed{
+\text{quasi-Monte Carlo}.
+}
+\]
+
+For a complicated target density available only up to normalization,
+consider:
+
+\[
+\boxed{
+\text{MCMC}.
+}
+\]
+
+For time-evolving distributions, consider:
+
+\[
+\boxed{
+\text{sequential Monte Carlo}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:monte-carlo-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Reporting an Estimate Without Its Monte Carlo Error}
+
+A simulation output such as
+
+\[
+\widehat{\mu}=4.217
+\]
+
+is incomplete without information about uncertainty.
+
+Report a standard error or confidence interval when possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming More Samples Eliminate All Error}
+
+Increasing \(N\) reduces sampling error.
+
+It does not automatically reduce:
+
+\[
+\boxed{
+\text{model bias},
+}
+\]
+
+\[
+\boxed{
+\text{time-discretization bias},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{implementation error}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Standard Deviation and Standard Error}
+
+The sample standard deviation estimates variation among individual
+simulated outputs.
+
+The standard error estimates variation of the sample mean:
+
+\[
+\boxed{
+\operatorname{SE}
+=
+\frac{s}{\sqrt{N}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Monte Carlo Converges Rapidly}
+
+The standard rate
+
+\[
+O(N^{-1/2})
+\]
+
+is slow.
+
+Doubling the number of samples does not halve the standard error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Random Seeds}
+
+Without recording simulation settings and seeds, exact computational
+reproduction may be difficult.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating Pseudorandom Numbers as Mathematically Independent Automatically}
+
+Pseudorandom sequences are deterministic.
+
+A high-quality generator is designed to approximate the statistical
+behavior needed for simulation.
+
+Generator quality matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Poor Importance Distribution}
+
+If
+
+\[
+q(x)
+\]
+
+is too small where
+
+\[
+g(x)p(x)
+\]
+
+is important, importance weights can become enormous.
+
+Estimator variance may then explode.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Importance Sampling Without Support Coverage}
+
+If
+
+\[
+q(x)=0
+\]
+
+where
+
+\[
+g(x)p(x)\neq0,
+\]
+
+the estimator cannot correctly represent that region.
+
+The proposal must cover all relevant target support.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Antithetic Pairing Always Reduces Variance}
+
+Antithetic variates help when the paired outputs are negatively
+correlated.
+
+Positive correlation may provide little benefit or even increase
+variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Weakly Correlated Control Variate}
+
+Control variates are most effective when correlation magnitude is large.
+
+A nearly unrelated control contributes little variance reduction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating MCMC Samples as Independent}
+
+Markov-chain samples are correlated.
+
+Using
+
+\[
+s/\sqrt{N}
+\]
+
+as though all samples were independent can severely underestimate
+uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Burn-In Guarantees Convergence}
+
+Discarding the first fixed number of samples does not prove that the chain
+has reached the target distribution.
+
+Mixing and convergence diagnostics are still needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Thinning Without a Reason}
+
+Discarding most MCMC samples reduces stored autocorrelation but also throws
+away information.
+
+Thinning is not automatically required for valid MCMC estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Judging MCMC Only by Acceptance Rate}
+
+High acceptance can mean proposals are too small.
+
+Low acceptance can mean proposals are too aggressive.
+
+The important issue is efficient exploration of the target.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Too Few Chains for a Difficult Multimodal Target}
+
+One chain can remain trapped in a single mode.
+
+Multiple starting points may reveal unexplored regions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Rare Events}
+
+A simulation may produce zero rare events simply because the sample size is
+too small.
+
+Zero observed events does not imply zero true probability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Monte Carlo With Quasi-Monte Carlo}
+
+Monte Carlo uses randomized samples.
+
+Classical quasi-Monte Carlo uses deterministic low-discrepancy points.
+
+Their error analyses are different.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring SDE Discretization Error}
+
+Using millions of paths with a poor time discretization can produce a
+highly precise estimate of a biased quantity.
+
+Sampling and discretization errors must both be controlled.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:monte-carlo-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Probability.}
+Monte Carlo estimates probabilities, expectations, stopping-event
+frequencies, and distributional quantities.
+
+\medskip
+
+\textbf{Statistics.}
+Bootstrap methods, Bayesian posterior simulation, and randomization
+procedures rely on repeated simulation.
+
+\medskip
+
+\textbf{Finance.}
+Derivative pricing, portfolio risk, value-at-risk estimation, and
+stochastic models frequently use Monte Carlo path simulation.
+
+\medskip
+
+\textbf{Physics.}
+Statistical mechanics, particle systems, transport problems, and high-
+dimensional integrals are major Monte Carlo applications.
+
+\medskip
+
+\textbf{Engineering.}
+Reliability, uncertainty propagation, failure probability, and robust
+design can be studied by random simulation.
+
+\medskip
+
+\textbf{Operations Research.}
+Simulation evaluates queues, inventories, service systems, and stochastic
+decision policies.
+
+\medskip
+
+\textbf{Bayesian Inference.}
+MCMC and related methods approximate posterior expectations when analytic
+integration is impossible.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Monte Carlo provides a general computational framework for problems where
+random sampling is easier than deterministic integration.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:monte-carlo-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a Monte Carlo estimator.
+\end{exercise}
+
+\begin{exercise}[1]
+State the standard Monte Carlo convergence rate.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Monte Carlo standard error.
+\end{exercise}
+
+\begin{exercise}[1]
+Define importance sampling.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a control variate.
+\end{exercise}
+
+\begin{exercise}[1]
+Define MCMC.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a stationary distribution.
+\end{exercise}
+
+\begin{exercise}[1]
+Define effective sample size conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define quasi-Monte Carlo conceptually.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a bootstrap sample.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the Monte Carlo estimate from a supplied sample.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the sample variance of simulated outputs.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the Monte Carlo standard error.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct an approximate \(95\%\) confidence interval.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine how the standard error changes if \(N\) is multiplied by \(4\).
+\end{exercise}
+
+\begin{exercise}[2]
+Determine how much \(N\) must increase to reduce standard error by a
+factor of \(5\).
+\end{exercise}
+
+\begin{exercise}[2]
+Write
+
+\[
+\int_0^2f(x)\,dx
+\]
+
+as an expectation involving a uniform random variable.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Monte Carlo estimator for that integral.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate \(\pi\) from a supplied set of random points.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the variance of a Monte Carlo probability estimator.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate the number of samples needed to achieve a desired standard error.
+\end{exercise}
+
+\begin{exercise}[2]
+Explain the purpose of a random seed.
+\end{exercise}
+
+\begin{exercise}[2]
+Use inverse-transform sampling to simulate an exponential random variable.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the inverse-transform formula for a specified continuous
+distribution.
+\end{exercise}
+
+\begin{exercise}[3]
+Design an acceptance--rejection sampler for a target density with a given
+proposal.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the acceptance probability when the bounding constant \(M\) is
+given.
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the basic importance-sampling identity.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an importance-sampling estimator for a specified integral.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why support coverage is necessary.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute importance weights for given target and proposal densities.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why importance sampling can help estimate rare-event
+probabilities.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the relative standard error of a naive rare-event probability
+estimator.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct a control-variate estimator.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the optimal control-variate coefficient.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the resulting variance depends on
+
+\[
+1-\rho^2.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Construct an antithetic estimator using \(U\) and \(1-U\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain when antithetic pairing reduces variance.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a two-stratum Monte Carlo estimator.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain Latin hypercube sampling.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain common random numbers for comparing two systems.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the sample-average approximation of
+
+\[
+F(x)
+=
+\mathbb{E}[f(x,\xi)].
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Monte Carlo gradient estimator.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the Metropolis--Hastings acceptance probability.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a Metropolis--Hastings acceptance probability for supplied
+densities.
+\end{exercise}
+
+\begin{exercise}[3]
+Simplify the acceptance rule for a symmetric proposal.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why an unknown normalizing constant cancels.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain detailed balance.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe one Gibbs sampling sweep for a bivariate distribution.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why MCMC samples are not independent.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute effective sample size from a supplied integrated autocorrelation
+time.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the purpose and limitation of burn-in.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why thinning is not automatically necessary.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe indicators of poor MCMC mixing.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why multiple chains can be useful.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a nonparametric bootstrap sample from five observations.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate a bootstrap standard error from supplied bootstrap statistics.
+\end{exercise}
+
+\begin{exercise}[3]
+Distinguish parametric and nonparametric bootstrap.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain low-discrepancy sampling.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare ordinary Monte Carlo and quasi-Monte Carlo.
+\end{exercise}
+
+\begin{exercise}[3]
+Write the Euler--Maruyama scheme.
+\end{exercise}
+
+\begin{exercise}[3]
+Simulate one Euler--Maruyama time step for supplied values of
+\(\Delta W\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between strong and weak SDE accuracy.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why increasing the number of SDE paths does not remove time-step
+bias.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a Monte Carlo convergence study.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate the empirical rate at which simulation standard error decreases.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why Monte Carlo computations are naturally parallel.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove unbiasedness of the sample-average Monte Carlo estimator.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the variance
+
+\[
+\operatorname{Var}
+(
+\widehat{\mu}_N
+)
+=
+\frac{\sigma^2}{N}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the central-limit confidence interval for a Monte Carlo mean.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Berry--Esseen corrections to Monte Carlo normal approximation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study optimal allocation in stratified sampling.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the minimum-variance importance-sampling density formally.
+\end{exercise}
+
+\begin{exercise}[4]
+Study self-normalized importance sampling.
+\end{exercise}
+
+\begin{exercise}[4]
+Study exponential tilting for rare events.
+\end{exercise}
+
+\begin{exercise}[4]
+Study conditional Monte Carlo variance reduction.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Rao--Blackwellization as variance reduction.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the optimal control-variate coefficient.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Latin hypercube variance properties.
+\end{exercise}
+
+\begin{exercise}[4]
+Study randomized quasi-Monte Carlo.
+\end{exercise}
+
+\begin{exercise}[4]
+Study discrepancy and the Koksma--Hlawka inequality.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove detailed balance for Metropolis--Hastings.
+\end{exercise}
+
+\begin{exercise}[4]
+Study irreducibility and aperiodicity in MCMC.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Markov-chain ergodic theorems.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive MCMC asymptotic variance.
+\end{exercise}
+
+\begin{exercise}[4]
+Study effective sample size estimators.
+\end{exercise}
+
+\begin{exercise}[4]
+Study adaptive MCMC conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Hamiltonian Monte Carlo conceptually.
+\end{exercise}
+
+\begin{exercise}[4]
+Study particle filters and sequential Monte Carlo.
+\end{exercise}
+
+\begin{exercise}[4]
+Study bootstrap consistency.
+\end{exercise}
+
+\begin{exercise}[4]
+Study bias-corrected bootstrap intervals.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze weak convergence of Euler--Maruyama.
+\end{exercise}
+
+\begin{exercise}[4]
+Study multilevel Monte Carlo.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate nested Monte Carlo complexity.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:monte-carlo-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Monte Carlo methods approximate expectations using random samples.
+
+For
+
+\[
+\boxed{
+\mu
+=
+\mathbb{E}[g(X)],
+}
+\]
+
+the standard estimator is
+
+\[
+\boxed{
+\widehat{\mu}_N
+=
+\frac1N
+\sum_{i=1}^{N}
+g(X_i).
+}
+\]
+
+Its variance is
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{\mu}_N
+)
+=
+\frac{
+\sigma^2
+}{
+N
+},
+}
+\]
+
+so its standard error is
+
+\[
+\boxed{
+O(N^{-1/2}).
+}
+\]
+
+Monte Carlo integration rewrites an integral as an expectation.
+
+Variance-reduction methods include
+
+\[
+\boxed{
+\text{importance sampling}
++
+\text{control variates}
++
+\text{antithetic variates}
++
+\text{stratification}.
+}
+\]
+
+When direct independent sampling is difficult, MCMC constructs a Markov
+chain whose stationary distribution is the target.
+
+Metropolis--Hastings uses acceptance probability
+
+\[
+\boxed{
+\alpha(x,y)
+=
+\min
+\left\{
+1,
+\frac{
+\pi(y)q(x\mid y)
+}{
+\pi(x)q(y\mid x)
+}
+\right\}.
+}
+\]
+
+Monte Carlo methods therefore combine
+
+\[
+\boxed{
+\text{probability}
++
+\text{statistics}
++
+\text{numerical approximation}
++
+\text{random simulation}
++
+\text{computational inference}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:monte-carlo-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Monte Carlo Methods connect the probabilistic foundations of Chapter~7
+with the statistical methods of Chapter~8 and the computational framework
+of Chapter~11. Ordinary Monte Carlo converts expectations and integrals
+into sample averages, while importance sampling and control variates
+improve efficiency. MCMC provides a computational route to complicated
+probability distributions, especially in Bayesian statistics, and
+Euler--Maruyama connects simulation with the stochastic differential
+equations of Chapter~7. Monte Carlo also appears in stochastic
+optimization, reliability analysis, finance, uncertainty quantification,
+and large-scale scientific simulation. The next section, Scientific
+Computing, broadens the computational viewpoint to algorithm
+implementation, software architecture, precision, performance,
+parallelism, reproducibility, and large-scale mathematical computation.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.6 Monte Carlo Methods
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard Monte Carlo simulation theory.
+%   - Standard variance-reduction methods.
+%   - Standard Markov chain Monte Carlo.
+%   - Standard quasi-Monte Carlo, bootstrap, and stochastic simulation
+%     concepts.
+%
+% Used for:
+%   - expectation estimation;
+%   - Monte Carlo sample averages;
+%   - unbiasedness;
+%   - estimator variance;
+%   - N^{-1/2} convergence;
+%   - Law of Large Numbers;
+%   - Central Limit Theorem;
+%   - Monte Carlo standard errors;
+%   - confidence intervals;
+%   - bias and variance;
+%   - Monte Carlo integration;
+%   - high-dimensional integration;
+%   - area and volume estimation;
+%   - probability estimation;
+%   - indicator variables;
+%   - pseudorandom number generation;
+%   - random seeds;
+%   - inverse-transform sampling;
+%   - transformation methods;
+%   - acceptance--rejection sampling;
+%   - variance reduction;
+%   - importance sampling;
+%   - importance weights;
+%   - rare-event simulation;
+%   - control variates;
+%   - antithetic variates;
+%   - stratified sampling;
+%   - Latin hypercube sampling preview;
+%   - common random numbers;
+%   - Monte Carlo optimization;
+%   - sample-average approximation;
+%   - gradient estimation;
+%   - Markov Chain Monte Carlo;
+%   - stationary distributions;
+%   - Metropolis--Hastings;
+%   - symmetric proposals;
+%   - unnormalized targets;
+%   - detailed balance;
+%   - Gibbs sampling;
+%   - burn-in;
+%   - autocorrelation;
+%   - effective sample size;
+%   - mixing and diagnostics;
+%   - multiple chains;
+%   - sequential Monte Carlo preview;
+%   - particle degeneracy;
+%   - bootstrap simulation;
+%   - parametric and nonparametric bootstrap;
+%   - quasi-Monte Carlo;
+%   - discrepancy;
+%   - randomized quasi-Monte Carlo;
+%   - stochastic differential equation simulation;
+%   - Euler--Maruyama;
+%   - strong and weak SDE accuracy preview;
+%   - nested Monte Carlo;
+%   - uncertainty quantification;
+%   - sensitivity analysis;
+%   - parallel simulation;
+%   - convergence studies;
+%   - applications and exercises.
+%
+% Notes:
+%   - Scientific Computing is developed next in Section 11.7.
+%   - Stochastic-process foundations appear in Chapter 7.
+%   - Statistical inference appears in Chapter 8.
+%   - Stochastic Optimization appears in Section 10.8.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

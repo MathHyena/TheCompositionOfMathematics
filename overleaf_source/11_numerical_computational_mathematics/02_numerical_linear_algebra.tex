@@ -1,0 +1,4716 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.2 NUMERICAL LINEAR ALGEBRA
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Numerical Linear Algebra}
+\label{sec:numerical-linear-algebra}
+
+\prerequisite{
+Linear algebra, matrices, determinants, vector spaces, eigenvalues,
+orthogonality, least squares, numerical analysis, floating-point
+arithmetic, conditioning, and basic algorithmic complexity.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the goals of numerical linear algebra;
+    \item distinguish dense and sparse matrix problems;
+    \item interpret matrix and vector norms;
+    \item understand induced matrix norms;
+    \item define the condition number of a linear system;
+    \item distinguish residual, forward error, and backward error;
+    \item understand why Gaussian elimination requires pivoting;
+    \item perform LU factorization;
+    \item understand partial and complete pivoting;
+    \item formulate triangular solves;
+    \item understand computational complexity of direct linear solvers;
+    \item recognize Cholesky factorization;
+    \item identify symmetric positive-definite matrices;
+    \item understand QR factorization;
+    \item apply Gram--Schmidt conceptually;
+    \item distinguish classical and modified Gram--Schmidt;
+    \item understand Householder reflections;
+    \item understand Givens rotations;
+    \item solve least-squares problems using QR factorization;
+    \item explain why normal equations can worsen conditioning;
+    \item understand singular value decomposition;
+    \item define singular values;
+    \item understand matrix rank and numerical rank;
+    \item compute pseudoinverse solutions conceptually;
+    \item understand low-rank approximation;
+    \item state the Eckart--Young theorem conceptually;
+    \item understand eigenvalue computation;
+    \item apply the power method;
+    \item understand inverse iteration;
+    \item understand Rayleigh quotient iteration conceptually;
+    \item understand QR iteration conceptually;
+    \item recognize Hessenberg and tridiagonal reductions;
+    \item distinguish direct and iterative linear solvers;
+    \item understand Jacobi iteration;
+    \item understand Gauss--Seidel iteration;
+    \item understand successive over-relaxation conceptually;
+    \item formulate stationary iterations using matrix splittings;
+    \item understand spectral-radius convergence conditions;
+    \item recognize Krylov subspaces;
+    \item understand conjugate-gradient methods;
+    \item recognize GMRES conceptually;
+    \item understand preconditioning;
+    \item recognize sparse matrix storage;
+    \item understand fill-in;
+    \item understand iterative refinement;
+    \item distinguish algebraic error from floating-point error;
+    \item understand backward stability of linear-system solvers;
+    \item connect numerical linear algebra with optimization,
+          differential equations, statistics, data science, and
+          scientific computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Numerical Linear Algebra?}
+\label{subsec:what-is-numerical-linear-algebra}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical linear algebra develops reliable and efficient algorithms for
+matrix computations.
+
+Core problems include:
+
+\[
+\boxed{
+A\mathbf{x}
+=
+\mathbf{b},
+}
+\]
+
+\[
+\boxed{
+A\mathbf{x}
+\approx
+\mathbf{b},
+}
+\]
+
+\[
+\boxed{
+A\mathbf{v}
+=
+\lambda\mathbf{v},
+}
+\]
+
+and
+
+\[
+\boxed{
+A
+\approx
+\text{low-rank matrix}.
+}
+\]
+
+These problems appear throughout applied mathematics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Numerical Linear Algebra Matters}
+\label{subsec:why-numerical-linear-algebra-matters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many computational models eventually require one or more matrix
+operations.
+
+Examples include:
+
+\[
+\boxed{
+\text{Newton steps in optimization},
+}
+\]
+
+\[
+\boxed{
+\text{finite-difference PDE systems},
+}
+\]
+
+\[
+\boxed{
+\text{least-squares regression},
+}
+\]
+
+\[
+\boxed{
+\text{Markov-chain calculations},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{data compression}.
+}
+\]
+
+The efficiency and stability of the matrix computation can dominate the
+overall computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dense and Sparse Matrices}
+\label{subsec:dense-sparse-matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A dense matrix has many nonzero entries.
+
+A sparse matrix has relatively few nonzero entries.
+
+For a matrix
+
+\[
+A\in\mathbb{R}^{m\times n},
+\]
+
+a dense representation stores approximately
+
+\[
+\boxed{
+mn
+}
+\]
+
+entries.
+
+For sparse matrices, storing every zero entry may be wasteful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vector Norms}
+\label{subsec:numerical-vector-norms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Important vector norms include:
+
+\[
+\boxed{
+\|\mathbf{x}\|_1
+=
+\sum_{i=1}^{n}
+|x_i|,
+}
+\]
+
+\[
+\boxed{
+\|\mathbf{x}\|_2
+=
+\sqrt{
+\sum_{i=1}^{n}
+x_i^2
+},
+}
+\]
+
+and
+
+\[
+\boxed{
+\|\mathbf{x}\|_\infty
+=
+\max_i
+|x_i|.
+}
+\]
+
+These norms measure vector size in different ways.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Induced Matrix Norms}
+\label{subsec:induced-matrix-norms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A vector norm induces a matrix norm defined by
+
+\[
+\boxed{
+\|A\|
+=
+\max_{\mathbf{x}\neq0}
+\frac{
+\|A\mathbf{x}\|
+}{
+\|\mathbf{x}\|
+}.
+}
+\]
+
+Important examples include:
+
+\[
+\boxed{
+\|A\|_1
+=
+\max_j
+\sum_i
+|a_{ij}|,
+}
+\]
+
+and
+
+\[
+\boxed{
+\|A\|_\infty
+=
+\max_i
+\sum_j
+|a_{ij}|.
+}
+\]
+
+Thus the \(1\)-norm is the maximum absolute column sum, while the
+\(\infty\)-norm is the maximum absolute row sum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix \(2\)-Norm}
+\label{subsec:matrix-two-norm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The matrix \(2\)-norm satisfies
+
+\[
+\boxed{
+\|A\|_2
+=
+\sigma_{\max}(A),
+}
+\]
+
+where
+
+\[
+\sigma_{\max}(A)
+\]
+
+is the largest singular value of \(A\).
+
+This norm plays an important role in conditioning and least squares.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Frobenius Norm}
+\label{subsec:frobenius-norm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Frobenius norm is
+
+\[
+\boxed{
+\|A\|_F
+=
+\sqrt{
+\sum_{i=1}^{m}
+\sum_{j=1}^{n}
+|a_{ij}|^2
+}.
+}
+\]
+
+It can also be written
+
+\[
+\boxed{
+\|A\|_F
+=
+\sqrt{
+\operatorname{tr}(A^TA)
+}.
+}
+\]
+
+Unlike induced norms, it treats the matrix entries collectively as a
+vector.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Systems}
+\label{subsec:numerical-linear-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+A\mathbf{x}
+=
+\mathbf{b},
+}
+\]
+
+where
+
+\[
+A\in\mathbb{R}^{n\times n}.
+\]
+
+If \(A\) is nonsingular, the exact solution is formally
+
+\[
+\mathbf{x}
+=
+A^{-1}\mathbf{b}.
+\]
+
+Numerically, one generally does not compute \(A^{-1}\) explicitly.
+
+Instead, one solves the system using factorization or iterative methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Explicit Matrix Inversion Is Usually Avoided}
+\label{subsec:avoid-explicit-inverse}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Computing
+
+\[
+A^{-1}
+\]
+
+explicitly is typically unnecessary when the goal is only to solve
+
+\[
+A\mathbf{x}
+=
+\mathbf{b}.
+\]
+
+Factorization-based solves are usually:
+
+\[
+\boxed{
+\text{more efficient},
+}
+\]
+
+\[
+\boxed{
+\text{more stable},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{easier to reuse for multiple right-hand sides}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual of a Linear System}
+\label{subsec:linear-system-residual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an approximate solution
+
+\[
+\widehat{\mathbf{x}},
+\]
+
+the residual is
+
+\[
+\boxed{
+\mathbf{r}
+=
+\mathbf{b}
+-
+A\widehat{\mathbf{x}}.
+}
+\]
+
+If
+
+\[
+\mathbf{r}=0,
+\]
+
+then the approximation exactly satisfies the original linear equations.
+
+A small residual alone does not guarantee a small forward error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward Error in Linear Systems}
+\label{subsec:linear-system-forward-error}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(\mathbf{x}\) is the exact solution, the forward error is
+
+\[
+\boxed{
+\mathbf{e}
+=
+\mathbf{x}
+-
+\widehat{\mathbf{x}}.
+}
+\]
+
+Because
+
+\[
+A\mathbf{x}
+=
+\mathbf{b},
+\]
+
+and
+
+\[
+A\widehat{\mathbf{x}}
+=
+\mathbf{b}
+-
+\mathbf{r},
+\]
+
+we have
+
+\[
+\boxed{
+A\mathbf{e}
+=
+\mathbf{r}.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\mathbf{e}
+=
+A^{-1}\mathbf{r}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Condition Number}
+\label{subsec:matrix-condition-number}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonsingular \(A\), the condition number in a chosen induced norm is
+
+\[
+\boxed{
+\kappa(A)
+=
+\|A\|
+\|A^{-1}\|.
+}
+\]
+
+Since
+
+\[
+\|I\|
+\leq
+\|A\|
+\|A^{-1}\|,
+\]
+
+we have
+
+\[
+\boxed{
+\kappa(A)\geq1.
+}
+\]
+
+Large condition numbers indicate sensitivity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Condition Number in the \(2\)-Norm}
+\label{subsec:condition-number-two-norm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonsingular \(A\),
+
+\[
+\boxed{
+\kappa_2(A)
+=
+\frac{
+\sigma_{\max}(A)
+}{
+\sigma_{\min}(A)
+}.
+}
+\]
+
+If the smallest singular value is close to zero, then
+
+\[
+\kappa_2(A)
+\]
+
+is large.
+
+Thus nearly singular matrices are ill conditioned.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relative Error Bound}
+\label{subsec:linear-relative-error-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For perturbations in the right-hand side only, a standard estimate is
+
+\[
+\boxed{
+\frac{
+\|\Delta\mathbf{x}\|
+}{
+\|\mathbf{x}\|
+}
+\leq
+\kappa(A)
+\frac{
+\|\Delta\mathbf{b}\|
+}{
+\|\mathbf{b}\|
+}
+}
+\]
+
+under compatible assumptions.
+
+Thus the condition number bounds the amplification of relative input
+errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Ill Conditioning}
+\label{subsec:worked-ill-conditioned-system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Nearly Dependent Equations}
+
+Consider
+
+\[
+\begin{aligned}
+x+y&=2,\\
+x+1.0001y&=2.0001.
+\end{aligned}
+\]
+
+The equations are nearly parallel.
+
+Small perturbations in the right-hand sides can produce relatively large
+changes in the intersection point.
+
+The matrix
+
+\[
+A
+=
+\begin{pmatrix}
+1&1\\
+1&1.0001
+\end{pmatrix}
+\]
+
+is close to singular because its rows are nearly linearly dependent.
+
+\begin{answerbox}
+\[
+\boxed{
+\text{The system is sensitive because }A\text{ is nearly singular.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gaussian Elimination}
+\label{subsec:gaussian-elimination-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gaussian elimination transforms
+
+\[
+A\mathbf{x}
+=
+\mathbf{b}
+\]
+
+into an equivalent upper-triangular system.
+
+At step \(k\), multiples of row \(k\) are subtracted from rows below it to
+eliminate entries
+
+\[
+a_{ik},
+\qquad
+i>k.
+\]
+
+The multipliers are
+
+\[
+\boxed{
+m_{ik}
+=
+\frac{
+a_{ik}
+}{
+a_{kk}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Back Substitution}
+\label{subsec:back-substitution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+After elimination, solve
+
+\[
+U\mathbf{x}
+=
+\mathbf{c},
+\]
+
+where \(U\) is upper triangular.
+
+Starting with the final equation,
+
+\[
+\boxed{
+x_n
+=
+\frac{
+c_n
+}{
+u_{nn}
+}.
+}
+\]
+
+Then for
+
+\[
+i=n-1,\ldots,1,
+\]
+
+\[
+\boxed{
+x_i
+=
+\frac{
+c_i
+-
+\sum_{j=i+1}^{n}
+u_{ij}x_j
+}{
+u_{ii}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward Substitution}
+\label{subsec:forward-substitution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a lower-triangular system
+
+\[
+L\mathbf{y}
+=
+\mathbf{b},
+\]
+
+solve from the first equation downward.
+
+If \(L\) has nonzero diagonal entries,
+
+\[
+\boxed{
+y_i
+=
+\frac{
+b_i
+-
+\sum_{j=1}^{i-1}
+\ell_{ij}y_j
+}{
+\ell_{ii}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LU Factorization}
+\label{subsec:lu-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gaussian elimination can be expressed as
+
+\[
+\boxed{
+A
+=
+LU,
+}
+\]
+
+where:
+
+\[
+L
+=
+\text{lower triangular matrix},
+\]
+
+and
+
+\[
+U
+=
+\text{upper triangular matrix}.
+\]
+
+Then
+
+\[
+A\mathbf{x}
+=
+\mathbf{b}
+\]
+
+becomes
+
+\[
+LU\mathbf{x}
+=
+\mathbf{b}.
+\]
+
+First solve
+
+\[
+\boxed{
+L\mathbf{y}
+=
+\mathbf{b},
+}
+\]
+
+then solve
+
+\[
+\boxed{
+U\mathbf{x}
+=
+\mathbf{y}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: LU Factorization}
+\label{subsec:worked-lu-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Factoring a \(2\times2\) Matrix}
+
+Let
+
+\[
+A
+=
+\begin{pmatrix}
+2&1\\
+6&5
+\end{pmatrix}.
+\]
+
+The elimination multiplier is
+
+\[
+m_{21}
+=
+\frac62
+=
+3.
+\]
+
+Subtract \(3\) times row \(1\) from row \(2\):
+
+\[
+U
+=
+\begin{pmatrix}
+2&1\\
+0&2
+\end{pmatrix}.
+\]
+
+The multiplier is stored in
+
+\[
+L
+=
+\begin{pmatrix}
+1&0\\
+3&1
+\end{pmatrix}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+A
+=
+LU
+=
+\begin{pmatrix}
+1&0\\
+3&1
+\end{pmatrix}
+\begin{pmatrix}
+2&1\\
+0&2
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pivoting}
+\label{subsec:numerical-pivoting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gaussian elimination can become unstable if a pivot
+
+\[
+a_{kk}
+\]
+
+is zero or very small.
+
+Pivoting changes row or column order to select more appropriate pivots.
+
+The most common strategy is partial pivoting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Partial Pivoting}
+\label{subsec:partial-pivoting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At elimination step \(k\), partial pivoting selects the entry of largest
+absolute value in column \(k\) among rows \(k,\ldots,n\).
+
+Thus choose row \(p\) satisfying
+
+\[
+\boxed{
+|a_{pk}|
+=
+\max_{i\geq k}
+|a_{ik}|.
+}
+\]
+
+Then interchange rows \(k\) and \(p\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LU Factorization With Pivoting}
+\label{subsec:lu-with-pivoting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With row pivoting, the factorization becomes
+
+\[
+\boxed{
+PA
+=
+LU,
+}
+\]
+
+where \(P\) is a permutation matrix.
+
+To solve
+
+\[
+A\mathbf{x}
+=
+\mathbf{b},
+\]
+
+rewrite as
+
+\[
+LU\mathbf{x}
+=
+P\mathbf{b}.
+\]
+
+Then perform triangular solves.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete Pivoting}
+\label{subsec:complete-pivoting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Complete pivoting searches the remaining submatrix for the largest
+magnitude entry and may interchange both rows and columns.
+
+It can provide stronger pivot control but requires more search and data
+movement.
+
+Partial pivoting is much more common in general-purpose dense linear
+solvers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Growth Factor}
+\label{subsec:growth-factor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+During Gaussian elimination, matrix entries may become larger than those in
+the original matrix.
+
+A growth factor measures this amplification.
+
+Large growth can amplify rounding effects.
+
+Partial pivoting generally controls growth well in practice, although
+specially constructed matrices can produce large worst-case growth.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computational Cost of Gaussian Elimination}
+\label{subsec:gaussian-elimination-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a dense \(n\times n\) matrix, LU factorization requires approximately
+
+\[
+\boxed{
+\frac{2}{3}n^3
+}
+\]
+
+floating-point arithmetic operations to leading order.
+
+A triangular solve requires only
+
+\[
+\boxed{
+O(n^2)
+}
+\]
+
+operations.
+
+Thus factorization dominates the cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Right-Hand Sides}
+\label{subsec:multiple-right-hand-sides}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+A\mathbf{x}^{(k)}
+=
+\mathbf{b}^{(k)}
+\]
+
+must be solved for many different right-hand sides.
+
+Compute
+
+\[
+PA=LU
+\]
+
+once.
+
+Then reuse the same factors for every
+
+\[
+\mathbf{b}^{(k)}.
+\]
+
+This makes factorization especially valuable when the coefficient matrix
+does not change.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetric Positive-Definite Matrices}
+\label{subsec:symmetric-positive-definite}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A real matrix \(A\) is symmetric positive definite if
+
+\[
+\boxed{
+A=A^T
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbf{x}^TA\mathbf{x}>0
+}
+\]
+
+for every nonzero \(\mathbf{x}\).
+
+Such matrices arise frequently in:
+
+\[
+\boxed{
+\text{least squares},
+}
+\]
+
+\[
+\boxed{
+\text{optimization},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{elliptic PDE discretization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cholesky Factorization}
+\label{subsec:cholesky-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(A\) is symmetric positive definite, then
+
+\[
+\boxed{
+A
+=
+LL^T,
+}
+\]
+
+where \(L\) is lower triangular with positive diagonal entries.
+
+This is the Cholesky factorization.
+
+It is more efficient than general LU factorization and preserves symmetry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Cholesky Factorization}
+\label{subsec:worked-cholesky}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Factoring a Positive-Definite Matrix}
+
+Let
+
+\[
+A
+=
+\begin{pmatrix}
+4&2\\
+2&3
+\end{pmatrix}.
+\]
+
+Assume
+
+\[
+L
+=
+\begin{pmatrix}
+\ell_{11}&0\\
+\ell_{21}&\ell_{22}
+\end{pmatrix}.
+\]
+
+From
+
+\[
+LL^T=A,
+\]
+
+we obtain
+
+\[
+\ell_{11}^2=4,
+\]
+
+so
+
+\[
+\ell_{11}=2.
+\]
+
+Next,
+
+\[
+\ell_{11}\ell_{21}=2,
+\]
+
+so
+
+\[
+\ell_{21}=1.
+\]
+
+Finally,
+
+\[
+\ell_{21}^2+\ell_{22}^2=3,
+\]
+
+so
+
+\[
+\ell_{22}=\sqrt{2}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+L
+=
+\begin{pmatrix}
+2&0\\
+1&\sqrt{2}
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cholesky Cost}
+\label{subsec:cholesky-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Dense Cholesky factorization requires approximately
+
+\[
+\boxed{
+\frac{1}{3}n^3
+}
+\]
+
+floating-point operations to leading order.
+
+This is roughly half the leading arithmetic cost of general LU
+factorization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Orthogonal Matrices}
+\label{subsec:numerical-orthogonal-matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A square matrix \(Q\) is orthogonal if
+
+\[
+\boxed{
+Q^TQ=I.
+}
+\]
+
+Then
+
+\[
+\boxed{
+Q^{-1}=Q^T.
+}
+\]
+
+Orthogonal transformations preserve Euclidean norms:
+
+\[
+\boxed{
+\|Q\mathbf{x}\|_2
+=
+\|\mathbf{x}\|_2.
+}
+\]
+
+This makes them numerically valuable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QR Factorization}
+\label{subsec:qr-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+A\in\mathbb{R}^{m\times n},
+\qquad
+m\geq n,
+\]
+
+with linearly independent columns, QR factorization writes
+
+\[
+\boxed{
+A
+=
+QR,
+}
+\]
+
+where \(Q\) has orthonormal columns and \(R\) is upper triangular.
+
+In a thin QR factorization,
+
+\[
+\boxed{
+Q\in\mathbb{R}^{m\times n},
+\qquad
+R\in\mathbb{R}^{n\times n}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gram--Schmidt Orthogonalization}
+\label{subsec:gram-schmidt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the columns of \(A\) are
+
+\[
+\mathbf{a}_1,\ldots,\mathbf{a}_n.
+\]
+
+Gram--Schmidt constructs orthonormal vectors
+
+\[
+\mathbf{q}_1,\ldots,\mathbf{q}_n.
+\]
+
+Begin with
+
+\[
+\boxed{
+\mathbf{q}_1
+=
+\frac{
+\mathbf{a}_1
+}{
+\|\mathbf{a}_1\|_2
+}.
+}
+\]
+
+Then remove from each subsequent column its projections onto previously
+constructed orthonormal directions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classical Gram--Schmidt}
+\label{subsec:classical-gram-schmidt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Classical Gram--Schmidt forms
+
+\[
+\boxed{
+\mathbf{v}_j
+=
+\mathbf{a}_j
+-
+\sum_{i=1}^{j-1}
+(
+\mathbf{q}_i^T\mathbf{a}_j
+)
+\mathbf{q}_i.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbf{q}_j
+=
+\frac{
+\mathbf{v}_j
+}{
+\|\mathbf{v}_j\|_2
+}.
+}
+\]
+
+In floating-point arithmetic, classical Gram--Schmidt can lose
+orthogonality for poorly conditioned column sets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modified Gram--Schmidt}
+\label{subsec:modified-gram-schmidt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Modified Gram--Schmidt removes one projection at a time:
+
+\[
+\mathbf{v}
+\leftarrow
+\mathbf{a}_j.
+\]
+
+Then for \(i=1,\ldots,j-1\),
+
+\[
+r_{ij}
+=
+\mathbf{q}_i^T\mathbf{v},
+\]
+
+\[
+\boxed{
+\mathbf{v}
+\leftarrow
+\mathbf{v}
+-
+r_{ij}\mathbf{q}_i.
+}
+\]
+
+This organization generally has better numerical orthogonality properties
+than classical Gram--Schmidt.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Householder Reflections}
+\label{subsec:householder-reflections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Householder reflector has form
+
+\[
+\boxed{
+H
+=
+I
+-
+2
+\frac{
+\mathbf{v}\mathbf{v}^T
+}{
+\mathbf{v}^T\mathbf{v}
+}.
+}
+\]
+
+It is orthogonal and symmetric:
+
+\[
+\boxed{
+H^T=H,
+}
+\]
+
+and
+
+\[
+\boxed{
+H^TH=I.
+}
+\]
+
+Householder transformations can zero several matrix entries at once.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QR by Householder Transformations}
+\label{subsec:qr-householder}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Householder QR repeatedly constructs reflectors
+
+\[
+H_1,H_2,\ldots
+\]
+
+that eliminate subdiagonal matrix entries.
+
+The product
+
+\[
+\boxed{
+Q^T
+=
+H_k\cdots H_2H_1
+}
+\]
+
+transforms \(A\) into upper-triangular form:
+
+\[
+\boxed{
+Q^TA
+=
+R.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+A=QR.
+}
+\]
+
+Householder QR is a standard stable choice for dense least-squares
+problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Givens Rotations}
+\label{subsec:givens-rotations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Givens rotation acts on two coordinates:
+
+\[
+\boxed{
+G
+=
+\begin{pmatrix}
+c&s\\
+-s&c
+\end{pmatrix},
+}
+\]
+
+where
+
+\[
+\boxed{
+c^2+s^2=1.
+}
+\]
+
+Parameters \(c\) and \(s\) are chosen to eliminate one selected component
+of a vector.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{When Givens Rotations Are Useful}
+\label{subsec:givens-use}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Givens rotations are useful when:
+
+\[
+\boxed{
+\text{only a few entries need to be eliminated},
+}
+\]
+
+or when
+
+\[
+\boxed{
+\text{matrix structure should be updated incrementally}.
+}
+\]
+
+They are especially useful in sparse or updating algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Least Squares}
+\label{subsec:nla-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an overdetermined system
+
+\[
+A\mathbf{x}
+\approx
+\mathbf{b},
+\]
+
+the least-squares problem is
+
+\[
+\boxed{
+\min_{\mathbf{x}}
+\|A\mathbf{x}-\mathbf{b}\|_2.
+}
+\]
+
+If \(A\) has full column rank, the solution is unique.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normal Equations}
+\label{subsec:nla-normal-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The least-squares first-order condition is
+
+\[
+\boxed{
+A^T
+(
+A\mathbf{x}-\mathbf{b}
+)
+=
+0.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+A^TA\mathbf{x}
+=
+A^T\mathbf{b}.
+}
+\]
+
+These are the normal equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditioning of Normal Equations}
+\label{subsec:normal-equations-conditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For full-column-rank \(A\),
+
+\[
+\boxed{
+\kappa_2(A^TA)
+=
+\kappa_2(A)^2.
+}
+\]
+
+Thus forming \(A^TA\) can square the condition number.
+
+A moderately ill-conditioned matrix can become much more difficult
+numerically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Least Squares Using QR}
+\label{subsec:least-squares-qr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+A=QR,
+\]
+
+with \(Q\) having orthonormal columns.
+
+Then
+
+\[
+\|A\mathbf{x}-\mathbf{b}\|_2
+=
+\|QR\mathbf{x}-\mathbf{b}\|_2.
+\]
+
+Using a full orthogonal extension of \(Q\), the least-squares problem
+reduces to solving
+
+\[
+\boxed{
+R\mathbf{x}
+=
+Q^T\mathbf{b}
+}
+\]
+
+for the relevant leading components.
+
+This avoids explicitly forming \(A^TA\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Least Squares by QR}
+\label{subsec:worked-least-squares-qr}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Using an Existing QR Factorization}
+
+Suppose
+
+\[
+A
+=
+QR,
+\]
+
+with
+
+\[
+R
+=
+\begin{pmatrix}
+2&1\\
+0&3
+\end{pmatrix},
+\]
+
+and suppose
+
+\[
+Q^T\mathbf{b}
+=
+\begin{pmatrix}
+5\\
+6
+\end{pmatrix}.
+\]
+
+Then solve
+
+\[
+R\mathbf{x}
+=
+Q^T\mathbf{b}.
+\]
+
+The second equation gives
+
+\[
+3x_2=6,
+\]
+
+so
+
+\[
+x_2=2.
+\]
+
+The first equation gives
+
+\[
+2x_1+x_2=5.
+\]
+
+Thus
+
+\[
+2x_1=3,
+\]
+
+so
+
+\[
+x_1=\frac32.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\mathbf{x}
+=
+\begin{pmatrix}
+3/2\\
+2
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Singular Value Decomposition}
+\label{subsec:singular-value-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every matrix
+
+\[
+A\in\mathbb{R}^{m\times n}
+\]
+
+has a singular value decomposition
+
+\[
+\boxed{
+A
+=
+U\Sigma V^T,
+}
+\]
+
+where \(U\) and \(V\) are orthogonal matrices and \(\Sigma\) is rectangular
+diagonal.
+
+The diagonal entries are the singular values:
+
+\[
+\boxed{
+\sigma_1
+\geq
+\sigma_2
+\geq
+\cdots
+\geq
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Singular Values}
+\label{subsec:singular-values}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The nonzero singular values satisfy
+
+\[
+\boxed{
+\sigma_i
+=
+\sqrt{
+\lambda_i(A^TA)
+}.
+}
+\]
+
+Thus singular values measure how strongly the matrix stretches vectors in
+special orthogonal directions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geometric Interpretation of the SVD}
+\label{subsec:svd-geometric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The transformation
+
+\[
+\mathbf{x}
+\mapsto
+A\mathbf{x}
+\]
+
+can be interpreted as:
+
+\begin{enumerate}
+    \item rotate or reflect using \(V^T\);
+    \item scale coordinate directions using \(\Sigma\);
+    \item rotate or reflect using \(U\).
+\end{enumerate}
+
+Thus the SVD separates direction and scale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank From the SVD}
+\label{subsec:svd-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The exact rank of \(A\) equals the number of nonzero singular values:
+
+\[
+\boxed{
+\operatorname{rank}(A)
+=
+\#\{
+i:
+\sigma_i>0
+\}.
+}
+\]
+
+In floating-point computation, very small singular values may be treated as
+numerically zero.
+
+This leads to the concept of numerical rank.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Rank}
+\label{subsec:numerical-rank}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matrix may be mathematically full rank but effectively rank deficient at
+the available precision.
+
+A practical numerical rank may be defined by thresholding:
+
+\[
+\boxed{
+\sigma_i
+>
+\tau.
+}
+\]
+
+The tolerance \(\tau\) should reflect matrix scale, dimension, precision,
+and the application.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pseudoinverse}
+\label{subsec:moore-penrose-pseudoinverse}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+A
+=
+U\Sigma V^T,
+\]
+
+the Moore--Penrose pseudoinverse is
+
+\[
+\boxed{
+A^+
+=
+V\Sigma^+U^T,
+}
+\]
+
+where each nonzero singular value is replaced by its reciprocal.
+
+For suitable least-squares problems,
+
+\[
+\boxed{
+\mathbf{x}^*
+=
+A^+\mathbf{b}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Minimum-Norm Solutions}
+\label{subsec:minimum-norm-solutions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If a linear system has infinitely many solutions, the pseudoinverse selects
+the solution with minimum Euclidean norm.
+
+That is,
+
+\[
+\boxed{
+\mathbf{x}^*
+=
+A^+\mathbf{b}
+}
+\]
+
+minimizes
+
+\[
+\|\mathbf{x}\|_2
+\]
+
+among all exact solutions when the system is consistent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Low-Rank Approximation}
+\label{subsec:low-rank-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+A
+=
+\sum_{i=1}^{r}
+\sigma_i
+\mathbf{u}_i
+\mathbf{v}_i^T.
+\]
+
+A rank-\(k\) approximation is
+
+\[
+\boxed{
+A_k
+=
+\sum_{i=1}^{k}
+\sigma_i
+\mathbf{u}_i
+\mathbf{v}_i^T.
+}
+\]
+
+Only the largest \(k\) singular components are retained.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Eckart--Young Theorem}
+\label{subsec:eckart-young}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{theorem}[Eckart--Young]
+Among matrices \(B\) of rank at most \(k\), the truncated SVD \(A_k\)
+provides a best approximation to \(A\) in both the spectral and Frobenius
+norms.
+\end{theorem}
+
+In particular,
+
+\[
+\boxed{
+\|A-A_k\|_2
+=
+\sigma_{k+1}.
+}
+\]
+
+Also,
+
+\[
+\boxed{
+\|A-A_k\|_F^2
+=
+\sum_{i=k+1}^{r}
+\sigma_i^2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications of Low-Rank Approximation}
+\label{subsec:low-rank-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Low-rank approximation is used in:
+
+\[
+\boxed{
+\text{data compression},
+}
+\]
+
+\[
+\boxed{
+\text{noise reduction},
+}
+\]
+
+\[
+\boxed{
+\text{latent-factor models},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{dimensionality reduction}.
+}
+\]
+
+It is a fundamental bridge between numerical linear algebra and data
+analysis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Eigenvalue Problems}
+\label{subsec:numerical-eigenvalue-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An eigenvalue problem seeks
+
+\[
+\boxed{
+A\mathbf{v}
+=
+\lambda\mathbf{v},
+}
+\]
+
+with
+
+\[
+\mathbf{v}\neq0.
+\]
+
+Numerically, directly computing roots of the characteristic polynomial
+
+\[
+\det(A-\lambda I)=0
+\]
+
+is generally not the preferred method.
+
+Stable matrix algorithms work directly with \(A\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rayleigh Quotient}
+\label{subsec:rayleigh-quotient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For nonzero \(\mathbf{x}\),
+
+\[
+\boxed{
+\rho_A(\mathbf{x})
+=
+\frac{
+\mathbf{x}^TA\mathbf{x}
+}{
+\mathbf{x}^T\mathbf{x}
+}.
+}
+\]
+
+If \(\mathbf{x}\) is an eigenvector of symmetric \(A\), then
+
+\[
+\boxed{
+\rho_A(\mathbf{x})
+=
+\lambda.
+}
+\]
+
+The Rayleigh quotient provides a natural eigenvalue estimate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power Method}
+\label{subsec:power-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Starting with nonzero vector \(\mathbf{x}_0\), repeatedly compute
+
+\[
+\boxed{
+\mathbf{y}_{k+1}
+=
+A\mathbf{x}_k,
+}
+\]
+
+then normalize:
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+\frac{
+\mathbf{y}_{k+1}
+}{
+\|\mathbf{y}_{k+1}\|
+}.
+}
+\]
+
+Under suitable conditions, \(\mathbf{x}_k\) converges toward an eigenvector
+associated with the dominant eigenvalue in magnitude.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why the Power Method Works}
+\label{subsec:why-power-method-works}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(A\) has eigenvectors \(\mathbf{v}_i\) and eigenvalues satisfying
+
+\[
+|\lambda_1|
+>
+|\lambda_2|
+\geq
+\cdots.
+\]
+
+Write
+
+\[
+\mathbf{x}_0
+=
+c_1\mathbf{v}_1
++
+c_2\mathbf{v}_2
++
+\cdots.
+\]
+
+Then
+
+\[
+A^k\mathbf{x}_0
+=
+c_1\lambda_1^k\mathbf{v}_1
++
+c_2\lambda_2^k\mathbf{v}_2
++
+\cdots.
+\]
+
+Factoring \(\lambda_1^k\),
+
+\[
+A^k\mathbf{x}_0
+=
+\lambda_1^k
+\left[
+c_1\mathbf{v}_1
++
+c_2
+\left(
+\frac{\lambda_2}{\lambda_1}
+\right)^k
+\mathbf{v}_2
++
+\cdots
+\right].
+\]
+
+The smaller ratios decay when their magnitudes are below \(1\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Power-Method Convergence Rate}
+\label{subsec:power-method-convergence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The asymptotic convergence rate is governed by approximately
+
+\[
+\boxed{
+\left|
+\frac{
+\lambda_2
+}{
+\lambda_1
+}
+\right|.
+}
+\]
+
+If
+
+\[
+|\lambda_2|
+\approx
+|\lambda_1|,
+\]
+
+convergence can be slow.
+
+A large spectral gap improves convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Power Method}
+\label{subsec:worked-power-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One Power Iteration}
+
+Let
+
+\[
+A
+=
+\begin{pmatrix}
+3&0\\
+0&1
+\end{pmatrix},
+\]
+
+and
+
+\[
+\mathbf{x}_0
+=
+\begin{pmatrix}
+1\\
+1
+\end{pmatrix}.
+\]
+
+Then
+
+\[
+A\mathbf{x}_0
+=
+\begin{pmatrix}
+3\\
+1
+\end{pmatrix}.
+\]
+
+Normalize using the Euclidean norm:
+
+\[
+\left\|
+\begin{pmatrix}
+3\\
+1
+\end{pmatrix}
+\right\|_2
+=
+\sqrt{10}.
+\]
+
+Thus
+
+\[
+\mathbf{x}_1
+=
+\frac1{\sqrt{10}}
+\begin{pmatrix}
+3\\
+1
+\end{pmatrix}.
+\]
+
+Repeated multiplication increasingly aligns the vector with
+
+\[
+\begin{pmatrix}
+1\\
+0
+\end{pmatrix},
+\]
+
+the eigenvector corresponding to eigenvalue \(3\).
+
+\begin{answerbox}
+\[
+\boxed{
+\lambda_{\max}=3.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse Iteration}
+\label{subsec:inverse-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Inverse iteration repeatedly solves
+
+\[
+\boxed{
+A\mathbf{y}_{k+1}
+=
+\mathbf{x}_k
+}
+\]
+
+and normalizes \(\mathbf{y}_{k+1}\).
+
+Because eigenvalues of \(A^{-1}\) are
+
+\[
+\frac1{\lambda_i},
+\]
+
+inverse iteration tends toward an eigenvector associated with the
+smallest-magnitude eigenvalue of \(A\), under suitable conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shifted Inverse Iteration}
+\label{subsec:shifted-inverse-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To target an eigenvalue near shift \(\mu\), solve repeatedly
+
+\[
+\boxed{
+(A-\mu I)
+\mathbf{y}_{k+1}
+=
+\mathbf{x}_k.
+}
+\]
+
+Eigenvalues of
+
+\[
+(A-\mu I)^{-1}
+\]
+
+are
+
+\[
+\frac1{\lambda_i-\mu}.
+\]
+
+Thus the eigenvalue nearest \(\mu\) becomes dominant in magnitude.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rayleigh Quotient Iteration}
+\label{subsec:rayleigh-quotient-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Rayleigh quotient iteration updates the shift dynamically:
+
+\[
+\boxed{
+\mu_k
+=
+\frac{
+\mathbf{x}_k^TA\mathbf{x}_k
+}{
+\mathbf{x}_k^T\mathbf{x}_k
+}.
+}
+\]
+
+Then solve
+
+\[
+\boxed{
+(A-\mu_kI)
+\mathbf{y}_{k+1}
+=
+\mathbf{x}_k,
+}
+\]
+
+and normalize.
+
+For symmetric matrices near an eigenvector, convergence can be extremely
+rapid.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QR Iteration}
+\label{subsec:qr-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic QR eigenvalue iteration performs
+
+\[
+A_k
+=
+Q_kR_k,
+\]
+
+then forms
+
+\[
+\boxed{
+A_{k+1}
+=
+R_kQ_k.
+}
+\]
+
+Because
+
+\[
+A_{k+1}
+=
+Q_k^TA_kQ_k,
+\]
+
+the matrices are orthogonally similar and therefore share eigenvalues.
+
+Repeated iteration can drive \(A_k\) toward triangular or nearly diagonal
+form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shifted QR Iteration}
+\label{subsec:shifted-qr-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Practical QR algorithms use shifts:
+
+\[
+A_k-\mu_kI
+=
+Q_kR_k,
+\]
+
+followed by
+
+\[
+\boxed{
+A_{k+1}
+=
+R_kQ_k+\mu_kI.
+}
+\]
+
+Carefully selected shifts can greatly accelerate convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hessenberg Reduction}
+\label{subsec:hessenberg-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Before applying QR iteration to a general dense matrix, it is efficient to
+reduce \(A\) to upper Hessenberg form:
+
+\[
+\boxed{
+h_{ij}=0
+\qquad
+\text{for}
+\qquad
+i>j+1.
+}
+\]
+
+Householder transformations can perform this reduction while preserving
+eigenvalues.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetric Tridiagonal Reduction}
+\label{subsec:symmetric-tridiagonal-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(A\) is symmetric, orthogonal similarity transformations can reduce it
+to a symmetric tridiagonal matrix.
+
+This preserves symmetry and significantly reduces the cost of later
+eigenvalue iterations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Direct and Iterative Linear Solvers}
+\label{subsec:direct-versus-iterative-linear-solvers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Direct methods such as LU attempt to obtain the solution after a finite
+sequence of arithmetic operations, apart from floating-point effects.
+
+Iterative methods generate approximations:
+
+\[
+\boxed{
+\mathbf{x}^{(0)},
+\mathbf{x}^{(1)},
+\mathbf{x}^{(2)},
+\ldots
+}
+\]
+
+and stop when the approximation is sufficiently accurate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Use Iterative Methods?}
+\label{subsec:why-iterative-linear-solvers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Iterative methods can be preferable when:
+
+\[
+\boxed{
+A
+\text{ is very large},
+}
+\]
+
+\[
+\boxed{
+A
+\text{ is sparse},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{only moderate solution accuracy is needed}.
+}
+\]
+
+They may avoid the memory and fill-in costs of direct factorization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix Splitting}
+\label{subsec:matrix-splitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Write
+
+\[
+\boxed{
+A
+=
+M-N,
+}
+\]
+
+where \(M\) is easy to invert.
+
+Then
+
+\[
+A\mathbf{x}
+=
+\mathbf{b}
+\]
+
+becomes
+
+\[
+M\mathbf{x}
+=
+N\mathbf{x}
++
+\mathbf{b}.
+\]
+
+This motivates iteration
+
+\[
+\boxed{
+M\mathbf{x}^{(k+1)}
+=
+N\mathbf{x}^{(k)}
++
+\mathbf{b}.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\mathbf{x}^{(k+1)}
+=
+M^{-1}N\mathbf{x}^{(k)}
++
+M^{-1}\mathbf{b}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Iteration Matrix}
+\label{subsec:iteration-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+G
+=
+M^{-1}N.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbf{x}^{(k+1)}
+=
+G\mathbf{x}^{(k)}
++
+\mathbf{c}.
+}
+\]
+
+The error satisfies
+
+\[
+\boxed{
+\mathbf{e}^{(k+1)}
+=
+G\mathbf{e}^{(k)}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mathbf{e}^{(k)}
+=
+G^k
+\mathbf{e}^{(0)}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spectral Radius}
+\label{subsec:spectral-radius-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The spectral radius of \(G\) is
+
+\[
+\boxed{
+\rho(G)
+=
+\max_i
+|\lambda_i(G)|.
+}
+\]
+
+For a stationary linear iteration, convergence for every initial guess
+occurs precisely when
+
+\[
+\boxed{
+\rho(G)<1.
+}
+\]
+
+This provides a central convergence criterion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobi Iteration}
+\label{subsec:jacobi-iteration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Write
+
+\[
+A
+=
+D+L+U,
+\]
+
+where:
+
+\[
+D
+=
+\text{diagonal part},
+\]
+
+\[
+L
+=
+\text{strictly lower triangular part},
+\]
+
+and
+
+\[
+U
+=
+\text{strictly upper triangular part}.
+\]
+
+Jacobi iteration is
+
+\[
+\boxed{
+D\mathbf{x}^{(k+1)}
+=
+\mathbf{b}
+-
+(L+U)
+\mathbf{x}^{(k)}.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\mathbf{x}^{(k+1)}
+=
+D^{-1}
+\left[
+\mathbf{b}
+-
+(L+U)\mathbf{x}^{(k)}
+\right].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Component Form of Jacobi}
+\label{subsec:jacobi-component-form}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For each component,
+
+\[
+\boxed{
+x_i^{(k+1)}
+=
+\frac1{a_{ii}}
+\left[
+b_i
+-
+\sum_{j\neq i}
+a_{ij}
+x_j^{(k)}
+\right].
+}
+\]
+
+Every updated component uses only values from the previous iteration.
+
+This makes Jacobi naturally parallelizable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gauss--Seidel Iteration}
+\label{subsec:gauss-seidel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gauss--Seidel uses newly updated values immediately.
+
+Its matrix form is
+
+\[
+\boxed{
+(D+L)
+\mathbf{x}^{(k+1)}
+=
+\mathbf{b}
+-
+U\mathbf{x}^{(k)}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mathbf{x}^{(k+1)}
+=
+-(D+L)^{-1}
+U\mathbf{x}^{(k)}
++
+(D+L)^{-1}\mathbf{b}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Component Form of Gauss--Seidel}
+\label{subsec:gauss-seidel-component}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For each \(i\),
+
+\[
+\boxed{
+x_i^{(k+1)}
+=
+\frac1{a_{ii}}
+\left[
+b_i
+-
+\sum_{j<i}
+a_{ij}
+x_j^{(k+1)}
+-
+\sum_{j>i}
+a_{ij}
+x_j^{(k)}
+\right].
+}
+\]
+
+Updated values are used as soon as they become available.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Jacobi Iteration}
+\label{subsec:worked-jacobi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One Jacobi Step}
+
+Consider
+
+\[
+\begin{aligned}
+4x+y&=9,\\
+x+3y&=7.
+\end{aligned}
+\]
+
+Solve each equation for its diagonal variable:
+
+\[
+x
+=
+\frac{9-y}{4},
+\]
+
+\[
+y
+=
+\frac{7-x}{3}.
+\]
+
+Starting with
+
+\[
+(x^{(0)},y^{(0)})
+=
+(0,0),
+\]
+
+the first Jacobi iteration gives
+
+\[
+x^{(1)}
+=
+\frac94
+=
+2.25,
+\]
+
+and
+
+\[
+y^{(1)}
+=
+\frac73
+\approx2.3333.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\mathbf{x}^{(1)}
+\approx
+\begin{pmatrix}
+2.25\\
+2.3333
+\end{pmatrix}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diagonal Dominance}
+\label{subsec:diagonal-dominance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A matrix is strictly row diagonally dominant if
+
+\[
+\boxed{
+|a_{ii}|
+>
+\sum_{j\neq i}
+|a_{ij}|
+}
+\]
+
+for every row \(i\).
+
+Strict diagonal dominance provides a useful sufficient condition for
+convergence of standard Jacobi and Gauss--Seidel iterations.
+
+It is not a necessary condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Successive Over-Relaxation}
+\label{subsec:successive-over-relaxation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Successive Over-Relaxation, abbreviated SOR, modifies the Gauss--Seidel
+step using relaxation parameter
+
+\[
+\boxed{
+\omega.
+}
+\]
+
+Conceptually,
+
+\[
+\boxed{
+\mathbf{x}^{(k+1)}
+=
+\mathbf{x}^{(k)}
++
+\omega
+\left(
+\mathbf{x}_{GS}^{(k+1)}
+-
+\mathbf{x}^{(k)}
+\right).
+}
+\]
+
+For
+
+\[
+\omega=1,
+\]
+
+SOR reduces to Gauss--Seidel.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Under- and Over-Relaxation}
+\label{subsec:under-over-relaxation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+0<\omega<1,
+\]
+
+the method is under-relaxed.
+
+If
+
+\[
+1<\omega<2,
+\]
+
+it is over-relaxed.
+
+A good \(\omega\) can accelerate convergence for suitable problems.
+
+A poor choice may slow convergence or cause divergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Krylov Subspaces}
+\label{subsec:krylov-subspaces}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given matrix \(A\) and vector \(\mathbf{r}_0\), the \(k\)-th Krylov
+subspace is
+
+\[
+\boxed{
+\mathcal{K}_k
+(
+A,\mathbf{r}_0
+)
+=
+\operatorname{span}
+\{
+\mathbf{r}_0,
+A\mathbf{r}_0,
+A^2\mathbf{r}_0,
+\ldots,
+A^{k-1}\mathbf{r}_0
+\}.
+}
+\]
+
+Many modern iterative methods search for corrections within Krylov
+subspaces.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conjugate Gradient Method}
+\label{subsec:conjugate-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Conjugate Gradient method, abbreviated CG, solves
+
+\[
+\boxed{
+A\mathbf{x}
+=
+\mathbf{b}
+}
+\]
+
+when \(A\) is symmetric positive definite.
+
+It can also be interpreted as minimizing the quadratic function
+
+\[
+\boxed{
+\phi(\mathbf{x})
+=
+\frac12
+\mathbf{x}^TA\mathbf{x}
+-
+\mathbf{b}^T\mathbf{x}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient of the CG Quadratic}
+\label{subsec:cg-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The gradient is
+
+\[
+\boxed{
+\nabla\phi(\mathbf{x})
+=
+A\mathbf{x}
+-
+\mathbf{b}.
+}
+\]
+
+Thus the negative gradient is the residual:
+
+\[
+\boxed{
+-\nabla\phi(\mathbf{x})
+=
+\mathbf{b}
+-
+A\mathbf{x}
+=
+\mathbf{r}.
+}
+\]
+
+CG chooses search directions more intelligently than ordinary steepest
+descent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(A\)-Conjugate Directions}
+\label{subsec:a-conjugate-directions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Vectors \(\mathbf{p}_i\) and \(\mathbf{p}_j\) are \(A\)-conjugate if
+
+\[
+\boxed{
+\mathbf{p}_i^TA\mathbf{p}_j
+=
+0.
+}
+\]
+
+For symmetric positive-definite \(A\), CG constructs mutually
+\(A\)-conjugate search directions.
+
+In exact arithmetic, CG terminates in at most \(n\) iterations for an
+\(n\times n\) system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conjugate Gradient Algorithm}
+\label{subsec:cg-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Start from \(\mathbf{x}_0\) and compute
+
+\[
+\boxed{
+\mathbf{r}_0
+=
+\mathbf{b}
+-
+A\mathbf{x}_0,
+}
+\]
+
+\[
+\boxed{
+\mathbf{p}_0
+=
+\mathbf{r}_0.
+}
+\]
+
+Then iterate:
+
+\[
+\boxed{
+\alpha_k
+=
+\frac{
+\mathbf{r}_k^T\mathbf{r}_k
+}{
+\mathbf{p}_k^TA\mathbf{p}_k
+},
+}
+\]
+
+\[
+\boxed{
+\mathbf{x}_{k+1}
+=
+\mathbf{x}_k
++
+\alpha_k
+\mathbf{p}_k,
+}
+\]
+
+\[
+\boxed{
+\mathbf{r}_{k+1}
+=
+\mathbf{r}_k
+-
+\alpha_k
+A\mathbf{p}_k,
+}
+\]
+
+\[
+\boxed{
+\beta_k
+=
+\frac{
+\mathbf{r}_{k+1}^T\mathbf{r}_{k+1}
+}{
+\mathbf{r}_k^T\mathbf{r}_k
+},
+}
+\]
+
+and
+
+\[
+\boxed{
+\mathbf{p}_{k+1}
+=
+\mathbf{r}_{k+1}
++
+\beta_k
+\mathbf{p}_k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{CG Error Bound}
+\label{subsec:cg-error-bound}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For symmetric positive-definite \(A\), a classical bound is
+
+\[
+\boxed{
+\|\mathbf{x}_k-\mathbf{x}^*\|_A
+\leq
+2
+\left(
+\frac{
+\sqrt{\kappa_2(A)}-1
+}{
+\sqrt{\kappa_2(A)}+1
+}
+\right)^k
+\|\mathbf{x}_0-\mathbf{x}^*\|_A,
+}
+\]
+
+where
+
+\[
+\boxed{
+\|\mathbf{v}\|_A
+=
+\sqrt{
+\mathbf{v}^TA\mathbf{v}
+}.
+}
+\]
+
+This shows why conditioning strongly affects CG convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{GMRES}
+\label{subsec:gmres}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Generalized Minimal Residual method, abbreviated GMRES, is a Krylov
+method for nonsymmetric linear systems.
+
+At iteration \(k\), it seeks
+
+\[
+\boxed{
+\mathbf{x}_k
+\in
+\mathbf{x}_0
++
+\mathcal{K}_k
+(
+A,\mathbf{r}_0
+)
+}
+\]
+
+that minimizes the residual norm
+
+\[
+\boxed{
+\|\mathbf{b}-A\mathbf{x}_k\|_2.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Arnoldi Process}
+\label{subsec:arnoldi-process}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+GMRES constructs an orthonormal basis of the Krylov subspace using the
+Arnoldi process.
+
+Arnoldi produces relation
+
+\[
+\boxed{
+AQ_k
+=
+Q_{k+1}
+\overline{H}_k,
+}
+\]
+
+where \(\overline{H}_k\) is upper Hessenberg.
+
+The large linear problem is reduced to a smaller least-squares problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{GMRES Restarting}
+\label{subsec:gmres-restarting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Full GMRES stores an increasing number of Krylov basis vectors.
+
+For large problems, memory and orthogonalization cost increase with each
+iteration.
+
+Restarted GMRES limits the subspace dimension and periodically starts a
+new Krylov cycle.
+
+Restarting reduces storage but can slow convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preconditioning}
+\label{subsec:preconditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A preconditioner is a matrix \(M\) that approximates \(A\) but is easier to
+solve with.
+
+Instead of solving
+
+\[
+A\mathbf{x}
+=
+\mathbf{b},
+\]
+
+one may solve a transformed system such as
+
+\[
+\boxed{
+M^{-1}A\mathbf{x}
+=
+M^{-1}\mathbf{b}.
+}
+\]
+
+The goal is to improve numerical properties and accelerate iterative
+convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Makes a Good Preconditioner?}
+\label{subsec:good-preconditioner}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A good preconditioner should:
+
+\[
+\boxed{
+\text{approximate }A\text{ sufficiently well},
+}
+\]
+
+while also being
+
+\[
+\boxed{
+\text{cheap to construct}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{cheap to apply}.
+}
+\]
+
+An excellent approximation that is as expensive as solving the original
+system may provide little practical benefit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobi Preconditioning}
+\label{subsec:jacobi-preconditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple preconditioner is
+
+\[
+\boxed{
+M
+=
+D,
+}
+\]
+
+where \(D\) is the diagonal of \(A\).
+
+Then applying \(M^{-1}\) is inexpensive.
+
+This can improve scaling, although it may be insufficient for difficult
+systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incomplete Factorization}
+\label{subsec:incomplete-factorization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An incomplete LU factorization constructs approximate factors
+
+\[
+\boxed{
+A
+\approx
+LU
+}
+\]
+
+while discarding selected fill-in entries.
+
+Similarly, incomplete Cholesky can be used for suitable symmetric
+positive-definite systems.
+
+These factorizations are widely used as preconditioners.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Matrix Storage}
+\label{subsec:sparse-matrix-storage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sparse matrices should generally store only nonzero values and structural
+information.
+
+Common ideas include storing:
+
+\[
+\boxed{
+\text{nonzero values},
+}
+\]
+
+\[
+\boxed{
+\text{column indices},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{row pointers}.
+}
+\]
+
+Compressed sparse row and compressed sparse column formats are widely
+used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Matrix-Vector Multiplication}
+\label{subsec:sparse-matrix-vector-product}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a sparse matrix with
+
+\[
+\operatorname{nnz}(A)
+\]
+
+nonzero entries, the matrix-vector product
+
+\[
+A\mathbf{x}
+\]
+
+can often be computed in approximately
+
+\[
+\boxed{
+O
+(
+\operatorname{nnz}(A)
+)
+}
+\]
+
+operations.
+
+This makes matrix-vector-product-based Krylov methods attractive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fill-In}
+\label{subsec:fill-in}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+During sparse LU or Cholesky factorization, entries that were originally
+zero may become nonzero.
+
+This is called fill-in.
+
+Excessive fill-in can cause:
+
+\[
+\boxed{
+\text{large memory use},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{large computational cost}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reordering Sparse Systems}
+\label{subsec:sparse-reordering}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Changing the order of rows and columns can dramatically affect fill-in.
+
+Sparse direct solvers therefore use graph-based ordering strategies before
+factorization.
+
+The algebraically equivalent system may become much cheaper to solve after
+an appropriate permutation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Iterative Refinement}
+\label{subsec:iterative-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose an approximate solution \(\widehat{\mathbf{x}}\) is available.
+
+Compute residual
+
+\[
+\boxed{
+\mathbf{r}
+=
+\mathbf{b}
+-
+A\widehat{\mathbf{x}}.
+}
+\]
+
+Solve the correction equation
+
+\[
+\boxed{
+A\mathbf{d}
+=
+\mathbf{r}.
+}
+\]
+
+Then update
+
+\[
+\boxed{
+\widehat{\mathbf{x}}
+\leftarrow
+\widehat{\mathbf{x}}
++
+\mathbf{d}.
+}
+\]
+
+Repeated corrections can improve solution accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mixed-Precision Refinement Preview}
+\label{subsec:mixed-precision-refinement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A factorization may sometimes be computed in lower precision for speed,
+while residuals and corrections are evaluated in higher precision.
+
+Under suitable conditioning and algorithmic conditions, iterative
+refinement can recover high-accuracy solutions.
+
+This is an important modern use of mixed-precision arithmetic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backward Stability of Linear Solvers}
+\label{subsec:backward-stability-linear-solvers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A computed solution \(\widehat{\mathbf{x}}\) is backward stable if it
+solves a nearby problem exactly:
+
+\[
+\boxed{
+(A+\Delta A)
+\widehat{\mathbf{x}}
+=
+\mathbf{b}+\Delta\mathbf{b},
+}
+\]
+
+where the perturbations are small relative to the original data.
+
+Gaussian elimination with partial pivoting is generally backward stable in
+practice, subject to growth-factor considerations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditioning and Backward Stability Together}
+\label{subsec:conditioning-backward-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A backward-stable method solves a nearby problem accurately.
+
+If the original problem is well conditioned, the nearby exact solution is
+also near the original exact solution.
+
+Thus:
+
+\[
+\boxed{
+\text{backward stability}
++
+\text{good conditioning}
+\Rightarrow
+\text{small forward error}.
+}
+\]
+
+This principle is central to numerical linear algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaling}
+\label{subsec:matrix-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If rows or columns have very different magnitudes, numerical performance
+can suffer.
+
+Scaling replaces the system with an equivalent or closely related one in
+which magnitudes are better balanced.
+
+For example,
+
+\[
+\boxed{
+D_rAD_c\mathbf{y}
+=
+D_r\mathbf{b},
+}
+\]
+
+with diagonal scaling matrices \(D_r\) and \(D_c\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix Equilibration}
+\label{subsec:matrix-equilibration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Equilibration attempts to scale matrix rows or columns so their norms are
+similar.
+
+The goal is not necessarily to minimize the mathematical condition number
+exactly.
+
+Rather, it can improve numerical behavior and reduce poor scaling effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Rank-Revealing Factorizations}
+\label{subsec:rank-revealing-factorizations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When a matrix may be nearly rank deficient, one wants a factorization that
+exposes weak directions.
+
+Useful approaches include:
+
+\[
+\boxed{
+\text{SVD},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{pivoted QR}.
+}
+\]
+
+These methods help estimate numerical rank and solve rank-deficient least-
+squares problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{QR With Column Pivoting}
+\label{subsec:qr-column-pivoting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A pivoted QR factorization has form
+
+\[
+\boxed{
+AP
+=
+QR,
+}
+\]
+
+where \(P\) permutes columns.
+
+The permutation attempts to place more linearly independent or larger
+directions earlier in the factorization.
+
+The diagonal of \(R\) can provide information about numerical rank.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Eigenvalue Conditioning}
+\label{subsec:eigenvalue-conditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Eigenvalues can themselves be sensitive to matrix perturbations.
+
+For symmetric matrices, eigenvalues are relatively well behaved under
+small perturbations.
+
+For general nonsymmetric matrices, eigenvalue sensitivity can be much more
+severe.
+
+Thus eigenvalue algorithms must be interpreted together with problem
+conditioning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Symmetric Eigenvalue Problems}
+\label{subsec:symmetric-eigenvalue-problems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+A=A^T,
+\]
+
+then all eigenvalues are real.
+
+Furthermore, \(A\) has an orthonormal eigenvector basis:
+
+\[
+\boxed{
+A
+=
+Q\Lambda Q^T.
+}
+\]
+
+This structure permits especially stable and efficient algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Schur Decomposition}
+\label{subsec:schur-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a real or complex square matrix, a Schur decomposition gives
+
+\[
+\boxed{
+A
+=
+QTQ^*,
+}
+\]
+
+where \(Q\) is unitary and \(T\) is upper triangular in the complex case.
+
+The diagonal entries of \(T\) are the eigenvalues of \(A\).
+
+Schur form is central to practical eigenvalue computation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Linear Algebra Workflow}
+\label{subsec:nla-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item determine matrix dimensions;
+    \item identify symmetry or positive definiteness;
+    \item determine whether the matrix is dense or sparse;
+    \item inspect scaling;
+    \item estimate or diagnose conditioning;
+    \item identify the required task;
+    \item choose a factorization or iterative method;
+    \item avoid unnecessary explicit inverses;
+    \item use pivoting when appropriate;
+    \item exploit symmetry and sparsity;
+    \item monitor residuals;
+    \item use backward-error reasoning;
+    \item refine the solution if necessary;
+    \item verify eigenpairs or least-squares residuals;
+    \item compare numerical rank with application requirements;
+    \item evaluate memory and computational cost.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Linear-System Solver}
+\label{subsec:choosing-linear-system-solver}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a general dense square system, use:
+
+\[
+\boxed{
+\text{LU with pivoting}.
+}
+\]
+
+For symmetric positive-definite systems, use:
+
+\[
+\boxed{
+\text{Cholesky}.
+}
+\]
+
+For large sparse symmetric positive-definite systems, consider:
+
+\[
+\boxed{
+\text{preconditioned CG}.
+}
+\]
+
+For large sparse nonsymmetric systems, consider:
+
+\[
+\boxed{
+\text{GMRES or another Krylov method}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Least-Squares Solver}
+\label{subsec:choosing-least-squares-solver}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a well-conditioned full-rank dense least-squares problem, QR is a
+standard choice.
+
+For rank-deficient or highly ill-conditioned problems, consider:
+
+\[
+\boxed{
+\text{SVD}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{rank-revealing QR}.
+}
+\]
+
+Normal equations can be faster in some settings but should be used with
+awareness of their squared condition number.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing an Eigenvalue Method}
+\label{subsec:choosing-eigenvalue-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For one dominant eigenpair, consider:
+
+\[
+\boxed{
+\text{power iteration}.
+}
+\]
+
+For an eigenvalue near a known shift, consider:
+
+\[
+\boxed{
+\text{shifted inverse iteration}.
+}
+\]
+
+For dense full-spectrum computations, practical methods are based on:
+
+\[
+\boxed{
+\text{Hessenberg or tridiagonal reduction}
++
+\text{QR-type iteration}.
+}
+\]
+
+For large sparse problems, specialized Krylov eigensolvers are often
+preferred.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:nla-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Computing \(A^{-1}\) to Solve \(A\mathbf{x}=\mathbf{b}\)}
+
+Explicit inversion is usually unnecessary.
+
+Use a factorization or iterative solve instead.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Pivoting}
+
+Gaussian elimination without pivoting can fail even for nonsingular
+matrices or can produce severe numerical error.
+
+Partial pivoting should normally be used for general dense systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating a Small Residual as Proof of a Small Error}
+
+A small residual does not guarantee small forward error when
+
+\[
+\kappa(A)
+\]
+
+is large.
+
+Conditioning matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Problem Conditioning and Solver Stability}
+
+An ill-conditioned system remains sensitive even when solved by an
+excellent algorithm.
+
+A stable method cannot remove information lost in the problem itself.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Cholesky on an Indefinite Matrix}
+
+Cholesky requires symmetric positive definiteness in its standard form.
+
+Symmetry alone is not sufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forming \(A^TA\) Without Considering Conditioning}
+
+The condition number satisfies
+
+\[
+\boxed{
+\kappa_2(A^TA)
+=
+\kappa_2(A)^2
+}
+\]
+
+for full-column-rank \(A\).
+
+This can significantly reduce numerical accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Classical Gram--Schmidt Is Always Numerically Orthogonal}
+
+Floating-point cancellation can cause loss of orthogonality.
+
+Modified Gram--Schmidt or Householder QR is usually more reliable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Determinants to Test Numerical Singularity}
+
+Computing
+
+\[
+\det(A)
+\]
+
+is usually not a good numerical test for singularity or conditioning.
+
+Factorizations and singular values are more informative.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Small Singular Values With Exact Zero}
+
+A singular value may be mathematically nonzero but below a meaningful
+numerical tolerance.
+
+Numerical rank depends on scale and precision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Applying CG to a General Nonsymmetric Matrix}
+
+Standard conjugate gradient requires
+
+\[
+\boxed{
+A=A^T
+}
+\]
+
+and
+
+\[
+\boxed{
+A\succ0.
+}
+\]
+
+For general nonsymmetric systems, another Krylov solver is required.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Jacobi or Gauss--Seidel Always Converges}
+
+Stationary iteration convergence depends on the iteration matrix.
+
+A sufficient structural condition such as diagonal dominance should not be
+confused with universal convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Preconditioning}
+
+A theoretically convergent Krylov method may converge extremely slowly on
+an ill-conditioned system.
+
+A good preconditioner can be more important than changing the iterative
+solver.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Sparse Fill-In}
+
+A sparse matrix does not guarantee a sparse factorization.
+
+Poor ordering can produce large amounts of fill-in.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Eigenvalue Algorithms on the Characteristic Polynomial}
+
+Forming and solving the characteristic polynomial numerically is usually
+inferior to matrix-based eigenvalue methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Scaling}
+
+Large magnitude differences among rows, columns, or variables can create
+avoidable numerical difficulties.
+
+Scaling can improve practical solver behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:nla-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Optimization.}
+Newton, interior-point, sequential quadratic programming, and least-squares
+methods repeatedly solve linear systems.
+
+\medskip
+
+\textbf{Differential Equations.}
+Finite-difference and finite-element discretizations produce large sparse
+linear systems.
+
+\medskip
+
+\textbf{Statistics.}
+Regression, covariance analysis, principal components, and multivariate
+methods rely on QR, Cholesky, eigenvalue methods, and SVD.
+
+\medskip
+
+\textbf{Data Science.}
+Low-rank approximations, dimensionality reduction, matrix completion, and
+latent-factor models depend on matrix factorizations.
+
+\medskip
+
+\textbf{Engineering.}
+Structural, circuit, control, and simulation models require repeated matrix
+solves and eigenvalue calculations.
+
+\medskip
+
+\textbf{Networks.}
+Graph Laplacians produce sparse linear algebra problems used in diffusion,
+ranking, clustering, and network analysis.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Efficient matrix kernels form the computational foundation of many large
+simulation codes.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:nla-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a vector \(2\)-norm.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the matrix \(1\)-norm.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the matrix \(\infty\)-norm.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the Frobenius norm.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the condition number of a nonsingular matrix.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a linear-system residual.
+\end{exercise}
+
+\begin{exercise}[1]
+Define LU factorization.
+\end{exercise}
+
+\begin{exercise}[1]
+Define Cholesky factorization.
+\end{exercise}
+
+\begin{exercise}[1]
+Define QR factorization.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the singular value decomposition.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute
+
+\[
+\|\mathbf{x}\|_1,
+\qquad
+\|\mathbf{x}\|_2,
+\qquad
+\|\mathbf{x}\|_\infty
+\]
+
+for a given vector.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute
+
+\[
+\|A\|_1
+\]
+
+and
+
+\[
+\|A\|_\infty
+\]
+
+for a given matrix.
+\end{exercise}
+
+\begin{exercise}[2]
+Given \(A\) and an approximate solution \(\widehat{\mathbf{x}}\), compute
+the residual.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare residual size with actual forward error in a small linear system.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a condition number for a diagonal matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a nearly singular matrix has a large condition number.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform Gaussian elimination on a \(3\times3\) system.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform back substitution.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform forward substitution.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an LU factorization without pivoting.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify the factorization by multiplying \(LU\).
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one step of partial pivoting.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct
+
+\[
+PA=LU
+\]
+
+for a small matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a very small pivot can cause numerical problems.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether a given symmetric matrix is positive definite.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a \(2\times2\) Cholesky factorization.
+\end{exercise}
+
+\begin{exercise}[3]
+Use Cholesky factors to solve a linear system.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the leading arithmetic cost of LU and Cholesky factorization.
+\end{exercise}
+
+\begin{exercise}[2]
+Verify that an orthogonal matrix preserves the Euclidean norm.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply Gram--Schmidt to two vectors.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a QR factorization of a small matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify that
+
+\[
+Q^TQ=I.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Householder reflector that maps a vector to a coordinate axis.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Givens rotation that eliminates one vector component.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve a least-squares problem using QR.
+\end{exercise}
+
+\begin{exercise}[3]
+Solve the same least-squares problem using normal equations.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare the condition numbers of \(A\) and \(A^TA\).
+\end{exercise}
+
+\begin{exercise}[2]
+Compute the singular values of a diagonal matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the SVD of a simple \(2\times2\) matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine the rank from its singular values.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine numerical rank using a specified tolerance.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a pseudoinverse for a simple diagonal matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Use the pseudoinverse to obtain a minimum-norm solution.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a rank-one approximation using the leading singular triplet.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the spectral-norm truncation error from the next singular value.
+\end{exercise}
+
+\begin{exercise}[2]
+Perform one power-method iteration.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply several power iterations to a diagonalizable matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Estimate the dominant eigenvalue using the Rayleigh quotient.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how the eigenvalue ratio affects power-method convergence.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one shifted inverse-iteration step.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why a shift near an eigenvalue accelerates targeting.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one unshifted QR iteration on a \(2\times2\) matrix.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the Jacobi iteration for a given linear system.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the Gauss--Seidel iteration for the same system.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform three Jacobi iterations.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform three Gauss--Seidel iterations.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare their observed convergence.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct the Jacobi iteration matrix.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute its spectral radius.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether the iteration converges for every initial guess.
+\end{exercise}
+
+\begin{exercise}[3]
+Test a matrix for strict diagonal dominance.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one SOR step for a specified \(\omega\).
+\end{exercise}
+
+\begin{exercise}[2]
+Construct
+
+\[
+\mathcal{K}_3(A,\mathbf{r}_0).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one conjugate-gradient iteration.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify that two CG search directions are \(A\)-conjugate in exact
+arithmetic for a small example.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why CG requires symmetric positive definiteness.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the role of the condition number in CG convergence.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe how GMRES minimizes residual norm over a Krylov subspace.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a Jacobi preconditioner.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the tradeoff in choosing a preconditioner.
+\end{exercise}
+
+\begin{exercise}[3]
+Count the nonzeros in a sparse matrix and estimate sparse matrix-vector
+multiplication cost.
+\end{exercise}
+
+\begin{exercise}[3]
+Give an example of fill-in during sparse elimination.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one iterative-refinement correction.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the connection between backward stability and conditioning.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive standard perturbation bounds for linear systems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study growth factors in Gaussian elimination.
+\end{exercise}
+
+\begin{exercise}[4]
+Study backward stability of LU factorization with partial pivoting.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Cholesky factorization recursively.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stability of classical and modified Gram--Schmidt.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Householder QR.
+\end{exercise}
+
+\begin{exercise}[4]
+Study rank-revealing QR factorization.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove
+
+\[
+\kappa_2(A^TA)
+=
+\kappa_2(A)^2
+\]
+
+for full-column-rank \(A\).
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the Eckart--Young theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study perturbation theory for singular values.
+\end{exercise}
+
+\begin{exercise}[4]
+Study eigenvalue conditioning for normal and nonnormal matrices.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the power-method asymptotic convergence rate.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Rayleigh quotient iteration for symmetric matrices.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Hessenberg reduction using Householder reflectors.
+\end{exercise}
+
+\begin{exercise}[4]
+Study shifted QR eigenvalue algorithms.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the stationary-iteration condition
+
+\[
+\rho(G)<1.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Study optimal SOR parameters for model problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive conjugate gradient from quadratic minimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the classical CG error estimate.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Lanczos iteration.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Arnoldi iteration and GMRES.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate incomplete LU preconditioning.
+\end{exercise}
+
+\begin{exercise}[4]
+Study sparse ordering strategies and elimination graphs.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate mixed-precision iterative refinement.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:nla-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical linear algebra develops stable and efficient matrix algorithms.
+
+A linear system is
+
+\[
+\boxed{
+A\mathbf{x}
+=
+\mathbf{b}.
+}
+\]
+
+Its conditioning is measured by
+
+\[
+\boxed{
+\kappa(A)
+=
+\|A\|
+\|A^{-1}\|.
+}
+\]
+
+General dense systems are commonly solved using
+
+\[
+\boxed{
+PA=LU.
+}
+\]
+
+Symmetric positive-definite systems admit
+
+\[
+\boxed{
+A=LL^T.
+}
+\]
+
+Least-squares problems can be solved using
+
+\[
+\boxed{
+A=QR.
+}
+\]
+
+The singular value decomposition is
+
+\[
+\boxed{
+A=U\Sigma V^T.
+}
+\]
+
+It provides information about:
+
+\[
+\boxed{
+\text{rank}
++
+\text{conditioning}
++
+\text{least squares}
++
+\text{low-rank approximation}.
+}
+\]
+
+Large sparse systems often use iterative methods such as
+
+\[
+\boxed{
+\text{CG}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{GMRES},
+}
+\]
+
+combined with
+
+\[
+\boxed{
+\text{preconditioning}.
+}
+\]
+
+Reliable numerical matrix computation therefore requires attention to
+
+\[
+\boxed{
+\text{structure}
++
+\text{conditioning}
++
+\text{stability}
++
+\text{sparsity}
++
+\text{computational cost}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:nla-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Numerical Linear Algebra builds on the error, conditioning, and stability
+ideas of Section~\ref{sec:numerical-analysis}. Matrix factorizations such
+as LU, Cholesky, QR, and SVD provide the computational foundation for
+least squares, eigenvalue problems, optimization, differential-equation
+solvers, statistics, and data analysis. Iterative Krylov methods become
+especially important for large sparse systems arising from scientific
+models. The next section, Numerical Optimization, develops computational
+algorithms for minimizing and maximizing nonlinear functions, including
+line-search methods, Newton and quasi-Newton methods, constrained
+optimization, and large-scale numerical optimization.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.2 Numerical Linear Algebra
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard numerical linear algebra.
+%   - Standard direct and iterative matrix algorithms.
+%   - Standard matrix-factorization and eigenvalue methods.
+%
+% Used for:
+%   - dense and sparse matrices;
+%   - vector and matrix norms;
+%   - Frobenius norm;
+%   - linear-system residuals;
+%   - forward and backward error;
+%   - matrix conditioning;
+%   - Gaussian elimination;
+%   - forward and back substitution;
+%   - LU factorization;
+%   - partial and complete pivoting;
+%   - growth factors;
+%   - arithmetic complexity;
+%   - symmetric positive-definite matrices;
+%   - Cholesky factorization;
+%   - orthogonal matrices;
+%   - QR factorization;
+%   - classical and modified Gram--Schmidt;
+%   - Householder reflections;
+%   - Givens rotations;
+%   - least-squares solution by QR;
+%   - normal-equation conditioning;
+%   - singular value decomposition;
+%   - singular values;
+%   - numerical rank;
+%   - Moore--Penrose pseudoinverse;
+%   - minimum-norm solutions;
+%   - low-rank approximation;
+%   - Eckart--Young theorem;
+%   - eigenvalue computation;
+%   - Rayleigh quotient;
+%   - power method;
+%   - inverse and shifted inverse iteration;
+%   - Rayleigh quotient iteration;
+%   - QR iteration;
+%   - Hessenberg and tridiagonal reductions;
+%   - direct and iterative solvers;
+%   - matrix splitting;
+%   - spectral-radius convergence;
+%   - Jacobi;
+%   - Gauss--Seidel;
+%   - SOR;
+%   - Krylov subspaces;
+%   - conjugate gradient;
+%   - GMRES;
+%   - Arnoldi process;
+%   - preconditioning;
+%   - incomplete factorizations;
+%   - sparse storage;
+%   - fill-in and reordering;
+%   - iterative refinement;
+%   - mixed-precision refinement preview;
+%   - scaling and equilibration;
+%   - rank-revealing factorizations;
+%   - Schur decomposition;
+%   - applications and exercises.
+%
+% Notes:
+%   - Numerical Optimization is developed next in Section 11.3.
+%   - Numerical ODEs and PDEs follow in Sections 11.4 and 11.5.
+%   - Scientific Computing in Section 11.7 develops broader computational
+%     implementation concepts.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

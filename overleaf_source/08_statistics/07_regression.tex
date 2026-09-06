@@ -1,0 +1,4966 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8.7 REGRESSION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Regression}
+\label{sec:regression}
+
+\prerequisite{
+Descriptive statistics, covariance, correlation, sampling distributions,
+statistical estimation, confidence intervals, hypothesis testing,
+linear algebra, matrix multiplication, derivatives, optimization, and
+basic probability.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the purpose of regression modeling;
+    \item distinguish response and explanatory variables;
+    \item formulate a simple linear regression model;
+    \item distinguish population regression parameters from estimated
+          regression coefficients;
+    \item derive ordinary least squares estimators;
+    \item interpret slope and intercept coefficients;
+    \item compute fitted values and residuals;
+    \item decompose variability using sums of squares;
+    \item define \(R^2\);
+    \item connect correlation and simple linear regression;
+    \item understand assumptions of the classical linear model;
+    \item derive sampling distributions of OLS estimators under normal
+          errors;
+    \item construct confidence intervals for regression coefficients;
+    \item perform \(t\)-tests for regression coefficients;
+    \item construct confidence intervals for the mean response;
+    \item construct prediction intervals for future observations;
+    \item distinguish confidence and prediction intervals;
+    \item formulate multiple linear regression;
+    \item express regression in matrix form;
+    \item derive the normal equations;
+    \item derive the OLS estimator
+          \((X^TX)^{-1}X^Ty\);
+    \item interpret partial regression coefficients;
+    \item understand interaction terms;
+    \item understand polynomial regression;
+    \item work with indicator variables;
+    \item understand categorical predictors;
+    \item understand adjusted \(R^2\);
+    \item interpret residual standard error;
+    \item diagnose nonlinearity, heteroskedasticity, and outliers;
+    \item understand leverage and influence;
+    \item define Cook's distance conceptually;
+    \item understand multicollinearity;
+    \item interpret variance inflation factors;
+    \item distinguish interpolation from extrapolation;
+    \item understand omitted-variable bias conceptually;
+    \item distinguish association from causation in regression;
+    \item understand robust standard errors conceptually;
+    \item recognize weighted least squares;
+    \item recognize generalized least squares;
+    \item understand model selection conceptually;
+    \item recognize ridge and lasso regression;
+    \item understand logistic regression as a generalized linear model
+          preview;
+    \item connect regression with ANOVA, experimental design,
+          statistical learning, and mathematical modeling.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Regression?}
+\label{subsec:what-is-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Regression studies relationships between a response variable and one or
+more explanatory variables.
+
+Suppose the response is denoted
+
+\[
+Y
+\]
+
+and explanatory variables are denoted
+
+\[
+X_1,\ldots,X_p.
+\]
+
+The central goal is to model how the conditional distribution of \(Y\)
+changes as the explanatory variables change.
+
+A regression model may be used for:
+
+\[
+\boxed{
+\text{description},
+}
+\]
+
+\[
+\boxed{
+\text{prediction},
+}
+\]
+
+\[
+\boxed{
+\text{estimation},
+}
+\]
+
+and, under stronger assumptions,
+
+\[
+\boxed{
+\text{causal analysis}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Response and Explanatory Variables}
+\label{subsec:response-explanatory-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{definitionbox}{Response Variable}
+The response variable is the outcome whose behavior is being modeled or
+predicted.
+\end{definitionbox}
+
+\begin{definitionbox}{Explanatory Variable}
+An explanatory variable is a variable used to explain, predict, or
+describe changes in the response.
+\end{definitionbox}
+
+Alternative names include:
+
+\[
+\boxed{
+\text{predictor},
+}
+\]
+
+\[
+\boxed{
+\text{covariate},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{independent variable}.
+}
+\]
+
+The term ``independent variable'' does not necessarily imply
+probabilistic independence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simple Linear Regression}
+\label{subsec:simple-linear-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simplest regression model uses one explanatory variable.
+
+\begin{definitionbox}{Simple Linear Regression Model}
+The simple linear regression model is
+
+\[
+\boxed{
+Y_i
+=
+\beta_0
++
+\beta_1X_i
++
+\varepsilon_i,
+}
+\]
+
+for
+
+\[
+i=1,\ldots,n.
+\]
+\end{definitionbox}
+
+Here:
+
+\[
+\boxed{
+\beta_0
+=
+\text{intercept},
+}
+\]
+
+\[
+\boxed{
+\beta_1
+=
+\text{slope},
+}
+\]
+
+and
+
+\[
+\boxed{
+\varepsilon_i
+=
+\text{random error}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditional Mean Interpretation}
+\label{subsec:conditional-mean-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\mathbb{E}[\varepsilon_i\mid X_i]=0,
+\]
+
+then
+
+\[
+\boxed{
+\mathbb{E}[Y_i\mid X_i]
+=
+\beta_0+\beta_1X_i.
+}
+\]
+
+Thus the regression line describes the conditional mean response.
+
+The model does not state that every observation lies exactly on the line.
+
+Instead,
+
+\[
+\boxed{
+Y_i
+=
+\text{systematic component}
++
+\text{random deviation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpreting the Slope}
+\label{subsec:interpreting-regression-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The slope
+
+\[
+\beta_1
+\]
+
+represents the change in the conditional mean response associated with a
+one-unit increase in \(X\).
+
+Thus,
+
+\[
+\boxed{
+\Delta
+\mathbb{E}[Y\mid X]
+=
+\beta_1
+}
+\]
+
+for a one-unit increase in \(X\).
+
+If
+
+\[
+\beta_1>0,
+\]
+
+the mean response increases with \(X\).
+
+If
+
+\[
+\beta_1<0,
+\]
+
+the mean response decreases with \(X\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpreting the Intercept}
+\label{subsec:interpreting-regression-intercept}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The intercept
+
+\[
+\beta_0
+\]
+
+is the predicted mean response when
+
+\[
+X=0.
+\]
+
+Thus,
+
+\[
+\boxed{
+\beta_0
+=
+\mathbb{E}[Y\mid X=0].
+}
+\]
+
+However, the intercept may not have a meaningful scientific
+interpretation if
+
+\[
+X=0
+\]
+
+is impossible or far outside the observed range.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Observed Data}
+\label{subsec:observed-regression-data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the observed data are
+
+\[
+(x_1,y_1),
+\ldots,
+(x_n,y_n).
+\]
+
+The estimated regression line is
+
+\[
+\boxed{
+\widehat{y}
+=
+b_0+b_1x.
+}
+\]
+
+The coefficients
+
+\[
+b_0
+\]
+
+and
+
+\[
+b_1
+\]
+
+estimate
+
+\[
+\beta_0
+\]
+
+and
+
+\[
+\beta_1.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residuals}
+\label{subsec:regression-residuals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For observation \(i\), the fitted value is
+
+\[
+\boxed{
+\widehat{y}_i
+=
+b_0+b_1x_i.
+}
+\]
+
+The residual is
+
+\[
+\boxed{
+e_i
+=
+y_i-\widehat{y}_i.
+}
+\]
+
+Thus residuals estimate the unobserved errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ordinary Least Squares}
+\label{subsec:ordinary-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary least squares, abbreviated OLS, chooses coefficients minimizing
+
+\[
+\boxed{
+SSE
+=
+\sum_{i=1}^{n}
+e_i^2.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+(b_0,b_1)
+=
+\arg\min_{a,b}
+\sum_{i=1}^{n}
+(y_i-a-bx_i)^2.
+}
+\]
+
+This is called the least-squares criterion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deriving the Least-Squares Equations}
+\label{subsec:derive-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+Q(a,b)
+=
+\sum_{i=1}^{n}
+(y_i-a-bx_i)^2.
+\]
+
+Differentiate with respect to \(a\):
+
+\[
+\frac{\partial Q}{\partial a}
+=
+-2
+\sum_{i=1}^{n}
+(y_i-a-bx_i).
+\]
+
+Set equal to zero:
+
+\[
+\sum y_i
+=
+na+b\sum x_i.
+\]
+
+Differentiate with respect to \(b\):
+
+\[
+\frac{\partial Q}{\partial b}
+=
+-2
+\sum
+x_i(y_i-a-bx_i).
+\]
+
+Set equal to zero:
+
+\[
+\sum x_iy_i
+=
+a\sum x_i
++
+b\sum x_i^2.
+\]
+
+These are the normal equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Slope Estimator}
+\label{subsec:slope-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Solving the normal equations gives
+
+\[
+\boxed{
+b_1
+=
+\frac{
+\sum_{i=1}^{n}
+(x_i-\overline{x})
+(y_i-\overline{y})
+}{
+\sum_{i=1}^{n}
+(x_i-\overline{x})^2
+}.
+}
+\]
+
+Define
+
+\[
+S_{xx}
+=
+\sum
+(x_i-\overline{x})^2,
+\]
+
+and
+
+\[
+S_{xy}
+=
+\sum
+(x_i-\overline{x})
+(y_i-\overline{y}).
+\]
+
+Then
+
+\[
+\boxed{
+b_1
+=
+\frac{S_{xy}}{S_{xx}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Intercept Estimator}
+\label{subsec:intercept-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Once the slope is known,
+
+\[
+\boxed{
+b_0
+=
+\overline{y}
+-
+b_1\overline{x}.
+}
+\]
+
+Therefore the estimated regression line always passes through
+
+\[
+\boxed{
+(\overline{x},\overline{y}).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Least-Squares Line}
+\label{subsec:worked-least-squares-line}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Fitting a Simple Regression}
+
+Suppose
+
+\[
+x=(1,2,3)
+\]
+
+and
+
+\[
+y=(2,3,5).
+\]
+
+Then
+
+\[
+\overline{x}=2,
+\qquad
+\overline{y}=\frac{10}{3}.
+\]
+
+Compute
+
+\[
+S_{xx}
+=
+(1-2)^2
++
+(2-2)^2
++
+(3-2)^2
+=
+2.
+\]
+
+Also,
+
+\[
+S_{xy}
+=
+(1-2)
+\left(
+2-\frac{10}{3}
+\right)
++
+(2-2)
+\left(
+3-\frac{10}{3}
+\right)
++
+(3-2)
+\left(
+5-\frac{10}{3}
+\right).
+\]
+
+Thus,
+
+\[
+S_{xy}
+=
+\frac43+\frac53
+=
+3.
+\]
+
+Therefore,
+
+\[
+b_1
+=
+\frac32.
+\]
+
+The intercept is
+
+\[
+b_0
+=
+\frac{10}{3}
+-
+\frac32(2)
+=
+\frac13.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+\widehat{y}
+=
+\frac13
++
+\frac32x.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Properties of OLS Residuals}
+\label{subsec:ols-residual-properties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For simple regression with an intercept,
+
+\[
+\boxed{
+\sum_{i=1}^{n}e_i=0.
+}
+\]
+
+Also,
+
+\[
+\boxed{
+\sum_{i=1}^{n}x_ie_i=0.
+}
+\]
+
+And since fitted values are linear combinations of \(1\) and \(x_i\),
+
+\[
+\boxed{
+\sum_{i=1}^{n}\widehat{y}_ie_i=0.
+}
+\]
+
+Thus residuals are orthogonal to the fitted regression space.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mean of the Fitted Values}
+\label{subsec:mean-fitted-values}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Since
+
+\[
+\sum e_i=0,
+\]
+
+we have
+
+\[
+\sum y_i
+=
+\sum\widehat{y}_i.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\overline{\widehat{y}}
+=
+\overline{y}.
+}
+\]
+
+The fitted values and observed responses have the same sample mean when
+an intercept is included.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Total Sum of Squares}
+\label{subsec:total-sum-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The total variation in the response is
+
+\[
+\boxed{
+SST
+=
+\sum_{i=1}^{n}
+(y_i-\overline{y})^2.
+}
+\]
+
+This measures variability of the observations around their mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Sum of Squares}
+\label{subsec:residual-sum-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The residual sum of squares is
+
+\[
+\boxed{
+SSE
+=
+\sum_{i=1}^{n}
+(y_i-\widehat{y}_i)^2.
+}
+\]
+
+This is the amount of variability not explained by the fitted regression
+line.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression Sum of Squares}
+\label{subsec:regression-sum-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The regression sum of squares is
+
+\[
+\boxed{
+SSR
+=
+\sum_{i=1}^{n}
+(\widehat{y}_i-\overline{y})^2.
+}
+\]
+
+This measures the variability of the fitted values around the response
+mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ANOVA Decomposition}
+\label{subsec:regression-anova-decomposition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For ordinary least squares with an intercept,
+
+\[
+\boxed{
+SST
+=
+SSR
++
+SSE.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\text{total variation}
+=
+\text{explained variation}
++
+\text{unexplained variation}.
+}
+\]
+
+This identity forms the basis of regression ANOVA.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coefficient of Determination}
+\label{subsec:coefficient-determination}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The coefficient of determination is
+
+\[
+\boxed{
+R^2
+=
+\frac{SSR}{SST}.
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+R^2
+=
+1-\frac{SSE}{SST}.
+}
+\]
+
+When an intercept is included,
+
+\[
+\boxed{
+0\leq R^2\leq1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of \(R^2\)}
+\label{subsec:r2-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An \(R^2\) value of
+
+\[
+0.80
+\]
+
+means that \(80\%\) of the observed sample variation around
+\(\overline{y}\) is accounted for by the fitted regression model in the
+sum-of-squares sense.
+
+It does not mean that:
+
+\[
+\boxed{
+80\%
+\text{ of }Y
+\text{ is caused by }X.
+}
+\]
+
+Nor does it guarantee accurate prediction outside the observed sample.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Correlation and Simple Regression}
+\label{subsec:correlation-simple-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Recall the sample correlation
+
+\[
+r
+=
+\frac{
+S_{xy}
+}{
+\sqrt{
+S_{xx}S_{yy}
+}
+},
+\]
+
+where
+
+\[
+S_{yy}
+=
+\sum
+(y_i-\overline{y})^2.
+\]
+
+The simple-regression slope is
+
+\[
+b_1
+=
+\frac{S_{xy}}{S_{xx}}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+b_1
+=
+r
+\frac{s_y}{s_x}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\(R^2\) and Correlation}
+\label{subsec:r2-correlation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For simple linear regression with an intercept,
+
+\[
+\boxed{
+R^2=r^2.
+}
+\]
+
+Thus the squared Pearson correlation equals the coefficient of
+determination.
+
+This identity is specific to simple linear regression with an intercept.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Slope from Correlation}
+\label{subsec:worked-slope-correlation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Using Standard Deviations and Correlation}
+
+Suppose
+
+\[
+r=0.75,
+\qquad
+s_x=4,
+\qquad
+s_y=10.
+\]
+
+Then
+
+\[
+b_1
+=
+r
+\frac{s_y}{s_x}.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+b_1
+=
+0.75
+\frac{10}{4}
+=
+1.875.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Classical Linear Regression Assumptions}
+\label{subsec:classical-linear-regression-assumptions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common simple linear regression model assumes
+
+\[
+\boxed{
+Y_i
+=
+\beta_0+\beta_1x_i+\varepsilon_i,
+}
+\]
+
+with
+
+\[
+\boxed{
+\mathbb{E}[\varepsilon_i]=0,
+}
+\]
+
+\[
+\boxed{
+\operatorname{Var}(\varepsilon_i)=\sigma^2,
+}
+\]
+
+and
+
+\[
+\boxed{
+\operatorname{Cov}(\varepsilon_i,\varepsilon_j)=0
+\quad
+(i\neq j).
+}
+\]
+
+For exact small-sample \(t\) and \(F\) inference, one commonly also
+assumes
+
+\[
+\boxed{
+\varepsilon_i
+\overset{\text{ind.}}{\sim}
+N(0,\sigma^2).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linearity Assumption}
+\label{subsec:regression-linearity-assumption}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The simple linear model assumes
+
+\[
+\boxed{
+\mathbb{E}[Y\mid X=x]
+=
+\beta_0+\beta_1x.
+}
+\]
+
+This means linearity in the coefficients and in the conditional mean
+structure being modeled.
+
+A visibly curved relationship may require transformations, polynomial
+terms, splines, or another model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Zero Conditional Mean}
+\label{subsec:zero-conditional-mean}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A central assumption is
+
+\[
+\boxed{
+\mathbb{E}[\varepsilon\mid X]=0.
+}
+\]
+
+This says that once \(X\) is known, the remaining error has no systematic
+mean pattern.
+
+Violation of this condition can arise from:
+
+\[
+\boxed{
+\text{omitted variables},
+}
+\]
+
+\[
+\boxed{
+\text{simultaneity},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{selection effects}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Homoskedasticity}
+\label{subsec:homoskedasticity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Homoskedasticity means
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\varepsilon_i\mid X_i
+)
+=
+\sigma^2
+}
+\]
+
+for all observations.
+
+Thus the conditional error variance is constant.
+
+If instead the variance changes with \(X\), the errors are
+heteroskedastic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independence of Errors}
+\label{subsec:independence-errors-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In many regression settings one assumes observations are independent.
+
+This may fail for:
+
+\[
+\boxed{
+\text{time series},
+}
+\]
+
+\[
+\boxed{
+\text{clustered observations},
+}
+\]
+
+\[
+\boxed{
+\text{spatial data},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{repeated measurements}.
+}
+\]
+
+Dependence affects standard errors and inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normality of Errors}
+\label{subsec:normality-errors-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Normality is not required to compute least-squares estimates.
+
+It is used to obtain exact finite-sample distributions for many classical
+tests and intervals.
+
+For large samples, asymptotic methods may remain useful under weaker
+conditions.
+
+Thus:
+
+\[
+\boxed{
+\text{normality is mainly an inference assumption, not an OLS existence
+requirement}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Expected Value of the OLS Slope}
+\label{subsec:expected-ols-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For fixed \(x_i\),
+
+\[
+b_1
+=
+\beta_1
++
+\frac{
+\sum
+(x_i-\overline{x})\varepsilon_i
+}{
+S_{xx}
+}.
+\]
+
+If
+
+\[
+\mathbb{E}[\varepsilon_i]=0,
+\]
+
+then
+
+\[
+\boxed{
+\mathbb{E}[b_1]
+=
+\beta_1.
+}
+\]
+
+Thus the OLS slope is unbiased under the standard zero-mean assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of the OLS Slope}
+\label{subsec:variance-ols-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under independent homoskedastic errors,
+
+\[
+\boxed{
+\operatorname{Var}(b_1)
+=
+\frac{
+\sigma^2
+}{
+S_{xx}
+}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{SE}(b_1)
+=
+\frac{
+\sigma
+}{
+\sqrt{S_{xx}}
+}.
+}
+\]
+
+Greater spread in the explanatory values reduces slope uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance of the OLS Intercept}
+\label{subsec:variance-ols-intercept}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under the standard assumptions,
+
+\[
+\boxed{
+\operatorname{Var}(b_0)
+=
+\sigma^2
+\left[
+\frac1n
++
+\frac{
+\overline{x}^2
+}{
+S_{xx}
+}
+\right].
+}
+\]
+
+Thus the intercept may be estimated imprecisely when \(x=0\) lies far
+from the center of the observed \(x\)-values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariance Between Intercept and Slope}
+\label{subsec:covariance-intercept-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The covariance is
+
+\[
+\boxed{
+\operatorname{Cov}(b_0,b_1)
+=
+-
+\frac{
+\overline{x}\sigma^2
+}{
+S_{xx}
+}.
+}
+\]
+
+If \(X\) is centered so that
+
+\[
+\overline{x}=0,
+\]
+
+then
+
+\[
+\boxed{
+\operatorname{Cov}(b_0,b_1)=0.
+}
+\]
+
+Centering can therefore improve coefficient interpretation and numerical
+behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Variance Estimator}
+\label{subsec:residual-variance-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In simple regression, two parameters
+
+\[
+\beta_0,
+\qquad
+\beta_1
+\]
+
+are estimated.
+
+Therefore the residual degrees of freedom are
+
+\[
+\boxed{
+n-2.
+}
+\]
+
+The error variance is estimated by
+
+\[
+\boxed{
+S^2
+=
+\frac{
+SSE
+}{
+n-2
+}.
+}
+\]
+
+The residual standard error is
+
+\[
+\boxed{
+S
+=
+\sqrt{
+\frac{
+SSE
+}{
+n-2
+}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Estimated Standard Error of the Slope}
+\label{subsec:estimated-se-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Replace \(\sigma\) by \(S\):
+
+\[
+\boxed{
+SE(b_1)
+=
+\frac{
+S
+}{
+\sqrt{S_{xx}}
+}.
+}
+\]
+
+Similarly,
+
+\[
+\boxed{
+SE(b_0)
+=
+S
+\sqrt{
+\frac1n
++
+\frac{
+\overline{x}^2
+}{
+S_{xx}
+}
+}.
+}
+\]
+
+These are used in coefficient confidence intervals and tests.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sampling Distribution of the Slope}
+\label{subsec:sampling-distribution-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under independent normal errors,
+
+\[
+b_1
+\]
+
+is normally distributed:
+
+\[
+\boxed{
+b_1
+\sim
+N
+\left(
+\beta_1,
+\frac{
+\sigma^2
+}{
+S_{xx}
+}
+\right).
+}
+\]
+
+After replacing \(\sigma\) with \(S\),
+
+\[
+\boxed{
+\frac{
+b_1-\beta_1
+}{
+SE(b_1)
+}
+\sim
+t_{n-2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confidence Interval for the Slope}
+\label{subsec:confidence-interval-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A \(100(1-\alpha)\%\) confidence interval for \(\beta_1\) is
+
+\[
+\boxed{
+b_1
+\pm
+t^*_{n-2}
+SE(b_1).
+}
+\]
+
+This interval quantifies uncertainty in the estimated change in mean
+response per unit change in \(X\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hypothesis Test for the Slope}
+\label{subsec:hypothesis-test-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common hypothesis is
+
+\[
+\boxed{
+H_0:\beta_1=0.
+}
+\]
+
+Against the two-sided alternative
+
+\[
+\boxed{
+H_A:\beta_1\neq0.
+}
+\]
+
+The test statistic is
+
+\[
+\boxed{
+T
+=
+\frac{
+b_1
+}{
+SE(b_1)
+}.
+}
+\]
+
+Under \(H_0\) and the normal-error model,
+
+\[
+\boxed{
+T\sim t_{n-2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Meaning of \(H_0:\beta_1=0\)}
+\label{subsec:meaning-zero-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In simple linear regression,
+
+\[
+\beta_1=0
+\]
+
+means
+
+\[
+\boxed{
+\mathbb{E}[Y\mid X=x]
+=
+\beta_0
+}
+\]
+
+for all \(x\) under the model.
+
+Thus the conditional mean does not change linearly with \(X\).
+
+This is a statement about linear association, not necessarily complete
+statistical independence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Testing the Slope}
+\label{subsec:worked-testing-slope}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Regression Coefficient Test}
+
+Suppose
+
+\[
+b_1=2.4
+\]
+
+and
+
+\[
+SE(b_1)=0.8.
+\]
+
+Test
+
+\[
+H_0:\beta_1=0.
+\]
+
+Then
+
+\[
+t
+=
+\frac{2.4}{0.8}
+=
+3.
+\]
+
+\begin{answerbox}
+\[
+\boxed{
+t=3.
+}
+\]
+\end{answerbox}
+
+The degrees of freedom are \(n-2\).
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confidence Interval for the Mean Response}
+\label{subsec:ci-mean-response}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At a specified predictor value
+
+\[
+x_0,
+\]
+
+the estimated mean response is
+
+\[
+\boxed{
+\widehat{y}_0
+=
+b_0+b_1x_0.
+}
+\]
+
+Its estimated standard error is
+
+\[
+\boxed{
+SE_{\text{mean}}
+=
+S
+\sqrt{
+\frac1n
++
+\frac{
+(x_0-\overline{x})^2
+}{
+S_{xx}
+}
+}.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+\widehat{y}_0
+\pm
+t^*_{n-2}
+SE_{\text{mean}}
+}
+\]
+
+is a confidence interval for the mean response at \(x_0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Prediction Interval for a New Observation}
+\label{subsec:prediction-interval-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A future observation at \(x_0\) contains additional individual error.
+
+Thus its prediction standard error is
+
+\[
+\boxed{
+SE_{\text{pred}}
+=
+S
+\sqrt{
+1
++
+\frac1n
++
+\frac{
+(x_0-\overline{x})^2
+}{
+S_{xx}
+}
+}.
+}
+\]
+
+The prediction interval is
+
+\[
+\boxed{
+\widehat{y}_0
+\pm
+t^*_{n-2}
+SE_{\text{pred}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confidence Versus Prediction Interval}
+\label{subsec:confidence-vs-prediction-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The mean-response confidence interval estimates
+
+\[
+\mathbb{E}[Y\mid X=x_0].
+\]
+
+The prediction interval targets an individual future value
+
+\[
+Y_{\text{new}}.
+\]
+
+Because
+
+\[
+SE_{\text{pred}}
+>
+SE_{\text{mean}},
+\]
+
+the prediction interval is wider.
+
+The extra \(1\) inside the square root represents individual-response
+variability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Where Prediction Is Most Precise}
+\label{subsec:prediction-precision-location}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Both interval formulas contain
+
+\[
+(x_0-\overline{x})^2.
+\]
+
+Therefore uncertainty is smallest near
+
+\[
+\boxed{
+x_0=\overline{x}.
+}
+\]
+
+Uncertainty increases as \(x_0\) moves farther from the center of the
+observed predictor values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extrapolation}
+\label{subsec:regression-extrapolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Extrapolation uses a regression model to predict outside the observed
+range of explanatory variables.
+
+For example, if observed \(X\)-values range from
+
+\[
+10
+\]
+
+to
+
+\[
+20,
+\]
+
+predicting at
+
+\[
+X=100
+\]
+
+is extrapolation.
+
+The assumed relationship may not continue outside the observed range.
+
+Therefore:
+
+\[
+\boxed{
+\text{extrapolation can be highly unreliable}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Linear Regression}
+\label{subsec:multiple-linear-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With several explanatory variables,
+
+\[
+\boxed{
+Y_i
+=
+\beta_0
++
+\beta_1X_{i1}
++
+\cdots
++
+\beta_pX_{ip}
++
+\varepsilon_i.
+}
+\]
+
+The conditional mean is
+
+\[
+\boxed{
+\mathbb{E}
+[
+Y_i
+\mid
+X_{i1},\ldots,X_{ip}
+]
+=
+\beta_0
++
+\sum_{j=1}^{p}
+\beta_jX_{ij}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpretation of a Partial Regression Coefficient}
+\label{subsec:partial-regression-coefficient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In multiple regression,
+
+\[
+\beta_j
+\]
+
+represents the change in conditional mean response associated with a
+one-unit increase in \(X_j\), while holding the other included
+explanatory variables fixed.
+
+Thus:
+
+\[
+\boxed{
+\beta_j
+=
+\text{partial association of }X_j\text{ with }Y
+\text{ given the other predictors}.
+}
+\]
+
+This interpretation depends on the model specification.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matrix Form of Regression}
+\label{subsec:matrix-form-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multiple regression can be written compactly as
+
+\[
+\boxed{
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+}
+\]
+
+Here,
+
+\[
+\mathbf{y}
+=
+\begin{pmatrix}
+y_1\\
+\vdots\\
+y_n
+\end{pmatrix},
+\]
+
+\[
+\boldsymbol{\beta}
+=
+\begin{pmatrix}
+\beta_0\\
+\beta_1\\
+\vdots\\
+\beta_p
+\end{pmatrix},
+\]
+
+and \(X\) is the design matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Design Matrix}
+\label{subsec:design-matrix-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the model contains an intercept, the design matrix is
+
+\[
+\boxed{
+X
+=
+\begin{pmatrix}
+1 & x_{11} & \cdots & x_{1p}\\
+1 & x_{21} & \cdots & x_{2p}\\
+\vdots & \vdots & \ddots & \vdots\\
+1 & x_{n1} & \cdots & x_{np}
+\end{pmatrix}.
+}
+\]
+
+Thus,
+
+\[
+X
+\]
+
+has
+
+\[
+n
+\]
+
+rows and
+
+\[
+p+1
+\]
+
+columns.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Least Squares in Matrix Form}
+\label{subsec:least-squares-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+OLS minimizes
+
+\[
+\boxed{
+\|\mathbf{y}-X\boldsymbol{\beta}\|_2^2.
+}
+\]
+
+Differentiate with respect to \(\boldsymbol{\beta}\):
+
+\[
+-2X^T
+(
+\mathbf{y}
+-
+X\boldsymbol{\beta}
+)
+=
+0.
+\]
+
+Therefore the normal equations are
+
+\[
+\boxed{
+X^TX
+\widehat{\boldsymbol{\beta}}
+=
+X^T\mathbf{y}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{OLS Matrix Estimator}
+\label{subsec:ols-matrix-estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+X^TX
+\]
+
+is invertible, then
+
+\[
+\boxed{
+\widehat{\boldsymbol{\beta}}
+=
+(X^TX)^{-1}
+X^T\mathbf{y}.
+}
+\]
+
+This is the ordinary least-squares estimator.
+
+Invertibility requires the columns of \(X\) to be linearly independent.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Full Column Rank}
+\label{subsec:full-column-rank-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the design matrix has
+
+\[
+p+1
+\]
+
+columns, full column rank means
+
+\[
+\boxed{
+\operatorname{rank}(X)
+=
+p+1.
+}
+\]
+
+If this fails, some predictors are exact linear combinations of others.
+
+Then the individual regression coefficients are not uniquely
+identified by ordinary least squares.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fitted Values in Matrix Form}
+\label{subsec:fitted-values-matrix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The fitted vector is
+
+\[
+\boxed{
+\widehat{\mathbf{y}}
+=
+X
+\widehat{\boldsymbol{\beta}}.
+}
+\]
+
+Substitute the OLS estimator:
+
+\[
+\widehat{\mathbf{y}}
+=
+X
+(X^TX)^{-1}
+X^T
+\mathbf{y}.
+\]
+
+Define the hat matrix
+
+\[
+\boxed{
+H
+=
+X
+(X^TX)^{-1}
+X^T.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\widehat{\mathbf{y}}
+=
+H\mathbf{y}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why It Is Called the Hat Matrix}
+\label{subsec:hat-matrix-name}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The matrix \(H\) transforms the response vector
+
+\[
+\mathbf{y}
+\]
+
+into the fitted vector
+
+\[
+\widehat{\mathbf{y}}.
+\]
+
+Thus it ``puts the hat on \(y\)'':
+
+\[
+\boxed{
+\widehat{\mathbf{y}}
+=
+H\mathbf{y}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projection Interpretation}
+\label{subsec:projection-interpretation-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The fitted vector is the orthogonal projection of \(\mathbf{y}\) onto
+the column space of \(X\).
+
+Thus
+
+\[
+\boxed{
+\widehat{\mathbf{y}}
+\in
+\operatorname{Col}(X).
+}
+\]
+
+The residual vector
+
+\[
+\mathbf{e}
+=
+\mathbf{y}
+-
+\widehat{\mathbf{y}}
+\]
+
+is orthogonal to that column space:
+
+\[
+\boxed{
+X^T\mathbf{e}
+=
+0.
+}
+\]
+
+This is the geometric meaning of the normal equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Properties of the Hat Matrix}
+\label{subsec:hat-matrix-properties}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The hat matrix satisfies
+
+\[
+\boxed{
+H^T=H
+}
+\]
+
+and
+
+\[
+\boxed{
+H^2=H.
+}
+\]
+
+Thus \(H\) is symmetric and idempotent.
+
+Its trace is
+
+\[
+\boxed{
+\operatorname{tr}(H)
+=
+p+1
+}
+\]
+
+when \(X\) has full column rank.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Maker Matrix}
+\label{subsec:residual-maker}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+M
+=
+I-H.
+}
+\]
+
+Then
+
+\[
+\boxed{
+\mathbf{e}
+=
+M\mathbf{y}.
+}
+\]
+
+The matrix \(M\) is also symmetric and idempotent.
+
+Its rank is
+
+\[
+\boxed{
+n-p-1.
+}
+\]
+
+This equals the residual degrees of freedom.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Unbiasedness in Multiple Regression}
+\label{subsec:unbiasedness-multiple-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Assume
+
+\[
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}
+\]
+
+with
+
+\[
+\mathbb{E}
+[
+\boldsymbol{\varepsilon}\mid X
+]
+=
+\mathbf{0}.
+\]
+
+Then
+
+\[
+\widehat{\boldsymbol{\beta}}
+=
+\boldsymbol{\beta}
++
+(X^TX)^{-1}
+X^T
+\boldsymbol{\varepsilon}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\mathbb{E}
+[
+\widehat{\boldsymbol{\beta}}
+\mid X
+]
+=
+\boldsymbol{\beta}.
+}
+\]
+
+Thus OLS is conditionally unbiased.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Covariance Matrix of OLS}
+\label{subsec:covariance-matrix-ols}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Under homoskedastic independent errors,
+
+\[
+\operatorname{Var}
+(
+\boldsymbol{\varepsilon}\mid X
+)
+=
+\sigma^2I.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{\boldsymbol{\beta}}
+\mid X
+)
+=
+\sigma^2
+(X^TX)^{-1}.
+}
+\]
+
+This matrix contains the variances and covariances of the estimated
+coefficients.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Variance in Multiple Regression}
+\label{subsec:residual-variance-multiple-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+With \(p\) predictors and an intercept, the number of estimated
+coefficients is
+
+\[
+p+1.
+\]
+
+Therefore the residual degrees of freedom are
+
+\[
+\boxed{
+n-p-1.
+}
+\]
+
+The error variance estimator is
+
+\[
+\boxed{
+S^2
+=
+\frac{
+SSE
+}{
+n-p-1
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coefficient Standard Errors}
+\label{subsec:coefficient-standard-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+C
+=
+(X^TX)^{-1}.
+\]
+
+Then
+
+\[
+\operatorname{Var}
+(
+\widehat{\beta}_j
+\mid X
+)
+=
+\sigma^2C_{jj}.
+\]
+
+The estimated standard error is
+
+\[
+\boxed{
+SE(\widehat{\beta}_j)
+=
+S\sqrt{C_{jj}}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coefficient \(t\)-Tests}
+\label{subsec:coefficient-t-tests}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To test
+
+\[
+H_0:
+\beta_j=\beta_{j0},
+\]
+
+use
+
+\[
+\boxed{
+T
+=
+\frac{
+\widehat{\beta}_j-\beta_{j0}
+}{
+SE(\widehat{\beta}_j)
+}.
+}
+\]
+
+Under normal homoskedastic errors,
+
+\[
+\boxed{
+T
+\sim
+t_{n-p-1}.
+}
+\]
+
+The most common null is
+
+\[
+\beta_{j0}=0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confidence Interval for a Regression Coefficient}
+\label{subsec:ci-regression-coefficient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A \(100(1-\alpha)\%\) confidence interval is
+
+\[
+\boxed{
+\widehat{\beta}_j
+\pm
+t^*_{n-p-1}
+SE(\widehat{\beta}_j).
+}
+\]
+
+This interval describes plausible values for the partial regression
+coefficient under the model assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Overall \(F\)-Test}
+\label{subsec:overall-f-test-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a model with \(p\) predictors, a common overall hypothesis is
+
+\[
+\boxed{
+H_0:
+\beta_1
+=
+\cdots
+=
+\beta_p
+=
+0.
+}
+\]
+
+The alternative is that at least one slope is nonzero.
+
+Define
+
+\[
+MSR
+=
+\frac{
+SSR
+}{p}
+\]
+
+and
+
+\[
+MSE
+=
+\frac{
+SSE
+}{
+n-p-1
+}.
+\]
+
+Then
+
+\[
+\boxed{
+F
+=
+\frac{
+MSR
+}{
+MSE
+}.
+}
+\]
+
+Under the classical null,
+
+\[
+\boxed{
+F
+\sim
+F_{p,n-p-1}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression ANOVA Table}
+\label{subsec:regression-anova-table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A regression ANOVA table has the structure
+
+\[
+\begin{array}{c|c|c|c|c}
+\text{Source}
+&
+\text{df}
+&
+\text{SS}
+&
+\text{MS}
+&
+F
+\\
+\hline
+\text{Regression}
+&
+p
+&
+SSR
+&
+SSR/p
+&
+MSR/MSE
+\\
+\text{Error}
+&
+n-p-1
+&
+SSE
+&
+SSE/(n-p-1)
+&
+\\
+\text{Total}
+&
+n-1
+&
+SST
+&
+&
+\end{array}
+\]
+
+This directly connects regression with analysis of variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adjusted \(R^2\)}
+\label{subsec:adjusted-r-squared}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ordinary \(R^2\) never decreases when more predictors are added.
+
+Adjusted \(R^2\) penalizes model complexity:
+
+\[
+\boxed{
+R_{\mathrm{adj}}^2
+=
+1
+-
+\frac{
+SSE/(n-p-1)
+}{
+SST/(n-1)
+}.
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+R_{\mathrm{adj}}^2
+=
+1
+-
+(1-R^2)
+\frac{
+n-1
+}{
+n-p-1
+}.
+}
+\]
+
+Adjusted \(R^2\) can decrease when an unhelpful variable is added.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Indicator Variables}
+\label{subsec:indicator-variables-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A categorical variable with two levels can be represented using an
+indicator variable.
+
+For example,
+
+\[
+D
+=
+\begin{cases}
+1,&\text{group A},\\
+0,&\text{group B}.
+\end{cases}
+\]
+
+Consider
+
+\[
+\boxed{
+Y
+=
+\beta_0
++
+\beta_1D
++
+\varepsilon.
+}
+\]
+
+Then for group B,
+
+\[
+\mathbb{E}[Y\mid D=0]
+=
+\beta_0.
+\]
+
+For group A,
+
+\[
+\mathbb{E}[Y\mid D=1]
+=
+\beta_0+\beta_1.
+\]
+
+Therefore,
+
+\[
+\boxed{
+\beta_1
+=
+\text{difference in group means}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Categorical Predictors with Several Levels}
+\label{subsec:categorical-predictors-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a categorical predictor has \(k\) levels.
+
+With an intercept, one commonly uses
+
+\[
+\boxed{
+k-1
+}
+\]
+
+indicator variables.
+
+One category serves as the reference category.
+
+Each indicator coefficient measures a difference relative to that
+reference level.
+
+Including all \(k\) indicators together with an intercept creates exact
+linear dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dummy Variable Trap}
+\label{subsec:dummy-variable-trap}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+D_1+\cdots+D_k=1.
+\]
+
+If all \(k\) category indicators and an intercept are included, then one
+column of the design matrix is an exact linear combination of the
+others.
+
+Thus
+
+\[
+X^TX
+\]
+
+is singular.
+
+This problem is sometimes called the dummy-variable trap.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interaction Terms}
+\label{subsec:interaction-terms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the model is
+
+\[
+\boxed{
+Y
+=
+\beta_0
++
+\beta_1X
++
+\beta_2Z
++
+\beta_3XZ
++
+\varepsilon.
+}
+\]
+
+The effect of \(X\) depends on \(Z\):
+
+\[
+\frac{
+\partial
+\mathbb{E}[Y\mid X,Z]
+}{
+\partial X
+}
+=
+\boxed{
+\beta_1+\beta_3Z.
+}
+\]
+
+Thus
+
+\[
+\beta_3
+\]
+
+measures interaction between \(X\) and \(Z\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Interaction Interpretation}
+\label{subsec:worked-interaction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Different Slopes by Group}
+
+Consider
+
+\[
+Y
+=
+10
++
+2X
++
+5D
+-
+X D
++
+\varepsilon,
+\]
+
+where \(D=0\) or \(1\).
+
+For \(D=0\),
+
+\[
+\mathbb{E}[Y\mid X,D=0]
+=
+10+2X.
+\]
+
+For \(D=1\),
+
+\[
+\mathbb{E}[Y\mid X,D=1]
+=
+15+X.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+\text{slope for }D=0:2,
+\qquad
+\text{slope for }D=1:1.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomial Regression}
+\label{subsec:polynomial-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A quadratic regression model is
+
+\[
+\boxed{
+Y
+=
+\beta_0
++
+\beta_1X
++
+\beta_2X^2
++
+\varepsilon.
+}
+\]
+
+This model is nonlinear in \(X\) but linear in the coefficients
+
+\[
+\beta_0,\beta_1,\beta_2.
+\]
+
+Therefore ordinary linear-model methods still apply.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Higher-Order Polynomial Regression}
+\label{subsec:higher-order-polynomial-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A degree-\(k\) polynomial regression has
+
+\[
+\boxed{
+Y
+=
+\beta_0
++
+\beta_1X
++
+\cdots
++
+\beta_kX^k
++
+\varepsilon.
+}
+\]
+
+High-degree polynomials can fit complex shapes but may oscillate
+strongly and extrapolate poorly.
+
+Flexible alternatives such as splines are often preferable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Transformations}
+\label{subsec:regression-transformations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Transformations may improve linearity or variance behavior.
+
+Examples include
+
+\[
+\boxed{
+\log Y,
+}
+\]
+
+\[
+\boxed{
+\sqrt{Y},
+}
+\]
+
+\[
+\boxed{
+\log X,
+}
+\]
+
+or
+
+\[
+\boxed{
+1/X.
+}
+\]
+
+Interpretation must be adjusted to the transformed scale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Linear Regression}
+\label{subsec:log-linear-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+\log Y
+=
+\beta_0+\beta_1X+\varepsilon.
+}
+\]
+
+Then
+
+\[
+Y
+\]
+
+changes multiplicatively as \(X\) changes.
+
+A one-unit increase in \(X\) multiplies the modeled geometric scale by
+
+\[
+\boxed{
+e^{\beta_1}.
+}
+\]
+
+For small \(\beta_1\),
+
+\[
+100\beta_1\%
+\]
+
+is approximately the percentage change in \(Y\), under the appropriate
+interpretation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Log-Log Regression}
+\label{subsec:log-log-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+\log Y
+=
+\beta_0
++
+\beta_1\log X
++
+\varepsilon.
+}
+\]
+
+Then
+
+\[
+\beta_1
+\]
+
+is an elasticity.
+
+A \(1\%\) increase in \(X\) is associated with approximately a
+
+\[
+\boxed{
+\beta_1\%
+}
+\]
+
+change in the modeled conditional response scale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residual Diagnostics}
+\label{subsec:residual-diagnostics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Residual diagnostics evaluate whether the fitted model is compatible with
+its assumptions.
+
+Useful plots include:
+
+\[
+\boxed{
+\text{residuals versus fitted values},
+}
+\]
+
+\[
+\boxed{
+\text{residuals versus predictors},
+}
+\]
+
+\[
+\boxed{
+\text{normal Q--Q plot},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{scale-location plots}.
+}
+\]
+
+Patterns in residuals suggest model deficiencies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Residuals Versus Fitted Values}
+\label{subsec:residuals-versus-fitted}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A well-specified simple regression often produces residuals scattered
+around zero without systematic structure.
+
+A curved pattern may indicate:
+
+\[
+\boxed{
+\text{nonlinearity}.
+}
+\]
+
+A funnel shape may indicate:
+
+\[
+\boxed{
+\text{heteroskedasticity}.
+}
+\]
+
+Clusters may indicate missing group structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Heteroskedasticity}
+\label{subsec:heteroskedasticity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Heteroskedasticity means
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\varepsilon_i\mid X_i
+)
+}
+\]
+
+is not constant.
+
+OLS coefficient estimates can remain unbiased under zero conditional
+mean, but the usual homoskedastic standard-error formulas can be
+incorrect.
+
+Thus the main problem is often inference rather than point estimation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Heteroskedasticity-Robust Standard Errors}
+\label{subsec:robust-standard-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Heteroskedasticity-consistent covariance estimators replace the
+homoskedastic covariance formula
+
+\[
+\sigma^2(X^TX)^{-1}
+\]
+
+with a sandwich estimator.
+
+A schematic form is
+
+\[
+\boxed{
+(X^TX)^{-1}
+X^T
+\widehat{\Omega}
+X
+(X^TX)^{-1}.
+}
+\]
+
+Different HC corrections modify the estimate of
+\(\widehat{\Omega}\).
+
+These methods leave OLS coefficients unchanged but adjust their estimated
+uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Weighted Least Squares}
+\label{subsec:weighted-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If error variances differ in a known or modeled way, weighted least
+squares can improve efficiency.
+
+Minimize
+
+\[
+\boxed{
+\sum_{i=1}^{n}
+w_i
+(y_i-\widehat{y}_i)^2.
+}
+\]
+
+Observations with smaller error variance typically receive larger
+weights.
+
+In matrix form,
+
+\[
+\boxed{
+\widehat{\boldsymbol{\beta}}_{WLS}
+=
+(X^TWX)^{-1}
+X^TW\mathbf{y}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generalized Least Squares}
+\label{subsec:generalized-least-squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\operatorname{Var}
+(
+\boldsymbol{\varepsilon}
+)
+=
+\Sigma
+\]
+
+rather than \(\sigma^2I\).
+
+If \(\Sigma\) is known and nonsingular, generalized least squares uses
+
+\[
+\boxed{
+\widehat{\boldsymbol{\beta}}_{GLS}
+=
+(X^T\Sigma^{-1}X)^{-1}
+X^T\Sigma^{-1}\mathbf{y}.
+}
+\]
+
+This accounts for heteroskedasticity or correlation in the errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Normal Q--Q Plot}
+\label{subsec:normal-qq-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A normal Q--Q plot compares ordered residuals with theoretical normal
+quantiles.
+
+Points approximately following a straight line suggest normality may be
+reasonable.
+
+Strong curvature or extreme tail deviations suggest nonnormality.
+
+Normal Q--Q plots are more informative than simply inspecting a
+histogram for small datasets.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Outliers}
+\label{subsec:regression-outliers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A regression outlier is an observation with an unusual response relative
+to the fitted model.
+
+It may have a large residual.
+
+However, an observation can have a large residual without having unusual
+predictor values.
+
+Thus outlyingness in the response and leverage in the predictors are
+different concepts.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Leverage}
+\label{subsec:regression-leverage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The diagonal elements
+
+\[
+h_{ii}
+\]
+
+of the hat matrix measure leverage.
+
+Since
+
+\[
+\widehat{\mathbf{y}}
+=
+H\mathbf{y},
+\]
+
+the value \(h_{ii}\) reflects how strongly observation \(i\)'s fitted
+value depends on its own observed response.
+
+Large leverage generally occurs for unusual predictor combinations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Average Leverage}
+\label{subsec:average-leverage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because
+
+\[
+\operatorname{tr}(H)=p+1,
+\]
+
+we have
+
+\[
+\sum_{i=1}^{n}
+h_{ii}
+=
+p+1.
+\]
+
+Therefore the average leverage is
+
+\[
+\boxed{
+\frac{
+p+1
+}{n}.
+}
+\]
+
+Values much larger than this average may deserve investigation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Studentized Residuals}
+\label{subsec:studentized-residuals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Residual variances differ because
+
+\[
+\operatorname{Var}(e_i)
+=
+\sigma^2(1-h_{ii}).
+\]
+
+Therefore a standardized residual uses
+
+\[
+\boxed{
+r_i
+=
+\frac{
+e_i
+}{
+S\sqrt{1-h_{ii}}
+}.
+}
+\]
+
+Studentized residuals make residual magnitudes more comparable across
+observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Influence}
+\label{subsec:regression-influence}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An observation is influential if removing it substantially changes the
+fitted model.
+
+Influence depends jointly on:
+
+\[
+\boxed{
+\text{residual size}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{leverage}.
+}
+\]
+
+A high-leverage point lying exactly on the regression trend may have
+little influence.
+
+A moderate residual combined with extreme leverage can be highly
+influential.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cook's Distance}
+\label{subsec:cooks-distance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Cook's distance measures how much fitted values change when observation
+\(i\) is removed.
+
+A common form is
+
+\[
+\boxed{
+D_i
+=
+\frac{
+e_i^2
+}{
+(p+1)S^2
+}
+\frac{
+h_{ii}
+}{
+(1-h_{ii})^2
+}.
+}
+\]
+
+Large values indicate observations with substantial potential influence.
+
+Thresholds should be used as diagnostics rather than automatic deletion
+rules.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Outliers Should Not Be Deleted Automatically}
+\label{subsec:outlier-deletion-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An unusual observation may represent:
+
+\[
+\boxed{
+\text{data error},
+}
+\]
+
+\[
+\boxed{
+\text{rare valid behavior},
+}
+\]
+
+\[
+\boxed{
+\text{model misspecification},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{a scientifically important subgroup}.
+}
+\]
+
+Investigation should precede exclusion.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multicollinearity}
+\label{subsec:multicollinearity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multicollinearity occurs when explanatory variables are highly linearly
+related.
+
+Exact multicollinearity makes
+
+\[
+X^TX
+\]
+
+singular.
+
+Near multicollinearity makes it poorly conditioned.
+
+Consequences can include:
+
+\[
+\boxed{
+\text{large coefficient standard errors},
+}
+\]
+
+\[
+\boxed{
+\text{unstable coefficient signs},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{sensitivity to small data changes}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance Inflation Factor}
+\label{subsec:variance-inflation-factor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For predictor \(X_j\), regress it on the other predictors and let the
+resulting coefficient of determination be
+
+\[
+R_j^2.
+\]
+
+Then the variance inflation factor is
+
+\[
+\boxed{
+VIF_j
+=
+\frac1{
+1-R_j^2
+}.
+}
+\]
+
+If \(R_j^2\) is near \(1\), then \(VIF_j\) is large.
+
+This indicates that \(X_j\) is highly predictable from the remaining
+predictors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multicollinearity Does Not Necessarily Harm Prediction}
+\label{subsec:multicollinearity-prediction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Severe multicollinearity can make individual coefficient estimates
+unstable.
+
+However, predictions within the observed predictor region may still be
+accurate.
+
+Thus:
+
+\[
+\boxed{
+\text{coefficient interpretation}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{prediction accuracy}
+}
+\]
+
+are distinct goals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Omitted Variable Bias}
+\label{subsec:omitted-variable-bias}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the true model contains
+
+\[
+Y
+=
+\beta_0+\beta_1X+\beta_2Z+\varepsilon,
+\]
+
+but \(Z\) is omitted.
+
+If \(Z\) affects \(Y\) and is correlated with \(X\), the estimated
+coefficient on \(X\) may absorb part of \(Z\)'s effect.
+
+Thus the slope can be systematically distorted.
+
+This is called omitted-variable bias.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression and Causation}
+\label{subsec:regression-causation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A regression coefficient measures conditional association under the
+specified model.
+
+It is not automatically a causal effect.
+
+Causal interpretation may require assumptions involving:
+
+\[
+\boxed{
+\text{randomization},
+}
+\]
+
+\[
+\boxed{
+\text{no unmeasured confounding},
+}
+\]
+
+\[
+\boxed{
+\text{correct temporal ordering},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{appropriate treatment definition}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simpson's Paradox}
+\label{subsec:simpsons-paradox-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An association observed in aggregated data can reverse after conditioning
+on another variable.
+
+This phenomenon is known as Simpson's paradox.
+
+Regression can help expose such relationships by adjusting for
+additional variables, but adjustment must be scientifically justified.
+
+Conditioning on inappropriate variables can itself create bias.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Confounders Versus Mediators}
+\label{subsec:confounders-mediators}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A confounder influences both an explanatory variable and the outcome.
+
+A mediator lies on a causal pathway from exposure to outcome.
+
+Adjusting for a confounder may reduce bias.
+
+Adjusting for a mediator changes the causal quantity being estimated.
+
+Thus variable selection for causal regression cannot be based only on
+statistical significance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Selection}
+\label{subsec:regression-model-selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Model selection determines which explanatory variables or functional
+forms to include.
+
+Possible criteria include:
+
+\[
+\boxed{
+\text{scientific theory},
+}
+\]
+
+\[
+\boxed{
+\text{prediction performance},
+}
+\]
+
+\[
+\boxed{
+\text{AIC},
+}
+\]
+
+\[
+\boxed{
+\text{BIC},
+}
+\]
+
+\[
+\boxed{
+\text{cross-validation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{regularization}.
+}
+\]
+
+The best procedure depends on the goal.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adjusted \(R^2\) Is Not a Universal Model Selector}
+\label{subsec:adjusted-r2-not-universal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adjusted \(R^2\) penalizes adding predictors, but it does not directly
+measure:
+
+\[
+\boxed{
+\text{out-of-sample prediction error},
+}
+\]
+
+\[
+\boxed{
+\text{causal validity},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{model calibration}.
+}
+\]
+
+Therefore model selection should not rely on a single statistic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Akaike Information Criterion Preview}
+\label{subsec:aic-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a likelihood-based model with \(k\) estimated parameters,
+
+\[
+\boxed{
+AIC
+=
+-2\ell(\widehat{\theta})
++
+2k.
+}
+\]
+
+Smaller AIC values indicate a better tradeoff between fit and model
+complexity within the candidate model set.
+
+AIC is motivated by predictive information loss rather than by
+hypothesis-testing significance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bayesian Information Criterion Preview}
+\label{subsec:bic-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Bayesian information criterion is
+
+\[
+\boxed{
+BIC
+=
+-2\ell(\widehat{\theta})
++
+k\ln n.
+}
+\]
+
+BIC penalizes model complexity more strongly than AIC as sample size
+increases.
+
+Its interpretation differs from that of AIC despite their similar form.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cross-Validation Preview}
+\label{subsec:cross-validation-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Cross-validation estimates out-of-sample predictive performance.
+
+The dataset is repeatedly divided into training and validation portions.
+
+A model is fit on training data and evaluated on held-out data.
+
+This directly addresses prediction rather than merely in-sample fit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Overfitting}
+\label{subsec:regression-overfitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Overfitting occurs when a model adapts too closely to random noise in the
+training data.
+
+An overfit model may have:
+
+\[
+\boxed{
+\text{excellent in-sample fit}
+}
+\]
+
+but
+
+\[
+\boxed{
+\text{poor out-of-sample prediction}.
+}
+\]
+
+Adding predictors always reduces or leaves unchanged \(SSE\), so
+training fit alone cannot detect overfitting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Underfitting}
+\label{subsec:regression-underfitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Underfitting occurs when a model is too simple to capture important
+structure.
+
+Examples include fitting a straight line to a strongly curved
+relationship.
+
+Thus model complexity involves a tradeoff:
+
+\[
+\boxed{
+\text{too simple}
+\longleftrightarrow
+\text{too flexible}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ridge Regression}
+\label{subsec:ridge-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ridge regression minimizes
+
+\[
+\boxed{
+\|\mathbf{y}-X\boldsymbol{\beta}\|_2^2
++
+\lambda
+\sum_{j=1}^{p}
+\beta_j^2.
+}
+\]
+
+Usually the intercept is not penalized.
+
+The penalty shrinks coefficients toward zero.
+
+For appropriately standardized predictors,
+
+\[
+\boxed{
+\widehat{\boldsymbol{\beta}}_{\text{ridge}}
+=
+(X^TX+\lambda I)^{-1}
+X^T\mathbf{y}
+}
+\]
+
+for the penalized coefficient block under the relevant convention.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Ridge Regression Helps}
+\label{subsec:why-ridge}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ridge regression introduces bias but can reduce variance.
+
+It is particularly useful when:
+
+\[
+\boxed{
+\text{predictors are highly correlated},
+}
+\]
+
+or
+
+\[
+\boxed{
+p
+\text{ is large relative to }n.
+}
+\]
+
+This is an example of the bias--variance tradeoff.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lasso Regression}
+\label{subsec:lasso-regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The lasso minimizes
+
+\[
+\boxed{
+\|\mathbf{y}-X\boldsymbol{\beta}\|_2^2
++
+\lambda
+\sum_{j=1}^{p}
+|\beta_j|.
+}
+\]
+
+The \(L^1\) penalty can force some estimated coefficients exactly to
+zero.
+
+Thus lasso can perform both:
+
+\[
+\boxed{
+\text{shrinkage}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{variable selection}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Standardization Before Regularization}
+\label{subsec:standardization-regularization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Because ridge and lasso penalties depend on coefficient magnitude,
+predictor scale matters.
+
+Therefore predictors are often standardized before fitting a regularized
+model.
+
+Otherwise variables measured in different units may be penalized
+unequally for purely numerical reasons.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generalized Linear Models Preview}
+\label{subsec:glm-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Linear regression assumes a continuous response with conditional mean
+modeled directly by a linear predictor.
+
+Generalized linear models extend regression to other response
+distributions.
+
+They use:
+
+\[
+\boxed{
+\text{random component}
++
+\text{linear predictor}
++
+\text{link function}.
+}
+\]
+
+Examples include logistic and Poisson regression.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logistic Regression Preview}
+\label{subsec:logistic-regression-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a binary response,
+
+\[
+Y\in\{0,1\},
+\]
+
+let
+
+\[
+p(x)
+=
+P(Y=1\mid X=x).
+\]
+
+Logistic regression models the log-odds:
+
+\[
+\boxed{
+\log
+\left(
+\frac{
+p(x)
+}{
+1-p(x)
+}
+\right)
+=
+\beta_0+\beta_1x.
+}
+\]
+
+Solving for \(p(x)\),
+
+\[
+\boxed{
+p(x)
+=
+\frac{
+e^{\beta_0+\beta_1x}
+}{
+1+
+e^{\beta_0+\beta_1x}
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Odds-Ratio Interpretation Preview}
+\label{subsec:odds-ratio-logistic-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In logistic regression,
+
+\[
+\beta_1
+\]
+
+is the change in log-odds for a one-unit increase in \(X\).
+
+Exponentiating,
+
+\[
+\boxed{
+e^{\beta_1}
+}
+\]
+
+is the multiplicative change in the odds for a one-unit increase in
+\(X\), holding other predictors fixed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Poisson Regression Preview}
+\label{subsec:poisson-regression-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For count responses, one may model
+
+\[
+Y_i
+\sim
+\operatorname{Poisson}(\mu_i)
+\]
+
+with
+
+\[
+\boxed{
+\log\mu_i
+=
+\beta_0
++
+\beta_1x_{i1}
++
+\cdots
++
+\beta_px_{ip}.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\mu_i
+=
+\exp
+(
+\beta_0+\cdots+\beta_px_{ip}
+).
+}
+\]
+
+This guarantees a positive predicted mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Regression Modeling Workflow}
+\label{subsec:regression-modeling-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical regression workflow is:
+
+\begin{enumerate}
+    \item identify the response variable;
+    \item identify candidate explanatory variables;
+    \item inspect data and scatterplots;
+    \item define the scientific or predictive goal;
+    \item specify a model;
+    \item fit the model;
+    \item interpret coefficients;
+    \item examine standard errors and confidence intervals;
+    \item test scientifically meaningful hypotheses;
+    \item inspect residual diagnostics;
+    \item assess leverage and influence;
+    \item investigate collinearity;
+    \item evaluate predictive performance;
+    \item check sensitivity to modeling choices;
+    \item avoid causal interpretations not supported by the study design.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:regression-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Interpreting Association as Causation}
+
+A regression slope is not automatically a causal effect.
+
+Causal interpretation depends on study design and assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Meaning of ``Holding Other Variables Fixed''}
+
+A multiple-regression coefficient is a partial association conditional
+on the other included variables.
+
+It is not generally the same as the simple bivariate relationship.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting a Nonsignificant Coefficient as No Relationship}
+
+A large standard error may reflect limited data or multicollinearity.
+
+Failure to reject
+
+\[
+\beta_j=0
+\]
+
+does not prove the coefficient is exactly zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interpreting a Significant Coefficient as Important}
+
+A very small coefficient can be statistically significant in a large
+sample.
+
+Magnitude and uncertainty should be reported together.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using \(R^2\) as the Only Measure of Model Quality}
+
+High \(R^2\) does not guarantee:
+
+\[
+\boxed{
+\text{correct specification},
+}
+\]
+
+\[
+\boxed{
+\text{good causal interpretation},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{good future prediction}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Comparing \(R^2\) Across Unrelated Responses Without Context}
+
+The natural amount of variation differs across scientific settings.
+
+An \(R^2\) that is useful in one field may be inadequate or exceptional
+in another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Residual Patterns}
+
+A good numerical fit can still hide nonlinearity, heteroskedasticity, or
+subgroup structure.
+
+Residual diagnostics should accompany regression fitting.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Deleting High-Leverage Observations Automatically}
+
+High leverage alone does not imply an observation is invalid.
+
+It indicates unusual predictor values.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Deleting Large Residuals Automatically}
+
+Large residuals can reveal important scientific structure or model
+failure.
+
+Investigate before excluding observations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Multicollinearity}
+
+Highly related predictors can make coefficient estimates unstable even
+when overall prediction remains strong.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Linear Model Outside the Data Range}
+
+Extrapolation assumes the modeled relationship continues beyond observed
+predictor values.
+
+This assumption may be unjustified.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Prediction Intervals and Mean-Response Intervals}
+
+Prediction intervals target individual future observations and are
+wider.
+
+Mean-response intervals target the conditional mean.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Classical Standard Errors Under Heteroskedasticity}
+
+If error variance is not constant, homoskedastic OLS standard errors can
+be incorrect.
+
+Robust or model-based alternatives may be needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Dependence}
+
+Regression errors may be correlated in time, space, clusters, or repeated
+measurements.
+
+Independence-based inference can then underestimate uncertainty.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Adding Variables Solely Because They Are Significant}
+
+Variable selection should reflect the analysis goal and scientific
+structure.
+
+Pure significance-based stepwise procedures can produce unstable
+estimates and invalid post-selection inference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:regression-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Scientific Research.}
+Regression models quantify relationships among measured variables and
+estimate adjusted associations.
+
+\medskip
+
+\textbf{Engineering.}
+Regression predicts system outputs from operating conditions and
+calibrates empirical models.
+
+\medskip
+
+\textbf{Environmental Science.}
+Environmental responses may be modeled using temperature, time, depth,
+location, chemical concentration, or other predictors.
+
+\medskip
+
+\textbf{Education Research.}
+Regression models student outcomes using preparation, demographics,
+program participation, and other measured variables.
+
+\medskip
+
+\textbf{Economics.}
+Regression estimates associations among prices, income, employment,
+policy variables, and economic outcomes.
+
+\medskip
+
+\textbf{Medicine and Epidemiology.}
+Regression adjusts for multiple risk factors and models treatment and
+exposure relationships.
+
+\medskip
+
+\textbf{Business.}
+Regression predicts demand, costs, sales, conversion rates, and customer
+behavior.
+
+\medskip
+
+\textbf{Machine Learning.}
+Linear models, regularization, logistic regression, and generalized
+linear models form the foundation of many predictive algorithms.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:regression-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define simple linear regression.
+\end{exercise}
+
+\begin{exercise}[1]
+Define the response variable and explanatory variable.
+\end{exercise}
+
+\begin{exercise}[1]
+Interpret \(\beta_0\) and \(\beta_1\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define a fitted value.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a residual.
+\end{exercise}
+
+\begin{exercise}[1]
+State the ordinary least-squares criterion.
+\end{exercise}
+
+\begin{exercise}[1]
+Define \(SST\), \(SSR\), and \(SSE\).
+\end{exercise}
+
+\begin{exercise}[1]
+Define \(R^2\).
+\end{exercise}
+
+\begin{exercise}[1]
+State the classical simple linear regression assumptions.
+\end{exercise}
+
+\begin{exercise}[1]
+Define homoskedasticity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define heteroskedasticity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define leverage.
+\end{exercise}
+
+\begin{exercise}[1]
+Define multicollinearity.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a variance inflation factor.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+\widehat{y}
+=
+5+3x.
+\]
+
+Interpret the slope.
+\end{exercise}
+
+\begin{exercise}[2]
+For the same model, predict \(Y\) at
+
+\[
+x=4.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+If the observed response at \(x=4\) is \(20\), compute the residual.
+\end{exercise}
+
+\begin{exercise}[2]
+For data with
+
+\[
+S_{xy}=24
+\]
+
+and
+
+\[
+S_{xx}=8,
+\]
+
+compute the OLS slope.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+\overline{x}=5,
+\qquad
+\overline{y}=20,
+\qquad
+b_1=2.
+\]
+
+Compute the intercept.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+SST=100,
+\qquad
+SSE=25.
+\]
+
+Compute \(SSR\) and \(R^2\).
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+r=-0.8.
+\]
+
+Find \(R^2\) for simple linear regression with an intercept.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+r=0.5,
+\qquad
+s_y=12,
+\qquad
+s_x=3.
+\]
+
+Compute the simple-regression slope.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+SSE=90,
+\qquad
+n=12.
+\]
+
+Compute the residual standard error for simple regression.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose
+
+\[
+b_1=1.5,
+\qquad
+SE(b_1)=0.5.
+\]
+
+Compute the \(t\)-statistic for testing
+
+\[
+H_0:\beta_1=0.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a multiple regression has \(n=100\) observations and \(p=4\)
+predictors. Find the residual degrees of freedom.
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose a categorical predictor has \(5\) categories. How many indicator
+variables are needed with an intercept?
+\end{exercise}
+
+\begin{exercise}[2]
+Suppose \(R_j^2=0.80\) when \(X_j\) is regressed on all remaining
+predictors. Compute \(VIF_j\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the normal equations for simple linear regression.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+b_1
+=
+\frac{S_{xy}}{S_{xx}}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+b_0
+=
+\overline{y}
+-
+b_1\overline{x}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that the fitted regression line passes through
+
+\[
+(\overline{x},\overline{y}).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that
+
+\[
+\sum e_i=0
+\]
+
+when an intercept is included.
+\end{exercise}
+
+\begin{exercise}[3]
+Prove that
+
+\[
+\sum x_ie_i=0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Prove the decomposition
+
+\[
+SST
+=
+SSR
++
+SSE.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+R^2=r^2
+\]
+
+in simple linear regression with an intercept.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+b_1
+=
+r
+\frac{s_y}{s_x}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+\operatorname{Var}(b_1)
+=
+\frac{
+\sigma^2
+}{
+S_{xx}
+}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the variance of the intercept estimator.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the covariance between the simple-regression slope and intercept.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the standard error for the estimated mean response at \(x_0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the standard error for predicting a future observation at \(x_0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why prediction intervals are wider than mean-response confidence
+intervals.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the matrix normal equations
+
+\[
+X^TX\widehat{\boldsymbol{\beta}}
+=
+X^T\mathbf{y}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive
+
+\[
+\widehat{\boldsymbol{\beta}}
+=
+(X^TX)^{-1}X^T\mathbf{y}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the hat matrix is symmetric.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the hat matrix is idempotent.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the residual vector is orthogonal to the column space of \(X\).
+\end{exercise}
+
+\begin{exercise}[3]
+Show that
+
+\[
+\operatorname{Var}
+(
+\widehat{\boldsymbol{\beta}}\mid X
+)
+=
+\sigma^2(X^TX)^{-1}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why exact multicollinearity prevents unique OLS coefficient
+estimation.
+\end{exercise}
+
+\begin{exercise}[3]
+Interpret the interaction coefficient in
+
+\[
+Y
+=
+\beta_0
++
+\beta_1X
++
+\beta_2Z
++
+\beta_3XZ
++
+\varepsilon.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why polynomial regression remains a linear model in the
+parameters.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why heteroskedasticity changes standard errors without
+necessarily biasing OLS coefficients.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why an observation can have high leverage but a small residual.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why high \(R^2\) does not establish causality.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an omitted-variable example in which an observed regression
+slope is misleading.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how multicollinearity can inflate coefficient standard errors.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why ridge regression can improve prediction under
+multicollinearity.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare ridge and lasso penalties.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the Gauss--Markov theorem.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Frisch--Waugh--Lovell theorem and partial regression.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the exact normal-theory distribution of the OLS coefficient
+vector.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the overall regression \(F\)-test from quadratic forms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study general linear hypotheses of the form
+
+\[
+H_0:
+R\boldsymbol{\beta}
+=
+\mathbf{r}.
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the corresponding partial \(F\)-test.
+\end{exercise}
+
+\begin{exercise}[4]
+Study heteroskedasticity-consistent covariance estimators HC0--HC3.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the Breusch--Pagan test.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate the White test for heteroskedasticity.
+\end{exercise}
+
+\begin{exercise}[4]
+Study generalized least squares under correlated errors.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate autocorrelation and regression with time-series errors.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Cook's distance, DFBETAS, and DFFITS.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate regression splines and smoothing splines.
+\end{exercise}
+
+\begin{exercise}[4]
+Study ridge regression in terms of singular-value decomposition.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the lasso optimization problem and study its geometric
+interpretation.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate cross-validation for regression model selection.
+\end{exercise}
+
+\begin{exercise}[4]
+Study post-selection inference.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate logistic regression through maximum likelihood.
+\end{exercise}
+
+\begin{exercise}[4]
+Study Poisson regression and generalized linear models.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:regression-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Simple linear regression models
+
+\[
+\boxed{
+Y_i
+=
+\beta_0
++
+\beta_1X_i
++
+\varepsilon_i.
+}
+\]
+
+The conditional mean is
+
+\[
+\boxed{
+\mathbb{E}[Y\mid X]
+=
+\beta_0+\beta_1X.
+}
+\]
+
+Ordinary least squares minimizes
+
+\[
+\boxed{
+\sum e_i^2.
+}
+\]
+
+The simple-regression slope is
+
+\[
+\boxed{
+b_1
+=
+\frac{
+\sum
+(x_i-\overline{x})
+(y_i-\overline{y})
+}{
+\sum
+(x_i-\overline{x})^2
+}.
+}
+\]
+
+The intercept is
+
+\[
+\boxed{
+b_0
+=
+\overline{y}
+-
+b_1\overline{x}.
+}
+\]
+
+Variation decomposes as
+
+\[
+\boxed{
+SST
+=
+SSR+SSE.
+}
+\]
+
+The coefficient of determination is
+
+\[
+\boxed{
+R^2
+=
+1-\frac{SSE}{SST}.
+}
+\]
+
+For simple regression,
+
+\[
+\boxed{
+R^2=r^2.
+}
+\]
+
+In matrix form,
+
+\[
+\boxed{
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon},
+}
+\]
+
+and
+
+\[
+\boxed{
+\widehat{\boldsymbol{\beta}}
+=
+(X^TX)^{-1}
+X^T\mathbf{y}.
+}
+\]
+
+Under homoskedastic independent errors,
+
+\[
+\boxed{
+\operatorname{Var}
+(
+\widehat{\boldsymbol{\beta}}
+\mid X
+)
+=
+\sigma^2
+(X^TX)^{-1}.
+}
+\]
+
+Regression therefore combines
+
+\[
+\boxed{
+\text{linear algebra}
++
+\text{optimization}
++
+\text{probability}
++
+\text{estimation}
++
+\text{hypothesis testing}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:regression-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Regression extends the estimation and testing framework developed in
+Sections~\ref{sec:statistical-estimation},
+\ref{sec:confidence-intervals}, and
+\ref{sec:hypothesis-testing} to models in which a response depends on one
+or more explanatory variables. The least-squares decomposition of
+variation leads directly to the Analysis of Variance framework developed
+in the next section. Multiple regression also provides a foundation for
+experimental design, categorical-data modeling, generalized linear
+models, time series, statistical learning, and high-dimensional
+statistics. Linear Algebra supplies the projection interpretation of OLS,
+while probability theory provides the sampling distributions needed for
+coefficient inference.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 8.7 Regression
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard linear regression theory.
+%   - Standard least-squares and linear-model theory.
+%   - Standard regression diagnostics and model-selection concepts.
+%
+% Used for:
+%   - simple linear regression;
+%   - conditional mean models;
+%   - slope and intercept interpretation;
+%   - fitted values and residuals;
+%   - ordinary least squares;
+%   - normal equations;
+%   - slope and intercept estimators;
+%   - residual properties;
+%   - SST, SSR, and SSE;
+%   - R-squared;
+%   - correlation-regression relationships;
+%   - classical linear-model assumptions;
+%   - unbiasedness of OLS;
+%   - coefficient variances;
+%   - residual variance;
+%   - coefficient standard errors;
+%   - t-tests and confidence intervals;
+%   - confidence intervals for mean response;
+%   - prediction intervals;
+%   - multiple linear regression;
+%   - matrix formulation;
+%   - design matrices;
+%   - OLS matrix estimator;
+%   - hat matrix;
+%   - projection interpretation;
+%   - residual-maker matrix;
+%   - covariance matrix of OLS;
+%   - overall F-tests;
+%   - regression ANOVA tables;
+%   - adjusted R-squared;
+%   - indicator variables;
+%   - categorical predictors;
+%   - interaction terms;
+%   - polynomial regression;
+%   - transformations;
+%   - residual diagnostics;
+%   - heteroskedasticity;
+%   - robust standard errors;
+%   - weighted and generalized least squares;
+%   - leverage;
+%   - studentized residuals;
+%   - influence and Cook's distance;
+%   - multicollinearity;
+%   - variance inflation factors;
+%   - omitted-variable bias;
+%   - causal interpretation cautions;
+%   - model selection;
+%   - AIC and BIC previews;
+%   - cross-validation;
+%   - overfitting and underfitting;
+%   - ridge and lasso regression;
+%   - generalized linear model previews;
+%   - logistic regression;
+%   - Poisson regression;
+%   - applications and exercises.
+%
+% Notes:
+%   - Analysis of Variance is developed next in Section 8.8.
+%   - Experimental Design follows in Section 8.9.
+%   - Categorical Data Analysis later develops logistic and log-linear
+%     models more fully.
+%   - Statistical Learning develops regularization and predictive
+%     modeling more deeply.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

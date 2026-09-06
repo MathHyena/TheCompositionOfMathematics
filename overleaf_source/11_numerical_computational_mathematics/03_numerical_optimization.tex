@@ -1,0 +1,4467 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 11.3 NUMERICAL OPTIMIZATION
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Numerical Optimization}
+\label{sec:numerical-optimization}
+
+\prerequisite{
+Optimization fundamentals, nonlinear programming, convex optimization,
+multivariable calculus, gradients and Hessians, numerical analysis,
+numerical linear algebra, and basic algorithmic complexity.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item explain the goals of numerical optimization;
+    \item distinguish analytical and numerical optimization;
+    \item define iterates, search directions, and step lengths;
+    \item understand descent directions;
+    \item understand line-search methods;
+    \item distinguish exact and inexact line searches;
+    \item apply Armijo sufficient decrease;
+    \item understand Wolfe and strong Wolfe conditions;
+    \item understand gradient descent;
+    \item analyze steepest descent on quadratic functions;
+    \item understand the role of conditioning in convergence;
+    \item derive Newton's method for optimization;
+    \item distinguish Newton's method for optimization from Newton root
+          finding;
+    \item recognize modified Newton methods;
+    \item understand damped Newton methods;
+    \item understand quasi-Newton methods;
+    \item understand the secant condition;
+    \item recognize the BFGS update;
+    \item recognize DFP conceptually;
+    \item understand limited-memory BFGS;
+    \item understand conjugate-gradient optimization conceptually;
+    \item understand nonlinear conjugate gradient;
+    \item recognize trust-region methods;
+    \item formulate the trust-region subproblem;
+    \item understand predicted and actual reduction;
+    \item understand trust-region radius updates;
+    \item compare line-search and trust-region globalization;
+    \item understand derivative-free optimization conceptually;
+    \item recognize coordinate-search and simplex-type methods;
+    \item understand finite-difference gradients;
+    \item understand automatic differentiation conceptually;
+    \item distinguish forward and reverse automatic differentiation;
+    \item understand constrained numerical optimization;
+    \item understand projected-gradient methods;
+    \item recognize penalty methods;
+    \item recognize barrier methods;
+    \item understand augmented Lagrangian methods;
+    \item understand sequential quadratic programming;
+    \item understand interior-point methods conceptually;
+    \item recognize primal-dual systems;
+    \item understand active-set methods;
+    \item understand numerical KKT residuals;
+    \item formulate stopping criteria;
+    \item understand scaling and preconditioning in optimization;
+    \item recognize sparse optimization structure;
+    \item understand large-scale optimization;
+    \item recognize stochastic gradient methods;
+    \item distinguish batch, stochastic, and mini-batch gradients;
+    \item understand momentum conceptually;
+    \item understand adaptive first-order methods conceptually;
+    \item recognize proximal-gradient methods;
+    \item understand nonsmooth optimization conceptually;
+    \item connect numerical optimization with machine learning, statistics,
+          engineering, optimal control, inverse problems, and scientific
+          computing.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is Numerical Optimization?}
+\label{subsec:what-is-numerical-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical optimization develops algorithms for approximately solving
+optimization problems using finite computation.
+
+A general problem has the form
+
+\[
+\boxed{
+\min_{x\in\mathbb{R}^n}
+f(x)
+}
+\]
+
+or, with constraints,
+
+\[
+\boxed{
+\begin{aligned}
+\min_x
+\quad&
+f(x)
+\\
+\text{subject to}
+\quad&
+g_i(x)\leq0,
+\\
+&
+h_j(x)=0.
+\end{aligned}
+}
+\]
+
+The goal is not merely to describe optimality conditions.
+
+The goal is to construct a computational procedure that finds a useful
+solution.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Iterative Optimization}
+\label{subsec:iterative-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Most nonlinear numerical optimization algorithms generate iterates
+
+\[
+\boxed{
+x_0,x_1,x_2,\ldots.
+}
+\]
+
+A common update is
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
++
+\alpha_kp_k,
+}
+\]
+
+where
+
+\[
+p_k
+=
+\text{search direction},
+\]
+
+and
+
+\[
+\alpha_k
+=
+\text{step length}.
+\]
+
+The algorithm must decide both quantities effectively.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Descent Directions}
+\label{subsec:descent-directions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(f\) is differentiable.
+
+A direction \(p\) is a descent direction at \(x\) if
+
+\[
+\boxed{
+\nabla f(x)^Tp<0.
+}
+\]
+
+Then for sufficiently small positive \(\alpha\),
+
+\[
+\boxed{
+f(x+\alpha p)<f(x).
+}
+\]
+
+This follows from the directional derivative.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Negative Gradient}
+\label{subsec:negative-gradient-direction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The negative gradient is
+
+\[
+\boxed{
+p
+=
+-\nabla f(x).
+}
+\]
+
+Then
+
+\[
+\nabla f(x)^Tp
+=
+-
+\|\nabla f(x)\|_2^2.
+\]
+
+If
+
+\[
+\nabla f(x)\neq0,
+\]
+
+then
+
+\[
+\boxed{
+\nabla f(x)^Tp<0.
+}
+\]
+
+Thus the negative gradient is always a descent direction at a
+nonstationary point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient Descent}
+\label{subsec:gradient-descent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gradient descent uses
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
+-
+\alpha_k
+\nabla f(x_k).
+}
+\]
+
+The main computational question is how to choose
+
+\[
+\alpha_k.
+\]
+
+Possible choices include:
+
+\[
+\boxed{
+\text{constant step size},
+}
+\]
+
+\[
+\boxed{
+\text{exact line search},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{inexact line search}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Line Search}
+\label{subsec:numerical-line-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given search direction \(p_k\), define the one-dimensional function
+
+\[
+\boxed{
+\phi(\alpha)
+=
+f(x_k+\alpha p_k).
+}
+\]
+
+A line search seeks a useful value of
+
+\[
+\alpha>0.
+\]
+
+The full multidimensional problem is temporarily reduced to a
+one-dimensional search along \(p_k\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Line Search}
+\label{subsec:exact-line-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An exact line search chooses
+
+\[
+\boxed{
+\alpha_k
+\in
+\operatorname*{arg\,min}_{\alpha>0}
+f(x_k+\alpha p_k).
+}
+\]
+
+This minimizes the objective exactly along the chosen line.
+
+In practice, exact line search can require too much computation relative
+to the benefit gained.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inexact Line Search}
+\label{subsec:inexact-line-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An inexact line search does not find the exact minimizer of
+
+\[
+\phi(\alpha).
+\]
+
+Instead, it seeks a step satisfying conditions that guarantee sufficient
+progress.
+
+Common conditions include:
+
+\[
+\boxed{
+\text{Armijo},
+}
+\]
+
+\[
+\boxed{
+\text{Wolfe},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{strong Wolfe}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Armijo Condition}
+\label{subsec:armijo-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Armijo sufficient-decrease condition is
+
+\[
+\boxed{
+f(x_k+\alpha p_k)
+\leq
+f(x_k)
++
+c_1
+\alpha
+\nabla f(x_k)^Tp_k,
+}
+\]
+
+where
+
+\[
+\boxed{
+0<c_1<1.
+}
+\]
+
+Because
+
+\[
+\nabla f(x_k)^Tp_k<0,
+\]
+
+the right-hand side is smaller than \(f(x_k)\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Backtracking Line Search}
+\label{subsec:backtracking-line-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common Armijo procedure is:
+
+\begin{enumerate}
+    \item choose initial trial step \(\alpha>0\);
+    \item test the Armijo condition;
+    \item if it fails, replace
+    \[
+    \alpha
+    \leftarrow
+    \rho\alpha,
+    \]
+    where
+    \[
+    0<\rho<1;
+    \]
+    \item repeat until sufficient decrease holds.
+\end{enumerate}
+
+This is called backtracking line search.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Backtracking}
+\label{subsec:worked-backtracking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Testing an Armijo Step}
+
+Let
+
+\[
+f(x)=x^2,
+\]
+
+with
+
+\[
+x_k=2.
+\]
+
+Then
+
+\[
+\nabla f(2)=4.
+\]
+
+Choose steepest-descent direction
+
+\[
+p_k=-4.
+\]
+
+Take
+
+\[
+c_1=0.1
+\]
+
+and trial step
+
+\[
+\alpha=0.5.
+\]
+
+The candidate point is
+
+\[
+x_{k+1}
+=
+2+0.5(-4)
+=
+0.
+\]
+
+Thus
+
+\[
+f(x_{k+1})=0.
+\]
+
+The Armijo right-hand side is
+
+\[
+4
++
+0.1(0.5)(4)(-4)
+=
+4-0.8
+=
+3.2.
+\]
+
+Since
+
+\[
+0\leq3.2,
+\]
+
+the condition is satisfied.
+
+\begin{answerbox}
+\[
+\boxed{
+\alpha=0.5
+\text{ is accepted by this Armijo test.}
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wolfe Conditions}
+\label{subsec:wolfe-conditions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Wolfe conditions combine sufficient decrease with a curvature
+condition.
+
+The first condition is Armijo:
+
+\[
+f(x_k+\alpha p_k)
+\leq
+f(x_k)
++
+c_1\alpha
+\nabla f(x_k)^Tp_k.
+\]
+
+The curvature condition is
+
+\[
+\boxed{
+\nabla f(x_k+\alpha p_k)^Tp_k
+\geq
+c_2
+\nabla f(x_k)^Tp_k,
+}
+\]
+
+where
+
+\[
+\boxed{
+0<c_1<c_2<1.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Strong Wolfe Conditions}
+\label{subsec:strong-wolfe}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The strong Wolfe curvature condition is
+
+\[
+\boxed{
+\left|
+\nabla f(x_k+\alpha p_k)^Tp_k
+\right|
+\leq
+c_2
+\left|
+\nabla f(x_k)^Tp_k
+\right|.
+}
+\]
+
+This prevents the step from stopping too early while also controlling the
+magnitude of the slope after the step.
+
+Strong Wolfe conditions are especially important in nonlinear conjugate
+gradient and quasi-Newton methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Objective}
+\label{subsec:quadratic-objective-numerical-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+f(x)
+=
+\frac12x^TAx-b^Tx,
+}
+\]
+
+where
+
+\[
+A=A^T\succ0.
+\]
+
+Then
+
+\[
+\boxed{
+\nabla f(x)
+=
+Ax-b,
+}
+\]
+
+and
+
+\[
+\boxed{
+\nabla^2f(x)
+=
+A.
+}
+\]
+
+The unique minimizer satisfies
+
+\[
+\boxed{
+Ax^*=b.
+}
+\]
+
+Thus minimizing a positive-definite quadratic is equivalent to solving a
+linear system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exact Step for Steepest Descent on a Quadratic}
+\label{subsec:quadratic-steepest-descent-step}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+g_k
+=
+\nabla f(x_k)
+=
+Ax_k-b.
+\]
+
+Choose
+
+\[
+p_k=-g_k.
+\]
+
+For exact line search,
+
+\[
+\boxed{
+\alpha_k
+=
+\frac{
+g_k^Tg_k
+}{
+g_k^TAg_k
+}.
+}
+\]
+
+This gives the best step along the negative-gradient direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conditioning and Gradient Descent}
+\label{subsec:conditioning-gradient-descent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For positive-definite quadratic objectives, gradient descent can converge
+slowly when
+
+\[
+\boxed{
+\kappa_2(A)
+}
+\]
+
+is large.
+
+Geometrically, level sets become highly elongated ellipses.
+
+The negative gradient may repeatedly zigzag across a narrow valley.
+
+Thus poor conditioning slows first-order optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Gradient Descent Step}
+\label{subsec:worked-gradient-descent-step}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{One Gradient Step}
+
+Let
+
+\[
+f(x,y)
+=
+x^2+2y^2.
+\]
+
+Then
+
+\[
+\nabla f(x,y)
+=
+\begin{pmatrix}
+2x\\
+4y
+\end{pmatrix}.
+\]
+
+At
+
+\[
+(x_0,y_0)
+=
+(1,1),
+\]
+
+\[
+\nabla f(1,1)
+=
+\begin{pmatrix}
+2\\
+4
+\end{pmatrix}.
+\]
+
+With step size
+
+\[
+\alpha=0.1,
+\]
+
+gradient descent gives
+
+\[
+\begin{pmatrix}
+x_1\\
+y_1
+\end{pmatrix}
+=
+\begin{pmatrix}
+1\\
+1
+\end{pmatrix}
+-
+0.1
+\begin{pmatrix}
+2\\
+4
+\end{pmatrix}.
+\]
+
+Thus,
+
+\begin{answerbox}
+\[
+\boxed{
+(x_1,y_1)
+=
+(0.8,0.6).
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton's Method for Optimization}
+\label{subsec:newton-method-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Near \(x_k\), approximate \(f\) by its second-order Taylor model:
+
+\[
+\boxed{
+m_k(p)
+=
+f(x_k)
++
+g_k^Tp
++
+\frac12
+p^TH_kp,
+}
+\]
+
+where
+
+\[
+g_k
+=
+\nabla f(x_k),
+\]
+
+and
+
+\[
+H_k
+=
+\nabla^2f(x_k).
+\]
+
+Minimizing the quadratic model gives
+
+\[
+\boxed{
+H_kp_k
+=
+-g_k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton Step}
+\label{subsec:newton-step-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(H_k\) is nonsingular,
+
+\[
+\boxed{
+p_k
+=
+-
+H_k^{-1}g_k.
+}
+\]
+
+The update is
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k+p_k.
+}
+\]
+
+In implementation, one solves
+
+\[
+H_kp_k=-g_k
+\]
+
+rather than explicitly computing \(H_k^{-1}\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton Optimization Versus Newton Root Finding}
+\label{subsec:newton-optimization-vs-root}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A local minimizer satisfies
+
+\[
+\boxed{
+\nabla f(x)=0.
+}
+\]
+
+Applying Newton root finding to the vector equation
+
+\[
+\nabla f(x)=0
+\]
+
+produces
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
+-
+[
+\nabla^2f(x_k)
+]^{-1}
+\nabla f(x_k).
+}
+\]
+
+Thus Newton optimization can be viewed as Newton's method applied to the
+first-order optimality equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Convergence of Newton's Method}
+\label{subsec:newton-optimization-quadratic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Near a nondegenerate local minimizer \(x^*\), under suitable smoothness
+conditions and with
+
+\[
+\nabla^2f(x^*)\succ0,
+\]
+
+Newton's method can converge quadratically:
+
+\[
+\boxed{
+\|x_{k+1}-x^*\|
+\leq
+C
+\|x_k-x^*\|^2.
+}
+\]
+
+This rapid local convergence is one of Newton's major advantages.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{When Newton's Direction Is a Descent Direction}
+\label{subsec:newton-descent-direction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+H_k\succ0,
+\]
+
+then
+
+\[
+p_k
+=
+-H_k^{-1}g_k.
+\]
+
+Therefore,
+
+\[
+g_k^Tp_k
+=
+-
+g_k^TH_k^{-1}g_k.
+\]
+
+For \(g_k\neq0\),
+
+\[
+\boxed{
+g_k^Tp_k<0.
+}
+\]
+
+Thus the Newton direction is a descent direction when the Hessian is
+positive definite.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Indefinite Hessians}
+\label{subsec:indefinite-hessians}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+H_k
+\]
+
+is indefinite, the Newton direction may fail to be a descent direction.
+
+This can occur far from a minimizer or near saddle points.
+
+Practical algorithms therefore modify or globalize Newton's method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Damped Newton Method}
+\label{subsec:damped-newton}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of always taking the full Newton step, use
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
++
+\alpha_kp_k,
+}
+\]
+
+where \(p_k\) solves
+
+\[
+H_kp_k=-g_k.
+\]
+
+A line search chooses
+
+\[
+0<\alpha_k\leq1.
+\]
+
+Far from the solution, damping improves robustness.
+
+Near the solution, the full step
+
+\[
+\alpha_k=1
+\]
+
+is often eventually accepted.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modified Newton Method}
+\label{subsec:modified-newton}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the Hessian is not positive definite, replace it by a modified matrix
+
+\[
+\boxed{
+B_k
+\succ0.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+B_k
+=
+H_k+\tau_kI
+}
+\]
+
+with sufficiently large
+
+\[
+\tau_k>0.
+\]
+
+Then solve
+
+\[
+\boxed{
+B_kp_k=-g_k.
+}
+\]
+
+This forces a descent direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quasi-Newton Methods}
+\label{subsec:quasi-newton-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Quasi-Newton methods approximate Hessian information using gradient
+changes instead of explicitly computing second derivatives.
+
+Define
+
+\[
+\boxed{
+s_k
+=
+x_{k+1}-x_k,
+}
+\]
+
+and
+
+\[
+\boxed{
+y_k
+=
+\nabla f(x_{k+1})
+-
+\nabla f(x_k).
+}
+\]
+
+These quantities approximate the action of the Hessian.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Secant Condition}
+\label{subsec:quasi-newton-secant-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A Hessian approximation \(B_{k+1}\) is often required to satisfy
+
+\[
+\boxed{
+B_{k+1}s_k
+=
+y_k.
+}
+\]
+
+This is the quasi-Newton secant condition.
+
+It is the multidimensional analogue of replacing derivatives by secant
+information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse Secant Condition}
+\label{subsec:inverse-secant-condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If \(H_k\) denotes an approximation to the inverse Hessian, then the
+corresponding condition is
+
+\[
+\boxed{
+H_{k+1}y_k
+=
+s_k.
+}
+\]
+
+The search direction is then
+
+\[
+\boxed{
+p_k
+=
+-H_kg_k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{BFGS Update}
+\label{subsec:bfgs-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One of the most widely used quasi-Newton methods is BFGS.
+
+For a Hessian approximation \(B_k\), the update is
+
+\[
+\boxed{
+B_{k+1}
+=
+B_k
+-
+\frac{
+B_ks_ks_k^TB_k
+}{
+s_k^TB_ks_k
+}
++
+\frac{
+y_ky_k^T
+}{
+y_k^Ts_k
+}.
+}
+\]
+
+Under
+
+\[
+\boxed{
+y_k^Ts_k>0,
+}
+\]
+
+positive definiteness is preserved when \(B_k\succ0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inverse BFGS Update}
+\label{subsec:inverse-bfgs-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+\boxed{
+\rho_k
+=
+\frac1{y_k^Ts_k}.
+}
+\]
+
+The inverse-Hessian update can be written
+
+\[
+\boxed{
+H_{k+1}
+=
+(
+I-\rho_ks_ky_k^T
+)
+H_k
+(
+I-\rho_ky_ks_k^T
+)
++
+\rho_ks_ks_k^T.
+}
+\]
+
+Then
+
+\[
+\boxed{
+p_k
+=
+-H_kg_k.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why BFGS Is Important}
+\label{subsec:why-bfgs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+BFGS combines:
+
+\[
+\boxed{
+\text{first-derivative information},
+}
+\]
+
+with an evolving approximation to
+
+\[
+\boxed{
+\text{second-order curvature}.
+}
+\]
+
+It often achieves much faster convergence than ordinary gradient descent
+without requiring explicit Hessian evaluation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DFP Method Preview}
+\label{subsec:dfp-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Davidon--Fletcher--Powell update is another classical quasi-Newton
+method.
+
+Like BFGS, it satisfies a secant equation and updates curvature
+information.
+
+BFGS is usually preferred in many modern unconstrained applications
+because of its practical numerical behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limited-Memory BFGS}
+\label{subsec:limited-memory-bfgs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For very large \(n\), storing an \(n\times n\) Hessian approximation is
+expensive.
+
+Limited-memory BFGS, abbreviated L-BFGS, stores only a small number of
+recent pairs
+
+\[
+\boxed{
+(s_k,y_k).
+}
+\]
+
+This reduces storage from approximately
+
+\[
+O(n^2)
+\]
+
+to approximately
+
+\[
+\boxed{
+O(mn),
+}
+\]
+
+where \(m\) is the number of stored correction pairs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Conjugate Gradient}
+\label{subsec:nonlinear-conjugate-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Nonlinear conjugate-gradient methods generate directions
+
+\[
+\boxed{
+p_{k+1}
+=
+-g_{k+1}
++
+\beta_kp_k.
+}
+\]
+
+The coefficient \(\beta_k\) is selected using gradient information.
+
+Different formulas produce different nonlinear conjugate-gradient
+variants.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fletcher--Reeves Parameter}
+\label{subsec:fletcher-reeves}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One common choice is
+
+\[
+\boxed{
+\beta_k^{FR}
+=
+\frac{
+g_{k+1}^Tg_{k+1}
+}{
+g_k^Tg_k
+}.
+}
+\]
+
+Combined with appropriate line searches, this extends the conjugate-
+gradient idea beyond quadratic functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polak--Ribiere Parameter}
+\label{subsec:polak-ribiere}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another common choice is
+
+\[
+\boxed{
+\beta_k^{PR}
+=
+\frac{
+g_{k+1}^T
+(
+g_{k+1}-g_k
+)
+}{
+g_k^Tg_k
+}.
+}
+\]
+
+Practical implementations may use safeguarded variants such as
+
+\[
+\boxed{
+\max
+\{
+\beta_k^{PR},0
+\}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trust-Region Methods}
+\label{subsec:trust-region-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A trust-region method constructs a local model
+
+\[
+m_k(p)
+\]
+
+of \(f(x_k+p)\).
+
+Instead of trusting the model everywhere, constrain the step:
+
+\[
+\boxed{
+\|p\|
+\leq
+\Delta_k.
+}
+\]
+
+The quantity
+
+\[
+\Delta_k
+\]
+
+is the trust-region radius.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quadratic Trust-Region Model}
+\label{subsec:quadratic-trust-region-model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A standard model is
+
+\[
+\boxed{
+m_k(p)
+=
+f_k
++
+g_k^Tp
++
+\frac12p^TB_kp.
+}
+\]
+
+The trust-region subproblem is
+
+\[
+\boxed{
+\min_{\|p\|\leq\Delta_k}
+m_k(p).
+}
+\]
+
+The matrix \(B_k\) may be the exact Hessian or an approximation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Actual and Predicted Reduction}
+\label{subsec:actual-predicted-reduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The actual objective reduction is
+
+\[
+\boxed{
+f(x_k)-f(x_k+p_k).
+}
+\]
+
+The model predicts reduction
+
+\[
+\boxed{
+m_k(0)-m_k(p_k).
+}
+\]
+
+Their ratio is
+
+\[
+\boxed{
+\rho_k
+=
+\frac{
+f(x_k)-f(x_k+p_k)
+}{
+m_k(0)-m_k(p_k)
+}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trust-Region Acceptance}
+\label{subsec:trust-region-acceptance}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\rho_k
+\]
+
+is large and positive, the model predicted the actual behavior well.
+
+The step is typically accepted.
+
+If
+
+\[
+\rho_k
+\]
+
+is poor or negative, the model was unreliable over the proposed region.
+
+The step may be rejected and
+
+\[
+\Delta_k
+\]
+
+reduced.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Updating the Trust Radius}
+\label{subsec:trust-radius-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A typical rule is:
+
+\[
+\boxed{
+\rho_k\text{ poor}
+\Rightarrow
+\Delta_{k+1}<\Delta_k,
+}
+\]
+
+\[
+\boxed{
+\rho_k\text{ good}
+\Rightarrow
+\Delta_{k+1}\approx\Delta_k,
+}
+\]
+
+and when the model is very accurate and the boundary is reached,
+
+\[
+\boxed{
+\Delta_{k+1}>\Delta_k.
+}
+\]
+
+Exact numerical thresholds vary by implementation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cauchy Point}
+\label{subsec:trust-region-cauchy-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple trust-region step minimizes the quadratic model along the
+negative-gradient direction:
+
+\[
+p=-\tau g_k,
+\]
+
+subject to
+
+\[
+\|p\|\leq\Delta_k.
+\]
+
+The best such point is called the Cauchy point.
+
+It provides a guaranteed amount of model decrease under standard
+assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Line Search Versus Trust Region}
+\label{subsec:line-search-vs-trust-region}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Line-search methods first choose a direction and then determine how far to
+move.
+
+Trust-region methods first determine how far the local model should be
+trusted and then optimize within that region.
+
+Thus:
+
+\[
+\boxed{
+\text{line search}
+=
+\text{direction first},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{trust region}
+=
+\text{region first}.
+}
+\]
+
+Both provide globalization beyond purely local Newton steps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Derivative-Free Optimization}
+\label{subsec:derivative-free-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some optimization problems do not provide reliable derivatives.
+
+Examples include:
+
+\[
+\boxed{
+\text{black-box simulations},
+}
+\]
+
+\[
+\boxed{
+\text{noisy experiments},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{nonsmooth computational models}.
+}
+\]
+
+Derivative-free optimization uses objective evaluations without requiring
+analytic gradients.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coordinate Search}
+\label{subsec:coordinate-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A simple derivative-free method tests movement along coordinate
+directions:
+
+\[
+\boxed{
+\pm e_1,
+\pm e_2,
+\ldots,
+\pm e_n.
+}
+\]
+
+If a direction improves the objective, the algorithm moves there.
+
+Otherwise the search step may be reduced.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Simplex-Type Direct Search}
+\label{subsec:simplex-direct-search}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Simplex-type direct-search methods maintain a collection of
+
+\[
+n+1
+\]
+
+points in \(n\)-dimensional space.
+
+The geometry is modified using operations such as:
+
+\[
+\boxed{
+\text{reflection},
+}
+\]
+
+\[
+\boxed{
+\text{expansion},
+}
+\]
+
+\[
+\boxed{
+\text{contraction},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{shrinkage}.
+}
+\]
+
+Such methods can be useful for small derivative-free problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Difference Gradients}
+\label{subsec:finite-difference-gradients}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If analytic derivatives are unavailable, approximate
+
+\[
+\frac{\partial f}{\partial x_i}
+\]
+
+using
+
+\[
+\boxed{
+\frac{
+f(x+he_i)-f(x)
+}{
+h
+}.
+}
+\]
+
+This requires approximately one additional objective evaluation per
+variable for a forward-difference gradient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Centered Gradient Approximation}
+\label{subsec:centered-gradient-approximation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A centered approximation is
+
+\[
+\boxed{
+\frac{
+\partial f
+}{
+\partial x_i
+}
+\approx
+\frac{
+f(x+he_i)
+-
+f(x-he_i)
+}{
+2h
+}.
+}
+\]
+
+This has higher truncation accuracy but requires approximately twice as
+many evaluations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Finite-Difference Step Selection}
+\label{subsec:optimization-finite-difference-step}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A very large \(h\) causes truncation error.
+
+A very small \(h\) amplifies floating-point cancellation.
+
+Therefore derivative approximation requires a compromise between:
+
+\[
+\boxed{
+\text{truncation error}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{roundoff error}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Automatic Differentiation}
+\label{subsec:automatic-differentiation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Automatic differentiation, abbreviated AD, computes derivatives by
+systematically applying the chain rule to the elementary operations used
+to evaluate a function.
+
+It is not the same as:
+
+\[
+\boxed{
+\text{symbolic differentiation},
+}
+\]
+
+and it is not the same as:
+
+\[
+\boxed{
+\text{finite differences}.
+}
+\]
+
+AD can often provide derivatives accurate to floating-point precision.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forward-Mode Automatic Differentiation}
+\label{subsec:forward-mode-ad}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Forward-mode AD propagates:
+
+\[
+\boxed{
+\text{function values}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{directional derivatives}
+}
+\]
+
+through the computational graph.
+
+It is especially effective when the number of inputs is small relative to
+the number of outputs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Reverse-Mode Automatic Differentiation}
+\label{subsec:reverse-mode-ad}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Reverse-mode AD first evaluates the function and records the computational
+graph.
+
+Then derivative information is propagated backward.
+
+For a scalar objective
+
+\[
+f:\mathbb{R}^n\to\mathbb{R},
+\]
+
+reverse mode can compute the entire gradient at a cost proportional to a
+small multiple of the original function evaluation.
+
+This makes it fundamental in large-scale machine learning.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gradient Checking}
+\label{subsec:gradient-checking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Analytic or automatic gradients can be checked numerically by comparing
+them with finite-difference directional derivatives.
+
+For direction \(d\),
+
+\[
+\boxed{
+\nabla f(x)^Td
+\approx
+\frac{
+f(x+hd)-f(x)
+}{
+h
+}.
+}
+\]
+
+Agreement across an appropriate range of \(h\) helps detect derivative
+implementation errors.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constrained Numerical Optimization}
+\label{subsec:constrained-numerical-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+\begin{aligned}
+\min_x
+\quad&
+f(x)
+\\
+\text{subject to}
+\quad&
+g_i(x)\leq0,
+\\
+&
+h_j(x)=0.
+\end{aligned}
+}
+\]
+
+Numerical methods must improve the objective while maintaining or
+restoring feasibility.
+
+This makes constrained optimization substantially more complicated than
+unconstrained optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Projected Gradient Method}
+\label{subsec:projected-gradient-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose \(C\) is a closed feasible set and projection is computationally
+tractable.
+
+Projected gradient uses
+
+\[
+\boxed{
+x_{k+1}
+=
+P_C
+\left(
+x_k
+-
+\alpha_k
+\nabla f(x_k)
+\right),
+}
+\]
+
+where
+
+\[
+\boxed{
+P_C(y)
+=
+\operatorname*{arg\,min}_{x\in C}
+\|x-y\|_2.
+}
+\]
+
+For convex \(C\), the Euclidean projection is uniquely defined.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bound Constraints}
+\label{subsec:bound-constrained-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common feasible set is
+
+\[
+\boxed{
+\ell_i
+\leq
+x_i
+\leq
+u_i.
+}
+\]
+
+Projection is then componentwise:
+
+\[
+\boxed{
+[P_C(y)]_i
+=
+\min
+\left\{
+u_i,
+\max
+\{
+\ell_i,y_i
+\}
+\right\}.
+}
+\]
+
+This makes projected methods simple for box constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Penalty Methods}
+\label{subsec:numerical-penalty-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Penalty methods replace constrained optimization by a sequence of
+unconstrained problems.
+
+For equality constraints
+
+\[
+h(x)=0,
+\]
+
+a quadratic penalty objective is
+
+\[
+\boxed{
+\Phi_\mu(x)
+=
+f(x)
++
+\frac{\mu}{2}
+\|h(x)\|_2^2.
+}
+\]
+
+As
+
+\[
+\mu
+\]
+
+increases, constraint violations become increasingly expensive.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Penalty Ill Conditioning}
+\label{subsec:penalty-ill-conditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Very large penalty parameters can force near-feasibility.
+
+However, they may also make the objective badly conditioned.
+
+Thus a pure penalty method can become numerically difficult as
+
+\[
+\mu\to\infty.
+\]
+
+This motivates augmented Lagrangian approaches.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Barrier Methods}
+\label{subsec:numerical-barrier-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For inequality constraints
+
+\[
+g_i(x)<0,
+\]
+
+a logarithmic barrier is
+
+\[
+\boxed{
+\Phi_\mu(x)
+=
+f(x)
+-
+\mu
+\sum_i
+\ln
+(
+-g_i(x)
+),
+}
+\]
+
+where
+
+\[
+\mu>0.
+\]
+
+The barrier tends to \(+\infty\) as a constraint boundary is approached
+from the feasible interior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Central Path}
+\label{subsec:numerical-central-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For each barrier parameter \(\mu\), solve the barrier subproblem.
+
+The collection of minimizers
+
+\[
+\boxed{
+x(\mu)
+}
+\]
+
+forms a central-path-type trajectory.
+
+As
+
+\[
+\mu\to0,
+\]
+
+the barrier solution approaches the constrained optimum under suitable
+assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Augmented Lagrangian}
+\label{subsec:numerical-augmented-lagrangian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For equality constraints
+
+\[
+h(x)=0,
+\]
+
+the augmented Lagrangian is
+
+\[
+\boxed{
+\mathcal{L}_\mu(x,\lambda)
+=
+f(x)
++
+\lambda^Th(x)
++
+\frac{\mu}{2}
+\|h(x)\|_2^2.
+}
+\]
+
+This combines multiplier information with a penalty term.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiplier Update}
+\label{subsec:augmented-lagrangian-multiplier-update}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic multiplier update is
+
+\[
+\boxed{
+\lambda_{k+1}
+=
+\lambda_k
++
+\mu_k
+h(x_{k+1}).
+}
+\]
+
+The multiplier corrects systematic constraint error, reducing the need for
+extremely large penalty parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequential Quadratic Programming}
+\label{subsec:numerical-sqp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sequential Quadratic Programming, abbreviated SQP, solves a sequence of
+quadratic approximations to a nonlinear constrained problem.
+
+At \(x_k\), linearize constraints and approximate the Lagrangian Hessian.
+
+A typical SQP subproblem is
+
+\[
+\boxed{
+\begin{aligned}
+\min_p
+\quad&
+\nabla f(x_k)^Tp
++
+\frac12p^TB_kp
+\\
+\text{subject to}
+\quad&
+g_i(x_k)
++
+\nabla g_i(x_k)^Tp
+\leq0,
+\\
+&
+h_j(x_k)
++
+\nabla h_j(x_k)^Tp
+=
+0.
+\end{aligned}
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SQP Interpretation}
+\label{subsec:sqp-interpretation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+SQP can be viewed as the constrained analogue of Newton's method.
+
+Newton solves a local quadratic model of the objective.
+
+SQP solves a local quadratic model while also imposing linearized
+constraints.
+
+Near a regular solution, SQP can converge very rapidly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Merit Functions}
+\label{subsec:optimization-merit-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A constrained method may reduce the objective while worsening feasibility,
+or improve feasibility while increasing the objective.
+
+A merit function combines both effects.
+
+One example is
+
+\[
+\boxed{
+\phi(x)
+=
+f(x)
++
+\rho
+\|h(x)\|_1
++
+\rho
+\|[g(x)]_+\|_1.
+}
+\]
+
+The merit function helps decide whether a trial step makes overall
+progress.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Filter Methods}
+\label{subsec:optimization-filter-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A filter method avoids combining feasibility and objective values into one
+weighted scalar.
+
+Instead, it accepts steps that sufficiently improve either:
+
+\[
+\boxed{
+\text{constraint violation}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{objective value}.
+}
+\]
+
+This can reduce sensitivity to merit-function penalty parameters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Active-Set Methods}
+\label{subsec:numerical-active-set-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At a constrained solution, some inequalities are active:
+
+\[
+\boxed{
+g_i(x)=0.
+}
+\]
+
+Active-set methods estimate which constraints should be active and solve
+equality-constrained subproblems based on that working set.
+
+The working set changes as the algorithm proceeds.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interior-Point Methods}
+\label{subsec:numerical-interior-point-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Interior-point methods approach the optimum through interior feasible
+points or approximate interior iterates.
+
+They are closely connected with barrier functions and primal-dual KKT
+systems.
+
+Modern interior-point methods are central to:
+
+\[
+\boxed{
+\text{linear programming},
+}
+\]
+
+\[
+\boxed{
+\text{quadratic programming},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{nonlinear optimization}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primal-Dual Interior-Point Idea}
+\label{subsec:primal-dual-interior-point}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For inequality constraint
+
+\[
+g_i(x)\leq0,
+\]
+
+with multiplier
+
+\[
+\lambda_i\geq0,
+\]
+
+ordinary complementarity is
+
+\[
+\boxed{
+\lambda_i
+g_i(x)
+=
+0.
+}
+\]
+
+Interior-point methods replace exact complementarity with a perturbed
+relation, conceptually of the form
+
+\[
+\boxed{
+\lambda_i
+(
+-g_i(x)
+)
+\approx
+\mu.
+}
+\]
+
+As
+
+\[
+\mu\to0,
+\]
+
+the iterates approach complementarity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{KKT Residuals}
+\label{subsec:numerical-kkt-residuals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical constrained solver should monitor first-order optimality
+conditions.
+
+Typical residuals include:
+
+\[
+\boxed{
+r_{\mathrm{stationarity}}
+=
+\nabla_x
+\mathcal{L}(x,\lambda,\nu),
+}
+\]
+
+\[
+\boxed{
+r_{\mathrm{eq}}
+=
+h(x),
+}
+\]
+
+and complementarity residuals such as
+
+\[
+\boxed{
+r_{\mathrm{comp},i}
+=
+\lambda_i g_i(x).
+}
+\]
+
+Constraint violation must also be monitored.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stopping Criteria}
+\label{subsec:optimization-stopping-criteria}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A numerical optimization algorithm may stop when several measures are
+small.
+
+Examples include:
+
+\[
+\boxed{
+\|\nabla f(x_k)\|
+\leq
+\varepsilon_g,
+}
+\]
+
+\[
+\boxed{
+\|x_{k+1}-x_k\|
+\leq
+\varepsilon_x,
+}
+\]
+
+and
+
+\[
+\boxed{
+|f(x_{k+1})-f(x_k)|
+\leq
+\varepsilon_f.
+}
+\]
+
+For constrained problems, feasibility and KKT residuals must also be
+checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relative Stopping Criteria}
+\label{subsec:relative-optimization-stopping}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A relative step test may use
+
+\[
+\boxed{
+\frac{
+\|x_{k+1}-x_k\|
+}{
+1+\|x_k\|
+}
+\leq
+\varepsilon.
+}
+\]
+
+A relative objective test may use
+
+\[
+\boxed{
+\frac{
+|f_{k+1}-f_k|
+}{
+1+|f_k|
+}
+\leq
+\varepsilon.
+}
+\]
+
+Relative tests account for problem scale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stopping Too Early}
+\label{subsec:optimization-stopping-too-early}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A small change in objective value does not necessarily imply stationarity.
+
+The algorithm may simply be taking very small steps.
+
+Similarly, a small gradient does not automatically imply a minimum when the
+Hessian is indefinite.
+
+Multiple diagnostics should be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaling}
+\label{subsec:numerical-optimization-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Optimization variables may have dramatically different magnitudes.
+
+For example,
+
+\[
+x_1
+\approx10^{-6},
+\qquad
+x_2
+\approx10^6.
+\]
+
+Poor scaling can distort:
+
+\[
+\boxed{
+\text{gradients},
+}
+\]
+
+\[
+\boxed{
+\text{Hessians},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{step lengths}.
+}
+\]
+
+Scaling can substantially improve numerical performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variable Scaling}
+\label{subsec:variable-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Introduce scaled variables
+
+\[
+\boxed{
+x=Dz,
+}
+\]
+
+where \(D\) is diagonal.
+
+Then solve in \(z\)-coordinates.
+
+The goal is to make typical components of \(z\) have comparable
+magnitudes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Objective Scaling}
+\label{subsec:objective-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Multiplying an objective by a positive constant does not change the exact
+minimizer:
+
+\[
+\boxed{
+\operatorname*{arg\,min}_x f(x)
+=
+\operatorname*{arg\,min}_x cf(x),
+\qquad
+c>0.
+}
+\]
+
+However, the numerical magnitude of derivatives and tolerances changes.
+
+This can affect solver performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constraint Scaling}
+\label{subsec:constraint-scaling}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose one constraint has typical magnitude
+
+\[
+10^{-8}
+\]
+
+while another has magnitude
+
+\[
+10^6.
+\]
+
+Treating their raw residuals equally can be numerically misleading.
+
+Constraint scaling makes feasibility tests more comparable across
+constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Preconditioning in Optimization}
+\label{subsec:optimization-preconditioning}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Gradient descent uses the Euclidean geometry of the coordinates.
+
+A preconditioned step uses
+
+\[
+\boxed{
+p_k
+=
+-
+M_k^{-1}g_k,
+}
+\]
+
+where
+
+\[
+M_k\succ0.
+\]
+
+If \(M_k\) approximates the Hessian well, this can reduce effects of poor
+conditioning.
+
+Newton and quasi-Newton methods can be viewed as sophisticated
+preconditioned gradient methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparse Optimization}
+\label{subsec:sparse-numerical-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large optimization problems often contain sparse derivatives.
+
+Examples include:
+
+\[
+\boxed{
+\text{sparse Jacobians},
+}
+\]
+
+\[
+\boxed{
+\text{sparse Hessians},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{sparse constraint matrices}.
+}
+\]
+
+Numerical methods should exploit this structure rather than storing dense
+matrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton--KKT Systems}
+\label{subsec:newton-kkt-systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Equality-constrained Newton or SQP methods may require solving systems of
+the form
+
+\[
+\boxed{
+\begin{pmatrix}
+H & A^T\\
+A & 0
+\end{pmatrix}
+\begin{pmatrix}
+p\\
+\lambda
+\end{pmatrix}
+=
+-
+\begin{pmatrix}
+g\\
+c
+\end{pmatrix}.
+}
+\]
+
+These are saddle-point or KKT systems.
+
+Efficient numerical linear algebra is essential for solving them.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Schur Complement Methods}
+\label{subsec:optimization-schur-complement}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Block linear systems can sometimes be reduced using a Schur complement.
+
+If \(H\) is invertible, eliminate \(p\) to obtain a smaller multiplier
+system involving
+
+\[
+\boxed{
+AH^{-1}A^T.
+}
+\]
+
+This can reduce computational cost when the constraint dimension is much
+smaller than the variable dimension.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hessian-Vector Products}
+\label{subsec:hessian-vector-products}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Large-scale algorithms may not form the full Hessian.
+
+Instead, they compute products
+
+\[
+\boxed{
+\nabla^2f(x)v.
+}
+\]
+
+Such products can be obtained using automatic differentiation or
+directional derivative techniques.
+
+This supports matrix-free Newton--Krylov methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Newton--CG Methods}
+\label{subsec:newton-cg-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the Hessian is positive definite or appropriately modified, the Newton
+system
+
+\[
+\boxed{
+H_kp_k=-g_k
+}
+\]
+
+can be solved approximately using conjugate gradient.
+
+The linear system need not be solved to high precision when far from the
+optimum.
+
+This can greatly reduce large-scale computational cost.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inexact Newton Methods}
+\label{subsec:inexact-newton-methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An inexact Newton step satisfies
+
+\[
+\boxed{
+H_kp_k
+=
+-g_k+r_k,
+}
+\]
+
+where \(r_k\) is a controlled residual.
+
+Early iterations may use loose linear-solve tolerances.
+
+As the optimization approaches the solution, the linear-system tolerance
+can be tightened.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonsmooth Optimization}
+\label{subsec:nonsmooth-numerical-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some important objectives are not differentiable everywhere.
+
+Examples include:
+
+\[
+\boxed{
+|x|,
+}
+\]
+
+\[
+\boxed{
+\|x\|_1,
+}
+\]
+
+and
+
+\[
+\boxed{
+\max_i f_i(x).
+}
+\]
+
+Ordinary Newton and gradient methods may not apply directly at
+nondifferentiable points.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subgradient Method}
+\label{subsec:subgradient-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For convex nonsmooth \(f\), choose
+
+\[
+g_k
+\in
+\partial f(x_k),
+\]
+
+where \(\partial f(x_k)\) is the subdifferential.
+
+Then iterate
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
+-
+\alpha_kg_k.
+}
+\]
+
+Subgradient methods are simple but usually converge more slowly than smooth
+gradient methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composite Optimization}
+\label{subsec:composite-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common problem is
+
+\[
+\boxed{
+\min_x
+f(x)+g(x),
+}
+\]
+
+where:
+
+\[
+f
+=
+\text{smooth function},
+\]
+
+and
+
+\[
+g
+=
+\text{possibly nonsmooth but structured function}.
+\]
+
+This structure leads to proximal methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proximal Operator}
+\label{subsec:proximal-operator-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The proximal operator of \(g\) is
+
+\[
+\boxed{
+\operatorname{prox}_{\alpha g}(v)
+=
+\operatorname*{arg\,min}_x
+\left\{
+g(x)
++
+\frac1{2\alpha}
+\|x-v\|_2^2
+\right\}.
+}
+\]
+
+It generalizes projection and provides a way to handle structured
+nonsmooth terms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proximal Gradient Method}
+\label{subsec:proximal-gradient-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+f(x)+g(x),
+\]
+
+with smooth \(f\), proximal gradient uses
+
+\[
+\boxed{
+x_{k+1}
+=
+\operatorname{prox}_{\alpha_kg}
+\left(
+x_k
+-
+\alpha_k
+\nabla f(x_k)
+\right).
+}
+\]
+
+This combines a gradient step on the smooth part with a proximal step on
+the nonsmooth part.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Soft Thresholding}
+\label{subsec:soft-thresholding-numerical}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+g(x)
+=
+\lambda\|x\|_1,
+\]
+
+the proximal operator is componentwise soft thresholding:
+
+\[
+\boxed{
+[\operatorname{prox}_{\alpha\lambda\|\cdot\|_1}(v)]_i
+=
+\operatorname{sign}(v_i)
+\max
+\{
+|v_i|-\alpha\lambda,
+0
+\}.
+}
+\]
+
+This is central to sparse optimization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Gradient Descent}
+\label{subsec:stochastic-gradient-descent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+\boxed{
+f(x)
+=
+\frac1N
+\sum_{i=1}^{N}
+f_i(x).
+}
+\]
+
+Full gradient descent uses
+
+\[
+\boxed{
+\nabla f(x)
+=
+\frac1N
+\sum_{i=1}^{N}
+\nabla f_i(x).
+}
+\]
+
+For very large \(N\), this can be expensive.
+
+Stochastic Gradient Descent, abbreviated SGD, uses only one or a small
+subset of terms at each step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Single-Sample SGD}
+\label{subsec:single-sample-sgd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Choose random index \(i_k\).
+
+Then
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
+-
+\alpha_k
+\nabla f_{i_k}(x_k).
+}
+\]
+
+If the sampling is appropriate,
+
+\[
+\boxed{
+\mathbb{E}
+[
+\nabla f_{i_k}(x)
+]
+=
+\nabla f(x).
+}
+\]
+
+The stochastic gradient is then an unbiased estimator of the full
+gradient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mini-Batch Gradient}
+\label{subsec:mini-batch-gradient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let \(B_k\) be a random subset of data indices.
+
+Define
+
+\[
+\boxed{
+g_k
+=
+\frac1{|B_k|}
+\sum_{i\in B_k}
+\nabla f_i(x_k).
+}
+\]
+
+Then update
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k-\alpha_kg_k.
+}
+\]
+
+Mini-batches balance gradient variance against computational efficiency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Batch, Mini-Batch, and Stochastic Gradients}
+\label{subsec:batch-mini-stochastic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Full batch:
+
+\[
+\boxed{
+|B_k|=N.
+}
+\]
+
+Pure stochastic:
+
+\[
+\boxed{
+|B_k|=1.
+}
+\]
+
+Mini-batch:
+
+\[
+\boxed{
+1<|B_k|<N.
+}
+\]
+
+The appropriate choice depends on computational architecture, noise, and
+problem scale.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stochastic Step Sizes}
+\label{subsec:stochastic-step-sizes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Classical stochastic approximation often uses decreasing step sizes
+satisfying conditions such as
+
+\[
+\boxed{
+\sum_{k=0}^{\infty}
+\alpha_k
+=
+\infty,
+}
+\]
+
+and
+
+\[
+\boxed{
+\sum_{k=0}^{\infty}
+\alpha_k^2
+<
+\infty.
+}
+\]
+
+These conditions balance continued movement with diminishing stochastic
+noise under suitable assumptions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constant Learning Rates}
+\label{subsec:constant-learning-rates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In practical large-scale learning problems, constant or piecewise-constant
+step sizes are common.
+
+A constant step can move rapidly but may cause the iterates to fluctuate
+around an optimum rather than converge exactly.
+
+Reducing the step size later can improve final accuracy.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Momentum}
+\label{subsec:optimization-momentum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Momentum introduces a velocity-like variable.
+
+A basic form is
+
+\[
+\boxed{
+v_{k+1}
+=
+\beta v_k
++
+g_k,
+}
+\]
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k
+-
+\alpha v_{k+1},
+}
+\]
+
+where
+
+\[
+0\leq\beta<1.
+\]
+
+Momentum can smooth oscillations and accelerate movement along persistent
+descent directions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Accelerated Gradient Preview}
+\label{subsec:accelerated-gradient-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For smooth convex optimization, acceleration methods combine gradient
+steps with carefully designed momentum terms.
+
+Under standard assumptions, accelerated methods can improve the
+first-order convergence rate compared with ordinary gradient descent.
+
+The analysis requires more structure than simply adding arbitrary
+momentum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adaptive First-Order Methods Preview}
+\label{subsec:adaptive-first-order-preview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adaptive first-order methods modify step sizes using past gradient
+information.
+
+They may maintain running estimates of:
+
+\[
+\boxed{
+\text{gradient magnitudes},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{first and second moments}.
+}
+\]
+
+These methods are widely used in machine learning.
+
+Their practical behavior depends strongly on hyperparameter choices and
+problem structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deterministic Versus Stochastic Optimization Algorithms}
+\label{subsec:deterministic-versus-stochastic-algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Deterministic algorithms evaluate an exact objective or gradient for the
+current model.
+
+Stochastic algorithms use random approximations.
+
+Thus deterministic iterations are often more predictable, while
+stochastic iterations may be much cheaper.
+
+Large data sets frequently favor stochastic or mini-batch methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local and Global Optimization}
+\label{subsec:local-global-numerical-optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Most numerical nonlinear optimization algorithms are designed to find a
+local stationary point.
+
+For nonconvex \(f\), the result may depend strongly on the initial guess.
+
+Finding a global optimum may require:
+
+\[
+\boxed{
+\text{multiple starts},
+}
+\]
+
+\[
+\boxed{
+\text{branch-and-bound},
+}
+\]
+
+\[
+\boxed{
+\text{global relaxations},
+}
+\]
+
+or specialized global-search methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Saddle Points}
+\label{subsec:optimization-saddle-points}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A point satisfying
+
+\[
+\boxed{
+\nabla f(x)=0
+}
+\]
+
+need not be a minimizer.
+
+If the Hessian has both positive and negative eigenvalues, the point is a
+saddle point.
+
+Second-order information can help distinguish minima from saddles.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Negative Curvature}
+\label{subsec:negative-curvature}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If there exists \(d\) such that
+
+\[
+\boxed{
+d^THd<0,
+}
+\]
+
+then \(d\) is a direction of negative curvature.
+
+Near a stationary point, moving along such a direction can decrease the
+objective.
+
+Trust-region and modified Newton methods can exploit negative curvature
+rather than blindly applying a Newton step.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimization Landscapes}
+\label{subsec:optimization-landscapes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonconvex objective may contain:
+
+\[
+\boxed{
+\text{multiple local minima},
+}
+\]
+
+\[
+\boxed{
+\text{local maxima},
+}
+\]
+
+\[
+\boxed{
+\text{saddle points},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{flat regions}.
+}
+\]
+
+Numerical algorithms interact with this geometry differently.
+
+Initialization and globalization become important.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Warm Starts}
+\label{subsec:optimization-warm-starts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A warm start initializes a solver using a solution or approximate solution
+from a related optimization problem.
+
+This is useful when solving sequences of nearby problems.
+
+Examples include:
+
+\[
+\boxed{
+\text{MPC},
+}
+\]
+
+\[
+\boxed{
+\text{parameter continuation},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{regularization paths}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continuation Methods}
+\label{subsec:optimization-continuation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose a difficult problem depends on parameter \(\mu\).
+
+Start with an easier value
+
+\[
+\mu_0,
+\]
+
+solve that problem, then gradually change \(\mu\).
+
+Each previous solution becomes the initial guess for the next problem.
+
+Barrier methods and homotopy methods use this principle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Optimization Workflow}
+\label{subsec:numerical-optimization-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item formulate the objective and constraints;
+    \item determine whether the problem is smooth;
+    \item identify convexity or nonconvexity;
+    \item determine whether gradients are available;
+    \item determine whether Hessians or Hessian-vector products are
+          available;
+    \item scale variables, objectives, and constraints;
+    \item choose an initial point;
+    \item determine whether feasibility is required initially;
+    \item choose an optimization algorithm;
+    \item select line-search or trust-region globalization;
+    \item verify derivative calculations;
+    \item monitor objective values and constraint violations;
+    \item monitor gradient or KKT residuals;
+    \item inspect step sizes and trust-region radii;
+    \item exploit sparsity;
+    \item solve internal linear systems accurately enough;
+    \item check stopping criteria;
+    \item test sensitivity to initialization;
+    \item verify second-order behavior when relevant;
+    \item compare with alternative methods or initial guesses;
+    \item independently evaluate the final solution.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing an Unconstrained Method}
+\label{subsec:choosing-unconstrained-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For inexpensive gradients and moderate dimension, consider:
+
+\[
+\boxed{
+\text{BFGS}.
+}
+\]
+
+For very large dimension, consider:
+
+\[
+\boxed{
+\text{L-BFGS}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{nonlinear conjugate gradient}.
+}
+\]
+
+For high-accuracy smooth problems with reliable Hessians, consider:
+
+\[
+\boxed{
+\text{Newton or trust-region Newton methods}.
+}
+\]
+
+For large data sets, consider:
+
+\[
+\boxed{
+\text{stochastic first-order methods}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a Constrained Method}
+\label{subsec:choosing-constrained-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For simple convex sets, consider:
+
+\[
+\boxed{
+\text{projected-gradient or proximal methods}.
+}
+\]
+
+For smooth nonlinear constraints, consider:
+
+\[
+\boxed{
+\text{SQP}
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{interior-point methods}.
+}
+\]
+
+For equality constraints or difficult feasibility, consider:
+
+\[
+\boxed{
+\text{augmented Lagrangian methods}.
+}
+\]
+
+For bound-constrained problems, specialized active-set or projected methods
+can be highly effective.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:numerical-optimization-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Using a Search Direction That Is Not Descent}
+
+A line search cannot guarantee decrease if
+
+\[
+\boxed{
+\nabla f(x_k)^Tp_k\geq0.
+}
+\]
+
+The direction itself must first be appropriate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Step Size That Is Always Too Large}
+
+A large fixed step may cause:
+
+\[
+\boxed{
+\text{oscillation},
+}
+\]
+
+\[
+\boxed{
+\text{divergence},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{constraint violations}.
+}
+\]
+
+Line search or adaptive step selection can improve robustness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Step Size That Is Always Too Small}
+
+Extremely small steps may produce apparent stability but very slow
+progress.
+
+A tiny objective change does not automatically indicate convergence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Forming a Hessian Inverse Explicitly}
+
+Newton's direction should normally be computed by solving
+
+\[
+\boxed{
+H_kp_k=-g_k.
+}
+\]
+
+Explicitly forming
+
+\[
+H_k^{-1}
+\]
+
+is generally unnecessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Newton's Method With an Indefinite Hessian Without Safeguards}
+
+The Newton direction may point uphill.
+
+Use:
+
+\[
+\boxed{
+\text{Hessian modification},
+}
+\]
+
+\[
+\boxed{
+\text{line search},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{trust regions}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming a Small Gradient Proves a Minimum}
+
+A stationary point may be:
+
+\[
+\boxed{
+\text{minimum},
+}
+\]
+
+\[
+\boxed{
+\text{maximum},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{saddle point}.
+}
+\]
+
+Second-order information may be needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Conditioning}
+
+A poorly conditioned objective can make gradient descent extremely slow.
+
+Scaling or curvature-aware methods may be necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Finite Differences With Arbitrary Step Size}
+
+Derivative quality depends critically on \(h\).
+
+Too large creates truncation error.
+
+Too small creates cancellation and roundoff error.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Trusting Unverified Gradients}
+
+A sign or indexing error in a gradient can completely invalidate
+optimization results.
+
+Gradient checking should be performed before blaming the solver.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Automatic Differentiation Fixes the Model}
+
+AD computes derivatives of the implemented computation.
+
+If the model or code is wrong, the derivative is accurately wrong.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Constraint Violation}
+
+A low objective value is meaningless if the final point is infeasible.
+
+Always report constraint residuals.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Huge Penalty Parameters Immediately}
+
+Very large penalty coefficients can create severe numerical ill
+conditioning.
+
+Increase penalties systematically or use augmented Lagrangian methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring KKT Residuals}
+
+For constrained optimization, a small gradient of the objective alone does
+not indicate optimality.
+
+Stationarity must include constraint multipliers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using One Stopping Criterion Alone}
+
+A solver may satisfy a small-step test because it has stalled.
+
+Use multiple measures such as:
+
+\[
+\boxed{
+\text{gradient},
+}
+\]
+
+\[
+\boxed{
+\text{step},
+}
+\]
+
+\[
+\boxed{
+\text{objective change},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{feasibility}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Scale in Tolerances}
+
+Absolute tolerances can be inappropriate when variables or objectives have
+very large or very small magnitudes.
+
+Relative tolerances are often more meaningful.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming SGD Should Decrease the Objective Every Step}
+
+Stochastic gradients contain sampling noise.
+
+Individual steps may increase the full objective even while the method
+makes progress in expectation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming One Initial Point Is Enough for Nonconvex Problems}
+
+A local algorithm may converge to different stationary points from
+different starts.
+
+Multiple starts can reveal sensitivity to initialization.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring the Cost of Linear Algebra Inside Optimization}
+
+For Newton, SQP, and interior-point methods, solving linear systems may
+dominate runtime.
+
+Optimization efficiency therefore depends heavily on numerical linear
+algebra.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:numerical-optimization-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Machine Learning.}
+Training many statistical and neural-network models is a large numerical
+optimization problem.
+
+\medskip
+
+\textbf{Statistics.}
+Maximum likelihood, nonlinear regression, penalized estimation, and
+Bayesian approximations rely on numerical optimization.
+
+\medskip
+
+\textbf{Engineering Design.}
+Geometry, material use, performance, energy, and safety constraints are
+optimized numerically.
+
+\medskip
+
+\textbf{Optimal Control.}
+Direct transcription converts trajectory optimization into large nonlinear
+programs.
+
+\medskip
+
+\textbf{Inverse Problems.}
+Unknown model parameters are estimated by minimizing mismatch between
+predictions and measurements.
+
+\medskip
+
+\textbf{Finance.}
+Portfolio allocation, calibration, risk minimization, and parameter
+estimation require constrained numerical optimization.
+
+\medskip
+
+\textbf{Scientific Computing.}
+Many PDE, simulation, and parameter-identification problems produce
+large-scale nonlinear optimization models.
+
+\medskip
+
+\textbf{Operations Research.}
+Continuous relaxations, nonlinear programs, and large sparse constrained
+models depend on robust numerical solvers.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:numerical-optimization-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a descent direction.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a line search.
+\end{exercise}
+
+\begin{exercise}[1]
+Define gradient descent.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a Newton step.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a quasi-Newton method.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a trust region.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a penalty method.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a barrier method.
+\end{exercise}
+
+\begin{exercise}[1]
+Define an augmented Lagrangian.
+\end{exercise}
+
+\begin{exercise}[1]
+Define stochastic gradient descent.
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether a given vector \(p\) is a descent direction by evaluating
+
+\[
+\nabla f(x)^Tp.
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Perform one gradient-descent step for a quadratic objective.
+\end{exercise}
+
+\begin{exercise}[2]
+Test whether a given trial step satisfies the Armijo condition.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a complete backtracking line search for a specified function and
+direction.
+\end{exercise}
+
+\begin{exercise}[3]
+Check the Wolfe conditions for a given step.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the exact steepest-descent step for a positive-definite quadratic.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why ill conditioning causes zigzagging in steepest descent.
+\end{exercise}
+
+\begin{exercise}[2]
+Construct the gradient and Hessian of a given objective.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute one Newton step.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether the Hessian is positive definite.
+\end{exercise}
+
+\begin{exercise}[3]
+Determine whether the Newton direction is a descent direction.
+\end{exercise}
+
+\begin{exercise}[3]
+Modify an indefinite Hessian using
+
+\[
+H+\tau I.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Apply damped Newton with a specified line-search step.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute
+
+\[
+s_k=x_{k+1}-x_k
+\]
+
+and
+
+\[
+y_k=g_{k+1}-g_k.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Verify the secant condition for a given quasi-Newton approximation.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one BFGS update on a small problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Verify symmetry of the BFGS update.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why
+
+\[
+y_k^Ts_k>0
+\]
+
+is important for BFGS.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why L-BFGS is useful in high dimensions.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a Fletcher--Reeves nonlinear conjugate-gradient coefficient.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute a Polak--Ribiere coefficient.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the quadratic trust-region subproblem.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute actual and predicted reductions.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the trust-region ratio
+
+\[
+\rho_k.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Decide whether the step should be accepted and whether the radius should
+increase or decrease.
+\end{exercise}
+
+\begin{exercise}[3]
+Find the Cauchy point for a simple trust-region model.
+\end{exercise}
+
+\begin{exercise}[2]
+Approximate a gradient using forward finite differences.
+\end{exercise}
+
+\begin{exercise}[3]
+Approximate the same gradient using centered differences.
+\end{exercise}
+
+\begin{exercise}[3]
+Compare finite-difference gradients with an exact gradient.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain forward-mode automatic differentiation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain reverse-mode automatic differentiation.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why reverse mode is attractive for scalar objectives with many
+inputs.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform a directional derivative gradient check.
+\end{exercise}
+
+\begin{exercise}[2]
+Project a point onto a box constraint.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one projected-gradient step.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a quadratic penalty function for an equality constraint.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a logarithmic barrier for two inequality constraints.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an augmented Lagrangian.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one multiplier update.
+\end{exercise}
+
+\begin{exercise}[3]
+Write an SQP subproblem for a simple nonlinear constrained problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a merit function.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between active-set and interior-point methods.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct stationarity, feasibility, and complementarity residuals.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a stopping test for an unconstrained optimizer.
+\end{exercise}
+
+\begin{exercise}[3]
+Design a stopping test for a constrained optimizer.
+\end{exercise}
+
+\begin{exercise}[3]
+Scale a problem whose variables differ by six orders of magnitude.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain preconditioning of gradient descent.
+\end{exercise}
+
+\begin{exercise}[3]
+Write a Newton--KKT system for an equality-constrained problem.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive a Schur complement for a block KKT system.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how Hessian-vector products enable matrix-free optimization.
+\end{exercise}
+
+\begin{exercise}[3]
+Write an inexact Newton residual condition.
+\end{exercise}
+
+\begin{exercise}[2]
+Compute a subgradient of
+
+\[
+f(x)=|x|
+\]
+
+at a nonzero point.
+\end{exercise}
+
+\begin{exercise}[3]
+Describe the subdifferential of
+
+\[
+|x|
+\]
+
+at \(x=0\).
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one subgradient step.
+\end{exercise}
+
+\begin{exercise}[3]
+Compute the proximal operator of a simple quadratic function.
+\end{exercise}
+
+\begin{exercise}[3]
+Apply soft thresholding to a vector.
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one proximal-gradient step for an \(\ell_1\)-regularized problem.
+\end{exercise}
+
+\begin{exercise}[2]
+Write the full gradient of a finite-sum objective.
+\end{exercise}
+
+\begin{exercise}[2]
+Write one SGD update.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct a mini-batch gradient.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why an SGD step may increase the full objective.
+\end{exercise}
+
+\begin{exercise}[3]
+Check whether a sequence of step sizes satisfies
+
+\[
+\sum\alpha_k=\infty
+\]
+
+and
+
+\[
+\sum\alpha_k^2<\infty.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Perform one momentum update.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain the difference between deterministic and stochastic optimization
+iterations.
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why multiple initializations may be necessary for a nonconvex
+objective.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove descent of the negative-gradient direction.
+\end{exercise}
+
+\begin{exercise}[4]
+Study global convergence of gradient descent under Lipschitz-gradient
+assumptions.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive convergence rates for gradient descent on strongly convex
+functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive steepest-descent convergence for positive-definite quadratics.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove local quadratic convergence of Newton's method for optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study damped Newton globalization.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the BFGS update from secant and minimum-change principles.
+\end{exercise}
+
+\begin{exercise}[4]
+Study superlinear convergence of BFGS.
+\end{exercise}
+
+\begin{exercise}[4]
+Study limited-memory quasi-Newton methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study nonlinear conjugate-gradient global convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive the Cauchy-decrease bound for trust-region methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the trust-region optimality conditions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study dogleg methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study truncated conjugate gradient for trust-region subproblems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study convergence of projected-gradient methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study exact penalty functions.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive first-order conditions for logarithmic barrier problems.
+\end{exercise}
+
+\begin{exercise}[4]
+Study augmented Lagrangian convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Study local SQP convergence.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive primal-dual Newton equations for interior-point methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study filter globalization for constrained optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Study semismooth Newton methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study convergence of proximal-gradient methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study accelerated proximal-gradient methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study stochastic-gradient convergence under unbiased-noise assumptions.
+\end{exercise}
+
+\begin{exercise}[4]
+Study variance reduction for finite-sum optimization.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate optimization with automatic differentiation and
+Hessian-vector products.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:numerical-optimization-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical optimization constructs iterates
+
+\[
+\boxed{
+x_{k+1}
+=
+x_k+\alpha_kp_k
+}
+\]
+
+that approach an optimal or stationary point.
+
+Gradient descent uses
+
+\[
+\boxed{
+p_k
+=
+-\nabla f(x_k).
+}
+\]
+
+Newton's method solves
+
+\[
+\boxed{
+\nabla^2f(x_k)p_k
+=
+-\nabla f(x_k).
+}
+\]
+
+Quasi-Newton methods approximate curvature using
+
+\[
+\boxed{
+s_k
+=
+x_{k+1}-x_k
+}
+\]
+
+and
+
+\[
+\boxed{
+y_k
+=
+g_{k+1}-g_k.
+}
+\]
+
+Trust-region methods solve
+
+\[
+\boxed{
+\min_{\|p\|\leq\Delta_k}
+m_k(p).
+}
+\]
+
+Constrained numerical optimization uses methods such as
+
+\[
+\boxed{
+\text{projection},
+}
+\]
+
+\[
+\boxed{
+\text{penalty},
+}
+\]
+
+\[
+\boxed{
+\text{barrier},
+}
+\]
+
+\[
+\boxed{
+\text{augmented Lagrangian},
+}
+\]
+
+\[
+\boxed{
+\text{SQP},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{interior point}.
+}
+\]
+
+Large-scale problems rely on:
+
+\[
+\boxed{
+\text{sparsity},
+}
+\]
+
+\[
+\boxed{
+\text{Hessian-vector products},
+}
+\]
+
+\[
+\boxed{
+\text{iterative linear algebra},
+}
+\]
+
+and sometimes
+
+\[
+\boxed{
+\text{stochastic gradients}.
+}
+\]
+
+Reliable numerical optimization therefore combines
+
+\[
+\boxed{
+\text{optimization theory}
++
+\text{numerical analysis}
++
+\text{linear algebra}
++
+\text{algorithm design}
++
+\text{computational verification}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:numerical-optimization-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Numerical Optimization combines the mathematical optimality theory of
+Chapter~10 with the conditioning, stability, and linear-algebra tools of
+Sections~\ref{sec:numerical-analysis} and
+\ref{sec:numerical-linear-algebra}. Gradient, Newton, quasi-Newton,
+trust-region, SQP, interior-point, proximal, and stochastic methods provide
+computational mechanisms for solving problems that rarely admit closed
+forms. These methods also appear inside optimal-control solvers, inverse
+problems, statistical estimation, machine learning, and scientific
+simulation. The next section, Numerical ODEs, develops computational
+methods for approximating solutions of ordinary differential equations,
+including Euler methods, Runge--Kutta schemes, multistep methods,
+stability, stiffness, and adaptive time stepping.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 11.3 Numerical Optimization
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard numerical nonlinear optimization.
+%   - Standard unconstrained and constrained optimization algorithms.
+%   - Standard large-scale, nonsmooth, and stochastic optimization
+%     techniques.
+%
+% Used for:
+%   - iterative optimization;
+%   - descent directions;
+%   - gradient descent;
+%   - line search;
+%   - exact and inexact line search;
+%   - Armijo condition;
+%   - Wolfe and strong Wolfe conditions;
+%   - quadratic objectives;
+%   - conditioning and steepest descent;
+%   - Newton's method;
+%   - damped and modified Newton methods;
+%   - quasi-Newton methods;
+%   - secant conditions;
+%   - BFGS and inverse BFGS;
+%   - DFP preview;
+%   - L-BFGS;
+%   - nonlinear conjugate gradient;
+%   - Fletcher--Reeves and Polak--Ribiere formulas;
+%   - trust-region methods;
+%   - trust-region ratio and radius updates;
+%   - Cauchy point;
+%   - derivative-free optimization;
+%   - coordinate and simplex-type search;
+%   - finite-difference gradients;
+%   - automatic differentiation;
+%   - gradient checking;
+%   - projected-gradient methods;
+%   - penalty methods;
+%   - barrier methods;
+%   - augmented Lagrangians;
+%   - SQP;
+%   - merit and filter methods;
+%   - active-set methods;
+%   - interior-point methods;
+%   - primal-dual complementarity;
+%   - KKT residuals;
+%   - stopping criteria;
+%   - scaling and preconditioning;
+%   - sparse optimization;
+%   - Newton--KKT systems;
+%   - Schur complements;
+%   - Hessian-vector products;
+%   - Newton--CG and inexact Newton;
+%   - nonsmooth and subgradient methods;
+%   - proximal operators;
+%   - proximal gradient;
+%   - soft thresholding;
+%   - stochastic-gradient methods;
+%   - mini-batches;
+%   - stochastic step sizes;
+%   - momentum;
+%   - acceleration and adaptive methods preview;
+%   - local and global optimization;
+%   - saddle points and negative curvature;
+%   - warm starts and continuation;
+%   - applications and exercises.
+%
+% Notes:
+%   - Numerical ODEs are developed next in Section 11.4.
+%   - Numerical PDEs follow in Section 11.5.
+%   - Monte Carlo Methods follow in Section 11.6.
+%   - Numerical Linear Algebra appears in Section 11.2.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

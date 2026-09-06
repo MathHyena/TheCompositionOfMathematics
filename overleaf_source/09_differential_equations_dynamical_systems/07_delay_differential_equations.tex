@@ -1,0 +1,3660 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 9.7 DELAY DIFFERENTIAL EQUATIONS
+% The Composition of Advanced Mathematics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Delay Differential Equations}
+\label{sec:delay-differential-equations}
+
+\prerequisite{
+Ordinary differential equations, dynamical systems, stability,
+linearization, characteristic equations, Laplace transforms, integral
+equations, numerical methods, and basic complex-number methods.
+}
+
+\learningobjectives{
+By the end of this section, the reader should be able to:
+\begin{itemize}
+    \item define a delay differential equation;
+    \item explain how delay equations differ from ordinary differential
+          equations;
+    \item distinguish discrete, distributed, constant, and
+          state-dependent delays;
+    \item understand why delay equations require history functions rather
+          than single initial values;
+    \item formulate delay initial-value problems;
+    \item understand the method of steps;
+    \item solve elementary delay equations piecewise;
+    \item identify equilibria of autonomous delay equations;
+    \item linearize nonlinear delay equations near equilibria;
+    \item derive characteristic equations containing exponentials;
+    \item understand why delay characteristic equations possess
+          infinitely many roots;
+    \item analyze stability of scalar linear delay equations;
+    \item understand delay-induced instability;
+    \item recognize oscillatory instability;
+    \item derive imaginary-axis crossing conditions;
+    \item understand Hopf bifurcation caused by delay;
+    \item understand the Lambert \(W\) representation for simple delay
+          equations;
+    \item recognize neutral delay equations;
+    \item distinguish retarded and neutral equations;
+    \item understand distributed-delay models;
+    \item connect distributed delays with integral equations;
+    \item recognize state-dependent delays;
+    \item understand delayed logistic population models;
+    \item understand delayed feedback systems;
+    \item understand delayed epidemic and physiological models;
+    \item formulate systems of DDEs;
+    \item understand phase space for delay equations;
+    \item recognize that DDEs are effectively infinite-dimensional;
+    \item understand numerical approximation of DDEs;
+    \item recognize interpolation requirements in numerical DDE solvers;
+    \item understand discontinuity propagation in derivatives;
+    \item recognize stability restrictions created by delay;
+    \item connect DDEs with ODEs, dynamical systems, integral equations,
+          control, and mathematical modeling.
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What Is a Delay Differential Equation?}
+\label{subsec:what-is-delay-differential-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A delay differential equation, abbreviated DDE, is a differential
+equation in which the rate of change at the present time depends on one
+or more past states.
+
+A simple example is
+
+\[
+\boxed{
+x'(t)
+=
+-x(t-1).
+}
+\]
+
+The derivative at time \(t\) depends on the value one time unit earlier.
+
+A more general form is
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau)
+\right),
+}
+\]
+
+where
+
+\[
+\boxed{
+\tau>0
+}
+\]
+
+is the delay.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why Delays Matter}
+\label{subsec:why-delays-matter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Many real systems do not react instantaneously.
+
+Examples include:
+
+\[
+\boxed{
+\text{biological maturation},
+}
+\]
+
+\[
+\boxed{
+\text{transport time},
+}
+\]
+
+\[
+\boxed{
+\text{communication lag},
+}
+\]
+
+\[
+\boxed{
+\text{incubation periods},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{delayed feedback}.
+}
+\]
+
+If the response time is not negligible, an ordinary differential equation
+may fail to represent the dynamics accurately.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ODE Versus DDE}
+\label{subsec:ode-versus-dde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ODE has present-state dependence such as
+
+\[
+\boxed{
+x'(t)
+=
+f(t,x(t)).
+}
+\]
+
+A DDE may include past-state dependence:
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau)
+\right).
+}
+\]
+
+Thus:
+
+\[
+\boxed{
+\text{ODE}
+\rightarrow
+\text{present state},
+}
+\]
+
+while
+
+\[
+\boxed{
+\text{DDE}
+\rightarrow
+\text{present and past states}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discrete Delay}
+\label{subsec:discrete-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A discrete or point delay uses one or more specific past times.
+
+For example,
+
+\[
+\boxed{
+x'(t)
+=
+ax(t)
++
+bx(t-\tau).
+}
+\]
+
+The past contribution is evaluated exactly at
+
+\[
+t-\tau.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Discrete Delays}
+\label{subsec:multiple-discrete-delays}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A system may depend on several past times:
+
+\[
+\boxed{
+x'(t)
+=
+ax(t)
++
+b_1x(t-\tau_1)
++
+b_2x(t-\tau_2).
+}
+\]
+
+More generally,
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+x(t),
+x(t-\tau_1),
+\ldots,
+x(t-\tau_m)
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constant Delay}
+\label{subsec:constant-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A constant delay satisfies
+
+\[
+\boxed{
+\tau=\text{constant}.
+}
+\]
+
+For example,
+
+\[
+\boxed{
+x'(t)
+=
+-x(t-2).
+}
+\]
+
+Constant-delay equations are among the most tractable DDEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time-Dependent Delay}
+\label{subsec:time-dependent-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The delay itself may depend on time:
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau(t))
+\right).
+}
+\]
+
+The quantity
+
+\[
+\tau(t)
+\]
+
+may vary because of changing transport, communication, or biological
+conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State-Dependent Delay}
+\label{subsec:state-dependent-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A state-dependent delay depends on the evolving solution:
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+x(t),
+x
+\left(
+t-\tau(x(t))
+\right)
+\right).
+}
+\]
+
+Such equations can be substantially more difficult because the delayed
+evaluation time is itself unknown until the solution is known.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distributed Delay}
+\label{subsec:distributed-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Instead of depending on one past time, a distributed-delay model averages
+over a range of past states:
+
+\[
+\boxed{
+x'(t)
+=
+f(x(t))
++
+\int_0^\tau
+K(s)x(t-s)\,ds.
+}
+\]
+
+The kernel
+
+\[
+K(s)
+\]
+
+weights the influence of different time lags.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infinite Distributed Delay}
+\label{subsec:infinite-distributed-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Some models use the entire past:
+
+\[
+\boxed{
+x'(t)
+=
+f(x(t))
++
+\int_0^\infty
+K(s)x(t-s)\,ds.
+}
+\]
+
+For the integral to be meaningful, the memory kernel usually decays
+sufficiently rapidly.
+
+This connects DDEs directly with Volterra integral equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Retarded Functional Differential Equations}
+\label{subsec:retarded-functional-differential-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A common abstract form is
+
+\[
+\boxed{
+x'(t)
+=
+F(x_t),
+}
+\]
+
+where \(x_t\) denotes the recent history segment
+
+\[
+\boxed{
+x_t(\theta)
+=
+x(t+\theta),
+\qquad
+-\tau\leq\theta\leq0.
+}
+\]
+
+The derivative depends on the history but not on delayed derivatives.
+
+Such equations are called retarded functional differential equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{History Functions}
+\label{subsec:dde-history-functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An ODE initial-value problem typically specifies one value:
+
+\[
+x(0)=x_0.
+\]
+
+A DDE with maximum delay \(\tau\) generally requires an entire history
+function:
+
+\[
+\boxed{
+x(t)
+=
+\phi(t),
+\qquad
+-\tau\leq t\leq0.
+}
+\]
+
+Thus the initial data are themselves a function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why One Initial Value Is Not Enough}
+\label{subsec:dde-one-value-not-enough}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+x'(t)
+=
+x(t-1).
+\]
+
+To compute
+
+\[
+x'(0.4),
+\]
+
+one needs
+
+\[
+x(-0.6).
+\]
+
+Therefore specifying only
+
+\[
+x(0)
+\]
+
+does not provide enough information.
+
+One must know the history on
+
+\[
+\boxed{
+[-1,0].
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DDE Initial-Value Problem}
+\label{subsec:dde-initial-value-problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic DDE initial-value problem is
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau)
+\right),
+\qquad
+t>0,
+}
+\]
+
+with history
+
+\[
+\boxed{
+x(t)
+=
+\phi(t),
+\qquad
+-\tau\leq t\leq0.
+}
+\]
+
+The function \(\phi\) determines the past state before evolution begins.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Phase Space for Delay Equations}
+\label{subsec:dde-phase-space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an ODE in \(\mathbb{R}^n\), the state at one time is a vector.
+
+For a DDE, the state must contain a history segment.
+
+A natural phase space is therefore a function space such as
+
+\[
+\boxed{
+C
+\left(
+[-\tau,0],
+\mathbb{R}^n
+\right).
+}
+\]
+
+Thus even a scalar DDE is effectively an infinite-dimensional dynamical
+system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Infinite-Dimensional Nature of DDEs}
+\label{subsec:dde-infinite-dimensional}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The present state cannot generally be described by finitely many numbers.
+
+Instead, one needs the entire function
+
+\[
+\boxed{
+x_t(\theta)
+=
+x(t+\theta).
+}
+\]
+
+This explains why DDEs can have much richer behavior than scalar ODEs.
+
+For example, a single scalar DDE can exhibit oscillations and complicated
+dynamics that would require higher dimension in ordinary differential
+equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Method of Steps}
+\label{subsec:method-of-steps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For constant-delay equations, a basic solution technique is the method of
+steps.
+
+Suppose
+
+\[
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau)
+\right)
+\]
+
+with known history on
+
+\[
+[-\tau,0].
+\]
+
+Then:
+
+\begin{enumerate}
+    \item solve on \(0\leq t\leq\tau\) using the known history;
+    \item use that solution as known delayed data on
+          \(\tau\leq t\leq2\tau\);
+    \item continue interval by interval.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Method of Steps}
+\label{subsec:worked-method-of-steps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{A Simple Delayed Equation}
+
+Solve
+
+\[
+x'(t)=x(t-1),
+\qquad
+t>0,
+\]
+
+with history
+
+\[
+x(t)=1,
+\qquad
+-1\leq t\leq0.
+\]
+
+For
+
+\[
+0\leq t\leq1,
+\]
+
+we have
+
+\[
+x(t-1)=1.
+\]
+
+Thus,
+
+\[
+x'(t)=1.
+\]
+
+Using
+
+\[
+x(0)=1,
+\]
+
+we obtain
+
+\[
+\boxed{
+x(t)=1+t,
+\qquad
+0\leq t\leq1.
+}
+\]
+
+For
+
+\[
+1\leq t\leq2,
+\]
+
+the delayed value is
+
+\[
+x(t-1)
+=
+1+(t-1)
+=
+t.
+\]
+
+Therefore,
+
+\[
+x'(t)=t.
+\]
+
+Integrating from \(1\),
+
+\[
+x(t)
+=
+x(1)
++
+\int_1^t s\,ds.
+\]
+
+Since
+
+\[
+x(1)=2,
+\]
+
+\[
+x(t)
+=
+2
++
+\frac12(t^2-1).
+\]
+
+Hence,
+
+\begin{answerbox}
+\[
+\boxed{
+x(t)
+=
+\frac32
++
+\frac12t^2,
+\qquad
+1\leq t\leq2.
+}
+\]
+\end{answerbox}
+
+The procedure continues step by step.
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Piecewise Smoothness}
+\label{subsec:dde-piecewise-smoothness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Even when the history function is continuous, derivatives of a DDE
+solution may develop changes in smoothness at times
+
+\[
+\boxed{
+\tau,
+\ 2\tau,
+\ 3\tau,
+\ldots
+}
+\]
+
+because delayed information propagates forward interval by interval.
+
+This is an important issue for numerical solvers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Compatibility at the Initial Time}
+\label{subsec:dde-initial-compatibility}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose the history is differentiable.
+
+The left derivative at \(t=0\) is
+
+\[
+\phi'(0^-).
+\]
+
+The DDE determines the right derivative:
+
+\[
+\boxed{
+x'(0^+)
+=
+f
+\left(
+0,
+\phi(0),
+\phi(-\tau)
+\right).
+}
+\]
+
+If these do not agree, the solution can remain continuous while its
+derivative has a jump at \(t=0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Existence and Uniqueness}
+\label{subsec:dde-existence-uniqueness}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a retarded DDE
+
+\[
+x'(t)=F(x_t),
+\]
+
+existence and uniqueness are obtained under conditions analogous to ODE
+theory.
+
+Roughly, continuity provides existence while a suitable Lipschitz
+condition in the history variable provides uniqueness.
+
+The precise hypotheses are formulated in function spaces.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Autonomous Delay Equations}
+\label{subsec:autonomous-delay-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An autonomous delay equation has no explicit time dependence.
+
+For example,
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+x(t),
+x(t-\tau)
+\right).
+}
+\]
+
+Equilibria are constant solutions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equilibria of Delay Equations}
+\label{subsec:dde-equilibria}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+x(t)=x^*
+\]
+
+for all \(t\).
+
+Then
+
+\[
+x(t-\tau)=x^*.
+\]
+
+Therefore an equilibrium satisfies
+
+\[
+\boxed{
+f(x^*,x^*)=0.
+}
+\]
+
+Notice that the delay itself often does not change the location of the
+equilibrium, but it can drastically change its stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linear Scalar Delay Equation}
+\label{subsec:linear-scalar-delay-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A basic linear DDE is
+
+\[
+\boxed{
+x'(t)
+=
+ax(t)
++
+bx(t-\tau).
+}
+\]
+
+To study stability, try an exponential solution
+
+\[
+\boxed{
+x(t)=e^{\lambda t}.
+}
+\]
+
+Then
+
+\[
+x'(t)
+=
+\lambda e^{\lambda t},
+\]
+
+and
+
+\[
+x(t-\tau)
+=
+e^{\lambda(t-\tau)}
+=
+e^{-\lambda\tau}e^{\lambda t}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic Equation of a Linear DDE}
+\label{subsec:dde-characteristic-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Substitution into
+
+\[
+x'
+=
+ax+bx(t-\tau)
+\]
+
+gives
+
+\[
+\lambda e^{\lambda t}
+=
+ae^{\lambda t}
++
+be^{-\lambda\tau}e^{\lambda t}.
+\]
+
+Cancel \(e^{\lambda t}\):
+
+\[
+\boxed{
+\lambda
+=
+a
++
+be^{-\lambda\tau}.
+}
+\]
+
+Equivalently,
+
+\[
+\boxed{
+\lambda-a-be^{-\lambda\tau}=0.
+}
+\]
+
+This is a transcendental characteristic equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why There Are Infinitely Many Characteristic Roots}
+\label{subsec:dde-infinitely-many-roots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For an ODE, the characteristic equation is usually polynomial.
+
+For a DDE,
+
+\[
+e^{-\lambda\tau}
+\]
+
+appears.
+
+Because exponential and algebraic terms interact, the equation generally
+has infinitely many complex roots.
+
+This is another manifestation of the infinite-dimensional nature of DDEs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Stability from Characteristic Roots}
+\label{subsec:dde-characteristic-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a linear retarded DDE, exponential stability is governed by the real
+parts of the characteristic roots.
+
+A standard criterion is:
+
+\[
+\boxed{
+\operatorname{Re}(\lambda)<0
+\quad
+\text{for every characteristic root}
+}
+\]
+
+for asymptotic or exponential stability under the usual hypotheses.
+
+If any root satisfies
+
+\[
+\boxed{
+\operatorname{Re}(\lambda)>0,
+}
+\]
+
+the equilibrium is unstable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{No-Delay Limit}
+\label{subsec:dde-no-delay-limit}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\tau=0,
+\]
+
+then
+
+\[
+x(t-\tau)=x(t).
+\]
+
+Thus
+
+\[
+x'
+=
+ax+bx
+=
+(a+b)x.
+\]
+
+The ODE stability condition is
+
+\[
+\boxed{
+a+b<0.
+}
+\]
+
+Increasing \(\tau\) can destabilize an equilibrium that is stable when
+\(\tau=0\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pure Delayed Negative Feedback}
+\label{subsec:pure-delayed-negative-feedback}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+\boxed{
+x'(t)
+=
+-kx(t-\tau),
+\qquad
+k>0.
+}
+\]
+
+The characteristic equation is
+
+\[
+\boxed{
+\lambda
++
+ke^{-\lambda\tau}
+=
+0.
+}
+\]
+
+This simple equation illustrates delay-induced oscillation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Imaginary-Axis Crossing}
+\label{subsec:dde-imaginary-axis-crossing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Stability can change when characteristic roots cross the imaginary axis.
+
+Set
+
+\[
+\boxed{
+\lambda=i\omega.
+}
+\]
+
+For
+
+\[
+\lambda
++
+ke^{-\lambda\tau}
+=
+0,
+\]
+
+we obtain
+
+\[
+i\omega
++
+k
+e^{-i\omega\tau}
+=
+0.
+\]
+
+Using
+
+\[
+e^{-i\omega\tau}
+=
+\cos(\omega\tau)
+-
+i\sin(\omega\tau),
+\]
+
+we get
+
+\[
+i\omega
++
+k\cos(\omega\tau)
+-
+ik\sin(\omega\tau)
+=
+0.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Separating Real and Imaginary Parts}
+\label{subsec:dde-real-imaginary-parts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The real part gives
+
+\[
+\boxed{
+k\cos(\omega\tau)=0.
+}
+\]
+
+Thus,
+
+\[
+\boxed{
+\cos(\omega\tau)=0.
+}
+\]
+
+The imaginary part gives
+
+\[
+\boxed{
+\omega
+-
+k\sin(\omega\tau)
+=
+0.
+}
+\]
+
+At the first positive crossing,
+
+\[
+\omega\tau
+=
+\frac{\pi}{2}.
+\]
+
+Then
+
+\[
+\sin(\omega\tau)=1,
+\]
+
+so
+
+\[
+\boxed{
+\omega=k.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+k\tau
+=
+\frac{\pi}{2}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Critical Delay}
+\label{subsec:critical-delay-pure-feedback}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+x'(t)
+=
+-kx(t-\tau),
+\]
+
+the first critical delay is
+
+\[
+\boxed{
+\tau_c
+=
+\frac{
+\pi
+}{
+2k
+}.
+}
+\]
+
+For
+
+\[
+\boxed{
+0<k\tau<\frac{\pi}{2},
+}
+\]
+
+the zero equilibrium is asymptotically stable.
+
+At
+
+\[
+\boxed{
+k\tau=\frac{\pi}{2},
+}
+\]
+
+a pair of roots lies on the imaginary axis.
+
+For larger delay, instability appears.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Delay-Induced Instability}
+\label{subsec:worked-delay-instability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Critical Delay}
+
+Consider
+
+\[
+x'(t)
+=
+-2x(t-\tau).
+\]
+
+Here,
+
+\[
+k=2.
+\]
+
+The critical delay is
+
+\[
+\tau_c
+=
+\frac{
+\pi
+}{
+2(2)
+}
+=
+\frac{\pi}{4}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+0<\tau<\frac{\pi}{4}
+}
+\]
+
+gives asymptotic stability for the zero equilibrium, while the first
+stability boundary occurs at
+
+\[
+\boxed{
+\tau=\frac{\pi}{4}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General Imaginary-Root Conditions}
+\label{subsec:general-dde-imaginary-root-conditions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+x'
+=
+ax+bx(t-\tau),
+\]
+
+the characteristic equation is
+
+\[
+\lambda-a-be^{-\lambda\tau}=0.
+\]
+
+Set
+
+\[
+\lambda=i\omega.
+\]
+
+Then
+
+\[
+i\omega
+-
+a
+-
+b
+[
+\cos(\omega\tau)
+-
+i\sin(\omega\tau)
+]
+=
+0.
+\]
+
+The real part gives
+
+\[
+\boxed{
+a
++
+b\cos(\omega\tau)
+=
+0,
+}
+\]
+
+while the imaginary part gives
+
+\[
+\boxed{
+\omega
++
+b\sin(\omega\tau)
+=
+0,
+}
+\]
+
+with signs depending on the chosen characteristic-equation arrangement.
+The equations must be derived consistently from the original model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Oscillatory Instability}
+\label{subsec:dde-oscillatory-instability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When a complex-conjugate pair crosses from the left half-plane into the
+right half-plane, the equilibrium loses stability through an oscillatory
+mode.
+
+This is fundamentally different from a real eigenvalue crossing zero.
+
+The delay introduces phase lag, which can turn negative feedback into
+oscillation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Delay as Phase Lag}
+\label{subsec:delay-phase-lag}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a mode
+
+\[
+e^{i\omega t},
+\]
+
+the delayed state is
+
+\[
+e^{i\omega(t-\tau)}
+=
+e^{-i\omega\tau}
+e^{i\omega t}.
+\]
+
+Thus the delay contributes a phase shift
+
+\[
+\boxed{
+-\omega\tau.
+}
+\]
+
+Large phase lag can make stabilizing feedback act effectively in the wrong
+direction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hopf Bifurcation in DDEs}
+\label{subsec:dde-hopf-bifurcation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A delay can act as a bifurcation parameter.
+
+Suppose a complex-conjugate pair of characteristic roots satisfies
+
+\[
+\boxed{
+\lambda(\tau_c)
+=
+\pm i\omega_c
+}
+\]
+
+at a critical delay.
+
+If the roots cross the imaginary axis transversely and appropriate
+nondegeneracy conditions hold, a Hopf bifurcation may occur.
+
+A periodic solution can then emerge near the equilibrium.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Delay-Induced Oscillation}
+\label{subsec:delay-induced-oscillation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One important modeling principle is
+
+\[
+\boxed{
+\text{stable instantaneous feedback}
++
+\text{sufficient delay}
+\rightarrow
+\text{oscillation or instability}.
+}
+\]
+
+This occurs in:
+
+\[
+\boxed{
+\text{control systems},
+}
+\]
+
+\[
+\boxed{
+\text{physiological regulation},
+}
+\]
+
+\[
+\boxed{
+\text{population dynamics},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{communication networks}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lambert \(W\) Function}
+\label{subsec:dde-lambert-w}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Lambert \(W\) function is defined implicitly by
+
+\[
+\boxed{
+W(z)e^{W(z)}=z.
+}
+\]
+
+It can express characteristic roots of some simple delay equations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lambert \(W\) Solution of a Characteristic Equation}
+\label{subsec:lambert-w-characteristic-roots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+x'(t)=ax(t)+bx(t-\tau).
+\]
+
+The characteristic equation is
+
+\[
+\lambda-a
+=
+be^{-\lambda\tau}.
+\]
+
+Multiply by
+
+\[
+e^{(\lambda-a)\tau}.
+\]
+
+Then
+
+\[
+(\lambda-a)
+e^{(\lambda-a)\tau}
+=
+b
+e^{-a\tau}.
+\]
+
+Multiply by \(\tau\):
+
+\[
+(\lambda-a)\tau
+e^{(\lambda-a)\tau}
+=
+b\tau e^{-a\tau}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+(\lambda-a)\tau
+=
+W_k
+\left(
+b\tau e^{-a\tau}
+\right),
+}
+\]
+
+where \(W_k\) denotes branch \(k\).
+
+Hence,
+
+\[
+\boxed{
+\lambda_k
+=
+a
++
+\frac1\tau
+W_k
+\left(
+b\tau e^{-a\tau}
+\right).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Branches of Lambert \(W\)}
+\label{subsec:lambert-w-branches}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Lambert \(W\) function has multiple complex branches.
+
+Therefore,
+
+\[
+\boxed{
+k\in\mathbb{Z}
+}
+\]
+
+produces infinitely many characteristic roots.
+
+This representation makes the infinite spectrum of the delay equation
+explicit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear Delay Equations}
+\label{subsec:nonlinear-delay-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A nonlinear DDE may have form
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+x(t),
+x(t-\tau)
+\right).
+}
+\]
+
+As with nonlinear ODEs, exact solutions are uncommon.
+
+Typical analysis focuses on:
+
+\[
+\boxed{
+\text{equilibria},
+}
+\]
+
+\[
+\boxed{
+\text{linear stability},
+}
+\]
+
+\[
+\boxed{
+\text{periodic solutions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{bifurcations}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linearization of a Nonlinear DDE}
+\label{subsec:linearization-nonlinear-dde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+x^*
+\]
+
+is an equilibrium of
+
+\[
+x'(t)
+=
+f
+\left(
+x(t),
+x(t-\tau)
+\right).
+\]
+
+Write
+
+\[
+x(t)=x^*+u(t).
+\]
+
+Then, to first order,
+
+\[
+\boxed{
+u'(t)
+=
+a u(t)
++
+b u(t-\tau),
+}
+\]
+
+where
+
+\[
+\boxed{
+a
+=
+\frac{\partial f}{\partial x_1}
+(x^*,x^*),
+}
+\]
+
+and
+
+\[
+\boxed{
+b
+=
+\frac{\partial f}{\partial x_2}
+(x^*,x^*).
+}
+\]
+
+The corresponding characteristic equation is
+
+\[
+\boxed{
+\lambda
+=
+a
++
+be^{-\lambda\tau}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Delayed Logistic Equation}
+\label{subsec:delayed-logistic-equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A delayed logistic model is
+
+\[
+\boxed{
+P'(t)
+=
+rP(t)
+\left[
+1-
+\frac{
+P(t-\tau)
+}{
+K
+}
+\right].
+}
+\]
+
+Here:
+
+\[
+r>0
+=
+\text{growth rate},
+\]
+
+\[
+K>0
+=
+\text{carrying capacity},
+\]
+
+and
+
+\[
+\tau
+=
+\text{delay in density feedback}.
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Equilibria of the Delayed Logistic Model}
+\label{subsec:delayed-logistic-equilibria}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Set
+
+\[
+P(t)=P^*.
+\]
+
+Then
+
+\[
+0
+=
+rP^*
+\left(
+1-\frac{P^*}{K}
+\right).
+\]
+
+Therefore,
+
+\[
+\boxed{
+P^*=0
+}
+\]
+
+and
+
+\[
+\boxed{
+P^*=K.
+}
+\]
+
+The delay does not change the equilibrium values, but it changes their
+stability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Linearization at Carrying Capacity}
+\label{subsec:delayed-logistic-linearization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let
+
+\[
+P(t)=K+u(t).
+\]
+
+Substitute into
+
+\[
+P'
+=
+rP(t)
+\left[
+1-\frac{P(t-\tau)}{K}
+\right].
+\]
+
+Ignoring nonlinear perturbation terms gives
+
+\[
+\boxed{
+u'(t)
+=
+-r u(t-\tau).
+}
+\]
+
+Thus the stability condition is inherited from the pure delayed negative
+feedback equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Delayed Logistic Stability Threshold}
+\label{subsec:delayed-logistic-stability-threshold}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The linearized equation is
+
+\[
+u'
+=
+-r u(t-\tau).
+\]
+
+Therefore the carrying-capacity equilibrium is locally asymptotically
+stable when
+
+\[
+\boxed{
+r\tau
+<
+\frac{\pi}{2}.
+}
+\]
+
+The first critical threshold occurs at
+
+\[
+\boxed{
+r\tau
+=
+\frac{\pi}{2}.
+}
+\]
+
+Larger delays can create sustained population oscillations or instability.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Delayed Feedback Control}
+\label{subsec:delayed-feedback-control}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider a controlled state
+
+\[
+x'(t)
+=
+ax(t)
++
+ku(t),
+\]
+
+with delayed feedback
+
+\[
+\boxed{
+u(t)
+=
+-x(t-\tau).
+}
+\]
+
+Then
+
+\[
+\boxed{
+x'(t)
+=
+ax(t)
+-
+k x(t-\tau).
+}
+\]
+
+Even if the feedback gain \(k\) stabilizes the zero-delay system, a
+sufficiently large delay can destabilize it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Physiological Delay Models}
+\label{subsec:physiological-delay-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Physiological regulation often involves delays caused by:
+
+\[
+\boxed{
+\text{hormone production},
+}
+\]
+
+\[
+\boxed{
+\text{blood transport},
+}
+\]
+
+\[
+\boxed{
+\text{cell maturation},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{neural response}.
+}
+\]
+
+Feedback models with delays can exhibit oscillations even when their
+instantaneous counterparts converge monotonically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Epidemiological Delay Models}
+\label{subsec:epidemiological-delay-models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Delays can represent:
+
+\[
+\boxed{
+\text{incubation time},
+}
+\]
+
+\[
+\boxed{
+\text{latent periods},
+}
+\]
+
+\[
+\boxed{
+\text{treatment delays},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{temporary immunity}.
+}
+\]
+
+For example, infection terms can depend on population states at earlier
+times rather than only at the present instant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maturation Delay}
+\label{subsec:maturation-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose individuals require time \(\tau\) to mature.
+
+Recruitment into the adult population at time \(t\) may depend on births
+at time
+
+\[
+t-\tau.
+\]
+
+A schematic model is
+
+\[
+\boxed{
+A'(t)
+=
+bA(t-\tau)
+-
+dA(t).
+}
+\]
+
+The delayed term represents recruitment from the earlier cohort.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Systems of Delay Differential Equations}
+\label{subsec:systems-of-ddes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A vector DDE may be written
+
+\[
+\boxed{
+\mathbf{x}'(t)
+=
+\mathbf{f}
+\left(
+\mathbf{x}(t),
+\mathbf{x}(t-\tau)
+\right).
+}
+\]
+
+A linear system has form
+
+\[
+\boxed{
+\mathbf{x}'(t)
+=
+A\mathbf{x}(t)
++
+B\mathbf{x}(t-\tau).
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic Equation for Linear DDE Systems}
+\label{subsec:linear-dde-system-characteristic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Try
+
+\[
+\mathbf{x}(t)
+=
+\mathbf{v}e^{\lambda t}.
+\]
+
+Then
+
+\[
+\lambda\mathbf{v}
+=
+A\mathbf{v}
++
+Be^{-\lambda\tau}\mathbf{v}.
+\]
+
+Thus nontrivial \(\mathbf{v}\) requires
+
+\[
+\boxed{
+\det
+\left[
+\lambda I
+-
+A
+-
+Be^{-\lambda\tau}
+\right]
+=
+0.
+}
+\]
+
+This is the matrix-valued delay characteristic equation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Several Delays in a Linear System}
+\label{subsec:linear-system-multiple-delays}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+\mathbf{x}'(t)
+=
+A_0\mathbf{x}(t)
++
+\sum_{j=1}^{m}
+A_j
+\mathbf{x}(t-\tau_j),
+\]
+
+the characteristic equation is
+
+\[
+\boxed{
+\det
+\left[
+\lambda I
+-
+A_0
+-
+\sum_{j=1}^{m}
+A_je^{-\lambda\tau_j}
+\right]
+=
+0.
+}
+\]
+
+The spectral problem can become highly complicated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neutral Delay Differential Equations}
+\label{subsec:neutral-delay-differential-equations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A neutral DDE includes delayed derivatives.
+
+For example,
+
+\[
+\boxed{
+x'(t)
+-
+c x'(t-\tau)
+=
+ax(t)
++
+bx(t-\tau).
+}
+\]
+
+This differs fundamentally from a retarded DDE.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Retarded Versus Neutral DDEs}
+\label{subsec:retarded-versus-neutral-ddes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A retarded DDE involves delayed states:
+
+\[
+\boxed{
+x(t-\tau).
+}
+\]
+
+A neutral DDE may also involve delayed derivatives:
+
+\[
+\boxed{
+x'(t-\tau).
+}
+\]
+
+Neutral equations can have more delicate stability and regularity
+properties.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic Equation for a Neutral DDE}
+\label{subsec:neutral-dde-characteristic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For
+
+\[
+x'(t)
+-
+c x'(t-\tau)
+=
+ax(t)
++
+bx(t-\tau),
+\]
+
+try
+
+\[
+x=e^{\lambda t}.
+\]
+
+Then
+
+\[
+\lambda
+-
+c\lambda e^{-\lambda\tau}
+=
+a
++
+be^{-\lambda\tau}.
+\]
+
+Thus,
+
+\[
+\boxed{
+\lambda
+\left(
+1-ce^{-\lambda\tau}
+\right)
+-
+a
+-
+be^{-\lambda\tau}
+=
+0.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distributed Delay as an Integral Operator}
+\label{subsec:distributed-delay-integral-operator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+x'(t)
+=
+ax(t)
++
+\int_0^\tau
+K(s)x(t-s)\,ds.
+\]
+
+The delayed history acts through an integral operator.
+
+Thus distributed-delay systems sit naturally between:
+
+\[
+\boxed{
+\text{DDEs}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{Volterra integral equations}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic Equation for Distributed Delay}
+\label{subsec:distributed-delay-characteristic}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Try
+
+\[
+x(t)=e^{\lambda t}.
+\]
+
+Then
+
+\[
+x(t-s)
+=
+e^{-\lambda s}
+e^{\lambda t}.
+\]
+
+Therefore,
+
+\[
+\lambda
+=
+a
++
+\int_0^\tau
+K(s)e^{-\lambda s}\,ds.
+\]
+
+Thus,
+
+\[
+\boxed{
+\lambda
+-
+a
+-
+\int_0^\tau
+K(s)e^{-\lambda s}\,ds
+=
+0.
+}
+\]
+
+The kernel enters through a Laplace-type transform.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponential Memory Kernel}
+\label{subsec:exponential-memory-kernel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Suppose
+
+\[
+K(s)
+=
+\alpha e^{-\beta s}.
+\]
+
+Then the memory contribution decays exponentially with lag.
+
+Such kernels can sometimes be converted into additional ODE state
+variables, replacing an infinite-memory integral by a finite-dimensional
+augmented system.
+
+This technique is often called the linear-chain or auxiliary-variable
+idea.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{State Augmentation for Exponential Memory}
+\label{subsec:state-augmentation-memory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Define
+
+\[
+\boxed{
+z(t)
+=
+\int_0^\infty
+\alpha e^{-\beta s}
+x(t-s)\,ds.
+}
+\]
+
+Under suitable assumptions, differentiation yields an equation of the
+form
+
+\[
+\boxed{
+z'
+=
+\alpha x
+-
+\beta z.
+}
+\]
+
+Thus a distributed-memory problem can sometimes be rewritten as a larger
+ODE system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DDEs and Integral Equations}
+\label{subsec:dde-integral-equation-connection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Integrating
+
+\[
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau)
+\right)
+\]
+
+from \(0\) to \(t\) gives
+
+\[
+\boxed{
+x(t)
+=
+x(0)
++
+\int_0^t
+f
+\left(
+s,
+x(s),
+x(s-\tau)
+\right)
+\,ds.
+}
+\]
+
+Thus a DDE can also be viewed as an integral equation with delayed
+arguments.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Laplace Transform of a Delayed Function}
+\label{subsec:laplace-delayed-function-dde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+When a function is zero before \(t=0\), the standard delay property is
+
+\[
+\boxed{
+\mathcal{L}
+\{
+u_\tau(t)f(t-\tau)
+\}
+=
+e^{-\tau s}
+F(s).
+}
+\]
+
+However, DDEs usually have nonzero history for negative times.
+
+Therefore the Laplace transform of
+
+\[
+x(t-\tau)
+\]
+
+must include contributions from the prescribed history.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Laplace Transform with a History Function}
+\label{subsec:laplace-history-function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For \(t\geq0\),
+
+\[
+\mathcal{L}\{x(t-\tau)\}
+=
+\int_0^\infty
+e^{-st}x(t-\tau)\,dt.
+\]
+
+Let
+
+\[
+u=t-\tau.
+\]
+
+Then
+
+\[
+\mathcal{L}\{x(t-\tau)\}
+=
+e^{-s\tau}
+\int_{-\tau}^{\infty}
+e^{-su}x(u)\,du.
+\]
+
+Split the integral:
+
+\[
+\boxed{
+\mathcal{L}\{x(t-\tau)\}
+=
+e^{-s\tau}
+\left[
+\int_{-\tau}^{0}
+e^{-su}\phi(u)\,du
++
+X(s)
+\right].
+}
+\]
+
+Thus history terms appear explicitly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Laplace Transform with Constant History}
+\label{subsec:worked-laplace-dde-history}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Transforming a Delayed State}
+
+Suppose
+
+\[
+x(t)=1,
+\qquad
+-1\leq t\leq0.
+\]
+
+Then
+
+\[
+\mathcal{L}\{x(t-1)\}
+=
+e^{-s}
+\left[
+X(s)
++
+\int_{-1}^{0}
+e^{-su}\,du
+\right].
+\]
+
+The history integral is
+
+\[
+\int_{-1}^{0}
+e^{-su}\,du
+=
+\frac{
+e^s-1
+}{
+s
+}.
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+\mathcal{L}\{x(t-1)\}
+=
+e^{-s}X(s)
++
+\frac{
+1-e^{-s}
+}{
+s
+}.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Solution of DDEs}
+\label{subsec:numerical-solution-ddes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Most nonlinear DDEs cannot be solved analytically.
+
+Numerical DDE solvers extend ODE methods while maintaining access to past
+solution values.
+
+At time \(t_n\), the method may require
+
+\[
+\boxed{
+x(t_n-\tau),
+}
+\]
+
+which generally does not coincide with a stored grid point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpolation of Delayed States}
+\label{subsec:dde-interpolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+t_n-\tau
+\]
+
+lies between computed solution points, the solver must interpolate the
+past solution.
+
+Therefore DDE solvers often maintain a continuous approximation of the
+recent solution history.
+
+This is sometimes called a continuous extension or dense output.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler Method for a DDE}
+\label{subsec:euler-method-dde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Consider
+
+\[
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau)
+\right).
+\]
+
+With time step \(h\),
+
+\[
+\boxed{
+x_{n+1}
+=
+x_n
++
+h
+f
+\left(
+t_n,
+x_n,
+x(t_n-\tau)
+\right).
+}
+\]
+
+The delayed value must come from:
+
+\[
+\boxed{
+\text{the history function},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{previous numerical solution values}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Delay Aligned with the Numerical Grid}
+\label{subsec:dde-grid-aligned-delay}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If
+
+\[
+\tau=mh
+\]
+
+for an integer \(m\), then
+
+\[
+t_n-\tau
+=
+t_{n-m}.
+\]
+
+The Euler update becomes
+
+\[
+\boxed{
+x_{n+1}
+=
+x_n
++
+h
+f
+\left(
+t_n,
+x_n,
+x_{n-m}
+\right).
+}
+\]
+
+This avoids interpolation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Worked Example: Euler DDE Step}
+\label{subsec:worked-euler-dde}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{workedexamplebox}{Delayed Euler Approximation}
+
+Consider
+
+\[
+x'(t)
+=
+-x(t-1),
+\]
+
+with history
+
+\[
+x(t)=1,
+\qquad
+-1\leq t\leq0.
+\]
+
+Use
+
+\[
+h=0.25.
+\]
+
+At \(t_0=0\),
+
+\[
+x_0=1,
+\]
+
+and
+
+\[
+x(-1)=1.
+\]
+
+Thus,
+
+\[
+x_1
+=
+x_0
++
+0.25[-x(-1)].
+\]
+
+Therefore,
+
+\begin{answerbox}
+\[
+\boxed{
+x_1
+=
+1-0.25
+=
+0.75.
+}
+\]
+\end{answerbox}
+
+\end{workedexamplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discontinuity Tracking}
+\label{subsec:dde-discontinuity-tracking}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If the history and DDE are not fully compatible at \(t=0\), derivative
+discontinuities can occur.
+
+These discontinuities propagate to times such as
+
+\[
+\boxed{
+\tau,
+\ 2\tau,
+\ 3\tau,\ldots
+}
+\]
+
+and may increase in derivative order as the solution evolves.
+
+Accurate DDE solvers often track these points explicitly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical Stability}
+\label{subsec:dde-numerical-stability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Numerical stability is especially important because the true DDE can be
+near a delay-induced stability boundary.
+
+A method may:
+
+\[
+\boxed{
+\text{create artificial oscillation},
+}
+\]
+
+\[
+\boxed{
+\text{over-damp true oscillation},
+}
+\]
+
+or
+
+\[
+\boxed{
+\text{shift a critical delay}.
+}
+\]
+
+Step-size convergence should therefore be checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bifurcation Diagrams for DDEs}
+\label{subsec:dde-bifurcation-diagrams}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A parameter such as
+
+\[
+\boxed{
+\tau
+}
+\]
+
+can be varied while tracking:
+
+\[
+\boxed{
+\text{equilibria},
+}
+\]
+
+\[
+\boxed{
+\text{characteristic roots},
+}
+\]
+
+\[
+\boxed{
+\text{periodic solutions},
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{oscillation amplitudes}.
+}
+\]
+
+This reveals delay-induced bifurcations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DDE Modeling Workflow}
+\label{subsec:dde-modeling-workflow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A practical workflow is:
+
+\begin{enumerate}
+    \item identify the process creating the delay;
+    \item determine whether the delay is fixed, distributed, or
+          state-dependent;
+    \item determine the maximum delay;
+    \item specify the required history function;
+    \item identify equilibria;
+    \item linearize around equilibria;
+    \item derive the characteristic equation;
+    \item analyze characteristic roots;
+    \item locate imaginary-axis crossings;
+    \item identify possible Hopf bifurcations;
+    \item solve by the method of steps when possible;
+    \item use numerical DDE solvers for nonlinear models;
+    \item vary the delay and other parameters;
+    \item compare delayed and zero-delay behavior;
+    \item interpret oscillations and instability in the application.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choosing a DDE Method}
+\label{subsec:choosing-dde-method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For simple constant-delay equations with known history, consider:
+
+\[
+\boxed{
+\text{method of steps}.
+}
+\]
+
+For linear stability, use:
+
+\[
+\boxed{
+\text{characteristic roots}.
+}
+\]
+
+For simple scalar characteristic equations, consider:
+
+\[
+\boxed{
+\text{Lambert }W.
+}
+\]
+
+For convolution-type memory, consider:
+
+\[
+\boxed{
+\text{Laplace transforms}.
+}
+\]
+
+For distributed exponential memory, consider:
+
+\[
+\boxed{
+\text{state augmentation}.
+}
+\]
+
+For nonlinear models, use:
+
+\[
+\boxed{
+\text{linearization and numerical continuation}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Common Errors}
+\label{subsec:dde-common-errors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Providing Only \(x(0)\)}
+
+A DDE generally requires a history function over an interval such as
+
+\[
+[-\tau,0].
+\]
+
+One scalar initial value is usually insufficient.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Treating \(x(t-\tau)\) as \(x(t)-\tau\)}
+
+These expressions are completely different:
+
+\[
+\boxed{
+x(t-\tau)
+}
+\]
+
+is the function evaluated at an earlier time.
+
+It is not
+
+\[
+\boxed{
+x(t)-\tau.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Delay Changes the Equilibrium Location}
+
+For many autonomous equations, a constant equilibrium satisfies
+
+\[
+x(t-\tau)=x(t)=x^*.
+\]
+
+Thus delay often changes stability rather than equilibrium location.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using a Polynomial Characteristic Equation}
+
+The delay characteristic equation contains
+
+\[
+e^{-\lambda\tau}.
+\]
+
+It is transcendental and generally has infinitely many roots.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Checking Only One Characteristic Root}
+
+Stability requires control of the entire spectrum.
+
+A single stable root does not imply the DDE is stable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Complex Roots}
+
+Delay-induced instability often occurs through a complex-conjugate pair.
+
+Restricting attention to real roots can miss the critical behavior.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Zero-Delay Stability as the Final Answer}
+
+A system that is stable for
+
+\[
+\tau=0
+\]
+
+may become unstable for positive delay.
+
+The delay must be analyzed explicitly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the Ordinary Laplace Delay Rule Without History Terms}
+
+For a DDE with nonzero negative-time history,
+
+\[
+\mathcal{L}\{x(t-\tau)\}
+\]
+
+contains an extra integral involving the history function.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Assuming Every Delay Produces Instability}
+
+Small delays may preserve stability.
+
+The effect depends on the coefficients and feedback structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Confusing Retarded and Neutral Equations}
+
+A retarded DDE uses delayed states.
+
+A neutral DDE contains delayed derivatives and requires separate theory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring State-Dependent Delay Constraints}
+
+For
+
+\[
+t-\tau(x(t)),
+\]
+
+the delayed argument must remain in the region where history or solution
+data are available.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Interpolation Error in Numerical Solvers}
+
+If the delayed time does not lie on the numerical mesh, interpolation
+becomes part of the numerical approximation.
+
+Its accuracy matters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Ignoring Propagating Derivative Discontinuities}
+
+A DDE solution can be continuous while derivatives have jumps at
+predictable delay-related times.
+
+Numerical methods should respect those discontinuities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Applications}
+\label{subsec:dde-applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{applicationbox}
+
+\textbf{Population Biology.}
+Maturation, gestation, recruitment, and delayed density dependence lead
+naturally to DDE models.
+
+\medskip
+
+\textbf{Epidemiology.}
+Incubation, immunity, treatment, and reporting delays can be represented
+through delayed states.
+
+\medskip
+
+\textbf{Physiology.}
+Hormonal regulation, blood-cell production, neural feedback, and
+respiratory control involve biologically meaningful response delays.
+
+\medskip
+
+\textbf{Control Theory.}
+Sensors, processors, actuators, and communication networks introduce
+feedback delays that can destabilize otherwise stable systems.
+
+\medskip
+
+\textbf{Engineering.}
+Transport systems, machining processes, power networks, and
+communication systems often contain unavoidable delays.
+
+\medskip
+
+\textbf{Economics.}
+Investment, production, policy, and information delays can create
+oscillation and instability.
+
+\medskip
+
+\textbf{Ecology.}
+Delayed resource limitation and age structure can produce cycles in
+population models.
+
+\medskip
+
+\textbf{Network Science.}
+Propagation delays influence synchronization, consensus, and stability in
+interconnected systems.
+
+\end{applicationbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exercises}
+\label{subsec:dde-exercises}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{exercise}[1]
+Define a delay differential equation.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a discrete delay.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a distributed delay.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a history function.
+\end{exercise}
+
+\begin{exercise}[1]
+Explain why a scalar DDE is effectively infinite-dimensional.
+\end{exercise}
+
+\begin{exercise}[1]
+Define a neutral DDE.
+\end{exercise}
+
+\begin{exercise}[2]
+For
+
+\[
+x'(t)
+=
+x(t-2),
+\]
+
+state the history interval needed to begin the solution at \(t=0\).
+\end{exercise}
+
+\begin{exercise}[2]
+Find the equilibria of
+
+\[
+x'(t)
+=
+x(t)
+[
+1-x(t-\tau)
+].
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the characteristic equation for
+
+\[
+x'(t)
+=
+3x(t)
+-
+2x(t-\tau).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Derive the characteristic equation for
+
+\[
+x'(t)
+=
+-kx(t-\tau).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Find the first critical delay for
+
+\[
+x'(t)
+=
+-4x(t-\tau).
+\]
+\end{exercise}
+
+\begin{exercise}[2]
+Determine whether the equilibrium is stable when
+
+\[
+k\tau=\frac{\pi}{4}
+\]
+
+for
+
+\[
+x'=-kx(t-\tau).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Use the method of steps to solve
+
+\[
+x'(t)=x(t-1)
+\]
+
+on
+
+\[
+0\leq t\leq2
+\]
+
+when
+
+\[
+x(t)=2,
+\qquad
+-1\leq t\leq0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Solve
+
+\[
+x'(t)
+=
+-x(t-1)
+\]
+
+on the first step interval using a constant history
+
+\[
+x(t)=1,
+\qquad
+-1\leq t\leq0.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain how derivative discontinuities propagate through the method of
+steps.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the characteristic equation
+
+\[
+\lambda
+=
+a
++
+be^{-\lambda\tau}
+\]
+
+for the scalar linear DDE.
+\end{exercise}
+
+\begin{exercise}[3]
+Show that the zero-delay limit of the previous equation is
+
+\[
+x'=(a+b)x.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+For
+
+\[
+x'(t)
+=
+-kx(t-\tau),
+\]
+
+derive the imaginary-axis equations using
+
+\[
+\lambda=i\omega.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the stability threshold
+
+\[
+k\tau=\frac{\pi}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain physically why delay can destabilize negative feedback.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Lambert \(W\) expression for the roots of
+
+\[
+x'=ax+bx(t-\tau).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Linearize the delayed logistic equation around
+
+\[
+P=K.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the delayed logistic stability threshold
+
+\[
+r\tau<\frac{\pi}{2}.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a maturation-delay population model.
+\end{exercise}
+
+\begin{exercise}[3]
+Formulate a delayed feedback-control model.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the characteristic equation for
+
+\[
+\mathbf{x}'
+=
+A\mathbf{x}(t)
++
+B\mathbf{x}(t-\tau).
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the characteristic equation for a linear equation with two
+distinct delays.
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the characteristic equation of a neutral DDE.
+\end{exercise}
+
+\begin{exercise}[3]
+Show how a distributed-delay exponential mode leads to
+
+\[
+\int_0^\tau
+K(s)e^{-\lambda s}\,ds.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Convert a DDE into an integral equation by integrating from \(0\) to
+\(t\).
+\end{exercise}
+
+\begin{exercise}[3]
+Derive the Laplace-transform formula for \(x(t-\tau)\) when a nonzero
+history function is prescribed.
+\end{exercise}
+
+\begin{exercise}[3]
+Construct an Euler approximation for
+
+\[
+x'(t)
+=
+-x(t-1)
+\]
+
+using
+
+\[
+h=0.25.
+\]
+\end{exercise}
+
+\begin{exercise}[3]
+Explain why interpolation is required when
+
+\[
+\tau/h
+\]
+
+is not an integer.
+\end{exercise}
+
+\begin{exercise}[4]
+Study existence and uniqueness theory for retarded functional
+differential equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the solution semigroup on
+
+\[
+C([-\tau,0],\mathbb{R}^n).
+\]
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate spectral theory of linear delay equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Prove the stability threshold for pure delayed negative feedback using
+the argument principle or root-continuation methods.
+\end{exercise}
+
+\begin{exercise}[4]
+Study root crossing direction at a delay-induced Hopf bifurcation.
+\end{exercise}
+
+\begin{exercise}[4]
+Derive Hopf bifurcation conditions for the delayed logistic equation.
+\end{exercise}
+
+\begin{exercise}[4]
+Study normal-form theory for DDE Hopf bifurcations.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate multiple stability switches in equations with several delays.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the Lambert \(W\) branches associated with DDE spectra.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate distributed delays and their Laplace transforms.
+\end{exercise}
+
+\begin{exercise}[4]
+Study the linear-chain trick for gamma-distributed delays.
+\end{exercise}
+
+\begin{exercise}[4]
+Study neutral functional differential equations.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate state-dependent delays.
+\end{exercise}
+
+\begin{exercise}[4]
+Study delayed epidemic models.
+\end{exercise}
+
+\begin{exercise}[4]
+Study delayed predator--prey systems.
+\end{exercise}
+
+\begin{exercise}[4]
+Analyze delayed synchronization in networks.
+\end{exercise}
+
+\begin{exercise}[4]
+Study numerical Runge--Kutta methods for DDEs.
+\end{exercise}
+
+\begin{exercise}[4]
+Investigate interpolation and discontinuity tracking in numerical DDE
+solvers.
+\end{exercise}
+
+\begin{exercise}[4]
+Study numerical bifurcation continuation for periodic DDE solutions.
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conceptual Summary}
+\label{subsec:dde-summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A delay differential equation has the general form
+
+\[
+\boxed{
+x'(t)
+=
+f
+\left(
+t,
+x(t),
+x(t-\tau)
+\right).
+}
+\]
+
+Unlike an ODE, a DDE generally requires a history function
+
+\[
+\boxed{
+x(t)
+=
+\phi(t),
+\qquad
+-\tau\leq t\leq0.
+}
+\]
+
+For a linear scalar DDE,
+
+\[
+\boxed{
+x'(t)
+=
+ax(t)
++
+bx(t-\tau),
+}
+\]
+
+the exponential trial
+
+\[
+x(t)=e^{\lambda t}
+\]
+
+produces the transcendental characteristic equation
+
+\[
+\boxed{
+\lambda
+=
+a
++
+be^{-\lambda\tau}.
+}
+\]
+
+Because of the exponential delay factor, there are generally infinitely
+many characteristic roots.
+
+For pure delayed negative feedback,
+
+\[
+\boxed{
+x'(t)
+=
+-kx(t-\tau),
+}
+\]
+
+the first stability boundary occurs at
+
+\[
+\boxed{
+k\tau
+=
+\frac{\pi}{2}.
+}
+\]
+
+Thus increasing delay can destabilize an otherwise stable feedback
+system.
+
+The state of a DDE is a history segment
+
+\[
+\boxed{
+x_t(\theta)=x(t+\theta),
+}
+\]
+
+so DDEs are naturally infinite-dimensional dynamical systems.
+
+Delay differential equations therefore combine
+
+\[
+\boxed{
+\text{ODEs}
++
+\text{memory}
++
+\text{functional analysis}
++
+\text{stability}
++
+\text{bifurcation theory}.
+}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Section Connections}
+\label{subsec:dde-connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterconnection{
+Delay Differential Equations extend ordinary differential equations by
+allowing present rates of change to depend on past states. Their history
+functions connect naturally with the Volterra and memory formulations of
+Section~\ref{sec:integral-equations}, while their characteristic equations
+extend the stability analysis of Section~\ref{sec:dynamical-systems}.
+Because delayed feedback can generate oscillations and Hopf bifurcations,
+DDEs provide an important bridge between modeling, control theory, and
+infinite-dimensional dynamical systems. The next section,
+Differential-Algebraic Equations, completes Chapter 9 by studying systems
+in which differential evolution is constrained simultaneously by
+algebraic equations.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION SOURCE TRACKING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------
+% 9.7 Delay Differential Equations
+%------------------------------------------------------------
+%
+% Source basis:
+%   - Standard delay differential equation theory.
+%   - Standard functional differential equation stability theory.
+%   - Standard delayed-feedback and mathematical-modeling methods.
+%
+% Used for:
+%   - DDE definitions;
+%   - discrete, multiple, time-dependent, and state-dependent delays;
+%   - distributed delays;
+%   - history functions;
+%   - phase space of DDEs;
+%   - infinite-dimensional interpretation;
+%   - method of steps;
+%   - compatibility and smoothness;
+%   - existence and uniqueness;
+%   - equilibria;
+%   - scalar linear DDEs;
+%   - transcendental characteristic equations;
+%   - infinitely many characteristic roots;
+%   - characteristic-root stability;
+%   - delayed negative feedback;
+%   - imaginary-axis crossings;
+%   - critical-delay calculations;
+%   - delay-induced oscillation;
+%   - Hopf bifurcation;
+%   - Lambert W representation;
+%   - nonlinear DDE linearization;
+%   - delayed logistic equations;
+%   - feedback-control models;
+%   - physiological and epidemiological delays;
+%   - maturation delays;
+%   - linear DDE systems;
+%   - multiple-delay systems;
+%   - neutral DDEs;
+%   - distributed-delay characteristic equations;
+%   - exponential memory kernels;
+%   - state augmentation;
+%   - relation to integral equations;
+%   - Laplace transforms with history;
+%   - numerical DDE methods;
+%   - delayed-state interpolation;
+%   - Euler approximation;
+%   - discontinuity tracking;
+%   - applications and exercises.
+%
+% Notes:
+%   - Differential-Algebraic Equations is developed next in Section 9.8.
+%   - Section 9.8 completes Chapter 9.
+%   - Numerical DDE methods are developed more deeply in Chapter 11.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
