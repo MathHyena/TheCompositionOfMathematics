@@ -7,8 +7,8 @@ import html
 # CONFIGURATION
 # ============================================================
 
-LATEX_FILE = Path("overleaf_source/00_foundations/10_mathematical_writing_problem_solving.tex")
-PTX_FILE = Path("source/01_foundations/10_mathematical_writing_problem_solving.ptx")
+LATEX_FILE = Path("overleaf_source/01_algebra/01_elementary_algebra.tex")
+PTX_FILE = Path("source/02_algebra/01_elementary_algebra.ptx")
 
 PLACEHOLDER_TEXT = "Content for this section will be added here."
 
@@ -803,6 +803,7 @@ def parse_subsections(text):
         return convert_block(text)
 
     output = []
+    used_ids = {}
 
     intro = text[:commands[0]["start"]]
 
@@ -825,10 +826,21 @@ def parse_subsections(text):
 
         label, body = extract_leading_label(body)
 
-        xml_id = (
-            label_to_id(label)
+        section_prefix = "sec-" + slugify(PTX_FILE.stem)
+
+        base_id = (
+            f"{section_prefix}-" + label_to_id(label)
             if label
-            else "subsec-" + slugify(command["title"])
+            else f"{section_prefix}-subsec-" + slugify(command["title"])
+        )
+
+        count = used_ids.get(base_id, 0) + 1
+        used_ids[base_id] = count
+
+        xml_id = (
+            base_id
+            if count == 1
+            else f"{base_id}-{count}"
         )
 
         body_xml = parse_subsubsections(body)
@@ -841,7 +853,6 @@ def parse_subsections(text):
         )
 
     return "\n\n".join(output)
-
 
 def convert_document(text):
     text = strip_comments(text)
