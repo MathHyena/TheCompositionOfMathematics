@@ -1,9 +1,4925 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-09-statistics-07-regression">
-  <title>Regression</title>
+<section xml:id="sec-regression">
+<title>Regression</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Descriptive statistics, covariance, correlation, sampling distributions,
+statistical estimation, confidence intervals, hypothesis testing,
+linear algebra, matrix multiplication, derivatives, optimization, and
+basic probability.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain the purpose of regression modeling;</p>
+</li>
+<li>
+<p>distinguish response and explanatory variables;</p>
+</li>
+<li>
+<p>formulate a simple linear regression model;</p>
+</li>
+<li>
+<p>distinguish population regression parameters from estimated
+          regression coefficients;</p>
+</li>
+<li>
+<p>derive ordinary least squares estimators;</p>
+</li>
+<li>
+<p>interpret slope and intercept coefficients;</p>
+</li>
+<li>
+<p>compute fitted values and residuals;</p>
+</li>
+<li>
+<p>decompose variability using sums of squares;</p>
+</li>
+<li>
+<p>define <m>R^2</m>;</p>
+</li>
+<li>
+<p>connect correlation and simple linear regression;</p>
+</li>
+<li>
+<p>understand assumptions of the classical linear model;</p>
+</li>
+<li>
+<p>derive sampling distributions of OLS estimators under normal
+          errors;</p>
+</li>
+<li>
+<p>construct confidence intervals for regression coefficients;</p>
+</li>
+<li>
+<p>perform <m>t</m>-tests for regression coefficients;</p>
+</li>
+<li>
+<p>construct confidence intervals for the mean response;</p>
+</li>
+<li>
+<p>construct prediction intervals for future observations;</p>
+</li>
+<li>
+<p>distinguish confidence and prediction intervals;</p>
+</li>
+<li>
+<p>formulate multiple linear regression;</p>
+</li>
+<li>
+<p>express regression in matrix form;</p>
+</li>
+<li>
+<p>derive the normal equations;</p>
+</li>
+<li>
+<p>derive the OLS estimator
+          <m>(X^TX)^{-1}X^Ty</m>;</p>
+</li>
+<li>
+<p>interpret partial regression coefficients;</p>
+</li>
+<li>
+<p>understand interaction terms;</p>
+</li>
+<li>
+<p>understand polynomial regression;</p>
+</li>
+<li>
+<p>work with indicator variables;</p>
+</li>
+<li>
+<p>understand categorical predictors;</p>
+</li>
+<li>
+<p>understand adjusted <m>R^2</m>;</p>
+</li>
+<li>
+<p>interpret residual standard error;</p>
+</li>
+<li>
+<p>diagnose nonlinearity, heteroskedasticity, and outliers;</p>
+</li>
+<li>
+<p>understand leverage and influence;</p>
+</li>
+<li>
+<p>define Cook's distance conceptually;</p>
+</li>
+<li>
+<p>understand multicollinearity;</p>
+</li>
+<li>
+<p>interpret variance inflation factors;</p>
+</li>
+<li>
+<p>distinguish interpolation from extrapolation;</p>
+</li>
+<li>
+<p>understand omitted-variable bias conceptually;</p>
+</li>
+<li>
+<p>distinguish association from causation in regression;</p>
+</li>
+<li>
+<p>understand robust standard errors conceptually;</p>
+</li>
+<li>
+<p>recognize weighted least squares;</p>
+</li>
+<li>
+<p>recognize generalized least squares;</p>
+</li>
+<li>
+<p>understand model selection conceptually;</p>
+</li>
+<li>
+<p>recognize ridge and lasso regression;</p>
+</li>
+<li>
+<p>understand logistic regression as a generalized linear model
+          preview;</p>
+</li>
+<li>
+<p>connect regression with ANOVA, experimental design,
+          statistical learning, and mathematical modeling.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-07-regression-subsec-what-is-regression">
+<title>What Is Regression?</title>
+<p>Regression studies relationships between a response variable and one or
+more explanatory variables.</p>
+
+<p>Suppose the response is denoted</p>
+
+<p>
+<md>Y</md>
+</p>
+
+<p>and explanatory variables are denoted</p>
+
+<p>
+<md>X_1,\ldots,X_p.</md>
+</p>
+
+<p>The central goal is to model how the conditional distribution of <m>Y</m>
+changes as the explanatory variables change.</p>
+
+<p>A regression model may be used for:</p>
+
+<p>
+<md>\boxed{
+\text{description},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{prediction},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{estimation},
+}</md>
+</p>
+
+<p>and, under stronger assumptions,</p>
+
+<p>
+<md>\boxed{
+\text{causal analysis}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-response-explanatory-regression">
+<title>Response and Explanatory Variables</title>
+<definition>
+<title>Response Variable</title>
+<statement>
+<p>The response variable is the outcome whose behavior is being modeled or
+predicted.</p>
+</statement>
+</definition>
+
+<definition>
+<title>Explanatory Variable</title>
+<statement>
+<p>An explanatory variable is a variable used to explain, predict, or
+describe changes in the response.</p>
+</statement>
+</definition>
+
+<p>Alternative names include:</p>
+
+<p>
+<md>\boxed{
+\text{predictor},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{covariate},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{independent variable}.
+}</md>
+</p>
+
+<p>The term <q>independent variable</q> does not necessarily imply
+probabilistic independence.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-simple-linear-regression">
+<title>Simple Linear Regression</title>
+<p>The simplest regression model uses one explanatory variable.</p>
+
+<definition>
+<title>Simple Linear Regression Model</title>
+<statement>
+<p>The simple linear regression model is</p>
+
+<p>
+<md>\boxed{
+Y_i
+=
+\beta_0
++
+\beta_1X_i
++
+\varepsilon_i,
+}</md>
+</p>
+
+<p>for</p>
+
+<p>
+<md>i=1,\ldots,n.</md>
+</p>
+</statement>
+</definition>
+
+<p>Here:</p>
+
+<p>
+<md>\boxed{
+\beta_0
+=
+\text{intercept},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\beta_1
+=
+\text{slope},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\varepsilon_i
+=
+\text{random error}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-conditional-mean-regression">
+<title>Conditional Mean Interpretation</title>
+<p>If</p>
+
+<p>
+<md>\mathbb{E}[\varepsilon_i\mid X_i]=0,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[Y_i\mid X_i]
+=
+\beta_0+\beta_1X_i.
+}</md>
+</p>
+
+<p>Thus the regression line describes the conditional mean response.</p>
+
+<p>The model does not state that every observation lies exactly on the line.</p>
+
+<p>Instead,</p>
+
+<p>
+<md>\boxed{
+Y_i
+=
+\text{systematic component}
++
+\text{random deviation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-interpreting-regression-slope">
+<title>Interpreting the Slope</title>
+<p>The slope</p>
+
+<p>
+<md>\beta_1</md>
+</p>
+
+<p>represents the change in the conditional mean response associated with a
+one-unit increase in <m>X</m>.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\Delta
+\mathbb{E}[Y\mid X]
+=
+\beta_1
+}</md>
+</p>
+
+<p>for a one-unit increase in <m>X</m>.</p>
+
+<p>If</p>
+
+<p>
+<md>\beta_1&gt;0,</md>
+</p>
+
+<p>the mean response increases with <m>X</m>.</p>
+
+<p>If</p>
+
+<p>
+<md>\beta_1&lt;0,</md>
+</p>
+
+<p>the mean response decreases with <m>X</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-interpreting-regression-intercept">
+<title>Interpreting the Intercept</title>
+<p>The intercept</p>
+
+<p>
+<md>\beta_0</md>
+</p>
+
+<p>is the predicted mean response when</p>
+
+<p>
+<md>X=0.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\beta_0
+=
+\mathbb{E}[Y\mid X=0].
+}</md>
+</p>
+
+<p>However, the intercept may not have a meaningful scientific
+interpretation if</p>
+
+<p>
+<md>X=0</md>
+</p>
+
+<p>is impossible or far outside the observed range.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-observed-regression-data">
+<title>Observed Data</title>
+<p>Suppose the observed data are</p>
+
+<p>
+<md>(x_1,y_1),
+\ldots,
+(x_n,y_n).</md>
+</p>
+
+<p>The estimated regression line is</p>
+
+<p>
+<md>\boxed{
+\widehat{y}
+=
+b_0+b_1x.
+}</md>
+</p>
+
+<p>The coefficients</p>
+
+<p>
+<md>b_0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>b_1</md>
+</p>
+
+<p>estimate</p>
+
+<p>
+<md>\beta_0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\beta_1.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-residuals">
+<title>Residuals</title>
+<p>For observation <m>i</m>, the fitted value is</p>
+
+<p>
+<md>\boxed{
+\widehat{y}_i
+=
+b_0+b_1x_i.
+}</md>
+</p>
+
+<p>The residual is</p>
+
+<p>
+<md>\boxed{
+e_i
+=
+y_i-\widehat{y}_i.
+}</md>
+</p>
+
+<p>Thus residuals estimate the unobserved errors.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-ordinary-least-squares">
+<title>Ordinary Least Squares</title>
+<p>Ordinary least squares, abbreviated OLS, chooses coefficients minimizing</p>
+
+<p>
+<md>\boxed{
+SSE
+=
+\sum_{i=1}^{n}
+e_i^2.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+(b_0,b_1)
+=
+\arg\min_{a,b}
+\sum_{i=1}^{n}
+(y_i-a-bx_i)^2.
+}</md>
+</p>
+
+<p>This is called the least-squares criterion.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-derive-least-squares">
+<title>Deriving the Least-Squares Equations</title>
+<p>Define</p>
+
+<p>
+<md>Q(a,b)
+=
+\sum_{i=1}^{n}
+(y_i-a-bx_i)^2.</md>
+</p>
+
+<p>Differentiate with respect to <m>a</m>:</p>
+
+<p>
+<md>\frac{\partial Q}{\partial a}
+=
+-2
+\sum_{i=1}^{n}
+(y_i-a-bx_i).</md>
+</p>
+
+<p>Set equal to zero:</p>
+
+<p>
+<md>\sum y_i
+=
+na+b\sum x_i.</md>
+</p>
+
+<p>Differentiate with respect to <m>b</m>:</p>
+
+<p>
+<md>\frac{\partial Q}{\partial b}
+=
+-2
+\sum
+x_i(y_i-a-bx_i).</md>
+</p>
+
+<p>Set equal to zero:</p>
+
+<p>
+<md>\sum x_iy_i
+=
+a\sum x_i
++
+b\sum x_i^2.</md>
+</p>
+
+<p>These are the normal equations.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-slope-estimator">
+<title>Slope Estimator</title>
+<p>Solving the normal equations gives</p>
+
+<p>
+<md>\boxed{
+b_1
+=
+\frac{
+\sum_{i=1}^{n}
+(x_i-\overline{x})
+(y_i-\overline{y})
+}{
+\sum_{i=1}^{n}
+(x_i-\overline{x})^2
+}.
+}</md>
+</p>
+
+<p>Define</p>
+
+<p>
+<md>S_{xx}
+=
+\sum
+(x_i-\overline{x})^2,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>S_{xy}
+=
+\sum
+(x_i-\overline{x})
+(y_i-\overline{y}).</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+b_1
+=
+\frac{S_{xy}}{S_{xx}}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-intercept-estimator">
+<title>Intercept Estimator</title>
+<p>Once the slope is known,</p>
+
+<p>
+<md>\boxed{
+b_0
+=
+\overline{y}
+-
+b_1\overline{x}.
+}</md>
+</p>
+
+<p>Therefore the estimated regression line always passes through</p>
+
+<p>
+<md>\boxed{
+(\overline{x},\overline{y}).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-worked-least-squares-line">
+<title>Worked Example: Least-Squares Line</title>
+<example>
+<title>Fitting a Simple Regression</title>
+<p>Suppose</p>
+
+<p>
+<md>x=(1,2,3)</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y=(2,3,5).</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\overline{x}=2,
+\qquad
+\overline{y}=\frac{10}{3}.</md>
+</p>
+
+<p>Compute</p>
+
+<p>
+<md>S_{xx}
+=
+(1-2)^2
++
+(2-2)^2
++
+(3-2)^2
+=
+2.</md>
+</p>
+
+<p>Also,</p>
+
+<p>
+<md>S_{xy}
+=
+(1-2)
+\left(
+2-\frac{10}{3}
+\right)
++
+(2-2)
+\left(
+3-\frac{10}{3}
+\right)
++
+(3-2)
+\left(
+5-\frac{10}{3}
+\right).</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>S_{xy}
+=
+\frac43+\frac53
+=
+3.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>b_1
+=
+\frac32.</md>
+</p>
+
+<p>The intercept is</p>
+
+<p>
+<md>b_0
+=
+\frac{10}{3}
+-
+\frac32(2)
+=
+\frac13.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\widehat{y}
+=
+\frac13
++
+\frac32x.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-ols-residual-properties">
+<title>Properties of OLS Residuals</title>
+<p>For simple regression with an intercept,</p>
+
+<p>
+<md>\boxed{
+\sum_{i=1}^{n}e_i=0.
+}</md>
+</p>
+
+<p>Also,</p>
+
+<p>
+<md>\boxed{
+\sum_{i=1}^{n}x_ie_i=0.
+}</md>
+</p>
+
+<p>And since fitted values are linear combinations of <m>1</m> and <m>x_i</m>,</p>
+
+<p>
+<md>\boxed{
+\sum_{i=1}^{n}\widehat{y}_ie_i=0.
+}</md>
+</p>
+
+<p>Thus residuals are orthogonal to the fitted regression space.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-mean-fitted-values">
+<title>Mean of the Fitted Values</title>
+<p>Since</p>
+
+<p>
+<md>\sum e_i=0,</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\sum y_i
+=
+\sum\widehat{y}_i.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\overline{\widehat{y}}
+=
+\overline{y}.
+}</md>
+</p>
+
+<p>The fitted values and observed responses have the same sample mean when
+an intercept is included.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-total-sum-squares">
+<title>Total Sum of Squares</title>
+<p>The total variation in the response is</p>
+
+<p>
+<md>\boxed{
+SST
+=
+\sum_{i=1}^{n}
+(y_i-\overline{y})^2.
+}</md>
+</p>
+
+<p>This measures variability of the observations around their mean.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-residual-sum-squares">
+<title>Residual Sum of Squares</title>
+<p>The residual sum of squares is</p>
+
+<p>
+<md>\boxed{
+SSE
+=
+\sum_{i=1}^{n}
+(y_i-\widehat{y}_i)^2.
+}</md>
+</p>
+
+<p>This is the amount of variability not explained by the fitted regression
+line.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-sum-squares">
+<title>Regression Sum of Squares</title>
+<p>The regression sum of squares is</p>
+
+<p>
+<md>\boxed{
+SSR
+=
+\sum_{i=1}^{n}
+(\widehat{y}_i-\overline{y})^2.
+}</md>
+</p>
+
+<p>This measures the variability of the fitted values around the response
+mean.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-anova-decomposition">
+<title>ANOVA Decomposition</title>
+<p>For ordinary least squares with an intercept,</p>
+
+<p>
+<md>\boxed{
+SST
+=
+SSR
++
+SSE.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\text{total variation}
+=
+\text{explained variation}
++
+\text{unexplained variation}.
+}</md>
+</p>
+
+<p>This identity forms the basis of regression ANOVA.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-coefficient-determination">
+<title>Coefficient of Determination</title>
+<p>The coefficient of determination is</p>
+
+<p>
+<md>\boxed{
+R^2
+=
+\frac{SSR}{SST}.
+}</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+R^2
+=
+1-\frac{SSE}{SST}.
+}</md>
+</p>
+
+<p>When an intercept is included,</p>
+
+<p>
+<md>\boxed{
+0\leq R^2\leq1.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-r2-interpretation">
+<title>Interpretation of <m>R^2</m></title>
+<p>An <m>R^2</m> value of</p>
+
+<p>
+<md>0.80</md>
+</p>
+
+<p>means that <m>80\%</m> of the observed sample variation around
+<m>\overline{y}</m> is accounted for by the fitted regression model in the
+sum-of-squares sense.</p>
+
+<p>It does not mean that:</p>
+
+<p>
+<md>\boxed{
+80\%
+\text{ of }Y
+\text{ is caused by }X.
+}</md>
+</p>
+
+<p>Nor does it guarantee accurate prediction outside the observed sample.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-correlation-simple-regression">
+<title>Correlation and Simple Regression</title>
+<p>Recall the sample correlation</p>
+
+<p>
+<md>r
+=
+\frac{
+S_{xy}
+}{
+\sqrt{
+S_{xx}S_{yy}
+}
+},</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>S_{yy}
+=
+\sum
+(y_i-\overline{y})^2.</md>
+</p>
+
+<p>The simple-regression slope is</p>
+
+<p>
+<md>b_1
+=
+\frac{S_{xy}}{S_{xx}}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+b_1
+=
+r
+\frac{s_y}{s_x}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-r2-correlation">
+<title><m>R^2</m> and Correlation</title>
+<p>For simple linear regression with an intercept,</p>
+
+<p>
+<md>\boxed{
+R^2=r^2.
+}</md>
+</p>
+
+<p>Thus the squared Pearson correlation equals the coefficient of
+determination.</p>
+
+<p>This identity is specific to simple linear regression with an intercept.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-worked-slope-correlation">
+<title>Worked Example: Slope from Correlation</title>
+<example>
+<title>Using Standard Deviations and Correlation</title>
+<p>Suppose</p>
+
+<p>
+<md>r=0.75,
+\qquad
+s_x=4,
+\qquad
+s_y=10.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>b_1
+=
+r
+\frac{s_y}{s_x}.</md>
+</p>
+
+<p>Thus,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+b_1
+=
+0.75
+\frac{10}{4}
+=
+1.875.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-classical-linear-regression-assumptions">
+<title>Classical Linear Regression Assumptions</title>
+<p>A common simple linear regression model assumes</p>
+
+<p>
+<md>\boxed{
+Y_i
+=
+\beta_0+\beta_1x_i+\varepsilon_i,
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[\varepsilon_i]=0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(\varepsilon_i)=\sigma^2,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\operatorname{Cov}(\varepsilon_i,\varepsilon_j)=0
+\quad
+(i\neq j).
+}</md>
+</p>
+
+<p>For exact small-sample <m>t</m> and <m>F</m> inference, one commonly also
+assumes</p>
+
+<p>
+<md>\boxed{
+\varepsilon_i
+\overset{\text{ind.}}{\sim}
+N(0,\sigma^2).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-linearity-assumption">
+<title>Linearity Assumption</title>
+<p>The simple linear model assumes</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[Y\mid X=x]
+=
+\beta_0+\beta_1x.
+}</md>
+</p>
+
+<p>This means linearity in the coefficients and in the conditional mean
+structure being modeled.</p>
+
+<p>A visibly curved relationship may require transformations, polynomial
+terms, splines, or another model.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-zero-conditional-mean">
+<title>Zero Conditional Mean</title>
+<p>A central assumption is</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[\varepsilon\mid X]=0.
+}</md>
+</p>
+
+<p>This says that once <m>X</m> is known, the remaining error has no systematic
+mean pattern.</p>
+
+<p>Violation of this condition can arise from:</p>
+
+<p>
+<md>\boxed{
+\text{omitted variables},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{simultaneity},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{selection effects}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-homoskedasticity">
+<title>Homoskedasticity</title>
+<p>Homoskedasticity means</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+\varepsilon_i\mid X_i
+)
+=
+\sigma^2
+}</md>
+</p>
+
+<p>for all observations.</p>
+
+<p>Thus the conditional error variance is constant.</p>
+
+<p>If instead the variance changes with <m>X</m>, the errors are
+heteroskedastic.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-independence-errors-regression">
+<title>Independence of Errors</title>
+<p>In many regression settings one assumes observations are independent.</p>
+
+<p>This may fail for:</p>
+
+<p>
+<md>\boxed{
+\text{time series},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{clustered observations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{spatial data},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{repeated measurements}.
+}</md>
+</p>
+
+<p>Dependence affects standard errors and inference.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-normality-errors-regression">
+<title>Normality of Errors</title>
+<p>Normality is not required to compute least-squares estimates.</p>
+
+<p>It is used to obtain exact finite-sample distributions for many classical
+tests and intervals.</p>
+
+<p>For large samples, asymptotic methods may remain useful under weaker
+conditions.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{normality is mainly an inference assumption, not an OLS existence
+requirement}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-expected-ols-slope">
+<title>Expected Value of the OLS Slope</title>
+<p>For fixed <m>x_i</m>,</p>
+
+<p>
+<md>b_1
+=
+\beta_1
++
+\frac{
+\sum
+(x_i-\overline{x})\varepsilon_i
+}{
+S_{xx}
+}.</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\mathbb{E}[\varepsilon_i]=0,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[b_1]
+=
+\beta_1.
+}</md>
+</p>
+
+<p>Thus the OLS slope is unbiased under the standard zero-mean assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-variance-ols-slope">
+<title>Variance of the OLS Slope</title>
+<p>Under independent homoskedastic errors,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(b_1)
+=
+\frac{
+\sigma^2
+}{
+S_{xx}
+}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\operatorname{SE}(b_1)
+=
+\frac{
+\sigma
+}{
+\sqrt{S_{xx}}
+}.
+}</md>
+</p>
+
+<p>Greater spread in the explanatory values reduces slope uncertainty.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-variance-ols-intercept">
+<title>Variance of the OLS Intercept</title>
+<p>Under the standard assumptions,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(b_0)
+=
+\sigma^2
+\left[
+\frac1n
++
+\frac{
+\overline{x}^2
+}{
+S_{xx}
+}
+\right].
+}</md>
+</p>
+
+<p>Thus the intercept may be estimated imprecisely when <m>x=0</m> lies far
+from the center of the observed <m>x</m>-values.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-covariance-intercept-slope">
+<title>Covariance Between Intercept and Slope</title>
+<p>The covariance is</p>
+
+<p>
+<md>\boxed{
+\operatorname{Cov}(b_0,b_1)
+=
+-
+\frac{
+\overline{x}\sigma^2
+}{
+S_{xx}
+}.
+}</md>
+</p>
+
+<p>If <m>X</m> is centered so that</p>
+
+<p>
+<md>\overline{x}=0,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\operatorname{Cov}(b_0,b_1)=0.
+}</md>
+</p>
+
+<p>Centering can therefore improve coefficient interpretation and numerical
+behavior.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-residual-variance-estimator">
+<title>Residual Variance Estimator</title>
+<p>In simple regression, two parameters</p>
+
+<p>
+<md>\beta_0,
+\qquad
+\beta_1</md>
+</p>
+
+<p>are estimated.</p>
+
+<p>Therefore the residual degrees of freedom are</p>
+
+<p>
+<md>\boxed{
+n-2.
+}</md>
+</p>
+
+<p>The error variance is estimated by</p>
+
+<p>
+<md>\boxed{
+S^2
+=
+\frac{
+SSE
+}{
+n-2
+}.
+}</md>
+</p>
+
+<p>The residual standard error is</p>
+
+<p>
+<md>\boxed{
+S
+=
+\sqrt{
+\frac{
+SSE
+}{
+n-2
+}
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-estimated-se-slope">
+<title>Estimated Standard Error of the Slope</title>
+<p>Replace <m>\sigma</m> by <m>S</m>:</p>
+
+<p>
+<md>\boxed{
+SE(b_1)
+=
+\frac{
+S
+}{
+\sqrt{S_{xx}}
+}.
+}</md>
+</p>
+
+<p>Similarly,</p>
+
+<p>
+<md>\boxed{
+SE(b_0)
+=
+S
+\sqrt{
+\frac1n
++
+\frac{
+\overline{x}^2
+}{
+S_{xx}
+}
+}.
+}</md>
+</p>
+
+<p>These are used in coefficient confidence intervals and tests.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-sampling-distribution-slope">
+<title>Sampling Distribution of the Slope</title>
+<p>Under independent normal errors,</p>
+
+<p>
+<md>b_1</md>
+</p>
+
+<p>is normally distributed:</p>
+
+<p>
+<md>\boxed{
+b_1
+\sim
+N
+\left(
+\beta_1,
+\frac{
+\sigma^2
+}{
+S_{xx}
+}
+\right).
+}</md>
+</p>
+
+<p>After replacing <m>\sigma</m> with <m>S</m>,</p>
+
+<p>
+<md>\boxed{
+\frac{
+b_1-\beta_1
+}{
+SE(b_1)
+}
+\sim
+t_{n-2}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-confidence-interval-slope">
+<title>Confidence Interval for the Slope</title>
+<p>A <m>100(1-\alpha)\%</m> confidence interval for <m>\beta_1</m> is</p>
+
+<p>
+<md>\boxed{
+b_1
+\pm
+t^*_{n-2}
+SE(b_1).
+}</md>
+</p>
+
+<p>This interval quantifies uncertainty in the estimated change in mean
+response per unit change in <m>X</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-hypothesis-test-slope">
+<title>Hypothesis Test for the Slope</title>
+<p>A common hypothesis is</p>
+
+<p>
+<md>\boxed{
+H_0:\beta_1=0.
+}</md>
+</p>
+
+<p>Against the two-sided alternative</p>
+
+<p>
+<md>\boxed{
+H_A:\beta_1\neq0.
+}</md>
+</p>
+
+<p>The test statistic is</p>
+
+<p>
+<md>\boxed{
+T
+=
+\frac{
+b_1
+}{
+SE(b_1)
+}.
+}</md>
+</p>
+
+<p>Under <m>H_0</m> and the normal-error model,</p>
+
+<p>
+<md>\boxed{
+T\sim t_{n-2}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-meaning-zero-slope">
+<title>Meaning of <m>H_0:\beta_1=0</m></title>
+<p>In simple linear regression,</p>
+
+<p>
+<md>\beta_1=0</md>
+</p>
+
+<p>means</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[Y\mid X=x]
+=
+\beta_0
+}</md>
+</p>
+
+<p>for all <m>x</m> under the model.</p>
+
+<p>Thus the conditional mean does not change linearly with <m>X</m>.</p>
+
+<p>This is a statement about linear association, not necessarily complete
+statistical independence.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-worked-testing-slope">
+<title>Worked Example: Testing the Slope</title>
+<example>
+<title>Regression Coefficient Test</title>
+<p>Suppose</p>
+
+<p>
+<md>b_1=2.4</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>SE(b_1)=0.8.</md>
+</p>
+
+<p>Test</p>
+
+<p>
+<md>H_0:\beta_1=0.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>t
+=
+\frac{2.4}{0.8}
+=
+3.</md>
+</p>
+
+<p>The degrees of freedom are <m>n-2</m>.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+t=3.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-ci-mean-response">
+<title>Confidence Interval for the Mean Response</title>
+<p>At a specified predictor value</p>
+
+<p>
+<md>x_0,</md>
+</p>
+
+<p>the estimated mean response is</p>
+
+<p>
+<md>\boxed{
+\widehat{y}_0
+=
+b_0+b_1x_0.
+}</md>
+</p>
+
+<p>Its estimated standard error is</p>
+
+<p>
+<md>\boxed{
+SE_{\text{mean}}
+=
+S
+\sqrt{
+\frac1n
++
+\frac{
+(x_0-\overline{x})^2
+}{
+S_{xx}
+}
+}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\widehat{y}_0
+\pm
+t^*_{n-2}
+SE_{\text{mean}}
+}</md>
+</p>
+
+<p>is a confidence interval for the mean response at <m>x_0</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-prediction-interval-regression">
+<title>Prediction Interval for a New Observation</title>
+<p>A future observation at <m>x_0</m> contains additional individual error.</p>
+
+<p>Thus its prediction standard error is</p>
+
+<p>
+<md>\boxed{
+SE_{\text{pred}}
+=
+S
+\sqrt{
+1
++
+\frac1n
++
+\frac{
+(x_0-\overline{x})^2
+}{
+S_{xx}
+}
+}.
+}</md>
+</p>
+
+<p>The prediction interval is</p>
+
+<p>
+<md>\boxed{
+\widehat{y}_0
+\pm
+t^*_{n-2}
+SE_{\text{pred}}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-confidence-vs-prediction-regression">
+<title>Confidence Versus Prediction Interval</title>
+<p>The mean-response confidence interval estimates</p>
+
+<p>
+<md>\mathbb{E}[Y\mid X=x_0].</md>
+</p>
+
+<p>The prediction interval targets an individual future value</p>
+
+<p>
+<md>Y_{\text{new}}.</md>
+</p>
+
+<p>Because</p>
+
+<p>
+<md>SE_{\text{pred}}
+&gt;
+SE_{\text{mean}},</md>
+</p>
+
+<p>the prediction interval is wider.</p>
+
+<p>The extra <m>1</m> inside the square root represents individual-response
+variability.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-prediction-precision-location">
+<title>Where Prediction Is Most Precise</title>
+<p>Both interval formulas contain</p>
+
+<p>
+<md>(x_0-\overline{x})^2.</md>
+</p>
+
+<p>Therefore uncertainty is smallest near</p>
+
+<p>
+<md>\boxed{
+x_0=\overline{x}.
+}</md>
+</p>
+
+<p>Uncertainty increases as <m>x_0</m> moves farther from the center of the
+observed predictor values.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-extrapolation">
+<title>Extrapolation</title>
+<p>Extrapolation uses a regression model to predict outside the observed
+range of explanatory variables.</p>
+
+<p>For example, if observed <m>X</m>-values range from</p>
+
+<p>
+<md>10</md>
+</p>
+
+<p>to</p>
+
+<p>
+<md>20,</md>
+</p>
+
+<p>predicting at</p>
+
+<p>
+<md>X=100</md>
+</p>
+
+<p>is extrapolation.</p>
+
+<p>The assumed relationship may not continue outside the observed range.</p>
+
+<p>Therefore:</p>
+
+<p>
+<md>\boxed{
+\text{extrapolation can be highly unreliable}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-multiple-linear-regression">
+<title>Multiple Linear Regression</title>
+<p>With several explanatory variables,</p>
+
+<p>
+<md>\boxed{
+Y_i
+=
+\beta_0
++
+\beta_1X_{i1}
++
+\cdots
++
+\beta_pX_{ip}
++
+\varepsilon_i.
+}</md>
+</p>
+
+<p>The conditional mean is</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}
+[
+Y_i
+\mid
+X_{i1},\ldots,X_{ip}
+]
+=
+\beta_0
++
+\sum_{j=1}^{p}
+\beta_jX_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-partial-regression-coefficient">
+<title>Interpretation of a Partial Regression Coefficient</title>
+<p>In multiple regression,</p>
+
+<p>
+<md>\beta_j</md>
+</p>
+
+<p>represents the change in conditional mean response associated with a
+one-unit increase in <m>X_j</m>, while holding the other included
+explanatory variables fixed.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\beta_j
+=
+\text{partial association of }X_j\text{ with }Y
+\text{ given the other predictors}.
+}</md>
+</p>
+
+<p>This interpretation depends on the model specification.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-matrix-form-regression">
+<title>Matrix Form of Regression</title>
+<p>Multiple regression can be written compactly as</p>
+
+<p>
+<md>\boxed{
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+}</md>
+</p>
+
+<p>Here,</p>
+
+<p>
+<md>\mathbf{y}
+=
+\begin{pmatrix}
+y_1\\
+\vdots\\
+y_n
+\end{pmatrix},</md>
+</p>
+
+<p>
+<md>\boldsymbol{\beta}
+=
+\begin{pmatrix}
+\beta_0\\
+\beta_1\\
+\vdots\\
+\beta_p
+\end{pmatrix},</md>
+</p>
+
+<p>and <m>X</m> is the design matrix.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-design-matrix-regression">
+<title>Design Matrix</title>
+<p>If the model contains an intercept, the design matrix is</p>
+
+<p>
+<md>\boxed{
+X
+=
+\begin{pmatrix}
+1 &amp; x_{11} &amp; \cdots &amp; x_{1p}\\
+1 &amp; x_{21} &amp; \cdots &amp; x_{2p}\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+1 &amp; x_{n1} &amp; \cdots &amp; x_{np}
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>X</md>
+</p>
+
+<p>has</p>
+
+<p>
+<md>n</md>
+</p>
+
+<p>rows and</p>
+
+<p>
+<md>p+1</md>
+</p>
+
+<p>columns.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-least-squares-matrix">
+<title>Least Squares in Matrix Form</title>
+<p>OLS minimizes</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{y}-X\boldsymbol{\beta}\|_2^2.
+}</md>
+</p>
+
+<p>Differentiate with respect to <m>\boldsymbol{\beta}</m>:</p>
+
+<p>
+<md>-2X^T
+(
+\mathbf{y}
+-
+X\boldsymbol{\beta}
+)
+=
+0.</md>
+</p>
+
+<p>Therefore the normal equations are</p>
+
+<p>
+<md>\boxed{
+X^TX
+\widehat{\boldsymbol{\beta}}
+=
+X^T\mathbf{y}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-ols-matrix-estimator">
+<title>OLS Matrix Estimator</title>
+<p>If</p>
+
+<p>
+<md>X^TX</md>
+</p>
+
+<p>is invertible, then</p>
+
+<p>
+<md>\boxed{
+\widehat{\boldsymbol{\beta}}
+=
+(X^TX)^{-1}
+X^T\mathbf{y}.
+}</md>
+</p>
+
+<p>This is the ordinary least-squares estimator.</p>
+
+<p>Invertibility requires the columns of <m>X</m> to be linearly independent.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-full-column-rank-regression">
+<title>Full Column Rank</title>
+<p>If the design matrix has</p>
+
+<p>
+<md>p+1</md>
+</p>
+
+<p>columns, full column rank means</p>
+
+<p>
+<md>\boxed{
+\operatorname{rank}(X)
+=
+p+1.
+}</md>
+</p>
+
+<p>If this fails, some predictors are exact linear combinations of others.</p>
+
+<p>Then the individual regression coefficients are not uniquely
+identified by ordinary least squares.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-fitted-values-matrix">
+<title>Fitted Values in Matrix Form</title>
+<p>The fitted vector is</p>
+
+<p>
+<md>\boxed{
+\widehat{\mathbf{y}}
+=
+X
+\widehat{\boldsymbol{\beta}}.
+}</md>
+</p>
+
+<p>Substitute the OLS estimator:</p>
+
+<p>
+<md>\widehat{\mathbf{y}}
+=
+X
+(X^TX)^{-1}
+X^T
+\mathbf{y}.</md>
+</p>
+
+<p>Define the hat matrix</p>
+
+<p>
+<md>\boxed{
+H
+=
+X
+(X^TX)^{-1}
+X^T.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\widehat{\mathbf{y}}
+=
+H\mathbf{y}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-hat-matrix-name">
+<title>Why It Is Called the Hat Matrix</title>
+<p>The matrix <m>H</m> transforms the response vector</p>
+
+<p>
+<md>\mathbf{y}</md>
+</p>
+
+<p>into the fitted vector</p>
+
+<p>
+<md>\widehat{\mathbf{y}}.</md>
+</p>
+
+<p>Thus it <q>puts the hat on @@PROTECTED0@@</q>:</p>
+
+<p>
+<md>\boxed{
+\widehat{\mathbf{y}}
+=
+H\mathbf{y}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-projection-interpretation-regression">
+<title>Projection Interpretation</title>
+<p>The fitted vector is the orthogonal projection of <m>\mathbf{y}</m> onto
+the column space of <m>X</m>.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\widehat{\mathbf{y}}
+\in
+\operatorname{Col}(X).
+}</md>
+</p>
+
+<p>The residual vector</p>
+
+<p>
+<md>\mathbf{e}
+=
+\mathbf{y}
+-
+\widehat{\mathbf{y}}</md>
+</p>
+
+<p>is orthogonal to that column space:</p>
+
+<p>
+<md>\boxed{
+X^T\mathbf{e}
+=
+0.
+}</md>
+</p>
+
+<p>This is the geometric meaning of the normal equations.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-hat-matrix-properties">
+<title>Properties of the Hat Matrix</title>
+<p>The hat matrix satisfies</p>
+
+<p>
+<md>\boxed{
+H^T=H
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+H^2=H.
+}</md>
+</p>
+
+<p>Thus <m>H</m> is symmetric and idempotent.</p>
+
+<p>Its trace is</p>
+
+<p>
+<md>\boxed{
+\operatorname{tr}(H)
+=
+p+1
+}</md>
+</p>
+
+<p>when <m>X</m> has full column rank.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-residual-maker">
+<title>Residual Maker Matrix</title>
+<p>Define</p>
+
+<p>
+<md>\boxed{
+M
+=
+I-H.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\mathbf{e}
+=
+M\mathbf{y}.
+}</md>
+</p>
+
+<p>The matrix <m>M</m> is also symmetric and idempotent.</p>
+
+<p>Its rank is</p>
+
+<p>
+<md>\boxed{
+n-p-1.
+}</md>
+</p>
+
+<p>This equals the residual degrees of freedom.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-unbiasedness-multiple-regression">
+<title>Unbiasedness in Multiple Regression</title>
+<p>Assume</p>
+
+<p>
+<md>\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\mathbb{E}
+[
+\boldsymbol{\varepsilon}\mid X
+]
+=
+\mathbf{0}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\widehat{\boldsymbol{\beta}}
+=
+\boldsymbol{\beta}
++
+(X^TX)^{-1}
+X^T
+\boldsymbol{\varepsilon}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}
+[
+\widehat{\boldsymbol{\beta}}
+\mid X
+]
+=
+\boldsymbol{\beta}.
+}</md>
+</p>
+
+<p>Thus OLS is conditionally unbiased.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-covariance-matrix-ols">
+<title>Covariance Matrix of OLS</title>
+<p>Under homoskedastic independent errors,</p>
+
+<p>
+<md>\operatorname{Var}
+(
+\boldsymbol{\varepsilon}\mid X
+)
+=
+\sigma^2I.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+\widehat{\boldsymbol{\beta}}
+\mid X
+)
+=
+\sigma^2
+(X^TX)^{-1}.
+}</md>
+</p>
+
+<p>This matrix contains the variances and covariances of the estimated
+coefficients.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-residual-variance-multiple-regression">
+<title>Residual Variance in Multiple Regression</title>
+<p>With <m>p</m> predictors and an intercept, the number of estimated
+coefficients is</p>
+
+<p>
+<md>p+1.</md>
+</p>
+
+<p>Therefore the residual degrees of freedom are</p>
+
+<p>
+<md>\boxed{
+n-p-1.
+}</md>
+</p>
+
+<p>The error variance estimator is</p>
+
+<p>
+<md>\boxed{
+S^2
+=
+\frac{
+SSE
+}{
+n-p-1
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-coefficient-standard-errors">
+<title>Coefficient Standard Errors</title>
+<p>Let</p>
+
+<p>
+<md>C
+=
+(X^TX)^{-1}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\operatorname{Var}
+(
+\widehat{\beta}_j
+\mid X
+)
+=
+\sigma^2C_{jj}.</md>
+</p>
+
+<p>The estimated standard error is</p>
+
+<p>
+<md>\boxed{
+SE(\widehat{\beta}_j)
+=
+S\sqrt{C_{jj}}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-coefficient-t-tests">
+<title>Coefficient <m>t</m>-Tests</title>
+<p>To test</p>
+
+<p>
+<md>H_0:
+\beta_j=\beta_{j0},</md>
+</p>
+
+<p>use</p>
+
+<p>
+<md>\boxed{
+T
+=
+\frac{
+\widehat{\beta}_j-\beta_{j0}
+}{
+SE(\widehat{\beta}_j)
+}.
+}</md>
+</p>
+
+<p>Under normal homoskedastic errors,</p>
+
+<p>
+<md>\boxed{
+T
+\sim
+t_{n-p-1}.
+}</md>
+</p>
+
+<p>The most common null is</p>
+
+<p>
+<md>\beta_{j0}=0.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-ci-regression-coefficient">
+<title>Confidence Interval for a Regression Coefficient</title>
+<p>A <m>100(1-\alpha)\%</m> confidence interval is</p>
+
+<p>
+<md>\boxed{
+\widehat{\beta}_j
+\pm
+t^*_{n-p-1}
+SE(\widehat{\beta}_j).
+}</md>
+</p>
+
+<p>This interval describes plausible values for the partial regression
+coefficient under the model assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-overall-f-test-regression">
+<title>Overall <m>F</m>-Test</title>
+<p>For a model with <m>p</m> predictors, a common overall hypothesis is</p>
+
+<p>
+<md>\boxed{
+H_0:
+\beta_1
+=
+\cdots
+=
+\beta_p
+=
+0.
+}</md>
+</p>
+
+<p>The alternative is that at least one slope is nonzero.</p>
+
+<p>Define</p>
+
+<p>
+<md>MSR
+=
+\frac{
+SSR
+}{p}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>MSE
+=
+\frac{
+SSE
+}{
+n-p-1
+}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+F
+=
+\frac{
+MSR
+}{
+MSE
+}.
+}</md>
+</p>
+
+<p>Under the classical null,</p>
+
+<p>
+<md>\boxed{
+F
+\sim
+F_{p,n-p-1}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-anova-table">
+<title>Regression ANOVA Table</title>
+<p>A regression ANOVA table has the structure</p>
+
+<p>
+<md>\begin{array}{c|c|c|c|c}
+\text{Source}
+&amp;
+\text{df}
+&amp;
+\text{SS}
+&amp;
+\text{MS}
+&amp;
+F
+\\
+\hline
+\text{Regression}
+&amp;
+p
+&amp;
+SSR
+&amp;
+SSR/p
+&amp;
+MSR/MSE
+\\
+\text{Error}
+&amp;
+n-p-1
+&amp;
+SSE
+&amp;
+SSE/(n-p-1)
+&amp;
+\\
+\text{Total}
+&amp;
+n-1
+&amp;
+SST
+&amp;
+&amp;
+\end{array}</md>
+</p>
+
+<p>This directly connects regression with analysis of variance.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-adjusted-r-squared">
+<title>Adjusted <m>R^2</m></title>
+<p>Ordinary <m>R^2</m> never decreases when more predictors are added.</p>
+
+<p>Adjusted <m>R^2</m> penalizes model complexity:</p>
+
+<p>
+<md>\boxed{
+R_{\mathrm{adj}}^2
+=
+1
+-
+\frac{
+SSE/(n-p-1)
+}{
+SST/(n-1)
+}.
+}</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+R_{\mathrm{adj}}^2
+=
+1
+-
+(1-R^2)
+\frac{
+n-1
+}{
+n-p-1
+}.
+}</md>
+</p>
+
+<p>Adjusted <m>R^2</m> can decrease when an unhelpful variable is added.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-indicator-variables-regression">
+<title>Indicator Variables</title>
+<p>A categorical variable with two levels can be represented using an
+indicator variable.</p>
+
+<p>For example,</p>
+
+<p>
+<md>D
+=
+\begin{cases}
+1,&amp;\text{group A},\\
+0,&amp;\text{group B}.
+\end{cases}</md>
+</p>
+
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+Y
+=
+\beta_0
++
+\beta_1D
++
+\varepsilon.
+}</md>
+</p>
+
+<p>Then for group B,</p>
+
+<p>
+<md>\mathbb{E}[Y\mid D=0]
+=
+\beta_0.</md>
+</p>
+
+<p>For group A,</p>
+
+<p>
+<md>\mathbb{E}[Y\mid D=1]
+=
+\beta_0+\beta_1.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\beta_1
+=
+\text{difference in group means}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-categorical-predictors-regression">
+<title>Categorical Predictors with Several Levels</title>
+<p>Suppose a categorical predictor has <m>k</m> levels.</p>
+
+<p>With an intercept, one commonly uses</p>
+
+<p>
+<md>\boxed{
+k-1
+}</md>
+</p>
+
+<p>indicator variables.</p>
+
+<p>One category serves as the reference category.</p>
+
+<p>Each indicator coefficient measures a difference relative to that
+reference level.</p>
+
+<p>Including all <m>k</m> indicators together with an intercept creates exact
+linear dependence.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-dummy-variable-trap">
+<title>Dummy Variable Trap</title>
+<p>Suppose</p>
+
+<p>
+<md>D_1+\cdots+D_k=1.</md>
+</p>
+
+<p>If all <m>k</m> category indicators and an intercept are included, then one
+column of the design matrix is an exact linear combination of the
+others.</p>
+
+<p>Thus</p>
+
+<p>
+<md>X^TX</md>
+</p>
+
+<p>is singular.</p>
+
+<p>This problem is sometimes called the dummy-variable trap.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-interaction-terms">
+<title>Interaction Terms</title>
+<p>Suppose the model is</p>
+
+<p>
+<md>\boxed{
+Y
+=
+\beta_0
++
+\beta_1X
++
+\beta_2Z
++
+\beta_3XZ
++
+\varepsilon.
+}</md>
+</p>
+
+<p>The effect of <m>X</m> depends on <m>Z</m>:</p>
+
+<p>
+<md>\frac{
+\partial
+\mathbb{E}[Y\mid X,Z]
+}{
+\partial X
+}
+=
+\boxed{
+\beta_1+\beta_3Z.
+}</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\beta_3</md>
+</p>
+
+<p>measures interaction between <m>X</m> and <m>Z</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-worked-interaction">
+<title>Worked Example: Interaction Interpretation</title>
+<example>
+<title>Different Slopes by Group</title>
+<p>Consider</p>
+
+<p>
+<md>Y
+=
+10
++
+2X
++
+5D
+-
+X D
++
+\varepsilon,</md>
+</p>
+
+<p>where <m>D=0</m> or <m>1</m>.</p>
+
+<p>For <m>D=0</m>,</p>
+
+<p>
+<md>\mathbb{E}[Y\mid X,D=0]
+=
+10+2X.</md>
+</p>
+
+<p>For <m>D=1</m>,</p>
+
+<p>
+<md>\mathbb{E}[Y\mid X,D=1]
+=
+15+X.</md>
+</p>
+
+<p>Thus,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\text{slope for }D=0:2,
+\qquad
+\text{slope for }D=1:1.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-polynomial-regression">
+<title>Polynomial Regression</title>
+<p>A quadratic regression model is</p>
+
+<p>
+<md>\boxed{
+Y
+=
+\beta_0
++
+\beta_1X
++
+\beta_2X^2
++
+\varepsilon.
+}</md>
+</p>
+
+<p>This model is nonlinear in <m>X</m> but linear in the coefficients</p>
+
+<p>
+<md>\beta_0,\beta_1,\beta_2.</md>
+</p>
+
+<p>Therefore ordinary linear-model methods still apply.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-higher-order-polynomial-regression">
+<title>Higher-Order Polynomial Regression</title>
+<p>A degree-<m>k</m> polynomial regression has</p>
+
+<p>
+<md>\boxed{
+Y
+=
+\beta_0
++
+\beta_1X
++
+\cdots
++
+\beta_kX^k
++
+\varepsilon.
+}</md>
+</p>
+
+<p>High-degree polynomials can fit complex shapes but may oscillate
+strongly and extrapolate poorly.</p>
+
+<p>Flexible alternatives such as splines are often preferable.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-transformations">
+<title>Transformations</title>
+<p>Transformations may improve linearity or variance behavior.</p>
+
+<p>Examples include</p>
+
+<p>
+<md>\boxed{
+\log Y,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\sqrt{Y},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\log X,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+1/X.
+}</md>
+</p>
+
+<p>Interpretation must be adjusted to the transformed scale.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-log-linear-regression">
+<title>Log-Linear Regression</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\log Y
+=
+\beta_0+\beta_1X+\varepsilon.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>Y</md>
+</p>
+
+<p>changes multiplicatively as <m>X</m> changes.</p>
+
+<p>A one-unit increase in <m>X</m> multiplies the modeled geometric scale by</p>
+
+<p>
+<md>\boxed{
+e^{\beta_1}.
+}</md>
+</p>
+
+<p>For small <m>\beta_1</m>,</p>
+
+<p>
+<md>100\beta_1\%</md>
+</p>
+
+<p>is approximately the percentage change in <m>Y</m>, under the appropriate
+interpretation.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-log-log-regression">
+<title>Log-Log Regression</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\log Y
+=
+\beta_0
++
+\beta_1\log X
++
+\varepsilon.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\beta_1</md>
+</p>
+
+<p>is an elasticity.</p>
+
+<p>A <m>1\%</m> increase in <m>X</m> is associated with approximately a</p>
+
+<p>
+<md>\boxed{
+\beta_1\%
+}</md>
+</p>
+
+<p>change in the modeled conditional response scale.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-residual-diagnostics">
+<title>Residual Diagnostics</title>
+<p>Residual diagnostics evaluate whether the fitted model is compatible with
+its assumptions.</p>
+
+<p>Useful plots include:</p>
+
+<p>
+<md>\boxed{
+\text{residuals versus fitted values},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{residuals versus predictors},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{normal Q--Q plot},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{scale-location plots}.
+}</md>
+</p>
+
+<p>Patterns in residuals suggest model deficiencies.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-residuals-versus-fitted">
+<title>Residuals Versus Fitted Values</title>
+<p>A well-specified simple regression often produces residuals scattered
+around zero without systematic structure.</p>
+
+<p>A curved pattern may indicate:</p>
+
+<p>
+<md>\boxed{
+\text{nonlinearity}.
+}</md>
+</p>
+
+<p>A funnel shape may indicate:</p>
+
+<p>
+<md>\boxed{
+\text{heteroskedasticity}.
+}</md>
+</p>
+
+<p>Clusters may indicate missing group structure.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-heteroskedasticity">
+<title>Heteroskedasticity</title>
+<p>Heteroskedasticity means</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+\varepsilon_i\mid X_i
+)
+}</md>
+</p>
+
+<p>is not constant.</p>
+
+<p>OLS coefficient estimates can remain unbiased under zero conditional
+mean, but the usual homoskedastic standard-error formulas can be
+incorrect.</p>
+
+<p>Thus the main problem is often inference rather than point estimation.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-robust-standard-errors">
+<title>Heteroskedasticity-Robust Standard Errors</title>
+<p>Heteroskedasticity-consistent covariance estimators replace the
+homoskedastic covariance formula</p>
+
+<p>
+<md>\sigma^2(X^TX)^{-1}</md>
+</p>
+
+<p>with a sandwich estimator.</p>
+
+<p>A schematic form is</p>
+
+<p>
+<md>\boxed{
+(X^TX)^{-1}
+X^T
+\widehat{\Omega}
+X
+(X^TX)^{-1}.
+}</md>
+</p>
+
+<p>Different HC corrections modify the estimate of
+<m>\widehat{\Omega}</m>.</p>
+
+<p>These methods leave OLS coefficients unchanged but adjust their estimated
+uncertainty.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-weighted-least-squares">
+<title>Weighted Least Squares</title>
+<p>If error variances differ in a known or modeled way, weighted least
+squares can improve efficiency.</p>
+
+<p>Minimize</p>
+
+<p>
+<md>\boxed{
+\sum_{i=1}^{n}
+w_i
+(y_i-\widehat{y}_i)^2.
+}</md>
+</p>
+
+<p>Observations with smaller error variance typically receive larger
+weights.</p>
+
+<p>In matrix form,</p>
+
+<p>
+<md>\boxed{
+\widehat{\boldsymbol{\beta}}_{WLS}
+=
+(X^TWX)^{-1}
+X^TW\mathbf{y}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-generalized-least-squares">
+<title>Generalized Least Squares</title>
+<p>Suppose</p>
+
+<p>
+<md>\operatorname{Var}
+(
+\boldsymbol{\varepsilon}
+)
+=
+\Sigma</md>
+</p>
+
+<p>rather than <m>\sigma^2I</m>.</p>
+
+<p>If <m>\Sigma</m> is known and nonsingular, generalized least squares uses</p>
+
+<p>
+<md>\boxed{
+\widehat{\boldsymbol{\beta}}_{GLS}
+=
+(X^T\Sigma^{-1}X)^{-1}
+X^T\Sigma^{-1}\mathbf{y}.
+}</md>
+</p>
+
+<p>This accounts for heteroskedasticity or correlation in the errors.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-normal-qq-regression">
+<title>Normal Q--Q Plot</title>
+<p>A normal Q--Q plot compares ordered residuals with theoretical normal
+quantiles.</p>
+
+<p>Points approximately following a straight line suggest normality may be
+reasonable.</p>
+
+<p>Strong curvature or extreme tail deviations suggest nonnormality.</p>
+
+<p>Normal Q--Q plots are more informative than simply inspecting a
+histogram for small datasets.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-outliers">
+<title>Outliers</title>
+<p>A regression outlier is an observation with an unusual response relative
+to the fitted model.</p>
+
+<p>It may have a large residual.</p>
+
+<p>However, an observation can have a large residual without having unusual
+predictor values.</p>
+
+<p>Thus outlyingness in the response and leverage in the predictors are
+different concepts.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-leverage">
+<title>Leverage</title>
+<p>The diagonal elements</p>
+
+<p>
+<md>h_{ii}</md>
+</p>
+
+<p>of the hat matrix measure leverage.</p>
+
+<p>Since</p>
+
+<p>
+<md>\widehat{\mathbf{y}}
+=
+H\mathbf{y},</md>
+</p>
+
+<p>the value <m>h_{ii}</m> reflects how strongly observation <m>i</m>'s fitted
+value depends on its own observed response.</p>
+
+<p>Large leverage generally occurs for unusual predictor combinations.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-average-leverage">
+<title>Average Leverage</title>
+<p>Because</p>
+
+<p>
+<md>\operatorname{tr}(H)=p+1,</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\sum_{i=1}^{n}
+h_{ii}
+=
+p+1.</md>
+</p>
+
+<p>Therefore the average leverage is</p>
+
+<p>
+<md>\boxed{
+\frac{
+p+1
+}{n}.
+}</md>
+</p>
+
+<p>Values much larger than this average may deserve investigation.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-studentized-residuals">
+<title>Studentized Residuals</title>
+<p>Residual variances differ because</p>
+
+<p>
+<md>\operatorname{Var}(e_i)
+=
+\sigma^2(1-h_{ii}).</md>
+</p>
+
+<p>Therefore a standardized residual uses</p>
+
+<p>
+<md>\boxed{
+r_i
+=
+\frac{
+e_i
+}{
+S\sqrt{1-h_{ii}}
+}.
+}</md>
+</p>
+
+<p>Studentized residuals make residual magnitudes more comparable across
+observations.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-influence">
+<title>Influence</title>
+<p>An observation is influential if removing it substantially changes the
+fitted model.</p>
+
+<p>Influence depends jointly on:</p>
+
+<p>
+<md>\boxed{
+\text{residual size}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{leverage}.
+}</md>
+</p>
+
+<p>A high-leverage point lying exactly on the regression trend may have
+little influence.</p>
+
+<p>A moderate residual combined with extreme leverage can be highly
+influential.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-cooks-distance">
+<title>Cook's Distance</title>
+<p>Cook's distance measures how much fitted values change when observation
+<m>i</m> is removed.</p>
+
+<p>A common form is</p>
+
+<p>
+<md>\boxed{
+D_i
+=
+\frac{
+e_i^2
+}{
+(p+1)S^2
+}
+\frac{
+h_{ii}
+}{
+(1-h_{ii})^2
+}.
+}</md>
+</p>
+
+<p>Large values indicate observations with substantial potential influence.</p>
+
+<p>Thresholds should be used as diagnostics rather than automatic deletion
+rules.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-outlier-deletion-regression">
+<title>Outliers Should Not Be Deleted Automatically</title>
+<p>An unusual observation may represent:</p>
+
+<p>
+<md>\boxed{
+\text{data error},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{rare valid behavior},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{model misspecification},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{a scientifically important subgroup}.
+}</md>
+</p>
+
+<p>Investigation should precede exclusion.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-multicollinearity">
+<title>Multicollinearity</title>
+<p>Multicollinearity occurs when explanatory variables are highly linearly
+related.</p>
+
+<p>Exact multicollinearity makes</p>
+
+<p>
+<md>X^TX</md>
+</p>
+
+<p>singular.</p>
+
+<p>Near multicollinearity makes it poorly conditioned.</p>
+
+<p>Consequences can include:</p>
+
+<p>
+<md>\boxed{
+\text{large coefficient standard errors},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{unstable coefficient signs},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{sensitivity to small data changes}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-variance-inflation-factor">
+<title>Variance Inflation Factor</title>
+<p>For predictor <m>X_j</m>, regress it on the other predictors and let the
+resulting coefficient of determination be</p>
+
+<p>
+<md>R_j^2.</md>
+</p>
+
+<p>Then the variance inflation factor is</p>
+
+<p>
+<md>\boxed{
+VIF_j
+=
+\frac1{
+1-R_j^2
+}.
+}</md>
+</p>
+
+<p>If <m>R_j^2</m> is near <m>1</m>, then <m>VIF_j</m> is large.</p>
+
+<p>This indicates that <m>X_j</m> is highly predictable from the remaining
+predictors.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-multicollinearity-prediction">
+<title>Multicollinearity Does Not Necessarily Harm Prediction</title>
+<p>Severe multicollinearity can make individual coefficient estimates
+unstable.</p>
+
+<p>However, predictions within the observed predictor region may still be
+accurate.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{coefficient interpretation}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{prediction accuracy}
+}</md>
+</p>
+
+<p>are distinct goals.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-omitted-variable-bias">
+<title>Omitted Variable Bias</title>
+<p>Suppose the true model contains</p>
+
+<p>
+<md>Y
+=
+\beta_0+\beta_1X+\beta_2Z+\varepsilon,</md>
+</p>
+
+<p>but <m>Z</m> is omitted.</p>
+
+<p>If <m>Z</m> affects <m>Y</m> and is correlated with <m>X</m>, the estimated
+coefficient on <m>X</m> may absorb part of <m>Z</m>'s effect.</p>
+
+<p>Thus the slope can be systematically distorted.</p>
+
+<p>This is called omitted-variable bias.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-causation">
+<title>Regression and Causation</title>
+<p>A regression coefficient measures conditional association under the
+specified model.</p>
+
+<p>It is not automatically a causal effect.</p>
+
+<p>Causal interpretation may require assumptions involving:</p>
+
+<p>
+<md>\boxed{
+\text{randomization},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{no unmeasured confounding},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{correct temporal ordering},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{appropriate treatment definition}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-simpsons-paradox-regression">
+<title>Simpson's Paradox</title>
+<p>An association observed in aggregated data can reverse after conditioning
+on another variable.</p>
+
+<p>This phenomenon is known as Simpson's paradox.</p>
+
+<p>Regression can help expose such relationships by adjusting for
+additional variables, but adjustment must be scientifically justified.</p>
+
+<p>Conditioning on inappropriate variables can itself create bias.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-confounders-mediators">
+<title>Confounders Versus Mediators</title>
+<p>A confounder influences both an explanatory variable and the outcome.</p>
+
+<p>A mediator lies on a causal pathway from exposure to outcome.</p>
+
+<p>Adjusting for a confounder may reduce bias.</p>
+
+<p>Adjusting for a mediator changes the causal quantity being estimated.</p>
+
+<p>Thus variable selection for causal regression cannot be based only on
+statistical significance.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-model-selection">
+<title>Model Selection</title>
+<p>Model selection determines which explanatory variables or functional
+forms to include.</p>
+
+<p>Possible criteria include:</p>
+
+<p>
+<md>\boxed{
+\text{scientific theory},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{prediction performance},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{AIC},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{BIC},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{cross-validation},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{regularization}.
+}</md>
+</p>
+
+<p>The best procedure depends on the goal.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-adjusted-r2-not-universal">
+<title>Adjusted <m>R^2</m> Is Not a Universal Model Selector</title>
+<p>Adjusted <m>R^2</m> penalizes adding predictors, but it does not directly
+measure:</p>
+
+<p>
+<md>\boxed{
+\text{out-of-sample prediction error},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{causal validity},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{model calibration}.
+}</md>
+</p>
+
+<p>Therefore model selection should not rely on a single statistic.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-aic-preview">
+<title>Akaike Information Criterion Preview</title>
+<p>For a likelihood-based model with <m>k</m> estimated parameters,</p>
+
+<p>
+<md>\boxed{
+AIC
+=
+-2\ell(\widehat{\theta})
++
+2k.
+}</md>
+</p>
+
+<p>Smaller AIC values indicate a better tradeoff between fit and model
+complexity within the candidate model set.</p>
+
+<p>AIC is motivated by predictive information loss rather than by
+hypothesis-testing significance.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-bic-preview">
+<title>Bayesian Information Criterion Preview</title>
+<p>The Bayesian information criterion is</p>
+
+<p>
+<md>\boxed{
+BIC
+=
+-2\ell(\widehat{\theta})
++
+k\ln n.
+}</md>
+</p>
+
+<p>BIC penalizes model complexity more strongly than AIC as sample size
+increases.</p>
+
+<p>Its interpretation differs from that of AIC despite their similar form.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-cross-validation-regression">
+<title>Cross-Validation Preview</title>
+<p>Cross-validation estimates out-of-sample predictive performance.</p>
+
+<p>The dataset is repeatedly divided into training and validation portions.</p>
+
+<p>A model is fit on training data and evaluated on held-out data.</p>
+
+<p>This directly addresses prediction rather than merely in-sample fit.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-overfitting">
+<title>Overfitting</title>
+<p>Overfitting occurs when a model adapts too closely to random noise in the
+training data.</p>
+
+<p>An overfit model may have:</p>
+
+<p>
+<md>\boxed{
+\text{excellent in-sample fit}
+}</md>
+</p>
+
+<p>but</p>
+
+<p>
+<md>\boxed{
+\text{poor out-of-sample prediction}.
+}</md>
+</p>
+
+<p>Adding predictors always reduces or leaves unchanged <m>SSE</m>, so
+training fit alone cannot detect overfitting.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-underfitting">
+<title>Underfitting</title>
+<p>Underfitting occurs when a model is too simple to capture important
+structure.</p>
+
+<p>Examples include fitting a straight line to a strongly curved
+relationship.</p>
+
+<p>Thus model complexity involves a tradeoff:</p>
+
+<p>
+<md>\boxed{
+\text{too simple}
+\longleftrightarrow
+\text{too flexible}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-ridge-regression">
+<title>Ridge Regression</title>
+<p>Ridge regression minimizes</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{y}-X\boldsymbol{\beta}\|_2^2
++
+\lambda
+\sum_{j=1}^{p}
+\beta_j^2.
+}</md>
+</p>
+
+<p>Usually the intercept is not penalized.</p>
+
+<p>The penalty shrinks coefficients toward zero.</p>
+
+<p>For appropriately standardized predictors,</p>
+
+<p>
+<md>\boxed{
+\widehat{\boldsymbol{\beta}}_{\text{ridge}}
+=
+(X^TX+\lambda I)^{-1}
+X^T\mathbf{y}
+}</md>
+</p>
+
+<p>for the penalized coefficient block under the relevant convention.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-why-ridge">
+<title>Why Ridge Regression Helps</title>
+<p>Ridge regression introduces bias but can reduce variance.</p>
+
+<p>It is particularly useful when:</p>
+
+<p>
+<md>\boxed{
+\text{predictors are highly correlated},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+p
+\text{ is large relative to }n.
+}</md>
+</p>
+
+<p>This is an example of the bias--variance tradeoff.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-lasso-regression">
+<title>Lasso Regression</title>
+<p>The lasso minimizes</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{y}-X\boldsymbol{\beta}\|_2^2
++
+\lambda
+\sum_{j=1}^{p}
+|\beta_j|.
+}</md>
+</p>
+
+<p>The <m>L^1</m> penalty can force some estimated coefficients exactly to
+zero.</p>
+
+<p>Thus lasso can perform both:</p>
+
+<p>
+<md>\boxed{
+\text{shrinkage}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{variable selection}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-standardization-regularization">
+<title>Standardization Before Regularization</title>
+<p>Because ridge and lasso penalties depend on coefficient magnitude,
+predictor scale matters.</p>
+
+<p>Therefore predictors are often standardized before fitting a regularized
+model.</p>
+
+<p>Otherwise variables measured in different units may be penalized
+unequally for purely numerical reasons.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-glm-preview">
+<title>Generalized Linear Models Preview</title>
+<p>Linear regression assumes a continuous response with conditional mean
+modeled directly by a linear predictor.</p>
+
+<p>Generalized linear models extend regression to other response
+distributions.</p>
+
+<p>They use:</p>
+
+<p>
+<md>\boxed{
+\text{random component}
++
+\text{linear predictor}
++
+\text{link function}.
+}</md>
+</p>
+
+<p>Examples include logistic and Poisson regression.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-logistic-regression-preview">
+<title>Logistic Regression Preview</title>
+<p>For a binary response,</p>
+
+<p>
+<md>Y\in\{0,1\},</md>
+</p>
+
+<p>let</p>
+
+<p>
+<md>p(x)
+=
+P(Y=1\mid X=x).</md>
+</p>
+
+<p>Logistic regression models the log-odds:</p>
+
+<p>
+<md>\boxed{
+\log
+\left(
+\frac{
+p(x)
+}{
+1-p(x)
+}
+\right)
+=
+\beta_0+\beta_1x.
+}</md>
+</p>
+
+<p>Solving for <m>p(x)</m>,</p>
+
+<p>
+<md>\boxed{
+p(x)
+=
+\frac{
+e^{\beta_0+\beta_1x}
+}{
+1+
+e^{\beta_0+\beta_1x}
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-odds-ratio-logistic-preview">
+<title>Odds-Ratio Interpretation Preview</title>
+<p>In logistic regression,</p>
+
+<p>
+<md>\beta_1</md>
+</p>
+
+<p>is the change in log-odds for a one-unit increase in <m>X</m>.</p>
+
+<p>Exponentiating,</p>
+
+<p>
+<md>\boxed{
+e^{\beta_1}
+}</md>
+</p>
+
+<p>is the multiplicative change in the odds for a one-unit increase in
+<m>X</m>, holding other predictors fixed.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-poisson-regression-preview">
+<title>Poisson Regression Preview</title>
+<p>For count responses, one may model</p>
+
+<p>
+<md>Y_i
+\sim
+\operatorname{Poisson}(\mu_i)</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+\log\mu_i
+=
+\beta_0
++
+\beta_1x_{i1}
++
+\cdots
++
+\beta_px_{ip}.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\mu_i
+=
+\exp
+(
+\beta_0+\cdots+\beta_px_{ip}
+).
+}</md>
+</p>
+
+<p>This guarantees a positive predicted mean.</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-modeling-workflow">
+<title>Regression Modeling Workflow</title>
+<p>A practical regression workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify the response variable;</p>
+</li>
+<li>
+<p>identify candidate explanatory variables;</p>
+</li>
+<li>
+<p>inspect data and scatterplots;</p>
+</li>
+<li>
+<p>define the scientific or predictive goal;</p>
+</li>
+<li>
+<p>specify a model;</p>
+</li>
+<li>
+<p>fit the model;</p>
+</li>
+<li>
+<p>interpret coefficients;</p>
+</li>
+<li>
+<p>examine standard errors and confidence intervals;</p>
+</li>
+<li>
+<p>test scientifically meaningful hypotheses;</p>
+</li>
+<li>
+<p>inspect residual diagnostics;</p>
+</li>
+<li>
+<p>assess leverage and influence;</p>
+</li>
+<li>
+<p>investigate collinearity;</p>
+</li>
+<li>
+<p>evaluate predictive performance;</p>
+</li>
+<li>
+<p>check sensitivity to modeling choices;</p>
+</li>
+<li>
+<p>avoid causal interpretations not supported by the study design.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="id-09-statistics-07-regression-subsubsec-interpreting-association-as-causation">
+<title>Interpreting Association as Causation</title>
+<p>A regression slope is not automatically a causal effect.</p>
+
+<p>Causal interpretation depends on study design and assumptions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-the-meaning-of-holding-other-variables-fixed">
+<title>Ignoring the Meaning of <q>Holding Other Variables Fixed</q></title>
+<p>A multiple-regression coefficient is a partial association conditional
+on the other included variables.</p>
+
+<p>It is not generally the same as the simple bivariate relationship.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interpreting-a-nonsignificant-coefficient-as-no-relationship">
+<title>Interpreting a Nonsignificant Coefficient as No Relationship</title>
+<p>A large standard error may reflect limited data or multicollinearity.</p>
+
+<p>Failure to reject</p>
+
+<p>
+<md>\beta_j=0</md>
+</p>
+
+<p>does not prove the coefficient is exactly zero.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interpreting-a-significant-coefficient-as-important">
+<title>Interpreting a Significant Coefficient as Important</title>
+<p>A very small coefficient can be statistically significant in a large
+sample.</p>
+
+<p>Magnitude and uncertainty should be reported together.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-r-2-as-the-only-measure-of-model-quality">
+<title>Using <m>R^2</m> as the Only Measure of Model Quality</title>
+<p>High <m>R^2</m> does not guarantee:</p>
+
+<p>
+<md>\boxed{
+\text{correct specification},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{good causal interpretation},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{good future prediction}.
+}</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-comparing-r-2-across-unrelated-responses-without-context">
+<title>Comparing <m>R^2</m> Across Unrelated Responses Without Context</title>
+<p>The natural amount of variation differs across scientific settings.</p>
+
+<p>An <m>R^2</m> that is useful in one field may be inadequate or exceptional
+in another.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-residual-patterns">
+<title>Ignoring Residual Patterns</title>
+<p>A good numerical fit can still hide nonlinearity, heteroskedasticity, or
+subgroup structure.</p>
+
+<p>Residual diagnostics should accompany regression fitting.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-deleting-high-leverage-observations-automatically">
+<title>Deleting High-Leverage Observations Automatically</title>
+<p>High leverage alone does not imply an observation is invalid.</p>
+
+<p>It indicates unusual predictor values.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-deleting-large-residuals-automatically">
+<title>Deleting Large Residuals Automatically</title>
+<p>Large residuals can reveal important scientific structure or model
+failure.</p>
+
+<p>Investigate before excluding observations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-multicollinearity">
+<title>Ignoring Multicollinearity</title>
+<p>Highly related predictors can make coefficient estimates unstable even
+when overall prediction remains strong.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-a-linear-model-outside-the-data-range">
+<title>Using a Linear Model Outside the Data Range</title>
+<p>Extrapolation assumes the modeled relationship continues beyond observed
+predictor values.</p>
+
+<p>This assumption may be unjustified.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-prediction-intervals-and-mean-response-intervals">
+<title>Confusing Prediction Intervals and Mean-Response Intervals</title>
+<p>Prediction intervals target individual future observations and are
+wider.</p>
+
+<p>Mean-response intervals target the conditional mean.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-classical-standard-errors-under-heteroskedasticity">
+<title>Using Classical Standard Errors Under Heteroskedasticity</title>
+<p>If error variance is not constant, homoskedastic OLS standard errors can
+be incorrect.</p>
+
+<p>Robust or model-based alternatives may be needed.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-dependence">
+<title>Ignoring Dependence</title>
+<p>Regression errors may be correlated in time, space, clusters, or repeated
+measurements.</p>
+
+<p>Independence-based inference can then underestimate uncertainty.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-adding-variables-solely-because-they-are-significant">
+<title>Adding Variables Solely Because They Are Significant</title>
+<p>Variable selection should reflect the analysis goal and scientific
+structure.</p>
+
+<p>Pure significance-based stepwise procedures can produce unstable
+estimates and invalid post-selection inference.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Scientific Research.</em>
+Regression models quantify relationships among measured variables and
+estimate adjusted associations.</p>
+
+<p>\medskip</p>
+
+<p><em>Engineering.</em>
+Regression predicts system outputs from operating conditions and
+calibrates empirical models.</p>
+
+<p>\medskip</p>
+
+<p><em>Environmental Science.</em>
+Environmental responses may be modeled using temperature, time, depth,
+location, chemical concentration, or other predictors.</p>
+
+<p>\medskip</p>
+
+<p><em>Education Research.</em>
+Regression models student outcomes using preparation, demographics,
+program participation, and other measured variables.</p>
+
+<p>\medskip</p>
+
+<p><em>Economics.</em>
+Regression estimates associations among prices, income, employment,
+policy variables, and economic outcomes.</p>
+
+<p>\medskip</p>
+
+<p><em>Medicine and Epidemiology.</em>
+Regression adjusts for multiple risk factors and models treatment and
+exposure relationships.</p>
+
+<p>\medskip</p>
+
+<p><em>Business.</em>
+Regression predicts demand, costs, sales, conversion rates, and customer
+behavior.</p>
+
+<p>\medskip</p>
+
+<p><em>Machine Learning.</em>
+Linear models, regularization, logistic regression, and generalized
+linear models form the foundation of many predictive algorithms.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define simple linear regression.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the response variable and explanatory variable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Interpret <m>\beta_0</m> and <m>\beta_1</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a fitted value.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a residual.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the ordinary least-squares criterion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define <m>SST</m>, <m>SSR</m>, and <m>SSE</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define <m>R^2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the classical simple linear regression assumptions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define homoskedasticity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define heteroskedasticity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define leverage.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define multicollinearity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a variance inflation factor.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>\widehat{y}
+=
+5+3x.</md>
+</p>
+
+<p>Interpret the slope.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the same model, predict <m>Y</m> at</p>
+
+<p>
+<md>x=4.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If the observed response at <m>x=4</m> is <m>20</m>, compute the residual.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For data with</p>
+
+<p>
+<md>S_{xy}=24</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>S_{xx}=8,</md>
+</p>
+
+<p>compute the OLS slope.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>\overline{x}=5,
+\qquad
+\overline{y}=20,
+\qquad
+b_1=2.</md>
+</p>
+
+<p>Compute the intercept.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>SST=100,
+\qquad
+SSE=25.</md>
+</p>
+
+<p>Compute <m>SSR</m> and <m>R^2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>r=-0.8.</md>
+</p>
+
+<p>Find <m>R^2</m> for simple linear regression with an intercept.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>r=0.5,
+\qquad
+s_y=12,
+\qquad
+s_x=3.</md>
+</p>
+
+<p>Compute the simple-regression slope.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>SSE=90,
+\qquad
+n=12.</md>
+</p>
+
+<p>Compute the residual standard error for simple regression.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>b_1=1.5,
+\qquad
+SE(b_1)=0.5.</md>
+</p>
+
+<p>Compute the <m>t</m>-statistic for testing</p>
+
+<p>
+<md>H_0:\beta_1=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose a multiple regression has <m>n=100</m> observations and <m>p=4</m>
+predictors. Find the residual degrees of freedom.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose a categorical predictor has <m>5</m> categories. How many indicator
+variables are needed with an intercept?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose <m>R_j^2=0.80</m> when <m>X_j</m> is regressed on all remaining
+predictors. Compute <m>VIF_j</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the normal equations for simple linear regression.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive</p>
+
+<p>
+<md>b_1
+=
+\frac{S_{xy}}{S_{xx}}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive</p>
+
+<p>
+<md>b_0
+=
+\overline{y}
+-
+b_1\overline{x}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that the fitted regression line passes through</p>
+
+<p>
+<md>(\overline{x},\overline{y}).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that</p>
+
+<p>
+<md>\sum e_i=0</md>
+</p>
+
+<p>when an intercept is included.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that</p>
+
+<p>
+<md>\sum x_ie_i=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the decomposition</p>
+
+<p>
+<md>SST
+=
+SSR
++
+SSE.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>R^2=r^2</md>
+</p>
+
+<p>in simple linear regression with an intercept.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>b_1
+=
+r
+\frac{s_y}{s_x}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive</p>
+
+<p>
+<md>\operatorname{Var}(b_1)
+=
+\frac{
+\sigma^2
+}{
+S_{xx}
+}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the variance of the intercept estimator.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the covariance between the simple-regression slope and intercept.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the standard error for the estimated mean response at <m>x_0</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the standard error for predicting a future observation at <m>x_0</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why prediction intervals are wider than mean-response confidence
+intervals.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the matrix normal equations</p>
+
+<p>
+<md>X^TX\widehat{\boldsymbol{\beta}}
+=
+X^T\mathbf{y}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive</p>
+
+<p>
+<md>\widehat{\boldsymbol{\beta}}
+=
+(X^TX)^{-1}X^T\mathbf{y}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the hat matrix is symmetric.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the hat matrix is idempotent.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the residual vector is orthogonal to the column space of <m>X</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>\operatorname{Var}
+(
+\widehat{\boldsymbol{\beta}}\mid X
+)
+=
+\sigma^2(X^TX)^{-1}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why exact multicollinearity prevents unique OLS coefficient
+estimation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Interpret the interaction coefficient in</p>
+
+<p>
+<md>Y
+=
+\beta_0
++
+\beta_1X
++
+\beta_2Z
++
+\beta_3XZ
++
+\varepsilon.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why polynomial regression remains a linear model in the
+parameters.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why heteroskedasticity changes standard errors without
+necessarily biasing OLS coefficients.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why an observation can have high leverage but a small residual.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why high <m>R^2</m> does not establish causality.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct an omitted-variable example in which an observed regression
+slope is misleading.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how multicollinearity can inflate coefficient standard errors.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why ridge regression can improve prediction under
+multicollinearity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare ridge and lasso penalties.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the Gauss--Markov theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the Frisch--Waugh--Lovell theorem and partial regression.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the exact normal-theory distribution of the OLS coefficient
+vector.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the overall regression <m>F</m>-test from quadratic forms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study general linear hypotheses of the form</p>
+
+<p>
+<md>H_0:
+R\boldsymbol{\beta}
+=
+\mathbf{r}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the corresponding partial <m>F</m>-test.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study heteroskedasticity-consistent covariance estimators HC0--HC3.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate the Breusch--Pagan test.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate the White test for heteroskedasticity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study generalized least squares under correlated errors.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate autocorrelation and regression with time-series errors.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Cook's distance, DFBETAS, and DFFITS.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate regression splines and smoothing splines.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study ridge regression in terms of singular-value decomposition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the lasso optimization problem and study its geometric
+interpretation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate cross-validation for regression model selection.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study post-selection inference.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate logistic regression through maximum likelihood.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Poisson regression and generalized linear models.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-summary">
+<title>Conceptual Summary</title>
+<p>Simple linear regression models</p>
+
+<p>
+<md>\boxed{
+Y_i
+=
+\beta_0
++
+\beta_1X_i
++
+\varepsilon_i.
+}</md>
+</p>
+
+<p>The conditional mean is</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[Y\mid X]
+=
+\beta_0+\beta_1X.
+}</md>
+</p>
+
+<p>Ordinary least squares minimizes</p>
+
+<p>
+<md>\boxed{
+\sum e_i^2.
+}</md>
+</p>
+
+<p>The simple-regression slope is</p>
+
+<p>
+<md>\boxed{
+b_1
+=
+\frac{
+\sum
+(x_i-\overline{x})
+(y_i-\overline{y})
+}{
+\sum
+(x_i-\overline{x})^2
+}.
+}</md>
+</p>
+
+<p>The intercept is</p>
+
+<p>
+<md>\boxed{
+b_0
+=
+\overline{y}
+-
+b_1\overline{x}.
+}</md>
+</p>
+
+<p>Variation decomposes as</p>
+
+<p>
+<md>\boxed{
+SST
+=
+SSR+SSE.
+}</md>
+</p>
+
+<p>The coefficient of determination is</p>
+
+<p>
+<md>\boxed{
+R^2
+=
+1-\frac{SSE}{SST}.
+}</md>
+</p>
+
+<p>For simple regression,</p>
+
+<p>
+<md>\boxed{
+R^2=r^2.
+}</md>
+</p>
+
+<p>In matrix form,</p>
+
+<p>
+<md>\boxed{
+\mathbf{y}
+=
+X\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\widehat{\boldsymbol{\beta}}
+=
+(X^TX)^{-1}
+X^T\mathbf{y}.
+}</md>
+</p>
+
+<p>Under homoskedastic independent errors,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+\widehat{\boldsymbol{\beta}}
+\mid X
+)
+=
+\sigma^2
+(X^TX)^{-1}.
+}</md>
+</p>
+
+<p>Regression therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{linear algebra}
++
+\text{optimization}
++
+\text{probability}
++
+\text{estimation}
++
+\text{hypothesis testing}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-regression-subsec-regression-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Regression extends the estimation and testing framework developed in
+Sections <xref ref="sec-statistical-estimation" />,
+<xref ref="sec-confidence-intervals" />, and
+<xref ref="sec-hypothesis-testing" /> to models in which a response depends on one
+or more explanatory variables. The least-squares decomposition of
+variation leads directly to the Analysis of Variance framework developed
+in the next section. Multiple regression also provides a foundation for
+experimental design, categorical-data modeling, generalized linear
+models, time series, statistical learning, and high-dimensional
+statistics. Linear Algebra supplies the projection interpretation of OLS,
+while probability theory provides the sampling distributions needed for
+coefficient inference.</p>
+</remark>
+</subsection>
+
 </section>

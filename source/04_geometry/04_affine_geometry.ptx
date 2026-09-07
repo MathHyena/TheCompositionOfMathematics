@@ -1,9 +1,3118 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-04-geometry-04-affine-geometry">
-  <title>Affine Geometry</title>
+<section xml:id="sec-affine-geometry">
+<title>Affine Geometry</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Euclidean Geometry from <xref ref="sec-euclidean-geometry" />,
+Analytic / Coordinate Geometry from
+<xref ref="sec-analytic-coordinate-geometry" />,
+Vector Geometry from <xref ref="sec-vector-geometry" />,
+and Linear Algebra from <xref ref="sec-linear-algebra" />.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>distinguish affine geometry from Euclidean and vector geometry;</p>
+</li>
+<li>
+<p>explain the difference between points and vectors in an affine space;</p>
+</li>
+<li>
+<p>describe affine lines, planes, and higher-dimensional affine subspaces;</p>
+</li>
+<li>
+<p>form and interpret affine combinations;</p>
+</li>
+<li>
+<p>recognize barycentric and convex combinations;</p>
+</li>
+<li>
+<p>characterize affine independence;</p>
+</li>
+<li>
+<p>compute affine hulls and understand affine dimension;</p>
+</li>
+<li>
+<p>use barycentric coordinates for points in simplices;</p>
+</li>
+<li>
+<p>identify affine transformations and their matrix form;</p>
+</li>
+<li>
+<p>determine which geometric properties are preserved by affine transformations;</p>
+</li>
+<li>
+<p>understand translations as affine rather than linear transformations;</p>
+</li>
+<li>
+<p>use homogeneous coordinates to represent affine transformations;</p>
+</li>
+<li>
+<p>recognize parallelism and ratios as fundamental affine invariants;</p>
+</li>
+<li>
+<p>connect affine geometry with convex geometry, projective geometry,
+    computational geometry, and computer graphics.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-what-is-affine-geometry">
+<title>What Is Affine Geometry?</title>
+<p>Euclidean geometry studies properties involving lengths, angles, circles,
+perpendicularity, and distance.</p>
+
+<p>Affine geometry keeps some geometric structure while discarding others.</p>
+
+<definition>
+<title>Affine Geometry</title>
+<statement>
+<p><em>Affine geometry</em> studies geometric properties preserved by affine
+transformations.</p>
+
+<p>These include incidence, collinearity, parallelism, ratios along parallel
+directions, affine combinations, and affine dimension.</p>
+</statement>
+</definition>
+
+<p>Affine geometry does <em>not</em> generally preserve:</p>
+
+<p>
+<ul>
+<li>
+<p>lengths;</p>
+</li>
+<li>
+<p>angles;</p>
+</li>
+<li>
+<p>perpendicularity;</p>
+</li>
+<li>
+<p>circles;</p>
+</li>
+<li>
+<p>ordinary areas or volumes.</p>
+</li>
+</ul>
+</p>
+
+<p>Thus affine geometry lies conceptually between linear algebra and projective
+geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-euclidean-versus-affine">
+<title>Euclidean Versus Affine Geometry</title>
+<p>Consider a square.</p>
+
+<p>Under an affine transformation, it may become a parallelogram.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.75]
+\draw[thick] (0,0)--(2,0)--(2,2)--(0,2)--cycle;
+\node at (1,-0.5) {square};</p>
+
+<p>\draw[-{Latex[length=3mm]},thick] (2.8,1)--(4.2,1);
+\node[above] at (3.5,1) {affine map};</p>
+
+<p>\draw[thick] (5,0)--(7.5,0)--(8.5,2)--(6,2)--cycle;
+\node at (6.75,-0.5) {parallelogram};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>The transformation may change:</p>
+
+<p>
+<md>\text{lengths},\qquad
+\text{angles},\qquad
+\text{area}.</md>
+</p>
+
+<p>But it preserves:</p>
+
+<p>
+<md>\text{lines},\qquad
+\text{parallelism},\qquad
+\text{collinearity}.</md>
+</p>
+
+<p>The square and parallelogram are therefore equivalent from the affine
+viewpoint.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-points-vectors">
+<title>Points and Vectors</title>
+<p>One of the most important distinctions in affine geometry is the distinction
+between <em>points</em> and <em>vectors</em>.</p>
+
+<p>A vector describes a displacement.</p>
+
+<p>A point describes a location.</p>
+
+<p>If <m>P</m> and <m>Q</m> are points, then</p>
+
+<p>
+<md>Q-P</md>
+</p>
+
+<p>is interpreted as the vector from <m>P</m> to <m>Q</m>.</p>
+
+<p>However, adding two points such as</p>
+
+<p>
+<md>P+Q</md>
+</p>
+
+<p>has no intrinsic affine meaning.</p>
+
+<p>By contrast, adding a vector to a point does make sense:</p>
+
+<p>
+<md>P+\mathbf{v}.</md>
+</p>
+
+<p>The result is another point.</p>
+
+<p>\begin{importantbox}
+An affine space has points and displacement vectors, but it has no preferred
+origin.</p>
+
+<p>Choosing an origin allows the affine space to be represented using a vector
+space, but the choice of origin is additional structure.
+\end{importantbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-space">
+<title>Affine Space</title>
+<definition>
+<title>Affine Space</title>
+<statement>
+<p>An <em>affine space</em> consists of a set of points together with a vector
+space of translations acting freely and transitively on those points.</p>
+</statement>
+</definition>
+
+<p>Informally, this means:</p>
+
+<p>
+<ul>
+<li>
+<p>vectors can move points;</p>
+</li>
+<li>
+<p>any point can be moved to any other point by exactly one vector;</p>
+</li>
+<li>
+<p>no point is inherently distinguished as the origin.</p>
+</li>
+</ul>
+</p>
+
+<p>If the underlying vector space is <m>V</m>, the affine space is often denoted</p>
+
+<p>
+<md>A.</md>
+</p>
+
+<p>For points <m>P,Q\in A</m>,</p>
+
+<p>
+<md>Q-P\in V.</md>
+</p>
+
+<p>For <m>P\in A</m> and <m>\mathbf{v}\in V</m>,</p>
+
+<p>
+<md>P+\mathbf{v}\in A.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-translated-vector-space">
+<title>Affine Space as a Translated Vector Space</title>
+<p>Once a point <m>O</m> is chosen as an origin, every point <m>P</m> can be associated
+with the vector</p>
+
+<p>
+<md>P-O.</md>
+</p>
+
+<p>This produces coordinates.</p>
+
+<p>However, another choice of origin gives different coordinate vectors.</p>
+
+<p>The underlying affine relationships remain unchanged.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.9]
+\fill (0,0) circle (2pt);
+\fill (4,2) circle (2pt);
+\fill (1,3) circle (2pt);</p>
+
+<p>\node[below] at (0,0) {<m>O</m>};
+\node[right] at (4,2) {<m>P</m>};
+\node[left] at (1,3) {<m>O'</m>};</p>
+
+<p>\draw[-{Latex[length=3mm]},thick] (0,0)--(4,2);
+\draw[-{Latex[length=3mm]},thick] (1,3)--(4,2);</p>
+
+<p>\node[below right] at (2,1) {<m>P-O</m>};
+\node[above right] at (2.4,2.6) {<m>P-O'</m>};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>The coordinates change, but the point <m>P</m> itself does not.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-combinations">
+<title>Affine Combinations</title>
+<p>Vector Geometry introduced weighted combinations whose coefficients sum to
+one.</p>
+
+<p>These combinations are fundamental in affine geometry.</p>
+
+<definition>
+<title>Affine Combination</title>
+<statement>
+<p>Given points <m>P_1,\ldots,P_k</m>, an <em>affine combination</em> is an
+expression</p>
+
+<p>
+<md>\boxed{
+\lambda_1P_1+\cdots+\lambda_kP_k
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\lambda_1+\cdots+\lambda_k=1.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>The lowercase Greek letter <m>\lambda</m> is <em>lambda</em>, pronounced
+<q>LAM-duh.</q></p>
+
+<p>The condition that the coefficients sum to <m>1</m> makes the expression
+independent of the choice of origin.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-coefficients-sum-one">
+<title>Why Must the Coefficients Sum to One?</title>
+<p>Suppose coordinates are measured relative to an origin <m>O</m>.</p>
+
+<p>If the origin is shifted by a vector <m>\mathbf{a}</m>, then each point
+coordinate changes by the same amount:</p>
+
+<p>
+<md>P_i\mapsto P_i+\mathbf{a}.</md>
+</p>
+
+<p>An affine combination becomes</p>
+
+<p>
+<md>\sum_{i=1}^{k}\lambda_i(P_i+\mathbf{a})
+=
+\sum_{i=1}^{k}\lambda_iP_i
++
+\left(\sum_{i=1}^{k}\lambda_i\right)\mathbf{a}.</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\sum_{i=1}^{k}\lambda_i=1,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\sum_{i=1}^{k}\lambda_i(P_i+\mathbf{a})
+=
+\left(\sum_{i=1}^{k}\lambda_iP_i\right)+\mathbf{a}.</md>
+</p>
+
+<p>Thus the resulting point transforms exactly as a point should under a change
+of origin.</p>
+
+<p>This explains why the coefficient condition is intrinsic to affine
+geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-line-two-points">
+<title>The Affine Line Through Two Points</title>
+<p>Let <m>P\neq Q</m>.</p>
+
+<p>The line through <m>P</m> and <m>Q</m> can be written</p>
+
+<p>
+<md>\boxed{L=\{(1-t)P+tQ:t\in\R\}.}</md>
+</p>
+
+<p>Because</p>
+
+<p>
+<md>(1-t)+t=1,</md>
+</p>
+
+<p>every point on the line is an affine combination of <m>P</m> and <m>Q</m>.</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{L=\{P+t(Q-P):t\in\R\}.}</md>
+</p>
+
+<p>The second form emphasizes a base point and a direction vector.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-segments-rays">
+<title>Segments and Rays</title>
+<p>The parameter range determines which part of the affine line is obtained.</p>
+
+<p>For</p>
+
+<p>
+<md>P+t(Q-P),</md>
+</p>
+
+<p>we have:</p>
+
+<p>
+<md>\begin{array}{c|c}
+\textbf{Parameter} &amp; \textbf{Geometric Set}\\
+\hline
+t\in\R &amp; \text{entire line}\\
+0\leq t\leq1 &amp; \text{segment from \(P\) to \(Q\)}\\
+t\geq0 &amp; \text{ray from \(P\) through \(Q\)}
+\end{array}</md>
+</p>
+
+<p>The segment is therefore the set of convex combinations of two points.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-midpoints">
+<title>Midpoints</title>
+<p>The midpoint of <m>P</m> and <m>Q</m> is</p>
+
+<p>
+<md>\boxed{
+M=\frac12P+\frac12Q.
+}</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>\frac12+\frac12=1,</md>
+</p>
+
+<p>the midpoint is an affine combination.</p>
+
+<p>Affine transformations preserve midpoints.</p>
+
+<p>This fact does not require preservation of distance.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-worked-affine-combination">
+<title>Worked Example: Affine Combination</title>
+<example>
+<title>Computing an Affine Combination</title>
+<p>Let</p>
+
+<p>
+<md>P=(1,2),\qquad Q=(5,6).</md>
+</p>
+
+<p>Find the point</p>
+
+<p>
+<md>R=\frac14P+\frac34Q.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{R=(4,5)}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-subspaces">
+<title>Affine Subspaces</title>
+<p>Linear subspaces must contain the zero vector.</p>
+
+<p>Affine subspaces need not contain the origin.</p>
+
+<definition>
+<title>Affine Subspace</title>
+<statement>
+<p>An <em>affine subspace</em> of a vector space <m>V</m> is a translated linear
+subspace of the form</p>
+
+<p>
+<md>\boxed{P+W=\{P+\mathbf{w}:\mathbf{w}\in W\},}</md>
+</p>
+
+<p>where <m>P</m> is a point and <m>W</m> is a linear subspace.</p>
+</statement>
+</definition>
+
+<p>The linear subspace <m>W</m> describes the directions available within the
+affine subspace.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-linear-versus-affine-subspaces">
+<title>Linear Versus Affine Subspaces</title>
+<p>Consider the lines</p>
+
+<p>
+<md>y=2x</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y=2x+3.</md>
+</p>
+
+<p>The first passes through the origin and corresponds to a one-dimensional
+linear subspace of <m>\R^2</m>.</p>
+
+<p>The second is parallel to the first but does not pass through the origin.</p>
+
+<p>It is an affine subspace, but not a linear subspace.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.65]
+\draw[-&gt;] (-3,0)--(4,0) node[right] {<m>x</m>};
+\draw[-&gt;] (0,-3)--(0,5) node[above] {<m>y</m>};</p>
+
+<p>\draw[thick,domain=-1.5:2] plot (\x,{2*\x});
+\draw[thick,dashed,domain=-3:0.8] plot (\x,{2*\x+3});</p>
+
+<p>\node[right] at (1.7,3.4) {<m>y=2x</m>};
+\node[left] at (-1,1) {<m>y=2x+3</m>};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-direction-space">
+<title>Direction Space</title>
+<p>If an affine subspace is written</p>
+
+<p>
+<md>A=P+W,</md>
+</p>
+
+<p>then <m>W</m> is called its <em>direction space</em>.</p>
+
+<p>Different choices of base point produce the same affine subspace.</p>
+
+<p>If <m>Q\in A</m>, then</p>
+
+<p>
+<md>A=Q+W.</md>
+</p>
+
+<p>Thus the base point is not unique, but the direction space is.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-planes">
+<title>Affine Planes</title>
+<p>An affine plane in <m>\R^3</m> can be written</p>
+
+<p>
+<md>\boxed{
+P+s\mathbf{u}+t\mathbf{v},
+\qquad s,t\in\R,
+}</md>
+</p>
+
+<p>where <m>\mathbf{u}</m> and <m>\mathbf{v}</m> are linearly independent.</p>
+
+<p>The point <m>P</m> determines the location of the plane.</p>
+
+<p>The span</p>
+
+<p>
+<md>\operatorname{span}\{\mathbf{u},\mathbf{v}\}</md>
+</p>
+
+<p>determines its directions.</p>
+
+<p>Thus</p>
+
+<p>
+<md>A=P+\operatorname{span}\{\mathbf{u},\mathbf{v}\}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-hull">
+<title>Affine Hull</title>
+<p>The affine analogue of linear span is the <em>affine hull</em>.</p>
+
+<definition>
+<title>Affine Hull</title>
+<statement>
+<p>The <em>affine hull</em> of points <m>P_1,\ldots,P_k</m> is the set of all affine
+combinations of those points:</p>
+
+<p>
+<md>\boxed{
+\operatorname{aff}\{P_1,\ldots,P_k\}
+=
+\left\{
+\sum_{i=1}^{k}\lambda_iP_i:
+\sum_{i=1}^{k}\lambda_i=1
+\right\}.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>The notation</p>
+
+<p>
+<md>\operatorname{aff}</md>
+</p>
+
+<p>is read <q>affine hull.</q></p>
+
+<p>It is the smallest affine subspace containing the given points.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-hull-differences">
+<title>Affine Hull from Vector Differences</title>
+<p>Choose one point, say <m>P_1</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\operatorname{aff}\{P_1,\ldots,P_k\}
+=
+P_1+
+\operatorname{span}
+\{P_2-P_1,\ldots,P_k-P_1\}.
+}</md>
+</p>
+
+<p>This formula is extremely useful.</p>
+
+<p>It converts an affine problem into a linear-algebra problem involving
+difference vectors.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-worked-affine-hull">
+<title>Worked Example: Affine Hull</title>
+<example>
+<title>Affine Hull of Three Points</title>
+<p>Let</p>
+
+<p>
+<md>P_1=(1,1,1),\qquad
+P_2=(2,1,1),\qquad
+P_3=(1,3,1).</md>
+</p>
+
+<p>Find their affine hull.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\operatorname{aff}\{P_1,P_2,P_3\}=\{(x,y,1):x,y\in\R\}}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-independence">
+<title>Affine Independence</title>
+<p>Linear independence applies to vectors.</p>
+
+<p>Affine independence applies to points.</p>
+
+<definition>
+<title>Affine Independence</title>
+<statement>
+<p>Points</p>
+
+<p>
+<md>P_0,P_1,\ldots,P_k</md>
+</p>
+
+<p>are <em>affinely independent</em> if the vectors</p>
+
+<p>
+<md>\boxed{
+P_1-P_0,\ldots,P_k-P_0
+}</md>
+</p>
+
+<p>are linearly independent.</p>
+</statement>
+</definition>
+
+<p>This definition does not depend on which point is chosen as the base point.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-geometric-affine-independence">
+<title>Geometric Meaning of Affine Independence</title>
+<p>Affine independence generalizes familiar geometric conditions.</p>
+
+<p>
+<md>\begin{array}{c|c}
+\textbf{Points} &amp; \textbf{Affine Independence Means}\\
+\hline
+2 &amp; \text{the points are distinct}\\
+3 &amp; \text{the points are not collinear}\\
+4\text{ in }\R^3 &amp; \text{the points are not coplanar}
+\end{array}</md>
+</p>
+
+<p>More generally, <m>k+1</m> affinely independent points determine a
+<m>k</m>-dimensional affine subspace.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-independence-equivalent">
+<title>Equivalent Test for Affine Independence</title>
+<p>Points <m>P_0,\ldots,P_k</m> are affinely independent if the equations</p>
+
+<p>
+<md>\lambda_0P_0+\cdots+\lambda_kP_k=0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\lambda_0+\cdots+\lambda_k=0</md>
+</p>
+
+<p>together imply</p>
+
+<p>
+<md>\lambda_0=\cdots=\lambda_k=0.</md>
+</p>
+
+<p>The second condition distinguishes affine independence from ordinary linear
+independence of point-coordinate vectors.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-dimension">
+<title>Affine Dimension</title>
+<definition>
+<title>Affine Dimension</title>
+<statement>
+<p>The <em>dimension</em> of an affine subspace</p>
+
+<p>
+<md>A=P+W</md>
+</p>
+
+<p>is defined by</p>
+
+<p>
+<md>\boxed{\dim A=\dim W.}</md>
+</p>
+</statement>
+</definition>
+
+<p>Thus:</p>
+
+<p>
+<md>\begin{array}{c|c}
+\textbf{Affine Object} &amp; \textbf{Dimension}\\
+\hline
+\text{point} &amp; 0\\
+\text{line} &amp; 1\\
+\text{plane} &amp; 2\\
+\text{ordinary three-dimensional affine space} &amp; 3
+\end{array}</md>
+</p>
+
+<p>For a finite set of points, affine dimension can be determined by the rank
+of their difference vectors.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-worked-affine-independence">
+<title>Worked Example: Affine Independence</title>
+<example>
+<title>Testing Three Points for Affine Independence</title>
+<p>Determine whether</p>
+
+<p>
+<md>P=(0,0),\qquad
+Q=(2,1),\qquad
+R=(4,2)</md>
+</p>
+
+<p>are affinely independent.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\text{The points are affinely dependent.}}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-simplices">
+<title>Simplices</title>
+<p>Affine independence produces the basic building blocks known as simplices.</p>
+
+<definition>
+<title>Simplex</title>
+<statement>
+<p>A <m>k</m>-dimensional <em>simplex</em> is the convex hull of <m>k+1</m> affinely
+independent points.</p>
+</statement>
+</definition>
+
+<p>The plural of simplex is <em>simplices</em>.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\begin{array}{c|c}
+k &amp; \textbf{Simplex}\\
+\hline
+0 &amp; \text{point}\\
+1 &amp; \text{line segment}\\
+2 &amp; \text{triangle}\\
+3 &amp; \text{tetrahedron}
+\end{array}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-simplex-visual">
+<title>Simplex Visual</title>
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.8]</p>
+
+<p>\fill (0,1) circle (3pt);
+\node at (0,-0.1) {<m>0</m>-simplex};</p>
+
+<p>\fill (2,1) circle (2.5pt);
+\fill (4,1) circle (2.5pt);
+\draw[thick] (2,1)--(4,1);
+\node at (3,-0.1) {<m>1</m>-simplex};</p>
+
+<p>\coordinate (A) at (5.5,0.4);
+\coordinate (B) at (8,0.4);
+\coordinate (C) at (6.75,2.2);
+\filldraw[fill=gray!12,draw=black,thick] (A)--(B)--(C)--cycle;
+\fill (A) circle (2pt);
+\fill (B) circle (2pt);
+\fill (C) circle (2pt);
+\node at (6.75,-0.1) {<m>2</m>-simplex};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>Higher-dimensional simplices generalize triangles and tetrahedra.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-barycentric-coordinates">
+<title>Barycentric Coordinates</title>
+<p>Affine combinations provide a natural coordinate system relative to a
+simplex.</p>
+
+<definition>
+<title>Barycentric Coordinates</title>
+<statement>
+<p>Let</p>
+
+<p>
+<md>P_0,\ldots,P_k</md>
+</p>
+
+<p>be affinely independent.</p>
+
+<p>Every point <m>P</m> in their affine hull can be written uniquely as</p>
+
+<p>
+<md>\boxed{
+P=\lambda_0P_0+\cdots+\lambda_kP_k,
+\qquad
+\lambda_0+\cdots+\lambda_k=1.
+}</md>
+</p>
+
+<p>The coefficients</p>
+
+<p>
+<md>(\lambda_0,\ldots,\lambda_k)</md>
+</p>
+
+<p>are the <em>barycentric coordinates</em> of <m>P</m> relative to the simplex.</p>
+</statement>
+</definition>
+
+<p>The word <em>barycentric</em> comes from the geometric idea of a center of
+mass.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-barycentric-triangle">
+<title>Barycentric Coordinates in a Triangle</title>
+<p>For a triangle with vertices <m>A,B,C</m>,</p>
+
+<p>
+<md>\boxed{
+P=\lambda_AA+\lambda_BB+\lambda_CC,
+\qquad
+\lambda_A+\lambda_B+\lambda_C=1.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\lambda_A,\lambda_B,\lambda_C\geq0,</md>
+</p>
+
+<p>then <m>P</m> lies inside or on the boundary of the triangle.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.85]
+\coordinate (A) at (0,0);
+\coordinate (B) at (5,0);
+\coordinate (C) at (1.5,3.5);
+\coordinate (P) at (2,1.2);</p>
+
+<p>\filldraw[fill=gray!8,draw=black,thick] (A)--(B)--(C)--cycle;
+\fill (A) circle (2pt);
+\fill (B) circle (2pt);
+\fill (C) circle (2pt);
+\fill (P) circle (2.5pt);</p>
+
+<p>\node[below left] at (A) {<m>A</m>};
+\node[below right] at (B) {<m>B</m>};
+\node[above] at (C) {<m>C</m>};
+\node[right] at (P) {<m>P</m>};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-worked-barycentric-coordinates">
+<title>Worked Example: Barycentric Coordinates</title>
+<example>
+<title>Barycentric Coordinates in a Triangle</title>
+<p>Let</p>
+
+<p>
+<md>A=(0,0),\qquad
+B=(4,0),\qquad
+C=(0,4).</md>
+</p>
+
+<p>Find barycentric coordinates of</p>
+
+<p>
+<md>P=(1,1).</md>
+</p>
+
+<p>Write</p>
+
+<p>
+<md>P=\lambda_AA+\lambda_BB+\lambda_CC.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{(\lambda_A,\lambda_B,\lambda_C)=\left(\frac12,\frac14,\frac14\right)}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-convex-combinations">
+<title>Convex Combinations</title>
+<p>An affine combination becomes a convex combination when all coefficients are
+nonnegative.</p>
+
+<definition>
+<title>Convex Combination</title>
+<statement>
+<p>A <em>convex combination</em> has the form</p>
+
+<p>
+<md>\boxed{
+\lambda_1P_1+\cdots+\lambda_kP_k
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\lambda_i\geq0,
+\qquad
+\sum_{i=1}^{k}\lambda_i=1.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>Convex combinations describe points lying <q>between</q> other points in an
+affine sense.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-convex-hull-affine">
+<title>Convex Hull</title>
+<definition>
+<title>Convex Hull</title>
+<statement>
+<p>The <em>convex hull</em> of points <m>P_1,\ldots,P_k</m> is the set of all convex
+combinations of those points:</p>
+
+<p>
+<md>\boxed{
+\operatorname{conv}\{P_1,\ldots,P_k\}
+=
+\left\{
+\sum_{i=1}^{k}\lambda_iP_i:
+\lambda_i\geq0,\ 
+\sum_{i=1}^{k}\lambda_i=1
+\right\}.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>The notation</p>
+
+<p>
+<md>\operatorname{conv}</md>
+</p>
+
+<p>is read <q>convex hull.</q></p>
+
+<p>For three noncollinear points, the convex hull is the filled triangle.</p>
+
+<p>For four noncoplanar points in <m>\R^3</m>, it is a tetrahedron.</p>
+
+<p>Convexity is developed more fully in Convex Geometry and Convex
+Optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-centroids-affine">
+<title>Centroids as Affine Combinations</title>
+<p>The centroid of points</p>
+
+<p>
+<md>P_1,\ldots,P_k</md>
+</p>
+
+<p>is</p>
+
+<p>
+<md>\boxed{
+G=\frac1k(P_1+\cdots+P_k).
+}</md>
+</p>
+
+<p>Because</p>
+
+<p>
+<md>\frac1k+\cdots+\frac1k=1,</md>
+</p>
+
+<p>the centroid is an affine combination.</p>
+
+<p>For a triangle,</p>
+
+<p>
+<md>\boxed{G=\frac13A+\frac13B+\frac13C.}</md>
+</p>
+
+<p>Affine transformations preserve centroids.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-transformations">
+<title>Affine Transformations</title>
+<p>The central transformations of affine geometry combine a linear
+transformation with a translation.</p>
+
+<definition>
+<title>Affine Transformation</title>
+<statement>
+<p>An <em>affine transformation</em> has the form</p>
+
+<p>
+<md>\boxed{
+T(\mathbf{x})=A\mathbf{x}+\mathbf{b},
+}</md>
+</p>
+
+<p>where <m>A</m> is a linear transformation and <m>\mathbf{b}</m> is a fixed vector.</p>
+</statement>
+</definition>
+
+<p>If <m>A</m> is invertible, then <m>T</m> is an invertible affine transformation,
+also called an <em>affine automorphism</em> of the space.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-linear-as-affine">
+<title>Linear Transformations as Affine Transformations</title>
+<p>If</p>
+
+<p>
+<md>\mathbf{b}=\mathbf{0},</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}.</md>
+</p>
+
+<p>Thus every linear transformation is affine.</p>
+
+<p>But not every affine transformation is linear.</p>
+
+<p>For example,</p>
+
+<p>
+<md>T(\mathbf{x})=\mathbf{x}+\mathbf{b}</md>
+</p>
+
+<p>with <m>\mathbf{b}\neq\mathbf{0}</m> is a translation.</p>
+
+<p>It does not fix the origin and therefore is not a linear transformation.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-basic-affine-transformations">
+<title>Basic Affine Transformations</title>
+<p>Common affine transformations include:</p>
+
+<p>
+<ul>
+<li>
+<p>translations;</p>
+</li>
+<li>
+<p>rotations;</p>
+</li>
+<li>
+<p>reflections;</p>
+</li>
+<li>
+<p>scalings;</p>
+</li>
+<li>
+<p>nonuniform scalings;</p>
+</li>
+<li>
+<p>shears;</p>
+</li>
+<li>
+<p>compositions of these transformations.</p>
+</li>
+</ul>
+</p>
+
+<p>Rotations and reflections are special because they preserve more Euclidean
+structure than general affine transformations.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-translation">
+<title>Translation</title>
+<p>A translation by vector <m>\mathbf{b}</m> is</p>
+
+<p>
+<md>\boxed{T(\mathbf{x})=\mathbf{x}+\mathbf{b}.}</md>
+</p>
+
+<p>Every point moves by the same displacement.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.75]
+\draw[thick] (0,0)--(2,0)--(1,1.8)--cycle;
+\draw[thick,dashed] (4,1)--(6,1)--(5,2.8)--cycle;</p>
+
+<p>\draw[-{Latex[length=3mm]},thick] (1,0.8)--(4.5,1.8);
+\node[above] at (2.7,1.4) {<m>\mathbf{b}</m>};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>Translations preserve all Euclidean distances and angles, and therefore also
+all affine properties.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-scaling">
+<title>Scaling</title>
+<p>A uniform scaling centered at the origin has the form</p>
+
+<p>
+<md>T(\mathbf{x})=c\mathbf{x}.</md>
+</p>
+
+<p>If <m>c\neq0</m>, this is an invertible affine transformation.</p>
+
+<p>Uniform scaling preserves angles but generally changes distances.</p>
+
+<p>Nonuniform scaling may change both lengths and angles.</p>
+
+<p>For example,</p>
+
+<p>
+<md>T(x,y)=(2x,y)</md>
+</p>
+
+<p>stretches horizontally but not vertically.</p>
+
+<p>A circle may therefore become an ellipse.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-shear">
+<title>Shear Transformations</title>
+<p>A <em>shear</em> shifts one coordinate by an amount depending on another.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+T(x,y)=(x+ky,y)
+}</md>
+</p>
+
+<p>has matrix</p>
+
+<p>
+<md>A=
+\begin{pmatrix}
+1&amp;k\\
+0&amp;1
+\end{pmatrix}.</md>
+</p>
+
+<p>A square becomes a parallelogram.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.7]
+\draw[thick] (0,0)--(2,0)--(2,2)--(0,2)--cycle;</p>
+
+<p>\draw[-{Latex[length=3mm]},thick] (2.8,1)--(4,1);</p>
+
+<p>\draw[thick] (5,0)--(7,0)--(8,2)--(6,2)--cycle;</p>
+
+<p>\node at (1,-0.5) {before};
+\node at (6.5,-0.5) {after shear};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>Angles change, but parallel lines remain parallel.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-worked-affine-transformation">
+<title>Worked Example: Affine Transformation</title>
+<example>
+<title>Applying an Affine Transformation</title>
+<p>Let</p>
+
+<p>
+<md>T(\mathbf{x})
+=
+\begin{pmatrix}
+2&amp;1\\
+0&amp;1
+\end{pmatrix}
+\mathbf{x}
++
+\begin{pmatrix}
+3\\
+-2
+\end{pmatrix}.</md>
+</p>
+
+<p>Find <m>T(1,4)</m>.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{T(1,4)=(9,2)}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-transformations-combinations">
+<title>Affine Transformations Preserve Affine Combinations</title>
+<p>Affine transformations interact naturally with affine combinations.</p>
+
+<p>\begin{theorem}[Preservation of Affine Combinations]
+Let</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b}.</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\lambda_1+\cdots+\lambda_k=1,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+T\left(\sum_{i=1}^{k}\lambda_iP_i\right)
+=
+\sum_{i=1}^{k}\lambda_iT(P_i).
+}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>\begin{proof}
+Using the affine form,</p>
+
+<p>
+<md>T\left(\sum_i\lambda_iP_i\right)
+=
+A\left(\sum_i\lambda_iP_i\right)+\mathbf{b}.</md>
+</p>
+
+<p>By linearity,</p>
+
+<p>
+<md>=
+\sum_i\lambda_iAP_i+\mathbf{b}.</md>
+</p>
+
+<p>Since <m>\sum_i\lambda_i=1</m>,</p>
+
+<p>
+<md>\mathbf{b}
+=
+\sum_i\lambda_i\mathbf{b}.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>T\left(\sum_i\lambda_iP_i\right)
+=
+\sum_i\lambda_i(AP_i+\mathbf{b})
+=
+\sum_i\lambda_iT(P_i).</md>
+</p>
+
+<p>Hence affine combinations are preserved.
+\end{proof}</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-lines-map-lines">
+<title>Lines Map to Lines</title>
+<p>Let a line be</p>
+
+<p>
+<md>P+t(Q-P).</md>
+</p>
+
+<p>Applying an affine transformation gives</p>
+
+<p>
+<md>T(P+t(Q-P)).</md>
+</p>
+
+<p>Because this is an affine combination,</p>
+
+<p>
+<md>T(P+t(Q-P))
+=
+T(P)+t(T(Q)-T(P)).</md>
+</p>
+
+<p>Thus an invertible affine transformation maps lines to lines.</p>
+
+<p>Similarly:</p>
+
+<p>
+<ul>
+<li>
+<p>planes map to planes;</p>
+</li>
+<li>
+<p>affine subspaces map to affine subspaces;</p>
+</li>
+<li>
+<p>collinear points remain collinear.</p>
+</li>
+</ul>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-parallelism">
+<title>Parallelism Is Preserved</title>
+<p>Suppose two lines have the same direction vector <m>\mathbf{v}</m>:</p>
+
+<p>
+<md>L_1=P+t\mathbf{v},
+\qquad
+L_2=Q+s\mathbf{v}.</md>
+</p>
+
+<p>Under</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b},</md>
+</p>
+
+<p>their direction vectors become</p>
+
+<p>
+<md>A\mathbf{v}.</md>
+</p>
+
+<p>Thus both transformed lines have the same direction.</p>
+
+<p>For invertible <m>A</m>, nonzero direction vectors remain nonzero.</p>
+
+<p>Therefore parallel lines remain parallel.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-ratios-line">
+<title>Ratios Along a Line</title>
+<p>Suppose <m>P,Q,R</m> are collinear and</p>
+
+<p>
+<md>R=(1-t)P+tQ.</md>
+</p>
+
+<p>The parameter <m>t</m> describes the relative position of <m>R</m> along the line.</p>
+
+<p>Since affine transformations preserve affine combinations,</p>
+
+<p>
+<md>T(R)
+=
+(1-t)T(P)+tT(Q).</md>
+</p>
+
+<p>Thus the same parameter <m>t</m> describes the transformed point.</p>
+
+<p>Consequently, affine transformations preserve ratios of directed segments
+along a line.</p>
+
+<p>In particular, they preserve:</p>
+
+<p>
+<ul>
+<li>
+<p>midpoints;</p>
+</li>
+<li>
+<p>trisection points;</p>
+</li>
+<li>
+<p>centroids;</p>
+</li>
+<li>
+<p>general fixed affine ratios.</p>
+</li>
+</ul>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-invariants">
+<title>What Affine Transformations Preserve</title>
+<p>For invertible affine transformations:</p>
+
+<p>
+<md>\begin{array}{c|c}
+\textbf{Property} &amp; \textbf{Preserved?}\\
+\hline
+points &amp; \text{yes}\\
+lines &amp; \text{yes}\\
+planes &amp; \text{yes}\\
+collinearity &amp; \text{yes}\\
+coplanarity &amp; \text{yes}\\
+parallelism &amp; \text{yes}\\
+affine dimension &amp; \text{yes}\\
+midpoints &amp; \text{yes}\\
+ratios along a line &amp; \text{yes}\\
+convex combinations &amp; \text{yes}\\
+length &amp; \text{not generally}\\
+angle &amp; \text{not generally}\\
+perpendicularity &amp; \text{not generally}\\
+circle shape &amp; \text{not generally}\\
+ordinary area &amp; \text{not generally}
+\end{array}</md>
+</p>
+
+<p>This table summarizes the central distinction between affine and Euclidean
+geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-area-volume-scaling">
+<title>Area and Volume Scaling</title>
+<p>Although an affine transformation need not preserve area or volume, the
+linear part determines how these quantities scale.</p>
+
+<p>For</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b},</md>
+</p>
+
+<p>the translation <m>\mathbf{b}</m> does not affect area or volume.</p>
+
+<p>In two dimensions,</p>
+
+<p>
+<md>\boxed{
+\text{area scale factor}=|\det A|.
+}</md>
+</p>
+
+<p>In three dimensions,</p>
+
+<p>
+<md>\boxed{
+\text{volume scale factor}=|\det A|.
+}</md>
+</p>
+
+<p>More generally, determinants measure oriented volume scaling in the
+appropriate dimension.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-orientation">
+<title>Orientation Under Affine Transformations</title>
+<p>For an invertible affine transformation</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b},</md>
+</p>
+
+<p>the sign of <m>\det A</m> determines whether orientation is preserved.</p>
+
+<p>
+<md>\begin{array}{c|c}
+\det A &amp; \textbf{Effect}\\
+\hline
+&gt;0 &amp; \text{orientation preserved}\\
+&lt;0 &amp; \text{orientation reversed}
+\end{array}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\det A=0,</md>
+</p>
+
+<p>the transformation is not invertible and collapses dimension.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-degenerate-affine-maps">
+<title>Degenerate Affine Maps</title>
+<p>Not every affine map is invertible.</p>
+
+<p>Consider</p>
+
+<p>
+<md>T(x,y)=(x,0).</md>
+</p>
+
+<p>This maps the entire plane onto the <m>x</m>-axis.</p>
+
+<p>Its linear part is</p>
+
+<p>
+<md>A=
+\begin{pmatrix}
+1&amp;0\\
+0&amp;0
+\end{pmatrix},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\det A=0.</md>
+</p>
+
+<p>Thus dimension can collapse under noninvertible affine maps.</p>
+
+<p>When discussing affine equivalence and preservation of dimension, invertible
+affine transformations are therefore essential.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-composition-affine-transformations">
+<title>Composition of Affine Transformations</title>
+<p>Let</p>
+
+<p>
+<md>T_1(\mathbf{x})=A_1\mathbf{x}+\mathbf{b}_1</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>T_2(\mathbf{x})=A_2\mathbf{x}+\mathbf{b}_2.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>T_2(T_1(\mathbf{x}))
+=
+A_2(A_1\mathbf{x}+\mathbf{b}_1)+\mathbf{b}_2.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>\boxed{
+(T_2\circ T_1)(\mathbf{x})
+=
+(A_2A_1)\mathbf{x}
++
+(A_2\mathbf{b}_1+\mathbf{b}_2).
+}</md>
+</p>
+
+<p>The composition of affine transformations is again affine.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-inverse-affine-transformations">
+<title>Inverse Affine Transformations</title>
+<p>Suppose</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b}</md>
+</p>
+
+<p>and <m>A</m> is invertible.</p>
+
+<p>Set</p>
+
+<p>
+<md>\mathbf{y}=A\mathbf{x}+\mathbf{b}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\mathbf{y}-\mathbf{b}=A\mathbf{x},</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>\mathbf{x}=A^{-1}(\mathbf{y}-\mathbf{b}).</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>\boxed{
+T^{-1}(\mathbf{y})
+=
+A^{-1}\mathbf{y}
+-
+A^{-1}\mathbf{b}.
+}</md>
+</p>
+
+<p>Thus the inverse of an invertible affine transformation is also affine.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-group">
+<title>The Affine Group</title>
+<p>The invertible affine transformations of <m>\R^n</m> form a group under
+composition.</p>
+
+<p>This group is called the <em>affine group</em>.</p>
+
+<p>It is commonly denoted</p>
+
+<p>
+<md>\operatorname{Aff}(n,\R).</md>
+</p>
+
+<p>The notation is read <q>the affine group of @@PROTECTED0@@-dimensional real affine
+space.</q></p>
+
+<p>Every element has the form</p>
+
+<p>
+<md>\mathbf{x}\mapsto A\mathbf{x}+\mathbf{b}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>A\in GL(n,\R),\qquad \mathbf{b}\in\R^n.</md>
+</p>
+
+<p>Here <m>GL(n,\R)</m> is the general linear group introduced in Group Theory and
+Linear Algebra.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-homogeneous-coordinates">
+<title>Homogeneous Coordinates</title>
+<p>Translations are affine but not linear in ordinary <m>n</m>-dimensional
+coordinates.</p>
+
+<p>They can be incorporated into matrix multiplication by introducing one
+additional coordinate.</p>
+
+<p>A point</p>
+
+<p>
+<md>\mathbf{x}=(x_1,\ldots,x_n)</md>
+</p>
+
+<p>is represented as</p>
+
+<p>
+<md>\boxed{
+\widetilde{\mathbf{x}}
+=
+\begin{pmatrix}
+x_1\\
+\vdots\\
+x_n\\
+1
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>The tilde in <m>\widetilde{\mathbf{x}}</m> is read <q>x tilde.</q></p>
+
+<p>These are called <em>homogeneous coordinates</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-homogeneous-matrix">
+<title>Affine Transformations as Matrices</title>
+<p>The affine transformation</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b}</md>
+</p>
+
+<p>can be represented by</p>
+
+<p>
+<md>\boxed{
+\begin{pmatrix}
+A &amp; \mathbf{b}\\
+\mathbf{0}^{T} &amp; 1
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\begin{pmatrix}
+A &amp; \mathbf{b}\\
+\mathbf{0}^{T} &amp; 1
+\end{pmatrix}
+\begin{pmatrix}
+\mathbf{x}\\
+1
+\end{pmatrix}
+=
+\begin{pmatrix}
+A\mathbf{x}+\mathbf{b}\\
+1
+\end{pmatrix}.</md>
+</p>
+
+<p>Translation and linear transformation are now represented by one matrix
+multiplication.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-2d-homogeneous-coordinates">
+<title>Two-Dimensional Homogeneous Coordinates</title>
+<p>For</p>
+
+<p>
+<md>T(x,y)=(ax+by+p,cx+dy+q),</md>
+</p>
+
+<p>the homogeneous matrix is</p>
+
+<p>
+<md>\boxed{
+\begin{pmatrix}
+a&amp;b&amp;p\\
+c&amp;d&amp;q\\
+0&amp;0&amp;1
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>It acts on</p>
+
+<p>
+<md>\begin{pmatrix}
+x\\
+y\\
+1
+\end{pmatrix}.</md>
+</p>
+
+<p>This representation is standard in computer graphics, robotics, and
+geometric computation.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-worked-homogeneous-translation">
+<title>Worked Example: Homogeneous Translation</title>
+<example>
+<title>Translation Using Homogeneous Coordinates</title>
+<p>Translate the point</p>
+
+<p>
+<md>P=(2,3)</md>
+</p>
+
+<p>by</p>
+
+<p>
+<md>\mathbf{b}=(4,-1).</md>
+</p>
+
+<p>The homogeneous transformation matrix is</p>
+
+<p>
+<md>T=
+\begin{pmatrix}
+1&amp;0&amp;4\\
+0&amp;1&amp;-1\\
+0&amp;0&amp;1
+\end{pmatrix}.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{T(P)=(6,2)}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-parallel-projective-preview">
+<title>Parallel Lines and Points at Infinity</title>
+<p>Parallel lines are fundamentally different from intersecting lines in affine
+geometry.</p>
+
+<p>For example,</p>
+
+<p>
+<md>y=0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y=1</md>
+</p>
+
+<p>never meet in the affine plane.</p>
+
+<p>Projective geometry extends affine geometry by introducing ideal points so
+that parallel lines can be regarded as meeting at points at infinity.</p>
+
+<p>This idea motivates the next section on Projective Geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-coordinate-changes">
+<title>Affine Geometry and Coordinate Changes</title>
+<p>Changing an affine coordinate system involves choosing:</p>
+
+<p>
+<ul>
+<li>
+<p>a new origin;</p>
+</li>
+<li>
+<p>a new basis of direction vectors.</p>
+</li>
+</ul>
+</p>
+
+<p>If the old coordinates are <m>\mathbf{x}</m> and the new coordinates are
+<m>\mathbf{x}'</m>, the relationship has affine form</p>
+
+<p>
+<md>\boxed{\mathbf{x}=A\mathbf{x}'+\mathbf{b}.}</md>
+</p>
+
+<p>Thus affine transformations naturally describe changes between coordinate
+frames.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-frames">
+<title>Affine Frames</title>
+<p>An affine coordinate system can be specified by a point <m>O</m> and a basis</p>
+
+<p>
+<md>\mathbf{e}_1,\ldots,\mathbf{e}_n</md>
+</p>
+
+<p>of the direction space.</p>
+
+<p>Every point <m>P</m> can then be written uniquely as</p>
+
+<p>
+<md>\boxed{
+P=O+x_1\mathbf{e}_1+\cdots+x_n\mathbf{e}_n.
+}</md>
+</p>
+
+<p>The collection</p>
+
+<p>
+<md>(O;\mathbf{e}_1,\ldots,\mathbf{e}_n)</md>
+</p>
+
+<p>is called an <em>affine frame</em>.</p>
+
+<p>Unlike a vector-space basis, an affine frame includes a chosen origin.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-map-frame">
+<title>Affine Maps Determined by a Frame</title>
+<p>An affine transformation in <m>n</m>-dimensional space is determined by its
+action on <m>n+1</m> affinely independent points.</p>
+
+<p>For example, an affine transformation of the plane is determined by where it
+sends three noncollinear points.</p>
+
+<p>An affine transformation of three-dimensional space is determined by where
+it sends four noncoplanar points.</p>
+
+<p>This follows because affine transformations preserve affine combinations.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-worked-determine-affine-map">
+<title>Worked Example: Determining an Affine Map</title>
+<example>
+<title>Affine Map from Three Points</title>
+<p>Suppose an affine map <m>T:\R^2\to\R^2</m> satisfies</p>
+
+<p>
+<md>T(0,0)=(1,1),\qquad
+T(1,0)=(3,1),\qquad
+T(0,1)=(2,4).</md>
+</p>
+
+<p>Find <m>T(x,y)</m>.</p>
+
+<p>Write</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b}.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+
+<p>Therefore</p>
+
+<p>
+<md>T(x,y)
+=
+\begin{pmatrix}
+2&amp;1\\
+0&amp;3
+\end{pmatrix}
+\begin{pmatrix}
+x\\
+y
+\end{pmatrix}
++
+\begin{pmatrix}
+1\\
+1
+\end{pmatrix}.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{T(x,y)=(2x+y+1,\,3y+1)}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-equivalence">
+<title>Affine Equivalence</title>
+<p>Two geometric figures are <em>affinely equivalent</em> if an invertible affine
+transformation maps one onto the other.</p>
+
+<p>For example:</p>
+
+<p>
+<ul>
+<li>
+<p>every nondegenerate triangle is affinely equivalent to every other
+    nondegenerate triangle;</p>
+</li>
+<li>
+<p>every parallelogram is affinely equivalent to a square;</p>
+</li>
+<li>
+<p>every nondegenerate ellipse is affinely equivalent to a circle.</p>
+</li>
+</ul>
+</p>
+
+<p>Thus affine geometry classifies figures more coarsely than Euclidean
+geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-triangles-affinely-equivalent">
+<title>Triangles Are Affinely Equivalent</title>
+<p>Let</p>
+
+<p>
+<md>A,B,C</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>A',B',C'</md>
+</p>
+
+<p>be two triples of noncollinear points.</p>
+
+<p>Because each triple forms an affine frame for the plane, there exists a
+unique affine transformation satisfying</p>
+
+<p>
+<md>T(A)=A',\qquad
+T(B)=B',\qquad
+T(C)=C'.</md>
+</p>
+
+<p>Consequently, any affine property proved for one convenient triangle can be
+transferred to every nondegenerate triangle.</p>
+
+<p>This is a powerful proof strategy.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-proof-strategy">
+<title>Affine Proof Strategy</title>
+<p>Suppose a geometric statement is invariant under affine transformations.</p>
+
+<p>Instead of proving it for an arbitrary triangle, one may transform the
+triangle into a convenient reference triangle such as</p>
+
+<p>
+<md>(0,0),\qquad
+(1,0),\qquad
+(0,1).</md>
+</p>
+
+<p>The theorem can then be proved using simple coordinates.</p>
+
+<p>If every part of the statement is affine invariant, the result transfers
+back to the original triangle.</p>
+
+<p>\begin{warningbox}
+This method cannot be used blindly for statements involving lengths, angles,
+perpendicularity, or circles because these are not general affine
+invariants.
+\end{warningbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-ceva-structure">
+<title>Ceva-Type Affine Structure</title>
+<p>Many classical triangle theorems depend only on:</p>
+
+<p>
+<ul>
+<li>
+<p>lines;</p>
+</li>
+<li>
+<p>intersections;</p>
+</li>
+<li>
+<p>ratios of points along sides.</p>
+</li>
+</ul>
+</p>
+
+<p>Such statements often have affine interpretations.</p>
+
+<p>For example, concurrency properties involving cevians and ratios along the
+sides of a triangle survive invertible affine transformations.</p>
+
+<p>This provides a bridge between classical Euclidean geometry and more
+structural geometric reasoning.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-linear-equations">
+<title>Affine Geometry and Linear Equations</title>
+<p>Systems of linear equations naturally define affine subspaces.</p>
+
+<p>A system</p>
+
+<p>
+<md>A\mathbf{x}=\mathbf{b}</md>
+</p>
+
+<p>has solution set</p>
+
+<p>
+<md>\mathbf{x}=\mathbf{x}_0+\mathbf{v},</md>
+</p>
+
+<p>where <m>\mathbf{x}_0</m> is one particular solution and</p>
+
+<p>
+<md>\mathbf{v}\in\ker A.</md>
+</p>
+
+<p>Thus, whenever the system is consistent,</p>
+
+<p>
+<md>\boxed{
+\{\mathbf{x}:A\mathbf{x}=\mathbf{b}\}
+=
+\mathbf{x}_0+\ker A.
+}</md>
+</p>
+
+<p>The solution set is therefore an affine translate of the null space.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-solution-set-affine">
+<title>Example: Solution Set as an Affine Space</title>
+<p>Consider</p>
+
+<p>
+<md>x+y+z=1.</md>
+</p>
+
+<p>A particular solution is</p>
+
+<p>
+<md>(1,0,0).</md>
+</p>
+
+<p>The corresponding homogeneous equation is</p>
+
+<p>
+<md>x+y+z=0.</md>
+</p>
+
+<p>Therefore the solution plane is</p>
+
+<p>
+<md>\boxed{
+(1,0,0)+
+\{(x,y,z):x+y+z=0\}.
+}</md>
+</p>
+
+<p>The first set specifies location.</p>
+
+<p>The second specifies direction.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-convex-geometry">
+<title>Affine Geometry and Convex Geometry</title>
+<p>Convex geometry is built naturally on affine geometry.</p>
+
+<p>Convexity depends on line segments:</p>
+
+<p>
+<md>(1-t)P+tQ,\qquad0\leq t\leq1.</md>
+</p>
+
+<p>Because affine transformations preserve these combinations, they preserve
+convexity.</p>
+
+<p>If <m>C</m> is convex and <m>T</m> is affine, then</p>
+
+<p>
+<md>T(C)</md>
+</p>
+
+<p>is convex.</p>
+
+<p>This makes affine transformations central tools in convex analysis and
+optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-computational-geometry">
+<title>Affine Geometry and Computational Geometry</title>
+<p>Computational geometry frequently uses affine concepts such as:</p>
+
+<p>
+<ul>
+<li>
+<p>orientation;</p>
+</li>
+<li>
+<p>convex hulls;</p>
+</li>
+<li>
+<p>barycentric coordinates;</p>
+</li>
+<li>
+<p>point-in-triangle tests;</p>
+</li>
+<li>
+<p>simplex representations;</p>
+</li>
+<li>
+<p>affine transformations;</p>
+</li>
+<li>
+<p>coordinate changes.</p>
+</li>
+</ul>
+</p>
+
+<p>Barycentric coordinates are especially useful because they allow points to
+be represented relative to triangle or tetrahedron vertices.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-computer-graphics">
+<title>Affine Geometry and Computer Graphics</title>
+<p>Computer graphics uses affine transformations to manipulate objects.</p>
+
+<p>Typical operations include:</p>
+
+<p>
+<md>\text{translate},
+\quad
+\text{rotate},
+\quad
+\text{scale},
+\quad
+\text{reflect},
+\quad
+\text{shear}.</md>
+</p>
+
+<p>Using homogeneous coordinates, all of these can be represented by matrices.</p>
+
+<p>Complex transformations can therefore be composed by matrix multiplication.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-robotics">
+<title>Affine Geometry and Robotics</title>
+<p>Robotic systems use coordinate frames to describe positions of:</p>
+
+<p>
+<ul>
+<li>
+<p>joints;</p>
+</li>
+<li>
+<p>sensors;</p>
+</li>
+<li>
+<p>tools;</p>
+</li>
+<li>
+<p>objects;</p>
+</li>
+<li>
+<p>world coordinates.</p>
+</li>
+</ul>
+</p>
+
+<p>Changing between frames requires transformations combining rotations and
+translations.</p>
+
+<p>These are special affine transformations.</p>
+
+<p>Homogeneous transformation matrices allow these operations to be composed
+efficiently.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-statistics">
+<title>Affine Geometry and Statistics</title>
+<p>Affine transformations also appear in statistics.</p>
+
+<p>Data vectors may be transformed by</p>
+
+<p>
+<md>\mathbf{y}=A\mathbf{x}+\mathbf{b}.</md>
+</p>
+
+<p>Translation changes the location of a data cloud, while <m>A</m> may rotate,
+scale, or shear it.</p>
+
+<p>Many multivariate statistical methods study quantities whose behavior under
+affine transformations is important.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-projective-connection">
+<title>Affine Geometry and Projective Geometry</title>
+<p>Affine geometry preserves parallelism.</p>
+
+<p>Projective geometry removes the special distinction between parallel and
+intersecting lines by adding points at infinity.</p>
+
+<p>Conceptually,</p>
+
+<p>
+<md>\boxed{
+\text{Euclidean Geometry}
+\longrightarrow
+\text{Affine Geometry}
+\longrightarrow
+\text{Projective Geometry}
+}</md>
+</p>
+
+<p>successively forgets geometric structure.</p>
+
+<p>Euclidean geometry remembers distances and angles.</p>
+
+<p>Affine geometry remembers parallelism but not general distance or angle.</p>
+
+<p>Projective geometry remembers incidence but does not preserve affine
+parallelism as a distinguished relation.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-geometric-structure-hierarchy">
+<title>Hierarchy of Geometric Structure</title>
+<p>A useful structural picture is:</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[
+node distance=9mm,
+every node/.style={draw,rounded corners,minimum width=4.5cm,
+minimum height=8mm,align=center}
+]
+\node (e) {Euclidean Geometry};
+\node (a) [below=of e] {Affine Geometry};
+\node (p) [below=of a] {Projective Geometry};</p>
+
+<p>\draw[-{Latex[length=3mm]},thick] (e)--(a)
+node[midway,right,draw=none,minimum width=0pt] {forget metric structure};</p>
+
+<p>\draw[-{Latex[length=3mm]},thick] (a)--(p)
+node[midway,right,draw=none,minimum width=0pt] {forget affine structure};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>Each step retains fewer invariants and permits a larger class of
+transformations.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-geometry-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-treating-points-as-ordinary-vectors">
+<title>Treating Points as Ordinary Vectors</title>
+<p>Although coordinates allow points to be represented numerically by vectors,
+affine geometry distinguishes locations from displacements.</p>
+
+<p>The expression</p>
+
+<p>
+<md>Q-P</md>
+</p>
+
+<p>has intrinsic meaning as a vector.</p>
+
+<p>The expression</p>
+
+<p>
+<md>P+Q</md>
+</p>
+
+<p>does not have intrinsic affine meaning without additional structure.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-the-sum-to-one-condition">
+<title>Forgetting the Sum-to-One Condition</title>
+<p>An affine combination requires</p>
+
+<p>
+<md>\boxed{\sum_i\lambda_i=1.}</md>
+</p>
+
+<p>Without this condition, the expression generally depends on the chosen
+origin.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-affine-and-convex-combinations">
+<title>Confusing Affine and Convex Combinations</title>
+<p>Affine combinations require only</p>
+
+<p>
+<md>\sum_i\lambda_i=1.</md>
+</p>
+
+<p>Convex combinations additionally require</p>
+
+<p>
+<md>\lambda_i\geq0.</md>
+</p>
+
+<p>Thus every convex combination is affine, but not every affine combination is
+convex.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-affine-and-linear-subspaces">
+<title>Confusing Affine and Linear Subspaces</title>
+<p>A linear subspace must contain the origin.</p>
+
+<p>An affine subspace may be translated away from the origin.</p>
+
+<p>For example,</p>
+
+<p>
+<md>y=1</md>
+</p>
+
+<p>is an affine line but not a linear subspace of <m>\R^2</m>.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-testing-points-directly-for-linear-independence">
+<title>Testing Points Directly for Linear Independence</title>
+<p>Affine independence should be tested using difference vectors.</p>
+
+<p>For</p>
+
+<p>
+<md>P_0,P_1,\ldots,P_k,</md>
+</p>
+
+<p>test</p>
+
+<p>
+<md>P_1-P_0,\ldots,P_k-P_0</md>
+</p>
+
+<p>for linear independence.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-affine-maps-preserve-length">
+<title>Assuming Affine Maps Preserve Length</title>
+<p>General affine transformations may stretch different directions by different
+amounts.</p>
+
+<p>Therefore length is not an affine invariant.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-affine-maps-preserve-angles">
+<title>Assuming Affine Maps Preserve Angles</title>
+<p>Shears and nonuniform scalings change angles.</p>
+
+<p>Thus perpendicular lines need not remain perpendicular.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-every-affine-map-is-invertible">
+<title>Assuming Every Affine Map Is Invertible</title>
+<p>An affine map</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b}</md>
+</p>
+
+<p>is invertible only when <m>A</m> is invertible.</p>
+
+<p>If</p>
+
+<p>
+<md>\det A=0,</md>
+</p>
+
+<p>dimension may collapse.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-calling-a-translation-linear">
+<title>Calling a Translation Linear</title>
+<p>A nontrivial translation</p>
+
+<p>
+<md>T(\mathbf{x})=\mathbf{x}+\mathbf{b}</md>
+</p>
+
+<p>does not satisfy</p>
+
+<p>
+<md>T(\mathbf{0})=\mathbf{0}.</md>
+</p>
+
+<p>Therefore it is affine but not linear.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-geometry-applications">
+<title>Applications and Connections</title>
+<p>\begin{applicationbox}
+<em>Linear Algebra.</em>
+Affine spaces are modeled on vector spaces, and affine subspaces are
+translations of linear subspaces.</p>
+
+<p>\medskip</p>
+
+<p><em>Euclidean Geometry.</em>
+Affine geometry retains lines, parallelism, incidence, and ratios while
+discarding general distance and angle information.</p>
+
+<p>\medskip</p>
+
+<p><em>Projective Geometry.</em>
+Projective geometry extends affine geometry by incorporating points at
+infinity and treating parallel lines projectively.</p>
+
+<p>\medskip</p>
+
+<p><em>Convex Geometry.</em>
+Convex combinations, convex hulls, simplices, and barycentric coordinates are
+naturally affine constructions.</p>
+
+<p>\medskip</p>
+
+<p><em>Algebraic Geometry.</em>
+Affine spaces such as <m>\mathbb{A}^n</m> provide fundamental settings for
+studying polynomial equations. The algebraic-geometric meaning of
+<q>affine</q> is developed in its canonical section.</p>
+
+<p>\medskip</p>
+
+<p><em>Optimization.</em>
+Linear equality constraints define affine feasible sets, while convex
+optimization combines affine structure with convexity.</p>
+
+<p>\medskip</p>
+
+<p><em>Computer Graphics.</em>
+Translation, scaling, rotation, reflection, and shear are implemented using
+affine transformations and homogeneous matrices.</p>
+
+<p>\medskip</p>
+
+<p><em>Robotics.</em>
+Coordinate frames and spatial transformations combine linear transformations
+with translations.</p>
+
+<p>\medskip</p>
+
+<p><em>Computational Geometry.</em>
+Affine independence, orientation, convex hulls, simplices, and barycentric
+coordinates are basic computational tools.</p>
+
+<p>\medskip</p>
+
+<p><em>Finite Element Methods.</em>
+Barycentric and simplex coordinates are used to map standard reference
+elements to physical computational elements.
+\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-geometry-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>\frac13P+\frac23Q</md>
+</p>
+
+<p>is an affine combination of <m>P</m> and <m>Q</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>2P-Q</md>
+</p>
+
+<p>is an affine combination of <m>P</m> and <m>Q</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>2P+Q</md>
+</p>
+
+<p>is an affine combination.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Let</p>
+
+<p>
+<md>P=(1,2),\qquad Q=(7,5).</md>
+</p>
+
+<p>Find</p>
+
+<p>
+<md>\frac23P+\frac13Q.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the midpoint of <m>P</m> and <m>Q</m> as an affine combination.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>P+t(Q-P)</md>
+</p>
+
+<p>can be rewritten as</p>
+
+<p>
+<md>(1-t)P+tQ.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe geometrically the set</p>
+
+<p>
+<md>\{(1-t)P+tQ:0\leq t\leq1\}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe geometrically</p>
+
+<p>
+<md>P+\operatorname{span}\{\mathbf{v}\}</md>
+</p>
+
+<p>when <m>\mathbf{v}\neq\mathbf{0}</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why</p>
+
+<p>
+<md>y=3x+2</md>
+</p>
+
+<p>is an affine subspace of <m>\R^2</m> but not a linear subspace.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the direction space of</p>
+
+<p>
+<md>y=4x-7.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the affine hull of</p>
+
+<p>
+<md>(0,0),\qquad(1,0).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the affine hull of</p>
+
+<p>
+<md>(0,0),\qquad(1,0),\qquad(0,1).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>(0,0),\qquad
+(1,2),\qquad
+(2,4)</md>
+</p>
+
+<p>are affinely independent.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>(0,0),\qquad
+(1,0),\qquad
+(0,1)</md>
+</p>
+
+<p>are affinely independent.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine the affine dimension of</p>
+
+<p>
+<md>(1,1,1),\qquad
+(2,1,1),\qquad
+(1,2,1),\qquad
+(3,4,1).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the centroid of the triangle with vertices</p>
+
+<p>
+<md>(0,0),\qquad(6,0),\qquad(0,9).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the barycentric coordinates of</p>
+
+<p>
+<md>P=(2,1)</md>
+</p>
+
+<p>relative to</p>
+
+<p>
+<md>A=(0,0),\qquad
+B=(4,0),\qquad
+C=(0,2).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>\frac12P+\frac14Q+\frac14R</md>
+</p>
+
+<p>is a convex combination.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>2P-Q</md>
+</p>
+
+<p>is a convex combination.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe the convex hull of three noncollinear points in the plane.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>T(x,y)=(x+3,y-2)</md>
+</p>
+
+<p>is linear, affine, or both.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>T(x,y)=(2x,3y)</md>
+</p>
+
+<p>is linear, affine, or both.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write</p>
+
+<p>
+<md>T(x,y)=(2x+y+4,x-y-3)</md>
+</p>
+
+<p>in the form</p>
+
+<p>
+<md>T(\mathbf{x})=A\mathbf{x}+\mathbf{b}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the image of</p>
+
+<p>
+<md>(2,-1)</md>
+</p>
+
+<p>under</p>
+
+<p>
+<md>T(x,y)=(3x+y+2,x+2y-4).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the matrix of the shear</p>
+
+<p>
+<md>T(x,y)=(x+2y,y).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the determinant of the linear part of</p>
+
+<p>
+<md>T(x,y)=(3x+y,2y).</md>
+</p>
+
+<p>What is the corresponding area scale factor?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the affine transformation</p>
+
+<p>
+<md>T(\mathbf{x})
+=
+\begin{pmatrix}
+1&amp;2\\
+2&amp;4
+\end{pmatrix}\mathbf{x}
++
+\begin{pmatrix}
+1\\
+0
+\end{pmatrix}</md>
+</p>
+
+<p>is invertible.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the inverse of</p>
+
+<p>
+<md>T(x,y)=(2x+1,3y-4).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Let</p>
+
+<p>
+<md>T_1(\mathbf{x})=A_1\mathbf{x}+\mathbf{b}_1</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>T_2(\mathbf{x})=A_2\mathbf{x}+\mathbf{b}_2.</md>
+</p>
+
+<p>Derive the affine form of <m>T_2\circ T_1</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the homogeneous-coordinate matrix for translation by</p>
+
+<p>
+<md>(5,-3).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the homogeneous-coordinate matrix for</p>
+
+<p>
+<md>T(x,y)=(2x,3y).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a single homogeneous matrix that first scales by</p>
+
+<p>
+<md>(x,y)\mapsto(2x,2y)</md>
+</p>
+
+<p>and then translates by</p>
+
+<p>
+<md>(3,-1).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that affine transformations preserve midpoints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that affine transformations preserve affine combinations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that an invertible affine transformation maps parallel lines to
+parallel lines.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that an affine transformation maps convex combinations to convex
+combinations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the solution set of a consistent system</p>
+
+<p>
+<md>A\mathbf{x}=\mathbf{b}</md>
+</p>
+
+<p>is a translate of <m>\ker A</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why every nondegenerate triangle is affinely equivalent to the
+triangle with vertices</p>
+
+<p>
+<md>(0,0),\qquad(1,0),\qquad(0,1).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of an affine transformation that does not preserve angles.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of an affine transformation that sends a circle to a
+noncircular ellipse.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a theorem involving only collinearity, parallelism, and ratios
+along lines is a natural candidate for an affine proof.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-geometry-summary">
+<title>Conceptual Summary</title>
+<p>Affine geometry studies geometric structure without requiring a preferred
+origin or Euclidean metric.</p>
+
+<p>An affine space distinguishes points from displacement vectors.</p>
+
+<p>The difference of two points is a vector:</p>
+
+<p>
+<md>\boxed{Q-P\in V.}</md>
+</p>
+
+<p>A vector can translate a point:</p>
+
+<p>
+<md>\boxed{P+\mathbf{v}\in A.}</md>
+</p>
+
+<p>An affine combination satisfies</p>
+
+<p>
+<md>\boxed{
+\lambda_1P_1+\cdots+\lambda_kP_k,
+\qquad
+\sum_{i=1}^{k}\lambda_i=1.
+}</md>
+</p>
+
+<p>The affine hull is</p>
+
+<p>
+<md>\boxed{
+\operatorname{aff}\{P_1,\ldots,P_k\}
+=
+P_1+
+\operatorname{span}\{P_2-P_1,\ldots,P_k-P_1\}.
+}</md>
+</p>
+
+<p>Points are affinely independent when their difference vectors are linearly
+independent.</p>
+
+<p>An affine subspace has the form</p>
+
+<p>
+<md>\boxed{P+W.}</md>
+</p>
+
+<p>A convex combination additionally satisfies</p>
+
+<p>
+<md>\boxed{\lambda_i\geq0.}</md>
+</p>
+
+<p>An affine transformation has the form</p>
+
+<p>
+<md>\boxed{T(\mathbf{x})=A\mathbf{x}+\mathbf{b}.}</md>
+</p>
+
+<p>Invertible affine transformations preserve:</p>
+
+<p>
+<md>\boxed{
+\text{incidence},
+\quad
+\text{collinearity},
+\quad
+\text{parallelism},
+\quad
+\text{affine combinations},
+\quad
+\text{ratios along lines}.
+}</md>
+</p>
+
+<p>They do not generally preserve:</p>
+
+<p>
+<md>\boxed{
+\text{length},
+\quad
+\text{angle},
+\quad
+\text{perpendicularity}.
+}</md>
+</p>
+
+<p>Homogeneous coordinates allow affine transformations to be represented by
+matrices:</p>
+
+<p>
+<md>\boxed{
+\begin{pmatrix}
+A&amp;\mathbf{b}\\
+\mathbf{0}^{T}&amp;1
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>Affine geometry therefore provides a structural language connecting vector
+spaces, classical geometry, convexity, computational geometry, and
+projective geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-04-affine-geometry-subsec-affine-geometry-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Affine Geometry builds directly on Vector Geometry from
+<xref ref="sec-vector-geometry" /> but removes the requirement that the geometry
+possess a distinguished origin, distance, or angle. Points form an affine
+space whose differences are vectors, while affine combinations describe
+lines, planes, simplices, centroids, and barycentric coordinates. Linear
+Algebra supplies the direction spaces and linear parts of affine
+transformations. Convex Geometry later develops convex combinations and
+convex hulls systematically. Algebraic Geometry uses affine spaces as
+fundamental settings for polynomial equations. The next section, Projective
+Geometry, extends the affine viewpoint by adding points at infinity and
+removing the special status of parallel lines.</p>
+</remark>
+</subsection>
+
 </section>

@@ -1,9 +1,3937 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-11-optimization-operations-research-06-combinatorial-optimization">
-  <title>Combinatorial Optimization</title>
+<section xml:id="sec-combinatorial-optimization">
+<title>Combinatorial Optimization</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Discrete mathematics, graph theory, combinatorics, linear programming,
+integer programming, sets, permutations, algorithms, asymptotic
+complexity, and basic probability.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define a combinatorial optimization problem;</p>
+</li>
+<li>
+<p>recognize optimization over subsets, permutations, paths,
+          trees, matchings, and discrete structures;</p>
+</li>
+<li>
+<p>distinguish explicit and implicit feasible sets;</p>
+</li>
+<li>
+<p>understand why enumeration becomes computationally impossible;</p>
+</li>
+<li>
+<p>formulate discrete problems using binary variables;</p>
+</li>
+<li>
+<p>recognize graph-based optimization models;</p>
+</li>
+<li>
+<p>understand shortest-path optimization;</p>
+</li>
+<li>
+<p>understand spanning-tree optimization;</p>
+</li>
+<li>
+<p>understand matching and assignment problems;</p>
+</li>
+<li>
+<p>formulate the traveling salesperson problem;</p>
+</li>
+<li>
+<p>understand subtour-elimination constraints;</p>
+</li>
+<li>
+<p>formulate set-covering and set-packing problems;</p>
+</li>
+<li>
+<p>understand independent-set, clique, and vertex-cover models;</p>
+</li>
+<li>
+<p>recognize coloring as a combinatorial optimization problem;</p>
+</li>
+<li>
+<p>understand knapsack as a combinatorial problem;</p>
+</li>
+<li>
+<p>recognize matroid optimization;</p>
+</li>
+<li>
+<p>understand the greedy algorithm for weighted matroid bases;</p>
+</li>
+<li>
+<p>distinguish exact algorithms from heuristics;</p>
+</li>
+<li>
+<p>understand dynamic-programming approaches conceptually;</p>
+</li>
+<li>
+<p>understand branch-and-bound approaches;</p>
+</li>
+<li>
+<p>understand cutting-plane and branch-and-cut approaches;</p>
+</li>
+<li>
+<p>use relaxations to obtain bounds;</p>
+</li>
+<li>
+<p>recognize polyhedral formulations;</p>
+</li>
+<li>
+<p>understand integrality and total unimodularity conceptually;</p>
+</li>
+<li>
+<p>distinguish polynomial-time and NP-hard optimization problems;</p>
+</li>
+<li>
+<p>understand decision versus optimization formulations;</p>
+</li>
+<li>
+<p>recognize reductions between combinatorial problems;</p>
+</li>
+<li>
+<p>define approximation algorithms;</p>
+</li>
+<li>
+<p>understand approximation ratios;</p>
+</li>
+<li>
+<p>recognize greedy approximation for set cover;</p>
+</li>
+<li>
+<p>understand metric TSP approximation conceptually;</p>
+</li>
+<li>
+<p>understand local-search methods;</p>
+</li>
+<li>
+<p>recognize randomized algorithms conceptually;</p>
+</li>
+<li>
+<p>understand submodular optimization;</p>
+</li>
+<li>
+<p>recognize submodular maximization under constraints;</p>
+</li>
+<li>
+<p>understand decomposition and problem structure;</p>
+</li>
+<li>
+<p>connect combinatorial optimization with networks, scheduling,
+          logistics, computer science, and operations research.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-what-is-combinatorial-optimization">
+<title>What Is Combinatorial Optimization?</title>
+<p>Combinatorial optimization studies optimization problems whose feasible
+solutions are discrete objects.</p>
+
+<p>A general problem can be written</p>
+
+<p>
+<md>\boxed{
+\min_{x\in\mathcal{F}}
+c(x),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\mathcal{F}</md>
+</p>
+
+<p>is a finite or discrete family of feasible structures.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{subsets},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{permutations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{paths},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{trees},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{matchings},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{partitions}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-discrete-feasible-structures">
+<title>Discrete Feasible Structures</title>
+<p>Unlike continuous optimization, a combinatorial problem often chooses
+among distinct structures.</p>
+
+<p>For example, if <m>n</m> items may each be selected or not selected, then
+there are</p>
+
+<p>
+<md>\boxed{
+2^n
+}</md>
+</p>
+
+<p>possible subsets.</p>
+
+<p>If <m>n</m> objects may be arranged in any order, there are</p>
+
+<p>
+<md>\boxed{
+n!
+}</md>
+</p>
+
+<p>possible permutations.</p>
+
+<p>These quantities grow extremely rapidly.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-explosion">
+<title>Combinatorial Explosion</title>
+<p>Suppose there are <m>50</m> binary choices.</p>
+
+<p>Then the number of possible subsets is</p>
+
+<p>
+<md>\boxed{
+2^{50}.
+}</md>
+</p>
+
+<p>This is more than</p>
+
+<p>
+<md>10^{15}.</md>
+</p>
+
+<p>Thus complete enumeration can be computationally impossible even for
+moderate problem sizes.</p>
+
+<p>Combinatorial optimization seeks mathematical structure that avoids
+testing every possible solution.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-explicit-implicit-feasible-sets">
+<title>Explicit and Implicit Feasible Sets</title>
+<p>A feasible set may be listed explicitly:</p>
+
+<p>
+<md>\mathcal{F}
+=
+\{
+x^{(1)},\ldots,x^{(N)}
+\}.</md>
+</p>
+
+<p>More commonly, the feasible set is described implicitly through rules or
+constraints.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\mathcal{F}
+=
+\{
+S\subseteq V:
+|S|=k
+\}
+}</md>
+</p>
+
+<p>contains all <m>k</m>-element subsets of <m>V</m>.</p>
+
+<p>The number of feasible objects may be enormous even when the mathematical
+description is short.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-binary-vector-combinatorial">
+<title>Binary Vector Representation</title>
+<p>A subset</p>
+
+<p>
+<md>S\subseteq\{1,\ldots,n\}</md>
+</p>
+
+<p>can be represented by its incidence vector</p>
+
+<p>
+<md>\boxed{
+x_i
+=
+\begin{cases}
+1,
+&amp;
+i\in S,
+\\
+0,
+&amp;
+i\notin S.
+\end{cases}
+}</md>
+</p>
+
+<p>Thus combinatorial problems can often be written as integer programs.</p>
+
+<p>For example,</p>
+
+<p>
+<md>|S|\leq k</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>\boxed{
+\sum_{i=1}^{n}
+x_i
+\leq
+k.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-graph-optimization">
+<title>Combinatorial Optimization on Graphs</title>
+<p>Many combinatorial optimization problems are naturally defined on a graph</p>
+
+<p>
+<md>\boxed{
+G=(V,E),
+}</md>
+</p>
+
+<p>where:</p>
+
+<p>
+<md>V
+=
+\text{vertex set},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>E
+=
+\text{edge set}.</md>
+</p>
+
+<p>Possible optimization objects include:</p>
+
+<p>
+<md>\boxed{
+\text{paths},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{cycles},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{trees},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{matchings},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{cuts}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-weighted-graphs-combinatorial">
+<title>Weighted Graphs</title>
+<p>Assign a cost</p>
+
+<p>
+<md>c_e</md>
+</p>
+
+<p>to each edge</p>
+
+<p>
+<md>e\in E.</md>
+</p>
+
+<p>For a selected edge set</p>
+
+<p>
+<md>F\subseteq E,</md>
+</p>
+
+<p>its total cost is</p>
+
+<p>
+<md>\boxed{
+c(F)
+=
+\sum_{e\in F}
+c_e.
+}</md>
+</p>
+
+<p>Many graph optimization problems minimize or maximize such sums subject to
+structural restrictions on <m>F</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-shortest-path">
+<title>Shortest-Path Problem</title>
+<p>Given a weighted graph and vertices <m>s</m> and <m>t</m>, the shortest-path
+problem asks for an <m>s</m>-to-<m>t</m> path of minimum total edge cost.</p>
+
+<p>If</p>
+
+<p>
+<md>P</md>
+</p>
+
+<p>is a path, then its cost is</p>
+
+<p>
+<md>\boxed{
+c(P)
+=
+\sum_{e\in P}
+c_e.
+}</md>
+</p>
+
+<p>The optimization problem is</p>
+
+<p>
+<md>\boxed{
+\min_{P\in\mathcal{P}_{st}}
+\sum_{e\in P}
+c_e.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-shortest-path-algorithms-combinatorial">
+<title>Shortest-Path Algorithms</title>
+<p>Important exact algorithms include:</p>
+
+<p>
+<md>\boxed{
+\text{Dijkstra's algorithm}
+}</md>
+</p>
+
+<p>for nonnegative edge weights,</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{Bellman--Ford}
+}</md>
+</p>
+
+<p>when negative edge weights may occur but reachable negative cycles must be
+handled appropriately.</p>
+
+<p>Shortest-path problems are examples of combinatorial problems that can be
+solved efficiently in polynomial time.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-worked-shortest-path-combinatorial">
+<title>Worked Example: Shortest Path</title>
+<example>
+<title>Comparing Candidate Paths</title>
+<p>Suppose three routes from <m>A</m> to <m>D</m> have costs</p>
+
+<p>
+<md>A\to B\to D:
+\qquad
+3+4=7,</md>
+</p>
+
+<p>
+<md>A\to C\to D:
+\qquad
+2+8=10,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>A\to B\to C\to D:
+\qquad
+3+1+2=6.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+A\to B\to C\to D
+}</md>
+</p>
+
+<p>is the shortest among these routes, with cost</p>
+
+<p>
+<md>\boxed{
+6.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-minimum-spanning-tree">
+<title>Minimum Spanning Tree</title>
+<p>A spanning tree of a connected graph includes every vertex and contains
+no cycles.</p>
+
+<p>A minimum spanning tree, abbreviated MST, solves</p>
+
+<p>
+<md>\boxed{
+\min_{T}
+\sum_{e\in T}
+c_e
+}</md>
+</p>
+
+<p>over all spanning trees <m>T</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-tree-properties-combinatorial">
+<title>Properties of Trees</title>
+<p>A tree on <m>n</m> vertices has exactly</p>
+
+<p>
+<md>\boxed{
+n-1
+}</md>
+</p>
+
+<p>edges.</p>
+
+<p>A connected graph with <m>n-1</m> edges is a tree if and only if it has no
+cycles.</p>
+
+<p>These structural properties are fundamental to spanning-tree algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-kruskals-algorithm">
+<title>Kruskal's Algorithm</title>
+<p>Kruskal's algorithm:</p>
+
+<p>
+<ol>
+<li>
+<p>sorts edges by nondecreasing weight;</p>
+</li>
+<li>
+<p>scans the edges in that order;</p>
+</li>
+<li>
+<p>adds an edge if doing so does not create a cycle;</p>
+</li>
+<li>
+<p>stops after <m>n-1</m> edges have been selected.</p>
+</li>
+</ol>
+</p>
+
+<p>The result is a minimum spanning tree.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-prims-algorithm">
+<title>Prim's Algorithm</title>
+<p>Prim's algorithm grows one connected tree.</p>
+
+<p>Starting from a vertex, repeatedly choose a minimum-cost edge connecting
+the current tree to a new vertex.</p>
+
+<p>The algorithm continues until every vertex is included.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-mst-cut-property">
+<title>Cut Property for MSTs</title>
+<p>Suppose a cut partitions the vertices into two sets.</p>
+
+<p>A minimum-weight edge crossing the cut is safe for some minimum spanning
+tree under the standard cut-property conditions.</p>
+
+<p>This property provides the theoretical basis for greedy MST algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-greedy-combinatorial">
+<title>Greedy Algorithms</title>
+<p>A greedy algorithm repeatedly makes a locally attractive choice and never
+reverses it.</p>
+
+<p>A generic structure is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify the locally best available choice;</p>
+</li>
+<li>
+<p>accept it if feasibility is preserved;</p>
+</li>
+<li>
+<p>repeat until a complete solution is formed.</p>
+</li>
+</ol>
+</p>
+
+<p>Greedy methods can be optimal for some combinatorial structures and fail
+badly for others.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-why-greedy-needs-proof">
+<title>Why Greedy Methods Need Proof</title>
+<p>A locally best choice need not lead to a globally optimal solution.</p>
+
+<p>Therefore a greedy algorithm requires a structural argument such as:</p>
+
+<p>
+<md>\boxed{
+\text{exchange property},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{cut property},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{matroid structure}.
+}</md>
+</p>
+
+<p>Without such structure, greedy behavior is only heuristic.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-matching-combinatorial">
+<title>Matching</title>
+<p>A matching is a set of edges such that no two selected edges share a
+vertex.</p>
+
+<p>A maximum-cardinality matching solves</p>
+
+<p>
+<md>\boxed{
+\max
+|M|
+}</md>
+</p>
+
+<p>over all matchings <m>M</m>.</p>
+
+<p>A weighted matching solves</p>
+
+<p>
+<md>\boxed{
+\max_{M}
+\sum_{e\in M}
+w_e.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-bipartite-matching">
+<title>Bipartite Matching</title>
+<p>A graph is bipartite if</p>
+
+<p>
+<md>V
+=
+U\cup W,</md>
+</p>
+
+<p>where every edge joins a vertex in <m>U</m> to one in <m>W</m>.</p>
+
+<p>Bipartite matching models:</p>
+
+<p>
+<md>\boxed{
+\text{workers to jobs},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{students to projects},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{resources to tasks}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-assignment-as-matching">
+<title>Assignment as Matching</title>
+<p>The assignment problem is a weighted perfect matching problem in a
+bipartite graph.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_{ij}\in\{0,1\}</md>
+</p>
+
+<p>indicate whether agent <m>i</m> receives task <m>j</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\sum_jx_{ij}=1
+}</md>
+</p>
+
+<p>for each agent,</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\sum_ix_{ij}=1
+}</md>
+</p>
+
+<p>for each task.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-hungarian-algorithm-preview">
+<title>Hungarian Algorithm Preview</title>
+<p>The assignment problem has specialized polynomial-time algorithms.</p>
+
+<p>One classical approach is the Hungarian algorithm.</p>
+
+<p>Its existence illustrates an important theme:</p>
+
+<p>
+<md>\boxed{
+\text{special combinatorial structure}
+\rightarrow
+\text{special efficient algorithm}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-hall-matching-connection">
+<title>Hall's Marriage Theorem Connection</title>
+<p>For a bipartite graph with parts <m>U</m> and <m>W</m>, Hall's theorem gives a
+criterion for a matching that covers every vertex of <m>U</m>.</p>
+
+<p>For every subset</p>
+
+<p>
+<md>S\subseteq U,</md>
+</p>
+
+<p>the neighborhood must satisfy</p>
+
+<p>
+<md>\boxed{
+|N(S)|
+\geq
+|S|.
+}</md>
+</p>
+
+<p>This is a structural existence theorem rather than an optimization
+algorithm, but it is closely connected with matching theory.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-traveling-salesperson-problem">
+<title>Traveling Salesperson Problem</title>
+<p>The traveling salesperson problem, abbreviated TSP, asks for a
+minimum-cost tour that visits every vertex exactly once and returns to the
+starting point.</p>
+
+<p>If edge <m>(i,j)</m> has cost <m>c_{ij}</m>, define</p>
+
+<p>
+<md>x_{ij}
+=
+\begin{cases}
+1,
+&amp;
+\text{edge }(i,j)\text{ is used},
+\\
+0,
+&amp;
+\text{otherwise}.
+\end{cases}</md>
+</p>
+
+<p>The objective is</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_{i}
+\sum_{j}
+c_{ij}x_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-tsp-degree-constraints">
+<title>Degree Constraints for TSP</title>
+<p>For a directed formulation, each vertex must have one outgoing and one
+incoming selected arc:</p>
+
+<p>
+<md>\boxed{
+\sum_{j\neq i}
+x_{ij}
+=
+1,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\sum_{j\neq i}
+x_{ji}
+=
+1.
+}</md>
+</p>
+
+<p>These conditions alone do not guarantee a single tour.</p>
+
+<p>They can produce several disconnected cycles.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-tsp-subtours">
+<title>Subtours</title>
+<p>A subtour is a cycle containing only a proper subset of the vertices.</p>
+
+<p>For example, the selected arcs might create:</p>
+
+<p>
+<md>\boxed{
+1\to2\to1
+}</md>
+</p>
+
+<p>and separately</p>
+
+<p>
+<md>\boxed{
+3\to4\to5\to3.
+}</md>
+</p>
+
+<p>Every vertex has the correct degree, but there is no single Hamiltonian
+tour.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-subtour-elimination">
+<title>Subtour-Elimination Constraints</title>
+<p>For a directed TSP, one family of subtour-elimination constraints is</p>
+
+<p>
+<md>\boxed{
+\sum_{i\in S}
+\sum_{j\in S}
+x_{ij}
+\leq
+|S|-1
+}</md>
+</p>
+
+<p>for every nonempty proper subset</p>
+
+<p>
+<md>S\subsetneq V</md>
+</p>
+
+<p>with at least two vertices.</p>
+
+<p>These inequalities prevent a closed tour contained entirely inside
+<m>S</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-tsp-exponential-constraints">
+<title>Exponential Number of TSP Constraints</title>
+<p>There are exponentially many possible subsets <m>S</m>.</p>
+
+<p>Therefore listing every subtour-elimination inequality in advance can be
+impractical.</p>
+
+<p>Instead, modern approaches often:</p>
+
+<p>
+<md>\boxed{
+\text{solve a relaxation},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{detect violated subtours},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{add cuts as needed}.
+}</md>
+</p>
+
+<p>This is a cutting-plane strategy.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-worked-detecting-subtour">
+<title>Worked Example: Detecting a Subtour</title>
+<example>
+<title>A Disconnected TSP Solution</title>
+<p>Suppose a candidate solution contains the cycle</p>
+
+<p>
+<md>1\to2\to3\to1.</md>
+</p>
+
+<p>Let</p>
+
+<p>
+<md>S=\{1,2,3\}.</md>
+</p>
+
+<p>The three selected arcs lie entirely inside <m>S</m>, so</p>
+
+<p>
+<md>\sum_{i\in S}
+\sum_{j\in S}
+x_{ij}
+=
+3.</md>
+</p>
+
+<p>But the subtour inequality requires</p>
+
+<p>
+<md>\sum_{i\in S}
+\sum_{j\in S}
+x_{ij}
+\leq
+|S|-1
+=
+2.</md>
+</p>
+
+<p>Thus the candidate violates the cut.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\text{The cycle on }\{1,2,3\}\text{ is eliminated.}
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-hamiltonian-problems">
+<title>Hamiltonian Problems</title>
+<p>A Hamiltonian cycle visits every vertex exactly once before returning to
+the start.</p>
+
+<p>Finding whether one exists is already computationally difficult in
+general.</p>
+
+<p>The TSP adds costs and asks for the best such cycle.</p>
+
+<p>Thus optimization can be harder than merely checking feasibility.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-set-cover">
+<title>Set Cover</title>
+<p>Let the universe be</p>
+
+<p>
+<md>U
+=
+\{1,\ldots,m\}.</md>
+</p>
+
+<p>Suppose subsets</p>
+
+<p>
+<md>S_1,\ldots,S_n
+\subseteq U</md>
+</p>
+
+<p>are available.</p>
+
+<p>The set-cover problem chooses subsets whose union covers <m>U</m>.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_j\in\{0,1\}</md>
+</p>
+
+<p>indicate whether <m>S_j</m> is chosen.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_{j=1}^{n}
+c_jx_j
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+\sum_{j:i\in S_j}
+x_j
+\geq
+1
+}</md>
+</p>
+
+<p>for each element</p>
+
+<p>
+<md>i\in U.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-set-packing">
+<title>Set Packing</title>
+<p>Set packing chooses a collection of mutually compatible subsets.</p>
+
+<p>A common binary formulation is</p>
+
+<p>
+<md>\boxed{
+\max
+\sum_j
+w_jx_j
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+\sum_{j:i\in S_j}
+x_j
+\leq
+1
+}</md>
+</p>
+
+<p>for each underlying element <m>i</m>.</p>
+
+<p>Thus no element may appear in more than one selected set.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-set-partitioning">
+<title>Set Partitioning</title>
+<p>Set partitioning requires each element to be covered exactly once:</p>
+
+<p>
+<md>\boxed{
+\sum_{j:i\in S_j}
+x_j
+=
+1.
+}</md>
+</p>
+
+<p>This structure appears in:</p>
+
+<p>
+<md>\boxed{
+\text{crew scheduling},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{vehicle routing},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{partitioning problems}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-vertex-cover">
+<title>Vertex Cover</title>
+<p>A vertex cover is a set of vertices touching every edge.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_v\in\{0,1\}</md>
+</p>
+
+<p>indicate whether vertex <m>v</m> is chosen.</p>
+
+<p>A minimum weighted vertex-cover model is</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_{v\in V}
+w_vx_v
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+x_u+x_v\geq1
+}</md>
+</p>
+
+<p>for every edge</p>
+
+<p>
+<md>(u,v)\in E.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-independent-set-optimization">
+<title>Independent Set</title>
+<p>An independent set contains no adjacent vertices.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_v\in\{0,1\}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+x_u+x_v\leq1
+}</md>
+</p>
+
+<p>for every edge</p>
+
+<p>
+<md>(u,v)\in E.</md>
+</p>
+
+<p>The maximum weighted independent-set problem is</p>
+
+<p>
+<md>\boxed{
+\max
+\sum_{v\in V}
+w_vx_v.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-vertex-cover-independent-set">
+<title>Vertex Cover and Independent Set</title>
+<p>For an unweighted graph,</p>
+
+<p>
+<md>C
+\subseteq V</md>
+</p>
+
+<p>is a vertex cover if and only if</p>
+
+<p>
+<md>V\setminus C</md>
+</p>
+
+<p>is an independent set.</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\tau(G)+\alpha(G)=|V|,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\tau(G)
+=
+\text{minimum vertex-cover size},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\alpha(G)
+=
+\text{maximum independent-set size}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-clique-optimization">
+<title>Clique</title>
+<p>A clique is a set of pairwise adjacent vertices.</p>
+
+<p>A clique in graph <m>G</m> is an independent set in the complement graph</p>
+
+<p>
+<md>\overline{G}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\omega(G)
+=
+\alpha(\overline{G}),
+}</md>
+</p>
+
+<p>where <m>\omega(G)</m> is the maximum clique size.</p>
+
+<p>This gives a direct relationship among several difficult graph
+optimization problems.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-graph-coloring-optimization">
+<title>Graph Coloring</title>
+<p>Graph coloring assigns colors to vertices so adjacent vertices receive
+different colors.</p>
+
+<p>The optimization problem seeks the minimum number of colors:</p>
+
+<p>
+<md>\boxed{
+\chi(G)
+=
+\text{chromatic number of }G.
+}</md>
+</p>
+
+<p>Coloring models:</p>
+
+<p>
+<md>\boxed{
+\text{scheduling conflicts},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{frequency assignment},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{resource incompatibilities}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-binary-coloring-formulation">
+<title>Binary Coloring Formulation</title>
+<p>Let</p>
+
+<p>
+<md>x_{vc}
+=
+1</md>
+</p>
+
+<p>if vertex <m>v</m> receives color <m>c</m>.</p>
+
+<p>Then every vertex receives exactly one color:</p>
+
+<p>
+<md>\boxed{
+\sum_c
+x_{vc}
+=
+1.
+}</md>
+</p>
+
+<p>For every edge <m>(u,v)</m>,</p>
+
+<p>
+<md>\boxed{
+x_{uc}+x_{vc}
+\leq1
+}</md>
+</p>
+
+<p>for each color <m>c</m>.</p>
+
+<p>Additional variables can indicate whether a color is used.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-maximum-cut">
+<title>Maximum Cut</title>
+<p>A cut partitions</p>
+
+<p>
+<md>V
+=
+S\cup(V\setminus S).</md>
+</p>
+
+<p>An edge crosses the cut when its endpoints lie on opposite sides.</p>
+
+<p>The maximum-cut problem seeks a partition maximizing the total weight of
+crossing edges:</p>
+
+<p>
+<md>\boxed{
+\max
+\sum_{e\in\delta(S)}
+w_e.
+}</md>
+</p>
+
+<p>This is a fundamental NP-hard combinatorial optimization problem.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-knapsack-combinatorial">
+<title>Knapsack Revisited</title>
+<p>The <m>0</m>-<m>1</m> knapsack problem is</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\max
+\quad&amp;
+\sum_j
+v_jx_j
+\\
+\text{subject to}
+\quad&amp;
+\sum_j
+w_jx_j
+\leq
+W,
+\\
+&amp;
+x_j\in\{0,1\}.
+\end{aligned}
+}</md>
+</p>
+
+<p>It illustrates several major combinatorial ideas:</p>
+
+<p>
+<md>\boxed{
+\text{binary modeling},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{dynamic programming},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-bound},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{approximation algorithms}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-matroids-combinatorial-optimization">
+<title>Matroids</title>
+<p>A matroid is a pair</p>
+
+<p>
+<md>\boxed{
+M=(E,\mathcal{I}),
+}</md>
+</p>
+
+<p>where <m>E</m> is a finite ground set and <m>\mathcal{I}</m> is a family of
+independent subsets satisfying matroid axioms.</p>
+
+<p>Matroids abstract independence from:</p>
+
+<p>
+<md>\boxed{
+\text{linear algebra},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{graph forests}.
+}</md>
+</p>
+
+<p>They provide a precise setting in which greedy optimization is optimal.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-matroid-independence-axioms">
+<title>Matroid Independence Axioms</title>
+<p>A standard independence formulation requires:</p>
+
+<p>
+<md>\boxed{
+\varnothing\in\mathcal{I},
+}</md>
+</p>
+
+<p>and hereditary closure:</p>
+
+<p>
+<md>\boxed{
+A\in\mathcal{I},
+\quad
+B\subseteq A
+\Rightarrow
+B\in\mathcal{I}.
+}</md>
+</p>
+
+<p>The exchange property states that if</p>
+
+<p>
+<md>A,B\in\mathcal{I}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>|A|&lt;|B|,</md>
+</p>
+
+<p>then there exists</p>
+
+<p>
+<md>e\in B\setminus A</md>
+</p>
+
+<p>such that</p>
+
+<p>
+<md>\boxed{
+A\cup\{e\}\in\mathcal{I}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-matroid-bases-optimization">
+<title>Matroid Bases</title>
+<p>A basis is a maximal independent set.</p>
+
+<p>All bases of a matroid have the same cardinality.</p>
+
+<p>Given weights</p>
+
+<p>
+<md>w_e,</md>
+</p>
+
+<p>the maximum-weight basis problem is</p>
+
+<p>
+<md>\boxed{
+\max_{B\text{ basis}}
+\sum_{e\in B}
+w_e.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-matroid-greedy-algorithm">
+<title>Greedy Algorithm for Matroid Bases</title>
+<p>To find a maximum-weight basis:</p>
+
+<p>
+<ol>
+<li>
+<p>order the elements so that</p>
+
+<p>
+<md>w_{e_1}\geq w_{e_2}\geq\cdots\geq w_{e_m};</md>
+</p>
+</li>
+<li>
+<p>begin with <m>S=\varnothing</m>;</p>
+</li>
+<li>
+<p>scan elements in that order;</p>
+</li>
+<li>
+<p>add <m>e_i</m> whenever</p>
+
+<p>
+<md>S\cup\{e_i\}\in\mathcal{I};</md>
+</p>
+</li>
+<li>
+<p>stop when a basis is obtained.</p>
+</li>
+</ol>
+</p>
+
+<p>The matroid exchange property guarantees optimality.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-graphic-matroid-optimization">
+<title>Graphic Matroid</title>
+<p>For a graph <m>G=(V,E)</m>, define an edge set to be independent if it
+contains no cycle.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+(E,\mathcal{I})
+}</md>
+</p>
+
+<p>forms the graphic matroid.</p>
+
+<p>Its bases are spanning forests, and for a connected graph, spanning
+trees.</p>
+
+<p>Thus Kruskal's algorithm is an instance of matroid greedy optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-greedy-failure-outside-matroids">
+<title>Greedy Failure Outside Matroids</title>
+<p>Consider the <m>0</m>-<m>1</m> knapsack problem.</p>
+
+<p>Selecting items greedily by largest value does not always work.</p>
+
+<p>Selecting by largest value-to-weight ratio also does not always produce
+the optimal <m>0</m>-<m>1</m> solution.</p>
+
+<p>Therefore:</p>
+
+<p>
+<md>\boxed{
+\text{greedy success depends on structure}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-exact-combinatorial-algorithms">
+<title>Exact Algorithms</title>
+<p>An exact algorithm guarantees an optimal solution.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{specialized polynomial algorithms},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{dynamic programming},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-bound},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-cut}.
+}</md>
+</p>
+
+<p>The computational cost may vary from polynomial to exponential.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-enumeration-combinatorial">
+<title>Enumeration</title>
+<p>The simplest exact method is complete enumeration:</p>
+
+<p>
+<md>\boxed{
+\text{evaluate every feasible solution}.
+}</md>
+</p>
+
+<p>If there are <m>2^n</m> subsets, this requires exponential work in the worst
+case.</p>
+
+<p>Enumeration is therefore useful mainly for:</p>
+
+<p>
+<md>\boxed{
+\text{small instances},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{benchmarking other methods}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-dynamic-programming-combinatorial-preview">
+<title>Dynamic Programming Preview</title>
+<p>Dynamic programming breaks a problem into overlapping subproblems.</p>
+
+<p>It is effective when the problem has:</p>
+
+<p>
+<md>\boxed{
+\text{optimal substructure},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{repeated subproblems}.
+}</md>
+</p>
+
+<p>Instead of solving the same subproblem repeatedly, its solution is stored
+and reused.</p>
+
+<p>Dynamic Programming is developed in detail in
+Section <xref ref="sec-dynamic-programming" />.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-branch-and-bound-combinatorial">
+<title>Branch-and-Bound in Combinatorial Optimization</title>
+<p>Branch-and-bound partitions the discrete feasible set into subproblems.</p>
+
+<p>For each subproblem:</p>
+
+<p>
+<ol>
+<li>
+<p>compute a relaxation bound;</p>
+</li>
+<li>
+<p>compare the bound with the incumbent;</p>
+</li>
+<li>
+<p>prune if improvement is impossible;</p>
+</li>
+<li>
+<p>otherwise branch further.</p>
+</li>
+</ol>
+</p>
+
+<p>This framework applies far beyond generic integer programming.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-relaxations">
+<title>Relaxations</title>
+<p>A relaxation replaces a difficult feasible set <m>\mathcal{F}</m> by an
+easier superset <m>\mathcal{R}</m>:</p>
+
+<p>
+<md>\boxed{
+\mathcal{F}
+\subseteq
+\mathcal{R}.
+}</md>
+</p>
+
+<p>For minimization,</p>
+
+<p>
+<md>\boxed{
+\min_{x\in\mathcal{R}}
+f(x)
+\leq
+\min_{x\in\mathcal{F}}
+f(x).
+}</md>
+</p>
+
+<p>Thus the relaxation gives a lower bound.</p>
+
+<p>For maximization, it gives an upper bound.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-common-combinatorial-relaxations">
+<title>Common Relaxations</title>
+<p>Important relaxation types include:</p>
+
+<p>
+<md>\boxed{
+\text{linear-programming relaxations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Lagrangian relaxations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{semidefinite relaxations},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{problem-specific combinatorial bounds}.
+}</md>
+</p>
+
+<p>A good relaxation should be both strong and computationally manageable.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-polyhedral-combinatorial-optimization">
+<title>Polyhedral Approach</title>
+<p>Represent each feasible combinatorial object by a binary incidence vector.</p>
+
+<p>If</p>
+
+<p>
+<md>X
+\subseteq
+\{0,1\}^n</md>
+</p>
+
+<p>is the set of feasible incidence vectors, study the polytope</p>
+
+<p>
+<md>\boxed{
+P
+=
+\operatorname{conv}(X).
+}</md>
+</p>
+
+<p>A perfect linear description of <m>P</m> would allow linear programming to
+solve the combinatorial problem.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-facet-defining-inequalities">
+<title>Facet-Defining Inequalities</title>
+<p>Strong linear inequalities defining high-dimensional faces of a
+combinatorial polytope are called facet-defining inequalities when they
+define facets.</p>
+
+<p>Finding such inequalities is central to polyhedral combinatorics.</p>
+
+<p>Strong facets can substantially improve branch-and-cut algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-separation-problem">
+<title>Separation Problem</title>
+<p>Given a point <m>\bar{x}</m>, the separation problem asks:</p>
+
+<p>
+<md>\boxed{
+\text{Is }\bar{x}\in P?
+}</md>
+</p>
+
+<p>If not, find a valid inequality</p>
+
+<p>
+<md>\boxed{
+a^Tx\leq b
+}</md>
+</p>
+
+<p>satisfied by every point in <m>P</m> but violated by <m>\bar{x}</m>.</p>
+
+<p>Separation is the algorithmic counterpart of cutting-plane generation.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-optimization-separation">
+<title>Optimization and Separation</title>
+<p>A deep principle in combinatorial optimization is that, under suitable
+conditions, polynomial-time linear optimization over a rational polytope
+and polynomial-time separation over that polytope are closely related.</p>
+
+<p>This connects geometric descriptions with algorithms.</p>
+
+<p>The full equivalence is developed in advanced polyhedral optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-integrality">
+<title>Integrality</title>
+<p>A polyhedron is integral if every extreme point is integral.</p>
+
+<p>If the feasible relaxation polyhedron is integral, then</p>
+
+<p>
+<md>\boxed{
+\text{linear programming solves the discrete problem directly}.
+}</md>
+</p>
+
+<p>Examples occur in:</p>
+
+<p>
+<md>\boxed{
+\text{shortest paths},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{network flows},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{bipartite matching}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-total-unimodularity">
+<title>Total Unimodularity Connection</title>
+<p>Total unimodularity provides one important sufficient condition for
+integrality.</p>
+
+<p>If</p>
+
+<p>
+<md>A</md>
+</p>
+
+<p>is totally unimodular and</p>
+
+<p>
+<md>b</md>
+</p>
+
+<p>is integral, then under appropriate standard formulations the polyhedron</p>
+
+<p>
+<md>\boxed{
+\{
+x:
+Ax\leq b
+\}
+}</md>
+</p>
+
+<p>has integral vertices.</p>
+
+<p>This explains why certain discrete problems have unusually tractable LP
+formulations.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-complexity">
+<title>Computational Complexity</title>
+<p>Combinatorial optimization problems differ dramatically in computational
+difficulty.</p>
+
+<p>Some admit polynomial-time algorithms.</p>
+
+<p>Others are NP-hard.</p>
+
+<p>Examples of polynomially solvable problems include:</p>
+
+<p>
+<md>\boxed{
+\text{shortest path},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{minimum spanning tree},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{bipartite matching}.
+}</md>
+</p>
+
+<p>Examples of NP-hard problems include:</p>
+
+<p>
+<md>\boxed{
+\text{general TSP},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{maximum clique},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{graph coloring},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{set cover}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-decision-problems-combinatorial">
+<title>Decision Problems</title>
+<p>An optimization problem can often be associated with a yes-or-no decision
+problem.</p>
+
+<p>For example, instead of asking for the minimum TSP tour length, ask:</p>
+
+<p>
+<md>\boxed{
+\text{Is there a tour of cost at most }B?
+}</md>
+</p>
+
+<p>Decision versions are central to computational-complexity theory.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-class-p-combinatorial">
+<title>Class P</title>
+<p>The class <m>P</m> contains decision problems solvable in polynomial time by
+a deterministic algorithm.</p>
+
+<p>Informally, these are problems for which an algorithm exists whose running
+time is bounded by</p>
+
+<p>
+<md>\boxed{
+O(n^k)
+}</md>
+</p>
+
+<p>for some fixed constant <m>k</m>, measured in the appropriate input size.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-class-np-combinatorial">
+<title>Class NP</title>
+<p>The class <m>NP</m> contains decision problems for which a proposed
+yes-certificate can be verified in polynomial time.</p>
+
+<p>For example, given a proposed TSP tour, one can check:</p>
+
+<p>
+<md>\boxed{
+\text{whether every vertex appears exactly once},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{whether its cost is at most }B
+}</md>
+</p>
+
+<p>in polynomial time.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-np-complete-combinatorial">
+<title>NP-Complete Problems</title>
+<p>A decision problem is NP-complete if:</p>
+
+<p>
+<ol>
+<li>
+<p>it belongs to <m>NP</m>; and</p>
+</li>
+<li>
+<p>every problem in <m>NP</m> can be reduced to it in polynomial time.</p>
+</li>
+</ol>
+</p>
+
+<p>NP-complete problems are among the hardest problems in <m>NP</m> under
+polynomial-time reductions.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-np-hard-optimization">
+<title>NP-Hard Optimization Problems</title>
+<p>An optimization problem is NP-hard if solving it efficiently would allow
+one to solve an NP-hard or NP-complete decision problem efficiently.</p>
+
+<p>NP-hardness does not imply that every instance is difficult.</p>
+
+<p>It describes worst-case computational complexity.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-polynomial-time-reductions">
+<title>Polynomial-Time Reductions</title>
+<p>A polynomial-time reduction transforms instances of problem <m>A</m> into
+instances of problem <m>B</m> so that solving <m>B</m> solves <m>A</m>.</p>
+
+<p>Symbolically,</p>
+
+<p>
+<md>\boxed{
+A
+\leq_P
+B.
+}</md>
+</p>
+
+<p>If <m>A</m> is known to be hard and</p>
+
+<p>
+<md>A\leq_P B,</md>
+</p>
+
+<p>then <m>B</m> is at least as hard as <m>A</m> in the reduction sense.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-why-complexity-matters">
+<title>Why Complexity Classification Matters</title>
+<p>Complexity guides algorithm selection.</p>
+
+<p>If a problem is polynomially solvable, seek an exact specialized
+algorithm.</p>
+
+<p>If it is NP-hard, one may need:</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-bound},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{approximations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{heuristics},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{problem-specific structure}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-approximation-algorithms">
+<title>Approximation Algorithms</title>
+<p>An approximation algorithm runs efficiently and guarantees a solution
+within a known factor of optimal.</p>
+
+<p>For a minimization problem, an algorithm is a <m>\rho</m>-approximation if</p>
+
+<p>
+<md>\boxed{
+C_{\mathrm{alg}}
+\leq
+\rho
+C^*
+}</md>
+</p>
+
+<p>for every instance, where</p>
+
+<p>
+<md>\rho\geq1.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-maximization-approximation-ratio">
+<title>Approximation Ratio for Maximization</title>
+<p>For maximization, a common guarantee is</p>
+
+<p>
+<md>\boxed{
+C_{\mathrm{alg}}
+\geq
+\alpha
+C^*,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>0&lt;\alpha\leq1.</md>
+</p>
+
+<p>Equivalent ratio conventions are also used.</p>
+
+<p>The convention should always be stated.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-approximation-versus-heuristic">
+<title>Approximation Versus Heuristic</title>
+<p>A heuristic aims to find good solutions but may have no proven
+worst-case guarantee.</p>
+
+<p>An approximation algorithm provides a theorem such as</p>
+
+<p>
+<md>\boxed{
+C_{\mathrm{alg}}
+\leq
+2C^*.
+}</md>
+</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{heuristic}
+\neq
+\text{approximation algorithm}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-greedy-set-cover">
+<title>Greedy Set Cover</title>
+<p>For unweighted set cover, a natural greedy algorithm repeatedly chooses
+the set covering the largest number of currently uncovered elements.</p>
+
+<p>For weighted set cover, choose a set with favorable cost per newly covered
+element:</p>
+
+<p>
+<md>\boxed{
+\frac{
+c_j
+}{
+\text{number of newly covered elements}
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-set-cover-approximation">
+<title>Set-Cover Approximation Guarantee</title>
+<p>The greedy set-cover algorithm has a logarithmic approximation guarantee.</p>
+
+<p>For a universe of size <m>m</m>, the approximation factor can be bounded by a
+harmonic-number quantity</p>
+
+<p>
+<md>\boxed{
+H_m
+=
+1+\frac12+\frac13+\cdots+\frac1m,
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+H_m
+\leq
+1+\ln m.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-metric-tsp">
+<title>Metric TSP</title>
+<p>A TSP instance is metric if edge costs satisfy:</p>
+
+<p>
+<md>\boxed{
+c_{ij}\geq0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+c_{ij}=c_{ji},
+}</md>
+</p>
+
+<p>and the triangle inequality</p>
+
+<p>
+<md>\boxed{
+c_{ij}
+\leq
+c_{ik}+c_{kj}.
+}</md>
+</p>
+
+<p>Metric structure permits approximation guarantees that are unavailable
+for arbitrary TSP costs.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-double-tree-tsp">
+<title>Double-Tree Approximation for Metric TSP</title>
+<p>A basic metric-TSP approximation proceeds as follows:</p>
+
+<p>
+<ol>
+<li>
+<p>compute a minimum spanning tree;</p>
+</li>
+<li>
+<p>duplicate every tree edge;</p>
+</li>
+<li>
+<p>form an Eulerian tour;</p>
+</li>
+<li>
+<p>shortcut repeated vertices.</p>
+</li>
+</ol>
+</p>
+
+<p>By the triangle inequality, shortcutting does not increase cost.</p>
+
+<p>The resulting tour has cost at most</p>
+
+<p>
+<md>\boxed{
+2C^*.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-double-tree-bound">
+<title>Why the Double-Tree Bound Works</title>
+<p>Removing one edge from an optimal TSP tour produces a spanning tree.</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+C_{\mathrm{MST}}
+\leq
+C^*_{\mathrm{TSP}}.
+}</md>
+</p>
+
+<p>Duplicating the MST gives cost</p>
+
+<p>
+<md>2C_{\mathrm{MST}}
+\leq
+2C^*_{\mathrm{TSP}}.</md>
+</p>
+
+<p>Metric shortcutting preserves the upper bound.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-christofides-preview">
+<title>Christofides Algorithm Preview</title>
+<p>For symmetric metric TSP, Christofides' algorithm combines:</p>
+
+<p>
+<md>\boxed{
+\text{minimum spanning tree},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{minimum-weight matching on odd-degree vertices},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{Eulerian shortcutting}.
+}</md>
+</p>
+
+<p>Its classical approximation factor is</p>
+
+<p>
+<md>\boxed{
+\frac32.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-vertex-cover-approximation">
+<title>Vertex-Cover Approximation Preview</title>
+<p>A simple algorithm for unweighted vertex cover chooses both endpoints of
+edges in a maximal matching.</p>
+
+<p>If <m>M</m> is the matching, the resulting cover has size</p>
+
+<p>
+<md>2|M|.</md>
+</p>
+
+<p>Every vertex cover must contain at least one endpoint of every matching
+edge.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+|C|
+\leq
+2|C^*|.
+}</md>
+</p>
+
+<p>This gives a <m>2</m>-approximation.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-local-search-combinatorial">
+<title>Local Search</title>
+<p>Local search begins from a feasible discrete solution and repeatedly moves
+to a neighboring solution with improved objective value.</p>
+
+<p>A generic scheme is:</p>
+
+<p>
+<ol>
+<li>
+<p>construct an initial feasible solution;</p>
+</li>
+<li>
+<p>define a neighborhood;</p>
+</li>
+<li>
+<p>search for an improving neighbor;</p>
+</li>
+<li>
+<p>move to that neighbor;</p>
+</li>
+<li>
+<p>stop when no improving move is found.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-neighborhoods">
+<title>Neighborhood Structures</title>
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{swap one selected item},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{reverse part of a route},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{move one job between machines},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{exchange two assignments}.
+}</md>
+</p>
+
+<p>Neighborhood design determines what local optima mean.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-two-opt-tsp">
+<title>2-Opt for TSP</title>
+<p>A <m>2</m>-opt move removes two tour edges and reconnects the resulting paths
+in a different way.</p>
+
+<p>If the new tour is shorter, accept the move.</p>
+
+<p>Repeated <m>2</m>-opt improvement can produce good tours quickly.</p>
+
+<p>However, a <m>2</m>-opt local optimum need not be globally optimal.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-metaheuristics-preview">
+<title>Metaheuristics Preview</title>
+<p>More advanced heuristic frameworks include:</p>
+
+<p>
+<md>\boxed{
+\text{simulated annealing},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{tabu search},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{genetic algorithms},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{variable-neighborhood search}.
+}</md>
+</p>
+
+<p>These methods can be effective in practice but generally do not provide
+global optimality certificates.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-randomized-combinatorial-algorithms">
+<title>Randomized Algorithms</title>
+<p>A randomized algorithm makes random choices during computation.</p>
+
+<p>Its performance may be analyzed through:</p>
+
+<p>
+<md>\boxed{
+\text{expected running time},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{probability of success},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{expected approximation quality}.
+}</md>
+</p>
+
+<p>Randomization can simplify algorithms or improve practical performance.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-randomized-rounding-preview">
+<title>Randomized Rounding Preview</title>
+<p>Suppose an LP relaxation gives fractional values</p>
+
+<p>
+<md>0\leq x_i^*\leq1.</md>
+</p>
+
+<p>Randomized rounding may set</p>
+
+<p>
+<md>X_i
+=
+1</md>
+</p>
+
+<p>with probability</p>
+
+<p>
+<md>\boxed{
+x_i^*.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[X_i]
+=
+x_i^*.
+}</md>
+</p>
+
+<p>The challenge is controlling feasibility and concentration around expected
+values.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-probabilistic-method-combinatorial">
+<title>Probabilistic Method Connection</title>
+<p>Sometimes random selection proves that a good combinatorial object must
+exist.</p>
+
+<p>If a randomly generated solution has positive probability of satisfying
+a desired property, then at least one such deterministic object exists.</p>
+
+<p>This connects combinatorial optimization with probabilistic combinatorics.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-submodular-functions-optimization">
+<title>Submodular Functions</title>
+<p>A set function</p>
+
+<p>
+<md>f:2^V\to\mathbb{R}</md>
+</p>
+
+<p>is submodular if it has diminishing returns.</p>
+
+<p>One equivalent condition is</p>
+
+<p>
+<md>\boxed{
+f(A\cup\{e\})-f(A)
+\geq
+f(B\cup\{e\})-f(B)
+}</md>
+</p>
+
+<p>whenever</p>
+
+<p>
+<md>A\subseteq B</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>e\notin B.</md>
+</p>
+
+<p>The marginal value of adding <m>e</m> decreases as the selected set grows.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-examples-submodularity">
+<title>Examples of Submodularity</title>
+<p>Submodular functions arise in:</p>
+
+<p>
+<md>\boxed{
+\text{coverage},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{information gain},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{sensor placement},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{influence maximization}.
+}</md>
+</p>
+
+<p>They are often viewed as discrete analogues of convex or concave
+structure, depending on whether one studies minimization or maximization.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-monotone-submodular-maximization">
+<title>Monotone Submodular Maximization</title>
+<p>Suppose <m>f</m> is monotone submodular and one may select at most <m>k</m>
+elements:</p>
+
+<p>
+<md>\boxed{
+\max
+f(S)
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+|S|\leq k.
+}</md>
+</p>
+
+<p>The greedy algorithm repeatedly adds the element with largest marginal
+gain.</p>
+
+<p>This greedy method has a strong approximation guarantee.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-submodular-greedy-guarantee">
+<title>Submodular Greedy Guarantee</title>
+<p>For nonnegative monotone submodular maximization under a cardinality
+constraint, the standard greedy algorithm achieves at least</p>
+
+<p>
+<md>\boxed{
+1-\frac1e
+}</md>
+</p>
+
+<p>of the optimal value.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+f(S_{\mathrm{greedy}})
+\geq
+\left(
+1-\frac1e
+\right)
+f(S^*).
+}</md>
+</p>
+
+<p>This is one of the most important approximation results in discrete
+optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-submodular-minimization-preview">
+<title>Submodular Minimization Preview</title>
+<p>Unconstrained submodular minimization can be solved in polynomial time.</p>
+
+<p>This is striking because submodular maximization can be difficult.</p>
+
+<p>Thus the direction of optimization matters greatly even for the same
+function class.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-dp-state-spaces">
+<title>Dynamic Programming and State Spaces</title>
+<p>A discrete optimization problem may be represented by states</p>
+
+<p>
+<md>s</md>
+</p>
+
+<p>and decisions</p>
+
+<p>
+<md>a.</md>
+</p>
+
+<p>The optimal value may satisfy a recurrence such as</p>
+
+<p>
+<md>\boxed{
+V(s)
+=
+\min_{a\in A(s)}
+\left[
+c(s,a)
++
+V(T(s,a))
+\right].
+}</md>
+</p>
+
+<p>This turns combinatorial search into recursive optimization.</p>
+
+<p>The full framework is developed in the next section.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-memoization">
+<title>Memoization</title>
+<p>If many solution paths reach the same subproblem, solving that subproblem
+once and storing the answer avoids repeated computation.</p>
+
+<p>This is memoization.</p>
+
+<p>It can reduce exponential recursive enumeration to a much smaller state
+space when repeated subproblems are abundant.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-pseudo-polynomial">
+<title>Pseudo-Polynomial Dynamic Programming</title>
+<p>For integer knapsack, a dynamic program can depend on capacity <m>W</m>.</p>
+
+<p>Its complexity may be polynomial in <m>W</m> but not in the number of bits
+required to encode <m>W</m>.</p>
+
+<p>Such an algorithm is pseudo-polynomial rather than polynomial in the
+formal input length.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-approximation-schemes-preview">
+<title>Approximation Schemes Preview</title>
+<p>A polynomial-time approximation scheme, abbreviated PTAS, produces for
+each fixed</p>
+
+<p>
+<md>\varepsilon&gt;0</md>
+</p>
+
+<p>a solution within a factor such as</p>
+
+<p>
+<md>\boxed{
+1+\varepsilon
+}</md>
+</p>
+
+<p>of optimal for a minimization problem, with polynomial running time for
+fixed <m>\varepsilon</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-fptas-preview">
+<title>FPTAS Preview</title>
+<p>A fully polynomial-time approximation scheme, abbreviated FPTAS, has
+running time polynomial in both:</p>
+
+<p>
+<md>\boxed{
+\text{input size},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\frac1\varepsilon.
+}</md>
+</p>
+
+<p>The <m>0</m>-<m>1</m> knapsack problem admits an FPTAS.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-parameterized-complexity-preview">
+<title>Parameterization Preview</title>
+<p>Some hard problems become manageable when a structural parameter <m>k</m> is
+small.</p>
+
+<p>A fixed-parameter tractable algorithm has running time of the form</p>
+
+<p>
+<md>\boxed{
+f(k)n^{O(1)}.
+}</md>
+</p>
+
+<p>This separates the potentially expensive dependence on <m>k</m> from the
+polynomial dependence on the overall input size.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-treewidth-preview">
+<title>Treewidth Preview</title>
+<p>Treewidth measures how close a graph is to a tree in a structural sense.</p>
+
+<p>Many graph problems that are difficult in general become tractable on
+graphs of bounded treewidth using dynamic programming over a tree
+decomposition.</p>
+
+<p>This is an important example of exploiting combinatorial structure.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-decomposition">
+<title>Decomposition</title>
+<p>Large problems may contain weakly coupled components.</p>
+
+<p>If the problem separates into parts, one can solve smaller subproblems and
+combine their information.</p>
+
+<p>Decomposition ideas include:</p>
+
+<p>
+<md>\boxed{
+\text{dynamic programming},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Lagrangian relaxation},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Benders decomposition},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{column generation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-column-generation-combinatorial">
+<title>Column Generation and Combinatorial Subproblems</title>
+<p>In column generation, the master problem may contain an enormous family of
+possible combinatorial objects.</p>
+
+<p>For example, one variable may represent:</p>
+
+<p>
+<md>\boxed{
+\text{an entire route},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{a schedule},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{a cutting pattern}.
+}</md>
+</p>
+
+<p>A pricing problem searches for a new object with attractive reduced cost.</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-optimization-workflow">
+<title>Combinatorial Optimization Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify the discrete object to be selected;</p>
+</li>
+<li>
+<p>determine whether the object is a subset, path, tree, matching,
+          permutation, partition, or another structure;</p>
+</li>
+<li>
+<p>define the objective;</p>
+</li>
+<li>
+<p>write feasibility rules clearly;</p>
+</li>
+<li>
+<p>search for known special structure;</p>
+</li>
+<li>
+<p>determine whether a polynomial-time exact algorithm is known;</p>
+</li>
+<li>
+<p>formulate a binary or integer model when useful;</p>
+</li>
+<li>
+<p>examine LP or convex relaxations;</p>
+</li>
+<li>
+<p>strengthen the relaxation using valid inequalities;</p>
+</li>
+<li>
+<p>consider dynamic programming for recursive structure;</p>
+</li>
+<li>
+<p>consider branch-and-bound for exact general search;</p>
+</li>
+<li>
+<p>consider approximation algorithms for NP-hard problems;</p>
+</li>
+<li>
+<p>consider heuristics when exact methods are too expensive;</p>
+</li>
+<li>
+<p>use bounds to evaluate solution quality;</p>
+</li>
+<li>
+<p>exploit symmetry and decomposition;</p>
+</li>
+<li>
+<p>verify feasibility;</p>
+</li>
+<li>
+<p>distinguish empirical quality from proven guarantees.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-choosing-combinatorial-method">
+<title>Choosing a Combinatorial Method</title>
+<p>For shortest paths, consider:</p>
+
+<p>
+<md>\boxed{
+\text{specialized graph algorithms}.
+}</md>
+</p>
+
+<p>For minimum spanning trees, use:</p>
+
+<p>
+<md>\boxed{
+\text{Kruskal or Prim}.
+}</md>
+</p>
+
+<p>For bipartite assignment, use:</p>
+
+<p>
+<md>\boxed{
+\text{matching or assignment algorithms}.
+}</md>
+</p>
+
+<p>For recursive problems with manageable state spaces, use:</p>
+
+<p>
+<md>\boxed{
+\text{dynamic programming}.
+}</md>
+</p>
+
+<p>For general integer formulations, use:</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-cut}.
+}</md>
+</p>
+
+<p>For large NP-hard problems where exact optimization is impractical,
+consider:</p>
+
+<p>
+<md>\boxed{
+\text{approximation algorithms or heuristics}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-optimization-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-assuming-every-discrete-problem-requires-enumeration">
+<title>Assuming Every Discrete Problem Requires Enumeration</title>
+<p>Many combinatorial problems have specialized polynomial-time algorithms.</p>
+
+<p>Always identify structure before using brute force.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-greedy-algorithms-are-automatically-optimal">
+<title>Assuming Greedy Algorithms Are Automatically Optimal</title>
+<p>Greedy choice is not a proof.</p>
+
+<p>Optimality requires structure such as matroid exchange properties or an
+appropriate graph theorem.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-a-heuristic-with-an-approximation-algorithm">
+<title>Confusing a Heuristic with an Approximation Algorithm</title>
+<p>A heuristic may work well experimentally.</p>
+
+<p>An approximation algorithm additionally has a proven worst-case
+performance guarantee.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-the-relaxation-direction">
+<title>Ignoring the Relaxation Direction</title>
+<p>For minimization, enlarging the feasible set gives a lower bound.</p>
+
+<p>For maximization, enlarging the feasible set gives an upper bound.</p>
+
+<p>The bound direction must be interpreted correctly.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-fractional-lp-solutions-are-useless">
+<title>Assuming Fractional LP Solutions Are Useless</title>
+<p>Fractional solutions can provide:</p>
+
+<p>
+<md>\boxed{
+\text{bounds},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{branching information},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{cut-generation information}.
+}</md>
+</p>
+
+<p>They are central to modern discrete optimization.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-degree-constraints-alone-for-tsp">
+<title>Using Degree Constraints Alone for TSP</title>
+<p>Degree constraints can produce multiple disconnected subtours.</p>
+
+<p>Connectivity or subtour-elimination conditions are also required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-paths-trails-and-cycles">
+<title>Confusing Paths, Trails, and Cycles</title>
+<p>These graph structures have different restrictions.</p>
+
+<p>An optimization formulation must model the intended object precisely.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-all-graph-problems-have-similar-complexity">
+<title>Assuming All Graph Problems Have Similar Complexity</title>
+<p>Shortest path and minimum spanning tree are polynomially solvable.</p>
+
+<p>Maximum clique and general TSP are NP-hard.</p>
+
+<p>Superficially similar graph problems can have very different
+computational complexity.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-np-hard-with-impossible">
+<title>Confusing NP-Hard with Impossible</title>
+<p>NP-hard problems can often be solved exactly for moderate instances.</p>
+
+<p>The classification concerns worst-case complexity, not impossibility.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-np-hard-means-exponential-time-has-been-proven-necessary">
+<title>Assuming NP-Hard Means Exponential Time Has Been Proven Necessary</title>
+<p>NP-hardness does not currently prove that every exact algorithm must take
+exponential time.</p>
+
+<p>Such a conclusion would depend on unresolved complexity assumptions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-approximation-ratios-without-stating-the-convention">
+<title>Using Approximation Ratios Without Stating the Convention</title>
+<p>For minimization and maximization, approximation guarantees are often
+written differently.</p>
+
+<p>Always state what the ratio means.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-applying-metric-tsp-guarantees-to-nonmetric-costs">
+<title>Applying Metric-TSP Guarantees to Nonmetric Costs</title>
+<p>Algorithms such as double-tree and Christofides rely on the triangle
+inequality.</p>
+
+<p>Their guarantees do not automatically hold for arbitrary TSP instances.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-local-search-finds-the-global-optimum">
+<title>Assuming Local Search Finds the Global Optimum</title>
+<p>A locally optimal solution depends on the chosen neighborhood.</p>
+
+<p>Different neighborhoods can have very different local optima.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-11-optimization-operations-research-06-combinatorial-optimization-subsubsec-ignoring-symmetry">
+<title>Ignoring Symmetry</title>
+<p>Equivalent combinatorial solutions can create enormous redundant search.</p>
+
+<p>Symmetry-breaking or canonical representations may improve algorithms.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-optimization-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Transportation and Routing.</em>
+Shortest paths, vehicle routing, TSP variants, and network design are
+central combinatorial optimization problems.</p>
+
+<p>\medskip</p>
+
+<p><em>Scheduling.</em>
+Jobs must be assigned, ordered, and timed while satisfying resource and
+precedence restrictions.</p>
+
+<p>\medskip</p>
+
+<p><em>Telecommunications.</em>
+Network topology, routing, frequency assignment, and infrastructure
+placement involve discrete choices.</p>
+
+<p>\medskip</p>
+
+<p><em>Computer Science.</em>
+Graph algorithms, compiler optimization, memory allocation, clustering,
+and data structures often lead to combinatorial optimization.</p>
+
+<p>\medskip</p>
+
+<p><em>Logistics.</em>
+Warehouse selection, fleet assignment, packing, and distribution planning
+combine discrete structures with cost optimization.</p>
+
+<p>\medskip</p>
+
+<p><em>Biology.</em>
+Sequence alignment, phylogenetic trees, network reconstruction, and
+molecular structure problems contain combinatorial components.</p>
+
+<p>\medskip</p>
+
+<p><em>Machine Learning.</em>
+Feature selection, clustering, subset selection, structured prediction,
+and experimental design can involve discrete optimization.</p>
+
+<p>\medskip</p>
+
+<p><em>Public Planning.</em>
+Facility placement, districting, emergency response, and infrastructure
+design frequently require optimization over discrete alternatives.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-optimization-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define combinatorial optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give three examples of discrete feasible structures.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many subsets does an <m>n</m>-element set have?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many permutations are there of <m>n</m> distinct objects?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a matching.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a spanning tree.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a vertex cover.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an independent set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a clique.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an approximation algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a submodular function conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Represent a subset of five items using binary variables.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a constraint selecting exactly three of eight items.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the cost of a path whose edge weights are</p>
+
+<p>
+<md>2,\ 7,\ 4,\ 1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many edges does a spanning tree on <m>12</m> vertices contain?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether a given edge set is a matching.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether a given vertex set is independent.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write binary constraints for a vertex-cover problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write binary constraints for an independent-set problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a set-cover model for a universe with four elements.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a set-partitioning constraint requiring every element to be covered
+exactly once.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Dijkstra's algorithm on a small nonnegative weighted graph.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Kruskal's algorithm to construct a minimum spanning tree.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Prim's algorithm on the same graph and compare the result.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that a tree on <m>n</m> vertices has <m>n-1</m> edges.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a weighted bipartite matching problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a three-agent, three-task assignment problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write degree constraints for a four-city directed TSP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example showing that TSP degree constraints can produce two
+subtours.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a subtour-elimination constraint for a specified subset <m>S</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a minimum vertex-cover problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a maximum independent-set problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that the complement of a vertex cover is an independent set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove</p>
+
+<p>
+<md>\tau(G)+\alpha(G)=|V|.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that a clique in <m>G</m> is an independent set in <m>\overline{G}</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate graph coloring using binary assignment variables.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a maximum-cut formulation for a small graph.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example where greedy <m>0</m>-<m>1</m> knapsack by value-to-weight ratio
+is not optimal.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply the matroid greedy algorithm to a weighted graphic matroid.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Kruskal's algorithm is a matroid greedy algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct an LP relaxation for a combinatorial problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain whether its relaxation gives an upper or lower bound.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare an integer feasible solution with the relaxation bound.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how branch-and-bound can solve a combinatorial problem exactly.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a valid inequality that removes a given fractional point.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between an integer hull and an LP relaxation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why integrality of a polyhedron is algorithmically valuable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Classify shortest path, MST, and TSP according to known computational
+difficulty.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the decision version of the traveling salesperson problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between <m>P</m>, <m>NP</m>, NP-complete, and NP-hard.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show why a proposed TSP tour can be verified in polynomial time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply the greedy set-cover algorithm to a small instance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>H_5
+=
+1+\frac12+\frac13+\frac14+\frac15.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a minimum spanning tree provides a lower bound on the metric
+TSP optimum.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the factor-<m>2</m> guarantee of the double-tree metric-TSP method.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply the maximal-matching <m>2</m>-approximation for vertex cover.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a <m>2</m>-opt neighborhood for TSP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of a local optimum that is not globally optimal.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify submodularity of a simple coverage function.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply greedy cardinality-constrained submodular maximization to a small
+coverage problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between polynomial and pseudo-polynomial running
+time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain what a PTAS guarantees.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain what an FPTAS guarantees.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study polyhedral descriptions of the spanning-tree polytope.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the bipartite matching polytope.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove integrality of the bipartite matching formulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Edmonds' matching algorithm for general graphs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the minimum-cost perfect matching problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study TSP subtour-elimination polytopes.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate comb inequalities for the TSP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study branch-and-cut methods for the TSP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the set-cover polyhedron.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the greedy logarithmic approximation guarantee for set cover.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the <m>2</m>-approximation guarantee for vertex cover.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Christofides' algorithm and prove its
+<m>\frac32</m>-approximation guarantee.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study approximation hardness for general TSP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study semidefinite relaxations for maximum cut.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study randomized rounding for a covering problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study concentration inequalities used in randomized rounding.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the matroid greedy theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study matroid intersection.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study weighted matroid intersection.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study submodular minimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the</p>
+
+<p>
+<md>1-\frac1e</md>
+</p>
+
+<p>guarantee for greedy monotone submodular maximization under a cardinality
+constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study approximation algorithms under matroid constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study fixed-parameter algorithms for vertex cover.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study dynamic programming on bounded-treewidth graphs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the equivalence between optimization and separation for rational
+polyhedra.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate column generation for set-partitioning models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study decomposition methods for large combinatorial optimization models.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-optimization-summary">
+<title>Conceptual Summary</title>
+<p>Combinatorial optimization solves problems of the form</p>
+
+<p>
+<md>\boxed{
+\min_{x\in\mathcal{F}}
+c(x),
+}</md>
+</p>
+
+<p>where <m>\mathcal{F}</m> is a discrete family of structures.</p>
+
+<p>Typical objects include</p>
+
+<p>
+<md>\boxed{
+\text{subsets}
++
+\text{paths}
++
+\text{trees}
++
+\text{matchings}
++
+\text{tours}.
+}</md>
+</p>
+
+<p>Some important combinatorial problems have polynomial-time exact
+algorithms:</p>
+
+<p>
+<md>\boxed{
+\text{shortest path},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{minimum spanning tree},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{bipartite matching}.
+}</md>
+</p>
+
+<p>Others are NP-hard:</p>
+
+<p>
+<md>\boxed{
+\text{TSP},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{maximum clique},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{set cover},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{graph coloring}.
+}</md>
+</p>
+
+<p>Relaxations provide bounds:</p>
+
+<p>
+<md>\boxed{
+\mathcal{F}
+\subseteq
+\mathcal{R}.
+}</md>
+</p>
+
+<p>Exact algorithms may use:</p>
+
+<p>
+<md>\boxed{
+\text{dynamic programming},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-bound},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-cut}.
+}</md>
+</p>
+
+<p>When exact optimization is too expensive, one may use approximation
+algorithms with provable performance guarantees or heuristics aimed at
+high-quality practical solutions.</p>
+
+<p>Combinatorial optimization therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{discrete mathematics}
++
+\text{graph theory}
++
+\text{integer programming}
++
+\text{algorithms}
++
+\text{complexity theory}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-06-combinatorial-optimization-subsec-combinatorial-optimization-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Combinatorial Optimization builds on the discrete structures developed in
+Chapter 6 and the integer-programming framework of
+Section <xref ref="sec-integer-programming" />. Graph algorithms, matroids,
+polyhedral formulations, relaxations, approximation methods, and
+complexity theory explain why some discrete optimization problems admit
+efficient exact solutions while others require exponential search,
+approximation, or heuristics. The next section, Dynamic Programming,
+develops one of the central exact optimization methods for problems with
+sequential decisions, optimal substructure, and repeated subproblems.
+Dynamic programming will later connect directly with stochastic
+optimization, scheduling, control, and decision theory.</p>
+</remark>
+</subsection>
+
 </section>

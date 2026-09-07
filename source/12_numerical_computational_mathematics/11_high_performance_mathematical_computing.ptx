@@ -1,9 +1,4360 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-12-numerical-computational-mathematics-11-high-performance-mathematical-computing">
-  <title>High Performance Mathematical Computing</title>
+<section xml:id="sec-high-performance-mathematical-computing">
+<title>High-Performance Mathematical Computing</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Scientific computing, numerical linear algebra, numerical differential
+equations, Monte Carlo methods, sparse matrices, algorithmic complexity,
+parallel computing concepts, and basic computer architecture.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain the purpose of high-performance mathematical computing;</p>
+</li>
+<li>
+<p>distinguish algorithmic, implementation, and hardware
+          performance;</p>
+</li>
+<li>
+<p>understand computational throughput;</p>
+</li>
+<li>
+<p>recognize floating-point operation counts;</p>
+</li>
+<li>
+<p>understand memory bandwidth limitations;</p>
+</li>
+<li>
+<p>interpret arithmetic intensity;</p>
+</li>
+<li>
+<p>understand the roofline model conceptually;</p>
+</li>
+<li>
+<p>distinguish latency-bound, bandwidth-bound, and compute-bound
+          algorithms;</p>
+</li>
+<li>
+<p>understand cache blocking and tiling;</p>
+</li>
+<li>
+<p>recognize vectorization and SIMD computation;</p>
+</li>
+<li>
+<p>understand dense linear algebra performance;</p>
+</li>
+<li>
+<p>recognize matrix-matrix multiplication as a high-intensity
+          computational kernel;</p>
+</li>
+<li>
+<p>understand sparse linear algebra performance;</p>
+</li>
+<li>
+<p>recognize irregular memory access;</p>
+</li>
+<li>
+<p>understand matrix-free computation;</p>
+</li>
+<li>
+<p>understand shared-memory parallelism;</p>
+</li>
+<li>
+<p>understand distributed-memory parallelism;</p>
+</li>
+<li>
+<p>recognize message-passing patterns;</p>
+</li>
+<li>
+<p>distinguish local and global communication;</p>
+</li>
+<li>
+<p>understand collective operations;</p>
+</li>
+<li>
+<p>recognize reductions and broadcasts;</p>
+</li>
+<li>
+<p>understand communication complexity;</p>
+</li>
+<li>
+<p>analyze domain decomposition;</p>
+</li>
+<li>
+<p>understand halo exchange;</p>
+</li>
+<li>
+<p>recognize strong and weak scaling;</p>
+</li>
+<li>
+<p>calculate speedup and parallel efficiency;</p>
+</li>
+<li>
+<p>apply Amdahl's law;</p>
+</li>
+<li>
+<p>understand Gustafson-type scaling conceptually;</p>
+</li>
+<li>
+<p>recognize load imbalance;</p>
+</li>
+<li>
+<p>understand synchronization costs;</p>
+</li>
+<li>
+<p>recognize communication hiding;</p>
+</li>
+<li>
+<p>understand asynchronous computation conceptually;</p>
+</li>
+<li>
+<p>recognize accelerator computing;</p>
+</li>
+<li>
+<p>understand GPU execution conceptually;</p>
+</li>
+<li>
+<p>distinguish host and accelerator memory;</p>
+</li>
+<li>
+<p>understand data-transfer overhead;</p>
+</li>
+<li>
+<p>recognize kernel launch overhead;</p>
+</li>
+<li>
+<p>understand batch and fused operations;</p>
+</li>
+<li>
+<p>recognize mixed-precision computation;</p>
+</li>
+<li>
+<p>understand iterative refinement;</p>
+</li>
+<li>
+<p>recognize tensor and accelerator arithmetic;</p>
+</li>
+<li>
+<p>understand parallel numerical linear algebra;</p>
+</li>
+<li>
+<p>recognize distributed matrix layouts;</p>
+</li>
+<li>
+<p>understand block decomposition;</p>
+</li>
+<li>
+<p>recognize communication-avoiding algorithms;</p>
+</li>
+<li>
+<p>understand scalable Krylov methods;</p>
+</li>
+<li>
+<p>recognize global-reduction bottlenecks;</p>
+</li>
+<li>
+<p>understand multigrid scalability;</p>
+</li>
+<li>
+<p>recognize parallel FFT algorithms;</p>
+</li>
+<li>
+<p>understand distributed PDE solvers;</p>
+</li>
+<li>
+<p>recognize parallel Monte Carlo;</p>
+</li>
+<li>
+<p>understand ensemble parallelism;</p>
+</li>
+<li>
+<p>recognize parallel optimization;</p>
+</li>
+<li>
+<p>understand checkpointing at scale;</p>
+</li>
+<li>
+<p>recognize resilience and fault tolerance;</p>
+</li>
+<li>
+<p>understand reproducibility in parallel floating-point
+          computation;</p>
+</li>
+<li>
+<p>distinguish bitwise and numerical reproducibility;</p>
+</li>
+<li>
+<p>understand energy and resource efficiency conceptually;</p>
+</li>
+<li>
+<p>recognize performance portability;</p>
+</li>
+<li>
+<p>understand benchmarking and profiling at scale;</p>
+</li>
+<li>
+<p>design scalable computational experiments;</p>
+</li>
+<li>
+<p>connect high-performance computing with simulation,
+          optimization, numerical linear algebra, PDEs, statistics,
+          probability, and applied mathematics.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-what-is-hpmc">
+<title>What Is High-Performance Mathematical Computing?</title>
+<p>High-performance mathematical computing studies how mathematical
+algorithms can be executed efficiently on large and parallel computer
+systems.</p>
+
+<p>The central goal is not merely</p>
+
+<p>
+<md>\boxed{
+\text{to compute quickly},
+}</md>
+</p>
+
+<p>but rather</p>
+
+<p>
+<md>\boxed{
+\text{to solve mathematically meaningful problems at scales that would
+otherwise be impractical}.
+}</md>
+</p>
+
+<p>This includes problems involving:</p>
+
+<p>
+<md>\boxed{
+\text{large matrices},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{fine computational meshes},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{large simulation ensembles},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{high-dimensional optimization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-performance-layers">
+<title>Performance Has Several Layers</title>
+<p>Computational performance depends on several interacting layers:</p>
+
+<p>
+<md>\boxed{
+\text{mathematical formulation}
+}</md>
+</p>
+
+<p>
+<md>\downarrow</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{numerical algorithm}
+}</md>
+</p>
+
+<p>
+<md>\downarrow</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{software implementation}
+}</md>
+</p>
+
+<p>
+<md>\downarrow</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{hardware architecture}.
+}</md>
+</p>
+
+<p>Improving one layer cannot always compensate for a poor choice at another
+layer.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-algorithm-versus-hardware">
+<title>Algorithmic Improvement Versus Faster Hardware</title>
+<p>Suppose one algorithm costs</p>
+
+<p>
+<md>O(n^3)</md>
+</p>
+
+<p>while another costs</p>
+
+<p>
+<md>O(n^2).</md>
+</p>
+
+<p>For sufficiently large <m>n</m>, the algorithmic improvement dominates any
+fixed hardware speedup.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\text{better mathematics}
+}</md>
+</p>
+
+<p>can provide a larger performance gain than</p>
+
+<p>
+<md>\boxed{
+\text{faster processors}.
+}</md>
+</p>
+
+<p>High-performance computing begins with good algorithmic design.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-flops">
+<title>Floating-Point Operations</title>
+<p>A floating-point operation, abbreviated FLOP, is an arithmetic operation
+performed on floating-point values.</p>
+
+<p>Performance is often expressed as</p>
+
+<p>
+<md>\boxed{
+\text{FLOP/s}
+=
+\frac{
+\text{number of floating-point operations}
+}{
+\text{execution time}
+}.
+}</md>
+</p>
+
+<p>Large values indicate high arithmetic throughput.</p>
+
+<p>However, FLOP/s alone does not characterize every algorithm.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-peak-sustained-performance">
+<title>Peak and Sustained Performance</title>
+<p>Peak performance is the theoretical maximum arithmetic rate of the
+hardware.</p>
+
+<p>Sustained performance is the rate actually achieved by an application.</p>
+
+<p>Usually,</p>
+
+<p>
+<md>\boxed{
+\text{sustained performance}
+&lt;
+\text{peak performance}.
+}</md>
+</p>
+
+<p>The gap may arise from:</p>
+
+<p>
+<md>\boxed{
+\text{memory traffic},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{branching},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{poor parallel utilization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-memory-bandwidth">
+<title>Memory Bandwidth</title>
+<p>Memory bandwidth measures the rate at which data can be transferred
+between memory and processing units.</p>
+
+<p>A simple model is</p>
+
+<p>
+<md>\boxed{
+\text{time}
+\approx
+\frac{
+\text{bytes transferred}
+}{
+\text{memory bandwidth}
+}.
+}</md>
+</p>
+
+<p>Algorithms performing little arithmetic per byte may be limited primarily
+by memory bandwidth rather than arithmetic capability.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-arithmetic-intensity">
+<title>Arithmetic Intensity</title>
+<p>Arithmetic intensity is</p>
+
+<p>
+<md>\boxed{
+I
+=
+\frac{
+\text{floating-point operations}
+}{
+\text{bytes transferred}
+}.
+}</md>
+</p>
+
+<p>Low <m>I</m> suggests a memory-bound computation.</p>
+
+<p>High <m>I</m> provides greater opportunity to use the processor's arithmetic
+capability.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-roofline-model">
+<title>Roofline Model</title>
+<p>A simplified roofline performance model estimates attainable performance
+as</p>
+
+<p>
+<md>\boxed{
+P
+\leq
+\min
+\left(
+P_{\mathrm{peak}},
+B I
+\right),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>P_{\mathrm{peak}}</md>
+</p>
+
+<p>is peak arithmetic throughput,</p>
+
+<p>
+<md>B</md>
+</p>
+
+<p>is memory bandwidth, and</p>
+
+<p>
+<md>I</md>
+</p>
+
+<p>is arithmetic intensity.</p>
+
+<p>The model separates two main regimes.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-bandwidth-bound-regime">
+<title>Bandwidth-Bound Regime</title>
+<p>If</p>
+
+<p>
+<md>BI&lt;P_{\mathrm{peak}},</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+P
+\lesssim
+BI.
+}</md>
+</p>
+
+<p>Performance is limited primarily by memory bandwidth.</p>
+
+<p>Increasing arithmetic capability alone produces little benefit.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-compute-bound-regime">
+<title>Compute-Bound Regime</title>
+<p>If</p>
+
+<p>
+<md>BI\geq P_{\mathrm{peak}},</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+P
+\lesssim
+P_{\mathrm{peak}}.
+}</md>
+</p>
+
+<p>The computation has enough arithmetic intensity to approach the hardware's
+computational ceiling.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-worked-roofline-estimate">
+<title>Worked Example: Roofline Estimate</title>
+<example>
+<title>Estimating a Performance Bound</title>
+<p>Suppose a processor has peak performance</p>
+
+<p>
+<md>P_{\mathrm{peak}}
+=
+1000</md>
+</p>
+
+<p>GFLOP/s and memory bandwidth</p>
+
+<p>
+<md>B
+=
+200</md>
+</p>
+
+<p>GB/s.</p>
+
+<p>Suppose an algorithm has arithmetic intensity</p>
+
+<p>
+<md>I
+=
+2</md>
+</p>
+
+<p>FLOP/byte.</p>
+
+<p>Then</p>
+
+<p>
+<md>BI
+=
+200(2)
+=
+400</md>
+</p>
+
+<p>GFLOP/s.</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>P
+\leq
+\min(1000,400).</md>
+</p>
+
+<p>The algorithm is bandwidth bound under this simplified model.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+P
+\leq
+400\text{ GFLOP/s}.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-roofline-threshold">
+<title>Operational Intensity Threshold</title>
+<p>The crossover between bandwidth-bound and compute-bound behavior occurs
+near</p>
+
+<p>
+<md>\boxed{
+I^*
+=
+\frac{
+P_{\mathrm{peak}}
+}{
+B
+}.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>I&lt;I^*,</md>
+</p>
+
+<p>the computation tends to be bandwidth bound.</p>
+
+<p>If</p>
+
+<p>
+<md>I&gt;I^*,</md>
+</p>
+
+<p>the computation may become compute bound.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-data-reuse">
+<title>Data Reuse</title>
+<p>Arithmetic intensity can often be improved by reusing data already loaded
+into fast memory.</p>
+
+<p>For example, a matrix block may be loaded once and used for many
+multiplications.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\text{data reuse}
+\longrightarrow
+\text{higher arithmetic intensity}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-cache-blocking">
+<title>Cache Blocking</title>
+<p>Cache blocking divides a computation into smaller pieces that fit into
+faster memory.</p>
+
+<p>For matrix multiplication,</p>
+
+<p>
+<md>C=AB,</md>
+</p>
+
+<p>partition matrices into blocks:</p>
+
+<p>
+<md>\boxed{
+A_{ik},
+\qquad
+B_{kj},
+\qquad
+C_{ij}.
+}</md>
+</p>
+
+<p>Then update</p>
+
+<p>
+<md>\boxed{
+C_{ij}
+\leftarrow
+C_{ij}
++
+A_{ik}B_{kj}.
+}</md>
+</p>
+
+<p>The goal is to reuse blocks before they leave cache.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-tiling">
+<title>Tiling</title>
+<p>Tiling is the general strategy of dividing iteration spaces or arrays into
+blocks.</p>
+
+<p>It improves locality by keeping working data close to the processor.</p>
+
+<p>Tiling appears in:</p>
+
+<p>
+<md>\boxed{
+\text{dense matrix multiplication},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{stencil computation},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{tensor operations}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-vectorization-simd">
+<title>Vectorization and SIMD</title>
+<p>SIMD means Single Instruction, Multiple Data.</p>
+
+<p>A single processor instruction operates on several numbers simultaneously.</p>
+
+<p>For vectors</p>
+
+<p>
+<md>x,y\in\mathbb{R}^n,</md>
+</p>
+
+<p>operations such as</p>
+
+<p>
+<md>\boxed{
+y
+\leftarrow
+ax+y
+}</md>
+</p>
+
+<p>can process several vector entries in parallel.</p>
+
+<p>Algorithms with regular arithmetic patterns vectorize especially well.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-contiguous-memory-access">
+<title>Data Alignment and Contiguous Access</title>
+<p>Processors typically move memory in blocks.</p>
+
+<p>Sequential access to contiguous elements therefore tends to be efficient.</p>
+
+<p>Irregular access such as</p>
+
+<p>
+<md>x_{p_1},
+x_{p_2},
+x_{p_3},
+\ldots</md>
+</p>
+
+<p>with unpredictable indices can reduce locality and effective bandwidth.</p>
+
+<p>This distinction is important in sparse computation.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-dense-matrix-multiplication">
+<title>Dense Matrix Multiplication</title>
+<p>For dense matrices</p>
+
+<p>
+<md>A,B\in\mathbb{R}^{n\times n},</md>
+</p>
+
+<p>standard matrix multiplication requires approximately</p>
+
+<p>
+<md>\boxed{
+2n^3
+}</md>
+</p>
+
+<p>floating-point operations.</p>
+
+<p>The result contains only</p>
+
+<p>
+<md>n^2</md>
+</p>
+
+<p>entries.</p>
+
+<p>Because matrix entries can be reused many times, dense matrix
+multiplication can achieve high arithmetic intensity.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-why-gemm-efficient">
+<title>Why Matrix-Matrix Multiplication Is Efficient</title>
+<p>In</p>
+
+<p>
+<md>C=AB,</md>
+</p>
+
+<p>each element of <m>A</m> and <m>B</m> participates in many arithmetic operations.</p>
+
+<p>Well-blocked implementations exploit this reuse.</p>
+
+<p>Therefore dense matrix multiplication is a fundamental high-performance
+kernel and often approaches a large fraction of machine peak throughput.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-matrix-vector">
+<title>Matrix-Vector Multiplication</title>
+<p>For dense</p>
+
+<p>
+<md>y=Ax,</md>
+</p>
+
+<p>the operation count is approximately</p>
+
+<p>
+<md>\boxed{
+2n^2,
+}</md>
+</p>
+
+<p>while the entire matrix <m>A</m> must usually be read.</p>
+
+<p>Each matrix entry contributes to only a small number of operations.</p>
+
+<p>Thus matrix-vector multiplication generally has much lower arithmetic
+intensity than matrix-matrix multiplication.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-spmv">
+<title>Sparse Matrix-Vector Multiplication</title>
+<p>For sparse matrix <m>A</m>,</p>
+
+<p>
+<md>\boxed{
+y=Ax
+}</md>
+</p>
+
+<p>requires approximately</p>
+
+<p>
+<md>\boxed{
+2\operatorname{nnz}(A)
+}</md>
+</p>
+
+<p>floating-point operations.</p>
+
+<p>However, the computation must also read:</p>
+
+<p>
+<md>\boxed{
+\text{values},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{column indices},
+}</md>
+</p>
+
+<p>and irregular elements of</p>
+
+<p>
+<md>\boxed{
+x.
+}</md>
+</p>
+
+<p>Sparse matrix-vector multiplication is therefore commonly bandwidth
+limited.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-sparse-storage">
+<title>Sparse Storage Formats</title>
+<p>Sparse matrices may be stored using structures such as:</p>
+
+<p>
+<md>\boxed{
+\text{compressed rows},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{compressed columns},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{coordinate lists}.
+}</md>
+</p>
+
+<p>The best format depends on the computational operation and matrix
+structure.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-structured-sparse-matrices">
+<title>Structured Sparse Matrices</title>
+<p>Matrices arising from regular PDE grids often have predictable sparsity.</p>
+
+<p>For example, a five-point stencil has only a few neighbors per grid point.</p>
+
+<p>In such cases, it may be unnecessary to store matrix indices explicitly.</p>
+
+<p>The stencil itself defines the matrix action.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-matrix-free">
+<title>Matrix-Free Computation</title>
+<p>A matrix-free method computes</p>
+
+<p>
+<md>\boxed{
+v
+\mapsto
+Av
+}</md>
+</p>
+
+<p>without explicitly storing <m>A</m>.</p>
+
+<p>This is particularly useful when <m>A</m> arises from a differential
+operator.</p>
+
+<p>Advantages include:</p>
+
+<p>
+<md>\boxed{
+\text{lower memory use},
+}</md>
+</p>
+
+<p>and sometimes</p>
+
+<p>
+<md>\boxed{
+\text{greater arithmetic intensity}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-matrix-free-pde-operator">
+<title>Matrix-Free PDE Operator</title>
+<p>For the discrete one-dimensional Laplacian,</p>
+
+<p>
+<md>(Au)_i
+=
+\frac{
+-u_{i-1}
++
+2u_i
+-
+u_{i+1}
+}{
+h^2
+}.</md>
+</p>
+
+<p>Instead of storing the tridiagonal matrix, compute this stencil directly.</p>
+
+<p>The matrix is represented implicitly by the numerical operator.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-shared-memory">
+<title>Shared-Memory Parallelism</title>
+<p>In shared-memory computation, many processor cores access the same memory
+space.</p>
+
+<p>A loop may be divided across threads:</p>
+
+<p>
+<md>\boxed{
+\{1,\ldots,N\}
+=
+I_1
+\cup
+\cdots
+\cup
+I_p.
+}</md>
+</p>
+
+<p>Thread <m>j</m> processes indices in <m>I_j</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-loop-independence">
+<title>Parallel Loop Independence</title>
+<p>A loop is easy to parallelize when iterations are independent.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+y_i
+=
+a x_i+b_i
+}</md>
+</p>
+
+<p>can be computed independently for every <m>i</m>.</p>
+
+<p>If iterations depend on previous results, additional algorithmic
+restructuring may be required.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-race-conditions">
+<title>Race Conditions</title>
+<p>Suppose several threads execute</p>
+
+<p>
+<md>s
+\leftarrow
+s+x_i.</md>
+</p>
+
+<p>If updates occur simultaneously without coordination, increments may be
+lost.</p>
+
+<p>This is a race condition.</p>
+
+<p>Parallel reductions require specialized synchronization or reduction
+strategies.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-parallel-reductions">
+<title>Parallel Reductions</title>
+<p>To compute</p>
+
+<p>
+<md>s
+=
+\sum_{i=1}^{N}
+x_i,</md>
+</p>
+
+<p>each worker can first compute a local sum</p>
+
+<p>
+<md>\boxed{
+s_j
+=
+\sum_{i\in I_j}
+x_i.
+}</md>
+</p>
+
+<p>Then combine the local sums:</p>
+
+<p>
+<md>\boxed{
+s
+=
+\sum_{j=1}^{p}
+s_j.
+}</md>
+</p>
+
+<p>A tree reduction reduces the parallel depth from <m>O(p)</m> to approximately</p>
+
+<p>
+<md>\boxed{
+O(\log p).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-synchronization-overhead">
+<title>Synchronization Overhead</title>
+<p>Parallel tasks sometimes must wait until all participants reach the same
+stage.</p>
+
+<p>A synchronization barrier enforces such coordination.</p>
+
+<p>Frequent barriers can reduce performance because fast workers wait for
+slow workers.</p>
+
+<p>Thus scalable algorithms minimize unnecessary synchronization.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-distributed-memory">
+<title>Distributed-Memory Parallelism</title>
+<p>In distributed-memory systems, each process owns separate local memory.</p>
+
+<p>Data must be exchanged explicitly.</p>
+
+<p>The computation therefore contains:</p>
+
+<p>
+<md>\boxed{
+\text{local arithmetic}
++
+\text{communication}.
+}</md>
+</p>
+
+<p>Large clusters and supercomputers commonly use this model.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-point-to-point">
+<title>Point-to-Point Communication</title>
+<p>A process can send data directly to another process:</p>
+
+<p>
+<md>\boxed{
+P_i
+\rightarrow
+P_j.
+}</md>
+</p>
+
+<p>This is useful for exchanging local neighboring information.</p>
+
+<p>Domain-decomposed PDE methods commonly use point-to-point communication.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-collectives">
+<title>Collective Communication</title>
+<p>Collective communication involves groups of processes.</p>
+
+<p>Important examples include:</p>
+
+<p>
+<md>\boxed{
+\text{broadcast},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{reduction},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{all-reduction},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{gather/scatter}.
+}</md>
+</p>
+
+<p>Collectives simplify communication patterns but may become scalability
+bottlenecks.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-broadcast">
+<title>Broadcast</title>
+<p>A broadcast sends one process's data to all others.</p>
+
+<p>Conceptually,</p>
+
+<p>
+<md>\boxed{
+P_0
+\longrightarrow
+P_1,\ldots,P_{p-1}.
+}</md>
+</p>
+
+<p>Broadcasts occur when every worker requires shared parameters or matrix
+blocks.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-global-reduction">
+<title>Global Reduction</title>
+<p>A global reduction combines one value from every process.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+s
+=
+\sum_{j=1}^{p}
+s_j.
+}</md>
+</p>
+
+<p>Dot products in distributed iterative solvers require reductions.</p>
+
+<p>Global reductions often require synchronization across the full machine.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-communication-model">
+<title>Communication Cost Model</title>
+<p>A simple communication model for sending <m>m</m> words is</p>
+
+<p>
+<md>\boxed{
+T_{\mathrm{comm}}
+=
+\alpha+\beta m,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\alpha
+=
+\text{latency},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\beta
+=
+\text{time per transmitted word}.</md>
+</p>
+
+<p>This explains why many tiny messages can be inefficient.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-latency">
+<title>Latency</title>
+<p>Latency is the fixed cost of initiating a communication.</p>
+
+<p>Even a very small message incurs this startup cost.</p>
+
+<p>Thus a program issuing millions of tiny messages can be much slower than
+one transferring the same total data in larger batches.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-network-bandwidth">
+<title>Bandwidth</title>
+<p>Network bandwidth determines the rate at which large messages can be
+transferred.</p>
+
+<p>When messages are large, communication cost is dominated increasingly by</p>
+
+<p>
+<md>\boxed{
+\beta m.
+}</md>
+</p>
+
+<p>Both latency and bandwidth must therefore be considered.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-communication-avoidance">
+<title>Communication Avoidance</title>
+<p>A communication-avoiding algorithm reorganizes computation to reduce data
+movement or synchronization.</p>
+
+<p>The goal may be to reduce:</p>
+
+<p>
+<md>\boxed{
+\text{number of messages},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{total communicated data},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{global reductions}.
+}</md>
+</p>
+
+<p>On modern large machines, reducing communication can be more important than
+reducing arithmetic operations.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-communication-hiding">
+<title>Communication Hiding</title>
+<p>Communication hiding overlaps communication with useful computation.</p>
+
+<p>Conceptually,</p>
+
+<p>
+<md>\boxed{
+\text{communicate data}
+\parallel
+\text{compute independent work}.
+}</md>
+</p>
+
+<p>If enough independent work exists, part of the communication time becomes
+invisible in total runtime.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-nonblocking-communication">
+<title>Nonblocking Communication</title>
+<p>Nonblocking communication allows a program to initiate a transfer and
+continue computing before the transfer completes.</p>
+
+<p>Later, the program checks or waits for completion.</p>
+
+<p>This supports communication overlap but requires careful dependency
+management.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-domain-decomposition">
+<title>Domain Decomposition</title>
+<p>Suppose</p>
+
+<p>
+<md>\Omega
+=
+\Omega_1
+\cup
+\cdots
+\cup
+\Omega_p.</md>
+</p>
+
+<p>Process <m>j</m> owns subdomain</p>
+
+<p>
+<md>\Omega_j.</md>
+</p>
+
+<p>Each process performs local calculations while exchanging data along
+subdomain boundaries.</p>
+
+<p>This is a central strategy for scalable PDE simulation.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-halo-exchange">
+<title>Halo Exchange</title>
+<p>Suppose a finite-difference stencil requires neighboring values.</p>
+
+<p>Near a subdomain boundary, some neighbors are stored by another process.</p>
+
+<p>Local copies are stored in ghost or halo cells.</p>
+
+<p>At each update,</p>
+
+<p>
+<md>\boxed{
+\text{neighboring processes exchange halo values}.
+}</md>
+</p>
+
+<p>The interior can then be updated locally.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-interior-boundary-work">
+<title>Interior and Boundary Work</title>
+<p>A domain-decomposed PDE step can often be organized as:</p>
+
+<p>
+<ol>
+<li>
+<p>initiate halo communication;</p>
+</li>
+<li>
+<p>update interior points;</p>
+</li>
+<li>
+<p>complete communication;</p>
+</li>
+<li>
+<p>update boundary-adjacent points.</p>
+</li>
+</ol>
+</p>
+
+<p>This overlaps local computation with communication.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-surface-volume-scaling">
+<title>Surface-to-Volume Scaling</title>
+<p>For a three-dimensional cubic subdomain with side length <m>n</m>,</p>
+
+<p>
+<md>\boxed{
+\text{computation}
+\sim
+n^3,
+}</md>
+</p>
+
+<p>while interface communication scales approximately as</p>
+
+<p>
+<md>\boxed{
+n^2.
+}</md>
+</p>
+
+<p>As local subdomains become smaller, the communication-to-computation ratio
+increases.</p>
+
+<p>This limits strong scaling.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-speedup">
+<title>Parallel Speedup</title>
+<p>If serial runtime is</p>
+
+<p>
+<md>T_1</md>
+</p>
+
+<p>and runtime using <m>p</m> processing units is</p>
+
+<p>
+<md>T_p,</md>
+</p>
+
+<p>define speedup</p>
+
+<p>
+<md>\boxed{
+S_p
+=
+\frac{
+T_1
+}{
+T_p
+}.
+}</md>
+</p>
+
+<p>Ideal scaling gives</p>
+
+<p>
+<md>\boxed{
+S_p=p.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-parallel-efficiency">
+<title>Parallel Efficiency</title>
+<p>Parallel efficiency is</p>
+
+<p>
+<md>\boxed{
+E_p
+=
+\frac{
+S_p
+}{
+p
+}.
+}</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+E_p
+=
+\frac{
+T_1
+}{
+pT_p
+}.
+}</md>
+</p>
+
+<p>Perfect efficiency gives</p>
+
+<p>
+<md>\boxed{
+E_p=1.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-worked-hpmc-scaling">
+<title>Worked Example: Parallel Scaling</title>
+<example>
+<title>Speedup and Efficiency</title>
+<p>Suppose a computation requires</p>
+
+<p>
+<md>T_1=800</md>
+</p>
+
+<p>seconds on one processor.</p>
+
+<p>On <m>16</m> processors it requires</p>
+
+<p>
+<md>T_{16}=60</md>
+</p>
+
+<p>seconds.</p>
+
+<p>Then</p>
+
+<p>
+<md>S_{16}
+=
+\frac{800}{60}
+\approx
+13.33.</md>
+</p>
+
+<p>The efficiency is</p>
+
+<p>
+<md>E_{16}
+=
+\frac{
+13.33
+}{
+16
+}
+\approx
+0.833.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+S_{16}\approx13.33,
+\qquad
+E_{16}\approx83.3\%.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-amdahl">
+<title>Amdahl's Law</title>
+<p>Suppose fraction <m>s</m> of a computation remains serial.</p>
+
+<p>Then idealized speedup is</p>
+
+<p>
+<md>\boxed{
+S_p
+=
+\frac{
+1
+}{
+s+\frac{1-s}{p}
+}.
+}</md>
+</p>
+
+<p>As</p>
+
+<p>
+<md>p\to\infty,</md>
+</p>
+
+<p>
+<md>\boxed{
+S_{\max}
+=
+\frac1s.
+}</md>
+</p>
+
+<p>Thus serial work limits strong scaling.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-worked-serial-fraction">
+<title>Worked Example: Serial Fraction</title>
+<example>
+<title>Amdahl Limit</title>
+<p>Suppose</p>
+
+<p>
+<md>s=0.02.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>S_{\max}
+=
+\frac1{0.02}
+=
+50.</md>
+</p>
+
+<p>Even infinitely many processors cannot overcome the serial fraction in this
+idealized model.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+S_{\max}=50.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-strong-scaling">
+<title>Strong Scaling</title>
+<p>Strong scaling keeps total problem size fixed while increasing <m>p</m>.</p>
+
+<p>The goal is to reduce</p>
+
+<p>
+<md>\boxed{
+T_p.
+}</md>
+</p>
+
+<p>Eventually each processor receives too little work relative to
+communication and synchronization overhead.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-weak-scaling">
+<title>Weak Scaling</title>
+<p>Weak scaling increases total problem size as the number of processors
+increases.</p>
+
+<p>If each process performs approximately the same amount of local work, the
+ideal weak-scaling runtime remains nearly constant.</p>
+
+<p>Thus weak scaling asks whether additional hardware can support
+proportionally larger problems.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-gustafson-scaling">
+<title>Gustafson-Type Scaling</title>
+<p>Amdahl's law assumes a fixed total problem size.</p>
+
+<p>In many scientific applications, adding processors allows the problem to
+grow.</p>
+
+<p>Gustafson-type reasoning emphasizes that the parallel fraction can increase
+with problem size.</p>
+
+<p>Thus large machines may be useful even when strong-scaling speedup is
+limited.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-load-imbalance">
+<title>Load Imbalance</title>
+<p>Suppose worker <m>j</m> requires time</p>
+
+<p>
+<md>T_j.</md>
+</p>
+
+<p>If all workers synchronize at the end, total time is approximately</p>
+
+<p>
+<md>\boxed{
+\max_j T_j.
+}</md>
+</p>
+
+<p>Thus one slow worker can delay every other worker.</p>
+
+<p>Balanced partitioning seeks</p>
+
+<p>
+<md>\boxed{
+T_1
+\approx
+T_2
+\approx
+\cdots
+\approx
+T_p.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-static-dynamic-load-balancing">
+<title>Static and Dynamic Load Balancing</title>
+<p>Static load balancing assigns tasks before execution.</p>
+
+<p>Dynamic load balancing redistributes work while computation proceeds.</p>
+
+<p>Static assignment has lower overhead.</p>
+
+<p>Dynamic assignment is useful when task costs are difficult to predict.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-accelerator-computing">
+<title>Accelerator Computing</title>
+<p>Accelerators are specialized processors designed for high computational
+throughput.</p>
+
+<p>The most common examples are GPUs.</p>
+
+<p>They are especially effective for:</p>
+
+<p>
+<md>\boxed{
+\text{regular parallel arithmetic},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{dense linear algebra},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{large independent batches}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-gpu-parallelism">
+<title>GPU Parallelism</title>
+<p>GPUs execute many lightweight computational threads.</p>
+
+<p>Performance is best when many threads perform similar operations on large
+amounts of data.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+y_i=ax_i+b_i,
+}</md>
+</p>
+
+<p>and grid-based simulation updates.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-host-device">
+<title>Host and Device</title>
+<p>In a heterogeneous system, one often distinguishes:</p>
+
+<p>
+<md>\boxed{
+\text{host}
+=
+\text{CPU side},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{device}
+=
+\text{accelerator side}.
+}</md>
+</p>
+
+<p>Data may need to move between separate memory spaces.</p>
+
+<p>Such transfers can be costly.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-accelerator-transfer-cost">
+<title>Accelerator Transfer Cost</title>
+<p>Suppose computation takes</p>
+
+<p>
+<md>T_{\mathrm{kernel}}</md>
+</p>
+
+<p>but transferring input and output requires</p>
+
+<p>
+<md>T_{\mathrm{transfer}}.</md>
+</p>
+
+<p>Total accelerator time is approximately</p>
+
+<p>
+<md>\boxed{
+T
+=
+T_{\mathrm{transfer}}
++
+T_{\mathrm{kernel}}.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>T_{\mathrm{transfer}}
+\gg
+T_{\mathrm{kernel}},</md>
+</p>
+
+<p>the accelerator may provide little overall benefit.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-kernel-launch-overhead">
+<title>Kernel Launch Overhead</title>
+<p>Starting an accelerator kernel incurs a fixed overhead.</p>
+
+<p>Therefore thousands of tiny kernels may be inefficient.</p>
+
+<p>Combining operations into larger kernels can reduce launch overhead and
+intermediate memory traffic.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-kernel-fusion">
+<title>Kernel Fusion</title>
+<p>Suppose an algorithm computes</p>
+
+<p>
+<md>y_i=f(x_i)</md>
+</p>
+
+<p>and then</p>
+
+<p>
+<md>z_i=g(y_i).</md>
+</p>
+
+<p>Instead of storing all <m>y_i</m>, a fused kernel can compute</p>
+
+<p>
+<md>\boxed{
+z_i
+=
+g(f(x_i))
+}</md>
+</p>
+
+<p>directly.</p>
+
+<p>This reduces:</p>
+
+<p>
+<md>\boxed{
+\text{memory traffic},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{kernel launches}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-batch-computation">
+<title>Batch Computation</title>
+<p>Many small operations can be grouped into a larger batch.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{many small matrix factorizations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{many Monte Carlo trajectories},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{many independent model evaluations}.
+}</md>
+</p>
+
+<p>Batching increases available parallelism and amortizes overhead.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-mixed-precision">
+<title>Mixed Precision</title>
+<p>Different parts of a computation may use different numerical precisions.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\text{low precision}
+}</md>
+</p>
+
+<p>may be used for an approximate solve, followed by</p>
+
+<p>
+<md>\boxed{
+\text{high-precision correction}.
+}</md>
+</p>
+
+<p>This can reduce memory traffic and increase arithmetic throughput.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-iterative-refinement">
+<title>Iterative Refinement</title>
+<p>Suppose an approximate solution <m>x_k</m> of</p>
+
+<p>
+<md>Ax=b</md>
+</p>
+
+<p>is available.</p>
+
+<p>Compute high-accuracy residual</p>
+
+<p>
+<md>\boxed{
+r_k
+=
+b-Ax_k.
+}</md>
+</p>
+
+<p>Solve approximately</p>
+
+<p>
+<md>\boxed{
+A\delta x_k
+=
+r_k
+}</md>
+</p>
+
+<p>and update</p>
+
+<p>
+<md>\boxed{
+x_{k+1}
+=
+x_k+\delta x_k.
+}</md>
+</p>
+
+<p>The inner solve may sometimes use lower precision than the residual
+calculation.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-mixed-precision-tradeoff">
+<title>Mixed-Precision Tradeoff</title>
+<p>Lower precision can improve:</p>
+
+<p>
+<md>\boxed{
+\text{throughput},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{memory efficiency}.
+}</md>
+</p>
+
+<p>But it may worsen:</p>
+
+<p>
+<md>\boxed{
+\text{rounding error},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{solver convergence}.
+}</md>
+</p>
+
+<p>Conditioning determines whether lower precision is acceptable.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-distributed-dense-matrices">
+<title>Distributed Dense Matrices</title>
+<p>A large dense matrix may be partitioned into blocks across processes.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+A
+=
+\begin{pmatrix}
+A_{11}&amp;A_{12}\\
+A_{21}&amp;A_{22}
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>Each process owns one or more blocks.</p>
+
+<p>Parallel factorization requires both local matrix operations and
+communication of pivot or panel information.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-one-dimensional-matrix-distribution">
+<title>One-Dimensional Matrix Distribution</title>
+<p>A simple parallel layout assigns blocks of rows to processes.</p>
+
+<p>Process <m>j</m> owns</p>
+
+<p>
+<md>\boxed{
+A_{I_j,:}.
+}</md>
+</p>
+
+<p>This is easy to implement but can create communication bottlenecks for some
+matrix operations.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-two-dimensional-matrix-distribution">
+<title>Two-Dimensional Matrix Distribution</title>
+<p>A more scalable dense layout distributes matrix blocks across a
+two-dimensional processor grid.</p>
+
+<p>This reduces communication per processor for many matrix factorizations and
+matrix multiplications.</p>
+
+<p>The matrix distribution becomes part of the algorithm.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-matrix-multiplication">
+<title>Parallel Matrix Multiplication</title>
+<p>For</p>
+
+<p>
+<md>C=AB,</md>
+</p>
+
+<p>processes compute local block products and communicate required blocks.</p>
+
+<p>A scalable implementation tries to balance:</p>
+
+<p>
+<md>\boxed{
+\text{local arithmetic}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{data exchange}.
+}</md>
+</p>
+
+<p>Because matrix multiplication has high arithmetic intensity, it scales
+well on many architectures.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-factorizations">
+<title>Parallel Factorizations</title>
+<p>Parallel versions of:</p>
+
+<p>
+<md>\boxed{
+\text{LU},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{QR},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{Cholesky}
+}</md>
+</p>
+
+<p>divide the matrix into blocks.</p>
+
+<p>Large matrix-matrix updates are performed efficiently, while smaller panel
+or synchronization steps may limit scalability.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-communication-avoiding-qr">
+<title>Communication-Avoiding QR Preview</title>
+<p>Classical QR factorization can require repeated communication.</p>
+
+<p>Communication-avoiding QR reorganizes the factorization to reduce data
+movement while preserving mathematical stability.</p>
+
+<p>This is an example where the numerical algorithm itself is redesigned for
+modern hardware.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-krylov-methods">
+<title>Parallel Krylov Methods</title>
+<p>Krylov methods rely on operations such as:</p>
+
+<p>
+<md>\boxed{
+Ax,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+x^Ty,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\|x\|.
+}</md>
+</p>
+
+<p>Sparse matrix-vector products often require local neighbor communication.</p>
+
+<p>Dot products require global reductions.</p>
+
+<p>Thus communication can dominate at large processor counts.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-krylov-global-reduction">
+<title>Global Reduction Bottleneck</title>
+<p>A dot product</p>
+
+<p>
+<md>x^Ty
+=
+\sum_i x_i y_i</md>
+</p>
+
+<p>is computed locally first.</p>
+
+<p>Then all processes combine their partial sums.</p>
+
+<p>This global reduction requires collective synchronization.</p>
+
+<p>At extreme scale, the cost of a few scalar reductions can exceed substantial
+local arithmetic.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-pipelined-krylov">
+<title>Pipelined Krylov Methods Preview</title>
+<p>Pipelined Krylov methods reorganize iterations so communication associated
+with reductions can overlap with matrix-vector computations.</p>
+
+<p>The mathematical recurrence becomes more complicated.</p>
+
+<p>The benefit is potentially reduced synchronization cost.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-preconditioning">
+<title>Preconditioning at Scale</title>
+<p>A preconditioner must improve convergence while also remaining parallel.</p>
+
+<p>A theoretically excellent serial preconditioner may scale poorly.</p>
+
+<p>Parallel-friendly choices include:</p>
+
+<p>
+<md>\boxed{
+\text{block methods},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{domain decomposition},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{multigrid}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-multigrid">
+<title>Parallel Multigrid</title>
+<p>Multigrid combines work on several mesh resolutions.</p>
+
+<p>Fine grids provide abundant parallel work.</p>
+
+<p>Coarser grids contain fewer unknowns and eventually provide insufficient
+parallelism.</p>
+
+<p>Thus coarse-grid solves can become scalability bottlenecks.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-multigrid-coarse-grid-bottleneck">
+<title>Coarse-Grid Bottleneck</title>
+<p>Suppose the finest level has millions of unknowns distributed across many
+processes.</p>
+
+<p>After repeated coarsening, the coarse problem may contain fewer unknowns
+than processors.</p>
+
+<p>Then many processors have little or no useful work.</p>
+
+<p>Special coarse-grid strategies are required at large scale.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-fft">
+<title>Parallel Fast Fourier Transform</title>
+<p>The FFT requires approximately</p>
+
+<p>
+<md>\boxed{
+O(N\log N)
+}</md>
+</p>
+
+<p>arithmetic operations.</p>
+
+<p>In distributed systems, data must also be rearranged among processes.</p>
+
+<p>For multidimensional FFTs, these redistributions can require expensive
+global communication.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-fft-communication">
+<title>FFT Communication</title>
+<p>A three-dimensional distributed FFT may partition data into slabs or
+pencils.</p>
+
+<p>Transforms are performed locally along one direction.</p>
+
+<p>Then data are redistributed so transforms can be performed along another
+direction.</p>
+
+<p>These global transpositions often dominate runtime at large scale.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-high-performance-pde-solvers">
+<title>High-Performance PDE Solvers</title>
+<p>A scalable PDE solver combines:</p>
+
+<p>
+<md>\boxed{
+\text{domain decomposition},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{local numerical kernels},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{halo communication},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{scalable linear solvers}.
+}</md>
+</p>
+
+<p>The numerical discretization and parallel decomposition should be designed
+together.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-structured-grid-pdes">
+<title>Structured-Grid PDEs</title>
+<p>Structured grids have regular communication patterns.</p>
+
+<p>Neighboring processes exchange values across predictable boundaries.</p>
+
+<p>These methods often provide:</p>
+
+<p>
+<md>\boxed{
+\text{simple memory access},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{efficient vectorization},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{regular parallel decomposition}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-unstructured-grid-pdes">
+<title>Unstructured-Grid PDEs</title>
+<p>Unstructured meshes allow complex geometry.</p>
+
+<p>However, they produce irregular:</p>
+
+<p>
+<md>\boxed{
+\text{memory access},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication patterns},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{load balancing}.
+}</md>
+</p>
+
+<p>Graph partitioning becomes important in assigning mesh elements to
+processes.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-graph-partitioning">
+<title>Graph Partitioning</title>
+<p>Represent a computational mesh as graph</p>
+
+<p>
+<md>G=(V,E).</md>
+</p>
+
+<p>Assign vertices to <m>p</m> partitions while seeking:</p>
+
+<p>
+<md>\boxed{
+\text{balanced vertex counts}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{few edges crossing partitions}.
+}</md>
+</p>
+
+<p>This balances computation while reducing communication.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-adaptive-meshes">
+<title>Adaptive Meshes at Scale</title>
+<p>Adaptive refinement creates nonuniform workloads.</p>
+
+<p>As the mesh changes, a previously balanced partition may become highly
+imbalanced.</p>
+
+<p>Parallel adaptive methods therefore require periodic repartitioning or
+dynamic load balancing.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-parallel-monte-carlo">
+<title>Parallel Monte Carlo</title>
+<p>Monte Carlo simulation is naturally parallel.</p>
+
+<p>Suppose</p>
+
+<p>
+<md>\widehat{\mu}
+=
+\frac1N
+\sum_{i=1}^{N}
+g(X_i).</md>
+</p>
+
+<p>Each worker generates a subset of samples independently.</p>
+
+<p>At the end, partial sums are reduced.</p>
+
+<p>Communication is minimal relative to computation.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-random-streams">
+<title>Random Number Streams</title>
+<p>Parallel Monte Carlo requires carefully separated pseudorandom streams.</p>
+
+<p>Workers should not accidentally generate overlapping or strongly
+correlated sequences.</p>
+
+<p>Stream management should support both:</p>
+
+<p>
+<md>\boxed{
+\text{statistical quality}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{reproducibility}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-parallel-ensembles">
+<title>Parallel Ensembles</title>
+<p>Suppose a simulation must be run for parameter values</p>
+
+<p>
+<md>\theta_1,\ldots,\theta_M.</md>
+</p>
+
+<p>Each parameter case can often be assigned independently.</p>
+
+<p>Thus ensemble simulation provides coarse-grained parallelism even when one
+individual simulation does not scale efficiently.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-nested-parallelism">
+<title>Nested Parallelism</title>
+<p>A computational study may have parallelism at several levels.</p>
+
+<p>For example:</p>
+
+<p>
+<md>\boxed{
+\text{parameter cases}
+}</md>
+</p>
+
+<p>may be distributed across groups of processors, while each individual case
+uses parallel PDE computation internally.</p>
+
+<p>This is nested parallelism.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-parallel-optimization">
+<title>Parallel Optimization</title>
+<p>Optimization may exploit parallelism through:</p>
+
+<p>
+<md>\boxed{
+\text{parallel objective evaluations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{parallel gradient computations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{distributed linear algebra},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{multiple starting points}.
+}</md>
+</p>
+
+<p>The useful strategy depends on the optimization algorithm.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-gradient-computation">
+<title>Parallel Gradient Computation</title>
+<p>If</p>
+
+<p>
+<md>F(x)
+=
+\sum_{i=1}^{N}
+f_i(x),</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\nabla F(x)
+=
+\sum_{i=1}^{N}
+\nabla f_i(x).
+}</md>
+</p>
+
+<p>Each worker can compute a partial gradient.</p>
+
+<p>A global reduction forms the total gradient.</p>
+
+<p>This is common in large data-fitting problems.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-distributed-hessian-vector">
+<title>Distributed Hessian-Vector Products</title>
+<p>For</p>
+
+<p>
+<md>F(x)
+=
+\sum_i f_i(x),</md>
+</p>
+
+<p>the Hessian-vector product is</p>
+
+<p>
+<md>\boxed{
+\nabla^2F(x)v
+=
+\sum_i
+\nabla^2f_i(x)v.
+}</md>
+</p>
+
+<p>Local contributions can be computed in parallel and summed.</p>
+
+<p>This supports large-scale Newton--Krylov optimization without forming the
+full Hessian.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-task-based-parallelism">
+<title>Task-Based Parallelism</title>
+<p>Instead of explicitly assigning work to processors, a program can express a
+collection of tasks and dependencies.</p>
+
+<p>A runtime system schedules ready tasks dynamically.</p>
+
+<p>This can improve:</p>
+
+<p>
+<md>\boxed{
+\text{load balance},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{overlap of computation and communication}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-dependency-graph">
+<title>Dependency Graph</title>
+<p>A task graph is a directed acyclic graph in which nodes represent
+computations and edges represent dependencies.</p>
+
+<p>If two tasks have no dependency path between them, they may execute
+simultaneously.</p>
+
+<p>This representation exposes algorithmic parallelism.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-critical-path">
+<title>Critical Path</title>
+<p>The critical path is the longest dependency chain in a task graph.</p>
+
+<p>Even with infinitely many processors, runtime cannot be shorter than the
+critical-path time.</p>
+
+<p>Thus theoretical parallelism is limited by both:</p>
+
+<p>
+<md>\boxed{
+\text{total work}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{dependency depth}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-work-span">
+<title>Work and Span</title>
+<p>Let</p>
+
+<p>
+<md>T_1</md>
+</p>
+
+<p>denote total serial work and</p>
+
+<p>
+<md>T_\infty</md>
+</p>
+
+<p>denote ideal critical-path time with unlimited processors.</p>
+
+<p>Then the maximum theoretical parallelism is approximately</p>
+
+<p>
+<md>\boxed{
+\frac{
+T_1
+}{
+T_\infty
+}.
+}</md>
+</p>
+
+<p>This provides an algorithmic view of parallel scalability.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-asynchronous-iteration">
+<title>Asynchronous Iteration</title>
+<p>Synchronous iterative methods require all workers to advance together.</p>
+
+<p>Asynchronous methods allow updates using partially delayed information.</p>
+
+<p>This can reduce waiting and improve hardware utilization.</p>
+
+<p>However, convergence analysis becomes more complicated.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-fault-tolerance">
+<title>Fault Tolerance</title>
+<p>A computation running across thousands of processors for many hours has a
+greater chance of encountering hardware or software failure.</p>
+
+<p>Fault tolerance allows computation to continue or restart efficiently.</p>
+
+<p>Common approaches include:</p>
+
+<p>
+<md>\boxed{
+\text{checkpoint/restart},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{replication},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{algorithmic recovery}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-checkpointing">
+<title>Checkpointing at Scale</title>
+<p>Suppose a distributed simulation stores state</p>
+
+<p>
+<md>x_j</md>
+</p>
+
+<p>on process <m>j</m>.</p>
+
+<p>A global checkpoint saves enough distributed state to reconstruct</p>
+
+<p>
+<md>\boxed{
+x
+=
+(x_1,\ldots,x_p).
+}</md>
+</p>
+
+<p>Writing checkpoints too frequently can overwhelm storage systems.</p>
+
+<p>Writing them too rarely increases recomputation after failure.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-incremental-checkpointing">
+<title>Incremental Checkpointing</title>
+<p>Instead of writing the entire simulation state each time, an incremental
+checkpoint records only changed or necessary portions.</p>
+
+<p>This can reduce storage traffic.</p>
+
+<p>The restart procedure becomes more complex because several checkpoint
+pieces may need to be combined.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-resilience">
+<title>Resilience</title>
+<p>Resilience is the ability of a computational method to tolerate and recover
+from failures or perturbations.</p>
+
+<p>At extreme scale, resilience may need to be part of algorithm design rather
+than only an operating-system feature.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-floating-point-reproducibility">
+<title>Floating-Point Reproducibility</title>
+<p>Floating-point addition is not associative:</p>
+
+<p>
+<md>\boxed{
+(a+b)+c
+\neq
+a+(b+c)
+}</md>
+</p>
+
+<p>in general.</p>
+
+<p>Parallel reductions may use different summation trees.</p>
+
+<p>Therefore the final low-order digits can vary with:</p>
+
+<p>
+<md>\boxed{
+\text{processor count},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{execution order},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{hardware}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-bitwise-numerical-reproducibility">
+<title>Bitwise Versus Numerical Reproducibility</title>
+<p>Bitwise reproducibility requires exactly identical binary results.</p>
+
+<p>Numerical reproducibility requires results to agree within meaningful
+mathematical tolerances.</p>
+
+<p>For many scientific applications,</p>
+
+<p>
+<md>\boxed{
+\text{numerical reproducibility}
+}</md>
+</p>
+
+<p>is more important than exact bitwise identity.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-reproducible-reductions">
+<title>Reproducible Reductions</title>
+<p>More reproducible summation may use:</p>
+
+<p>
+<md>\boxed{
+\text{fixed reduction trees},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{pairwise summation},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{compensated accumulation}.
+}</md>
+</p>
+
+<p>These methods may introduce additional computational cost.</p>
+
+<p>Thus reproducibility itself can become a performance tradeoff.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-profiling">
+<title>Profiling at Scale</title>
+<p>Large parallel applications should be profiled to identify:</p>
+
+<p>
+<md>\boxed{
+\text{computational hotspots},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication bottlenecks},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{load imbalance},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{memory limitations}.
+}</md>
+</p>
+
+<p>Optimization should target the dominant measured costs.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-parallel-timeline-analysis">
+<title>Parallel Timeline Analysis</title>
+<p>A parallel timeline shows when each process is:</p>
+
+<p>
+<md>\boxed{
+\text{computing},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communicating},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{waiting}.
+}</md>
+</p>
+
+<p>Large idle regions often reveal synchronization or load-balance problems.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-scaling-experiments">
+<title>Scaling Experiments</title>
+<p>A strong-scaling experiment records</p>
+
+<p>
+<md>T_1,T_2,T_4,T_8,\ldots</md>
+</p>
+
+<p>for one fixed problem.</p>
+
+<p>Then compute:</p>
+
+<p>
+<md>\boxed{
+S_p
+=
+\frac{T_1}{T_p},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+E_p
+=
+\frac{S_p}{p}.
+}</md>
+</p>
+
+<p>A weak-scaling experiment increases problem size with <m>p</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-efficiency-loss-decomposition">
+<title>Efficiency Loss Decomposition</title>
+<p>Parallel inefficiency can be attributed conceptually to:</p>
+
+<p>
+<md>\boxed{
+\text{serial work},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{load imbalance},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{synchronization},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{resource contention}.
+}</md>
+</p>
+
+<p>Understanding which contribution dominates guides optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-energy-efficiency">
+<title>Energy Efficiency</title>
+<p>High-performance computation consumes electrical energy.</p>
+
+<p>An algorithm may be evaluated by quantities such as</p>
+
+<p>
+<md>\boxed{
+\frac{
+\text{useful computation}
+}{
+\text{energy consumed}
+}.
+}</md>
+</p>
+
+<p>Reducing data movement can improve both runtime and energy efficiency.</p>
+
+<p>Thus performance and energy objectives often align.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-time-to-solution">
+<title>Time to Solution</title>
+<p>The most relevant performance metric is often total time required to obtain
+a scientifically acceptable result.</p>
+
+<p>This includes:</p>
+
+<p>
+<md>\boxed{
+\text{setup},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{computation},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{I/O},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{convergence}.
+}</md>
+</p>
+
+<p>A method achieving higher FLOP/s may still have worse time to solution.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-accuracy-to-solution">
+<title>Accuracy to Solution</title>
+<p>Performance comparisons should account for accuracy.</p>
+
+<p>Suppose method <m>A</m> is twice as fast per iteration but requires ten times
+as many iterations.</p>
+
+<p>Then its total time may be worse.</p>
+
+<p>A fair comparison holds the mathematical target approximately fixed:</p>
+
+<p>
+<md>\boxed{
+\text{same tolerance}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{same final error}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-performance-portability">
+<title>Performance Portability</title>
+<p>Performance portability means an algorithm remains reasonably efficient on
+different hardware architectures.</p>
+
+<p>This is challenging because CPUs, GPUs, and distributed systems favor
+different execution patterns.</p>
+
+<p>A portable numerical formulation should expose:</p>
+
+<p>
+<md>\boxed{
+\text{parallelism},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{locality},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{structured kernels}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hardware-aware-algorithms">
+<title>Hardware-Aware Algorithms</title>
+<p>Traditional algorithm analysis emphasizes arithmetic operation count.</p>
+
+<p>Modern high-performance algorithms also consider:</p>
+
+<p>
+<md>\boxed{
+\text{memory traffic},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{parallel depth}.
+}</md>
+</p>
+
+<p>Thus mathematically equivalent algorithms can have radically different
+performance.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-algorithm-codesign">
+<title>Algorithm Co-Design</title>
+<p>Algorithm co-design means developing mathematical algorithms with hardware
+characteristics in mind.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{communication-avoiding factorization},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{matrix-free PDE operators},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{mixed-precision iterative refinement}.
+}</md>
+</p>
+
+<p>The mathematical method and computational architecture are designed
+together.</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-workflow">
+<title>High-Performance Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>formulate the mathematical problem;</p>
+</li>
+<li>
+<p>estimate its asymptotic computational complexity;</p>
+</li>
+<li>
+<p>identify dominant numerical kernels;</p>
+</li>
+<li>
+<p>determine memory requirements;</p>
+</li>
+<li>
+<p>determine expected communication requirements;</p>
+</li>
+<li>
+<p>choose sparse, dense, or matrix-free representation;</p>
+</li>
+<li>
+<p>begin with a verified serial or small-scale implementation;</p>
+</li>
+<li>
+<p>measure runtime and memory use;</p>
+</li>
+<li>
+<p>compute arithmetic intensity where useful;</p>
+</li>
+<li>
+<p>identify whether kernels are bandwidth or compute limited;</p>
+</li>
+<li>
+<p>improve data locality;</p>
+</li>
+<li>
+<p>vectorize regular arithmetic;</p>
+</li>
+<li>
+<p>introduce shared-memory parallelism;</p>
+</li>
+<li>
+<p>introduce distributed-memory decomposition when needed;</p>
+</li>
+<li>
+<p>minimize synchronization;</p>
+</li>
+<li>
+<p>reduce communication volume and message count;</p>
+</li>
+<li>
+<p>overlap communication with computation;</p>
+</li>
+<li>
+<p>evaluate accelerator suitability;</p>
+</li>
+<li>
+<p>minimize host-device data transfer;</p>
+</li>
+<li>
+<p>consider mixed precision when numerically safe;</p>
+</li>
+<li>
+<p>use scalable preconditioners;</p>
+</li>
+<li>
+<p>perform strong-scaling experiments;</p>
+</li>
+<li>
+<p>perform weak-scaling experiments;</p>
+</li>
+<li>
+<p>analyze load balance;</p>
+</li>
+<li>
+<p>profile communication and computation;</p>
+</li>
+<li>
+<p>implement checkpointing for long jobs;</p>
+</li>
+<li>
+<p>verify that parallelization preserves numerical correctness;</p>
+</li>
+<li>
+<p>document hardware, software, and numerical settings;</p>
+</li>
+<li>
+<p>report time to solution at the required accuracy.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-choosing-hpmc-strategy">
+<title>Choosing a High-Performance Strategy</title>
+<p>For dense matrix calculations, emphasize:</p>
+
+<p>
+<md>\boxed{
+\text{blocking}
++
+\text{matrix-matrix kernels}.
+}</md>
+</p>
+
+<p>For sparse systems, emphasize:</p>
+
+<p>
+<md>\boxed{
+\text{memory efficiency}
++
+\text{preconditioning}.
+}</md>
+</p>
+
+<p>For PDEs, emphasize:</p>
+
+<p>
+<md>\boxed{
+\text{domain decomposition}
++
+\text{halo exchange}
++
+\text{multigrid}.
+}</md>
+</p>
+
+<p>For Monte Carlo, emphasize:</p>
+
+<p>
+<md>\boxed{
+\text{independent ensemble parallelism}.
+}</md>
+</p>
+
+<p>For accelerators, emphasize:</p>
+
+<p>
+<md>\boxed{
+\text{large parallel kernels}
++
+\text{data reuse}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-optimizing-before-measuring">
+<title>Optimizing Before Measuring</title>
+<p>Optimization should begin with profiling.</p>
+
+<p>A visually complicated part of the code may contribute little to total
+runtime.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-measuring-flop-s-without-considering-time-to-solution">
+<title>Measuring FLOP/s Without Considering Time to Solution</title>
+<p>High arithmetic throughput does not guarantee faster solution of the
+mathematical problem.</p>
+
+<p>Always compare total runtime at comparable accuracy.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-memory-bandwidth">
+<title>Ignoring Memory Bandwidth</title>
+<p>Many numerical kernels are limited by memory movement rather than floating-
+point arithmetic.</p>
+
+<p>Adding more arithmetic units may not improve them.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-arithmetic-intensity">
+<title>Ignoring Arithmetic Intensity</title>
+<p>An algorithm with low arithmetic intensity is unlikely to reach peak FLOP
+performance.</p>
+
+<p>Roofline-style reasoning can explain why.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-dense-storage-for-sparse-problems">
+<title>Using Dense Storage for Sparse Problems</title>
+<p>A sparse matrix with <m>O(N)</m> nonzeros should not generally require
+<m>O(N^2)</m> storage.</p>
+
+<p>Representation choice determines scalability.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-storing-a-matrix-that-can-be-applied-matrix-free">
+<title>Storing a Matrix That Can Be Applied Matrix-Free</title>
+<p>For structured operators, explicit storage may waste memory and bandwidth.</p>
+
+<p>Compute the operator action directly when appropriate.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-parallelizing-too-fine-a-task">
+<title>Parallelizing Too Fine a Task</title>
+<p>If each task performs very little computation, scheduling and communication
+overhead may dominate.</p>
+
+<p>Increase granularity.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-more-processors-always-reduce-runtime">
+<title>Assuming More Processors Always Reduce Runtime</title>
+<p>Strong scaling eventually saturates because of:</p>
+
+<p>
+<md>\boxed{
+\text{serial work},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{synchronization}.
+}</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-load-balance">
+<title>Ignoring Load Balance</title>
+<p>A parallel program is limited by the slowest required worker.</p>
+
+<p>Balanced workloads are essential.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-too-many-tiny-messages">
+<title>Using Too Many Tiny Messages</title>
+<p>Repeated latency costs can dominate.</p>
+
+<p>Batch communication when possible.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-global-reductions-excessively">
+<title>Using Global Reductions Excessively</title>
+<p>Global reductions synchronize the entire distributed system.</p>
+
+<p>At large scale, they can dominate otherwise inexpensive iterative
+operations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-moving-data-to-a-gpu-for-tiny-calculations">
+<title>Moving Data to a GPU for Tiny Calculations</title>
+<p>Transfer and launch overhead can exceed the saved computation time.</p>
+
+<p>Accelerators require sufficient computational work per transfer.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-kernel-fusion">
+<title>Ignoring Kernel Fusion</title>
+<p>Writing intermediate arrays to memory can create unnecessary bandwidth
+cost.</p>
+
+<p>Fuse compatible operations when mathematically appropriate.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-low-precision-without-conditioning-analysis">
+<title>Using Low Precision Without Conditioning Analysis</title>
+<p>Mixed precision is powerful only when the underlying numerical problem can
+tolerate lower precision.</p>
+
+<p>Conditioning and convergence must be checked.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-a-serial-preconditioner-inside-a-parallel-solver">
+<title>Using a Serial Preconditioner Inside a Parallel Solver</title>
+<p>The iterative method may be parallel while the preconditioner becomes the
+scalability bottleneck.</p>
+
+<p>Solver and preconditioner must be designed together.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-coarse-multigrid-levels">
+<title>Ignoring Coarse Multigrid Levels</title>
+<p>Fine-grid work may scale well while the coarse solve dominates at high
+processor counts.</p>
+
+<p>Coarse-level scalability must be analyzed separately.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-an-fft-is-communication-free">
+<title>Assuming an FFT Is Communication-Free</title>
+<p>Distributed FFTs can require expensive global data transpositions.</p>
+
+<p>Arithmetic complexity alone does not capture parallel cost.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-one-parallel-random-stream-everywhere">
+<title>Using One Parallel Random Stream Everywhere</title>
+<p>Parallel stochastic computation requires separated or reproducibly
+partitioned random-number streams.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-demanding-bitwise-reproducibility-without-need">
+<title>Demanding Bitwise Reproducibility Without Need</title>
+<p>Exact bitwise reproducibility can impose additional performance costs.</p>
+
+<p>Use it when scientifically necessary; otherwise define numerical tolerance.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-comparing-different-hardware-using-different-numerical-accuracy">
+<title>Comparing Different Hardware Using Different Numerical Accuracy</title>
+<p>A faster result is not meaningful if it solves the problem less accurately.</p>
+
+<p>Benchmark comparable mathematical outcomes.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-faster-hardware-fixes-poor-scaling">
+<title>Assuming Faster Hardware Fixes Poor Scaling</title>
+<p>Hardware cannot overcome an algorithm dominated by communication or serial
+dependencies.</p>
+
+<p>Redesign the algorithm when necessary.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Climate and Weather.</em>
+Large atmosphere-ocean models solve coupled PDE systems over enormous
+three-dimensional grids using distributed parallel computers.</p>
+
+<p>\medskip</p>
+
+<p><em>Computational Fluid Dynamics.</em>
+High-resolution flow simulation requires scalable sparse linear algebra,
+domain decomposition, and accelerator computation.</p>
+
+<p>\medskip</p>
+
+<p><em>Physics.</em>
+Particle simulations, quantum systems, plasma models, and lattice
+calculations frequently require massive parallelism.</p>
+
+<p>\medskip</p>
+
+<p><em>Engineering.</em>
+Structural mechanics, electromagnetics, heat transfer, and optimization
+often involve millions of degrees of freedom.</p>
+
+<p>\medskip</p>
+
+<p><em>Statistics and Data Analysis.</em>
+Large least-squares, matrix factorization, Bayesian sampling, and
+simulation problems benefit from distributed and accelerator-based
+computation.</p>
+
+<p>\medskip</p>
+
+<p><em>Optimization.</em>
+Large-scale optimization uses parallel objective evaluations, distributed
+gradients, matrix-free Hessian products, and scalable linear solvers.</p>
+
+<p>\medskip</p>
+
+<p><em>Monte Carlo Simulation.</em>
+Independent samples and trajectories provide natural coarse-grained
+parallelism.</p>
+
+<p>\medskip</p>
+
+<p><em>Mathematical Research.</em>
+Large numerical experiments can explore conjectures, parameter spaces,
+high-dimensional systems, and computational limits beyond manual
+calculation.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define high-performance mathematical computing.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define arithmetic intensity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define memory bandwidth.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define parallel speedup.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define parallel efficiency.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define strong scaling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define weak scaling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define communication latency.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define matrix-free computation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define load imbalance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute arithmetic intensity from a supplied FLOP count and byte count.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use a roofline model to estimate an upper performance bound.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether a kernel is bandwidth bound or compute bound.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the roofline crossover intensity</p>
+
+<p>
+<md>I^*
+=
+\frac{
+P_{\mathrm{peak}}
+}{
+B
+}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how cache blocking increases data reuse.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why dense matrix multiplication has high arithmetic intensity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why sparse matrix-vector multiplication is often bandwidth bound.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare dense and sparse storage requirements.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a matrix-free implementation formula for a tridiagonal Laplacian.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify independent iterations in a vector update.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how a race condition occurs during parallel summation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a tree reduction for eight workers.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute parallel speedup from <m>T_1</m> and <m>T_p</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute parallel efficiency.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply Amdahl's law for a specified serial fraction.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the maximum Amdahl speedup as</p>
+
+<p>
+<md>p\to\infty.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Amdahl's law is primarily a strong-scaling argument.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain Gustafson-type scaled-problem reasoning.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a strong-scaling experiment.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a weak-scaling experiment.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why load imbalance reduces parallel efficiency.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare static and dynamic load balancing.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use</p>
+
+<p>
+<md>T_{\mathrm{comm}}
+=
+\alpha+\beta m</md>
+</p>
+
+<p>to compare one large message with several small messages.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why communication latency matters even when bandwidth is high.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain communication hiding.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a halo-exchange sequence for a one-dimensional domain
+decomposition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Extend the halo-exchange idea to a two-dimensional grid.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the surface-to-volume effect.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why distributed dot products require global reductions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why global reductions limit Krylov scaling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe a pipelined Krylov strategy conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a preconditioner must also scale in parallel.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the coarse-grid bottleneck in multigrid.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why distributed FFTs require data redistribution.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a domain decomposition for a rectangular PDE grid.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why unstructured meshes require graph partitioning.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a graph-partitioning objective balancing work and edge cuts.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why adaptive mesh refinement creates dynamic load imbalance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a parallel Monte Carlo estimator.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how random streams should be separated across workers.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a parallel parameter sweep.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe nested parallelism for a simulation ensemble.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Parallelize the gradient</p>
+
+<p>
+<md>\nabla F(x)
+=
+\sum_i
+\nabla f_i(x).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain distributed Hessian-vector products.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a simple computational task graph.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the critical path in a supplied task graph.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute theoretical parallelism from</p>
+
+<p>
+<md>T_1/T_\infty.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain asynchronous iteration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why accelerator data transfer can dominate a small computation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain kernel-launch overhead.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of kernel fusion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why batching improves accelerator utilization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe a mixed-precision algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the iterative-refinement correction equations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how conditioning limits mixed-precision accuracy.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare one-dimensional and two-dimensional distributed matrix layouts.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why block matrix algorithms are useful in distributed dense linear
+algebra.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain communication-avoiding QR conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe checkpoint/restart for a distributed simulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the tradeoff in checkpoint frequency.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain resilience in large-scale computation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why floating-point parallel reductions may produce different last
+digits.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Distinguish bitwise and numerical reproducibility.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how a fixed reduction tree can improve reproducibility.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a profiling study for a distributed PDE solver.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a benchmark comparing CPU and GPU implementations at equal
+accuracy.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why time to solution is often more meaningful than raw FLOP/s.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain performance portability.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of hardware-aware numerical algorithm design.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the basic roofline bound.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Estimate arithmetic intensity of blocked dense matrix multiplication.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study cache-oblivious matrix algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study SIMD vectorization of numerical kernels.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze sparse matrix-vector arithmetic intensity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study communication lower bounds for dense linear algebra.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study communication-avoiding LU and QR factorizations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze the communication complexity of parallel conjugate gradient.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study pipelined Krylov methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study scalable domain-decomposition preconditioners.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study parallel geometric multigrid.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study algebraic multigrid scalability.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study distributed multidimensional FFT algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze graph partitioning for unstructured finite-element meshes.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study asynchronous iterative methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study work-stealing task schedulers.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze mixed-precision iterative refinement.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study accelerator-aware sparse linear algebra.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study matrix-free high-order finite-element methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study scalable checkpointing algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study reproducible parallel summation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze energy-to-solution as a performance metric.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a complete high-performance workflow for a large numerical PDE
+problem.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-summary">
+<title>Conceptual Summary</title>
+<p>High-performance mathematical computing combines</p>
+
+<p>
+<md>\boxed{
+\text{numerical algorithms}
++
+\text{parallelism}
++
+\text{memory-aware computation}
++
+\text{hardware architecture}.
+}</md>
+</p>
+
+<p>Performance is limited by both arithmetic and data movement.</p>
+
+<p>The roofline model gives the conceptual bound</p>
+
+<p>
+<md>\boxed{
+P
+\leq
+\min
+\left(
+P_{\mathrm{peak}},
+BI
+\right).
+}</md>
+</p>
+
+<p>Parallel speedup is</p>
+
+<p>
+<md>\boxed{
+S_p
+=
+\frac{
+T_1
+}{
+T_p
+},
+}</md>
+</p>
+
+<p>and efficiency is</p>
+
+<p>
+<md>\boxed{
+E_p
+=
+\frac{
+S_p
+}{
+p
+}.
+}</md>
+</p>
+
+<p>Amdahl's law illustrates the effect of serial work:</p>
+
+<p>
+<md>\boxed{
+S_p
+=
+\frac{
+1
+}{
+s+\frac{1-s}{p}
+}.
+}</md>
+</p>
+
+<p>Scalable numerical algorithms minimize:</p>
+
+<p>
+<md>\boxed{
+\text{memory traffic},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{communication},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{synchronization}.
+}</md>
+</p>
+
+<p>Modern high-performance mathematics relies on:</p>
+
+<p>
+<md>\boxed{
+\text{blocking},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{vectorization},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{domain decomposition},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{accelerators},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{matrix-free methods},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{mixed precision},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{communication-avoiding algorithms}.
+}</md>
+</p>
+
+<p>The relevant goal is not peak machine speed alone, but</p>
+
+<p>
+<md>\boxed{
+\text{minimum reliable time to a mathematically accurate solution}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-high-performance-mathematical-computing-subsec-hpmc-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>High-Performance Mathematical Computing completes Chapter 11 by showing
+how the numerical, symbolic, and simulation methods developed throughout
+the chapter can be scaled to modern computational systems. Numerical
+Linear Algebra supplies the dense, sparse, and iterative kernels;
+Numerical ODEs and PDEs provide large time-dependent systems; Monte Carlo
+Methods provide naturally parallel ensembles; Scientific Computing
+provides the broader software and reproducibility framework; and
+Mathematical Simulation provides application-scale computational
+experiments. High-performance methods add communication-aware algorithms,
+distributed data structures, accelerators, matrix-free operators, mixed
+precision, scalable solvers, and performance modeling. These computational
+tools support the formal foundations developed in the next chapter,
+Mathematical Logic and Foundations, while also providing the computational
+infrastructure for the applied modeling topics developed later in the
+text.</p>
+</remark>
+</subsection>
+
 </section>

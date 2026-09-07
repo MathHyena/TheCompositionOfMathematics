@@ -1,9 +1,3068 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-10-differential-equations-dynamical-systems-08-differential-algebraic-equations">
-  <title>Differential Algebraic Equations</title>
+<section xml:id="sec-differential-algebraic-equations">
+<title>Differential-Algebraic Equations</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Ordinary differential equations, systems of ODEs, linear algebra,
+matrices, rank, eigenvalues, implicit differentiation, numerical methods,
+dynamical systems, and basic constrained modeling.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define a differential-algebraic equation;</p>
+</li>
+<li>
+<p>distinguish DAEs from ordinary differential equations;</p>
+</li>
+<li>
+<p>identify differential and algebraic variables;</p>
+</li>
+<li>
+<p>understand algebraic constraints;</p>
+</li>
+<li>
+<p>write DAEs in implicit form;</p>
+</li>
+<li>
+<p>recognize semi-explicit DAEs;</p>
+</li>
+<li>
+<p>identify consistent initial conditions;</p>
+</li>
+<li>
+<p>understand why arbitrary initial data may violate constraints;</p>
+</li>
+<li>
+<p>differentiate algebraic constraints when necessary;</p>
+</li>
+<li>
+<p>understand the idea of differentiation index;</p>
+</li>
+<li>
+<p>distinguish index-1 and higher-index systems conceptually;</p>
+</li>
+<li>
+<p>understand hidden constraints;</p>
+</li>
+<li>
+<p>recognize singular mass-matrix formulations;</p>
+</li>
+<li>
+<p>analyze linear constant-coefficient DAEs;</p>
+</li>
+<li>
+<p>distinguish regular and singular matrix pencils conceptually;</p>
+</li>
+<li>
+<p>understand constrained mechanical systems;</p>
+</li>
+<li>
+<p>formulate Lagrange-multiplier DAEs;</p>
+</li>
+<li>
+<p>recognize electrical-circuit DAEs;</p>
+</li>
+<li>
+<p>recognize chemical and process-system DAEs;</p>
+</li>
+<li>
+<p>understand conservation constraints;</p>
+</li>
+<li>
+<p>understand reduction of index-1 DAEs to ODEs locally;</p>
+</li>
+<li>
+<p>understand why higher-index DAEs are numerically difficult;</p>
+</li>
+<li>
+<p>recognize constraint drift;</p>
+</li>
+<li>
+<p>understand projection methods conceptually;</p>
+</li>
+<li>
+<p>understand implicit Euler for DAEs;</p>
+</li>
+<li>
+<p>recognize backward differentiation formulas;</p>
+</li>
+<li>
+<p>understand Newton iteration in implicit DAE solvers;</p>
+</li>
+<li>
+<p>understand event and constraint handling conceptually;</p>
+</li>
+<li>
+<p>recognize differential-algebraic boundary and control systems;</p>
+</li>
+<li>
+<p>connect DAEs with constrained dynamics, numerical analysis,
+          optimization, and engineering models.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-what-is-dae">
+<title>What Is a Differential-Algebraic Equation?</title>
+<p>A differential-algebraic equation, abbreviated DAE, combines differential
+equations with algebraic constraints.</p>
+
+<p>A simple example is</p>
+
+<p>
+<md>\boxed{
+x'(t)=y(t),
+}</md>
+</p>
+
+<p>together with</p>
+
+<p>
+<md>\boxed{
+x(t)^2+y(t)^2=1.
+}</md>
+</p>
+
+<p>The first equation describes differential evolution.</p>
+
+<p>The second equation restricts the state to a constraint set.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-ode-versus-dae">
+<title>ODE Versus DAE</title>
+<p>An explicit ODE has form</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}'
+=
+\mathbf{f}(t,\mathbf{x}).
+}</md>
+</p>
+
+<p>A DAE may instead have implicit form</p>
+
+<p>
+<md>\boxed{
+\mathbf{F}
+(
+t,
+\mathbf{x},
+\mathbf{x}'
+)
+=
+\mathbf{0}.
+}</md>
+</p>
+
+<p>The derivative may not be uniquely isolated for every component.</p>
+
+<p>Some variables may be determined primarily by algebraic constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-implicit-differential-equations">
+<title>Implicit Differential Equations</title>
+<p>An equation such as</p>
+
+<p>
+<md>\boxed{
+F(t,x,x')=0
+}</md>
+</p>
+
+<p>is not automatically a DAE.</p>
+
+<p>If</p>
+
+<p>
+<md>\frac{\partial F}{\partial x'}</md>
+</p>
+
+<p>is nonsingular in the relevant region, the implicit function theorem may
+allow us to solve locally for</p>
+
+<p>
+<md>\boxed{
+x'=f(t,x).
+}</md>
+</p>
+
+<p>The system then behaves locally like an ODE.</p>
+
+<p>A genuine DAE typically involves a singular derivative structure.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-semi-explicit-dae">
+<title>Semi-Explicit DAE Form</title>
+<p>A common semi-explicit DAE has form</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\mathbf{y}'
+&amp;=
+\mathbf{f}
+(
+t,\mathbf{y},\mathbf{z}
+),
+\\
+\mathbf{0}
+&amp;=
+\mathbf{g}
+(
+t,\mathbf{y},\mathbf{z}
+).
+\end{aligned}
+}</md>
+</p>
+
+<p>Here:</p>
+
+<p>
+<md>\mathbf{y}
+=
+\text{differential variables},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\mathbf{z}
+=
+\text{algebraic variables}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-differential-variables-dae">
+<title>Differential Variables</title>
+<p>Differential variables have explicit time derivatives in the model.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+y'
+=
+f(t,y,z).
+}</md>
+</p>
+
+<p>Their values evolve dynamically.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-algebraic-variables-dae">
+<title>Algebraic Variables</title>
+<p>Algebraic variables are constrained by equations such as</p>
+
+<p>
+<md>\boxed{
+g(t,y,z)=0.
+}</md>
+</p>
+
+<p>They may adjust instantaneously so the constraint remains satisfied.</p>
+
+<p>This does not mean they are physically unimportant.</p>
+
+<p>They may represent:</p>
+
+<p>
+<md>\boxed{
+\text{forces},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{pressures},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{currents},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{constraint multipliers}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-algebraic-constraint">
+<title>Algebraic Constraint</title>
+<p>An algebraic constraint restricts the allowed states.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+x^2+y^2=1
+}</md>
+</p>
+
+<p>restricts the state to the unit circle.</p>
+
+<p>The DAE trajectory must remain on this constraint manifold.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-constraint-manifold-dae">
+<title>Constraint Manifold</title>
+<p>Suppose</p>
+
+<p>
+<md>\boxed{
+g(\mathbf{x})=0.
+}</md>
+</p>
+
+<p>The set</p>
+
+<p>
+<md>\boxed{
+\mathcal{M}
+=
+\{
+\mathbf{x}:
+g(\mathbf{x})=0
+\}
+}</md>
+</p>
+
+<p>is the constraint set.</p>
+
+<p>When appropriate regularity conditions hold, it forms a manifold.</p>
+
+<p>The DAE dynamics must remain tangent to <m>\mathcal{M}</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-consistent-initial-conditions-dae">
+<title>Consistent Initial Conditions</title>
+<p>Initial values cannot usually be chosen arbitrarily.</p>
+
+<p>They must satisfy all algebraic constraints.</p>
+
+<p>For</p>
+
+<p>
+<md>g(y,z)=0,</md>
+</p>
+
+<p>consistent initial data satisfy</p>
+
+<p>
+<md>\boxed{
+g(y_0,z_0)=0.
+}</md>
+</p>
+
+<p>Additional hidden derivative constraints may also need to be satisfied.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-worked-consistent-initial-data">
+<title>Worked Example: Consistent Initial Data</title>
+<example>
+<title>Checking a Constraint</title>
+<p>Consider</p>
+
+<p>
+<md>x'=y,</md>
+</p>
+
+<p>with constraint</p>
+
+<p>
+<md>x^2+y^2=1.</md>
+</p>
+
+<p>Suppose</p>
+
+<p>
+<md>x(0)=\frac35.</md>
+</p>
+
+<p>Consistency requires</p>
+
+<p>
+<md>\left(
+\frac35
+\right)^2
++
+y(0)^2
+=
+1.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>y(0)^2
+=
+1-\frac9{25}
+=
+\frac{16}{25}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>Any other value violates the algebraic constraint.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+y(0)=\pm\frac45.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-hidden-constraints-dae">
+<title>Hidden Constraints</title>
+<p>An algebraic equation may imply additional conditions after
+differentiation.</p>
+
+<p>Suppose</p>
+
+<p>
+<md>\boxed{
+g(y,z)=0.
+}</md>
+</p>
+
+<p>Differentiating with respect to time gives</p>
+
+<p>
+<md>\boxed{
+g_y y'
++
+g_z z'
+=
+0
+}</md>
+</p>
+
+<p>for an autonomous constraint.</p>
+
+<p>These derivative relations are called hidden constraints when they are
+not explicitly listed in the original system.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-differentiating-dae-constraint">
+<title>Differentiating a Constraint</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+x^2+y^2=1.
+}</md>
+</p>
+
+<p>Differentiate:</p>
+
+<p>
+<md>2xx'
++
+2yy'
+=
+0.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+xx'+yy'=0.
+}</md>
+</p>
+
+<p>This states that the velocity is tangent to the circle.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-tangent-space">
+<title>Tangent-Space Interpretation</title>
+<p>If</p>
+
+<p>
+<md>g(\mathbf{x})=0,</md>
+</p>
+
+<p>then along a valid trajectory,</p>
+
+<p>
+<md>\boxed{
+\nabla g(\mathbf{x})^T
+\mathbf{x}'
+=
+0.
+}</md>
+</p>
+
+<p>Therefore the velocity lies in the tangent space of the constraint
+manifold.</p>
+
+<p>The gradient</p>
+
+<p>
+<md>\nabla g</md>
+</p>
+
+<p>is normal to the constraint surface.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-index">
+<title>Index of a DAE</title>
+<p>The index of a DAE measures, roughly, how many times algebraic constraints
+must be differentiated before an explicit ODE-like description can be
+obtained.</p>
+
+<p>Several formal index definitions exist.</p>
+
+<p>Therefore the word <em>index</em> should always be interpreted in the
+context of the chosen DAE theory.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-differentiation-index">
+<title>Differentiation Index</title>
+<p>The differentiation index is the minimum number of differentiations of
+the algebraic equations required, under suitable assumptions, to obtain
+an explicit differential system.</p>
+
+<p>Conceptually:</p>
+
+<p>
+<md>\boxed{
+\text{fewer differentiations}
+\rightarrow
+\text{lower index}.
+}</md>
+</p>
+
+<p>Higher index usually means greater analytical and numerical difficulty.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-index-one-dae">
+<title>Index-1 Semi-Explicit DAE</title>
+<p>Consider</p>
+
+<p>
+<md>\begin{aligned}
+y'
+&amp;=
+f(t,y,z),
+\\
+0
+&amp;=
+g(t,y,z).
+\end{aligned}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\boxed{
+g_z
+}</md>
+</p>
+
+<p>is nonsingular, the implicit function theorem allows</p>
+
+<p>
+<md>\boxed{
+z=h(t,y)
+}</md>
+</p>
+
+<p>locally.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+y'
+=
+f
+(
+t,y,h(t,y)
+).
+}</md>
+</p>
+
+<p>Such systems are standard examples of index-1 DAEs.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-worked-index-one-reduction">
+<title>Worked Example: Index-1 Reduction</title>
+<example>
+<title>Eliminating an Algebraic Variable</title>
+<p>Consider</p>
+
+<p>
+<md>y'
+=
+-y+z,</md>
+</p>
+
+<p>with constraint</p>
+
+<p>
+<md>0=y+z-1.</md>
+</p>
+
+<p>The algebraic equation gives</p>
+
+<p>
+<md>z=1-y.</md>
+</p>
+
+<p>Substitute into the differential equation:</p>
+
+<p>
+<md>y'
+=
+-y+(1-y).</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>y'
+=
+1-2y.</md>
+</p>
+
+<p>Therefore the DAE reduces to</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+y'
+=
+1-2y,
+\qquad
+z=1-y.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-higher-index-daes">
+<title>Higher-Index DAEs</title>
+<p>A higher-index DAE cannot be reduced by simply solving the algebraic
+constraint for the algebraic variables.</p>
+
+<p>Differentiating constraints may be necessary.</p>
+
+<p>Higher-index systems arise naturally in:</p>
+
+<p>
+<md>\boxed{
+\text{constrained mechanics},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{electrical circuits},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{multibody systems}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-simple-higher-index-structure">
+<title>Simple Higher-Index Structure</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+x'=v,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+v'=\lambda,
+}</md>
+</p>
+
+<p>with algebraic constraint</p>
+
+<p>
+<md>\boxed{
+x=0.
+}</md>
+</p>
+
+<p>Differentiate the constraint:</p>
+
+<p>
+<md>x'=0.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>v=0.</md>
+</p>
+
+<p>Differentiate again:</p>
+
+<p>
+<md>v'=0.</md>
+</p>
+
+<p>Hence,</p>
+
+<p>
+<md>\lambda=0.</md>
+</p>
+
+<p>The algebraic condition produces hidden differential constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-mass-matrix-form">
+<title>Mass-Matrix Form</title>
+<p>Many DAEs are written</p>
+
+<p>
+<md>\boxed{
+M(t,x)x'
+=
+f(t,x),
+}</md>
+</p>
+
+<p>where <m>M</m> is called the mass matrix.</p>
+
+<p>If <m>M</m> is invertible, then</p>
+
+<p>
+<md>\boxed{
+x'
+=
+M^{-1}f,
+}</md>
+</p>
+
+<p>and the system is an ODE.</p>
+
+<p>If <m>M</m> is singular, the system may be a DAE.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-constant-linear-dae">
+<title>Constant Linear DAE</title>
+<p>A linear constant-coefficient DAE has form</p>
+
+<p>
+<md>\boxed{
+E x'
+=
+A x
++
+f(t),
+}</md>
+</p>
+
+<p>where <m>E</m> may be singular.</p>
+
+<p>If</p>
+
+<p>
+<md>\det(E)\neq0,</md>
+</p>
+
+<p>the system reduces to an ODE.</p>
+
+<p>If</p>
+
+<p>
+<md>\det(E)=0,</md>
+</p>
+
+<p>algebraic constraints may be present.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-matrix-pencil">
+<title>Matrix Pencil</title>
+<p>For the homogeneous linear DAE</p>
+
+<p>
+<md>E x'=Ax,</md>
+</p>
+
+<p>the matrix pencil is</p>
+
+<p>
+<md>\boxed{
+\lambda E-A.
+}</md>
+</p>
+
+<p>It generalizes the characteristic matrix</p>
+
+<p>
+<md>\lambda I-A</md>
+</p>
+
+<p>from ordinary linear systems.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-regular-matrix-pencil">
+<title>Regular Matrix Pencil</title>
+<p>A square matrix pencil</p>
+
+<p>
+<md>\lambda E-A</md>
+</p>
+
+<p>is called regular if</p>
+
+<p>
+<md>\boxed{
+\det(\lambda E-A)
+}</md>
+</p>
+
+<p>is not identically zero as a polynomial in <m>\lambda</m>.</p>
+
+<p>Otherwise it is singular.</p>
+
+<p>Regular pencils provide a standard framework for well-structured linear
+DAEs.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-finite-infinite-eigenvalues-dae">
+<title>Finite and Infinite Eigenvalues</title>
+<p>When <m>E</m> is singular, the pencil can possess finite generalized
+eigenvalues together with structure associated with eigenvalues at
+infinity.</p>
+
+<p>The finite eigenvalues govern differential modes.</p>
+
+<p>The infinite-eigenvalue structure is related to algebraic constraints and
+DAE index.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-generalized-eigenvalue-problem">
+<title>Generalized Eigenvalue Problem</title>
+<p>Trying</p>
+
+<p>
+<md>x(t)=ve^{\lambda t}</md>
+</p>
+
+<p>in</p>
+
+<p>
+<md>E x'=Ax</md>
+</p>
+
+<p>gives</p>
+
+<p>
+<md>\lambda Ev=Av.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+Av
+=
+\lambda Ev.
+}</md>
+</p>
+
+<p>This is a generalized eigenvalue problem.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-simple-linear-dae-example">
+<title>Simple Linear DAE Example</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\begin{pmatrix}
+1&amp;0\\
+0&amp;0
+\end{pmatrix}
+\begin{pmatrix}
+x'\\
+y'
+\end{pmatrix}
+=
+\begin{pmatrix}
+-x+y\\
+x+y-1
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>The equations are</p>
+
+<p>
+<md>\boxed{
+x'=-x+y,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+0=x+y-1.
+}</md>
+</p>
+
+<p>The second row is purely algebraic.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-reduction-linear-dae-example">
+<title>Reduction of the Linear DAE Example</title>
+<p>From</p>
+
+<p>
+<md>x+y-1=0,</md>
+</p>
+
+<p>we obtain</p>
+
+<p>
+<md>y=1-x.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>x'
+=
+-x+(1-x)
+=
+1-2x.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+x'=1-2x,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+y=1-x.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-solution-linear-dae-example">
+<title>Solution of the Linear DAE Example</title>
+<p>The ODE</p>
+
+<p>
+<md>x'=1-2x</md>
+</p>
+
+<p>has solution</p>
+
+<p>
+<md>\boxed{
+x(t)
+=
+\frac12
++
+Ce^{-2t}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+y(t)
+=
+\frac12
+-
+Ce^{-2t}.
+}</md>
+</p>
+
+<p>The initial conditions must satisfy</p>
+
+<p>
+<md>\boxed{
+x(0)+y(0)=1.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-constrained-mechanical-systems-dae">
+<title>Constrained Mechanical Systems</title>
+<p>Mechanical systems often involve geometric constraints.</p>
+
+<p>Let</p>
+
+<p>
+<md>q(t)</md>
+</p>
+
+<p>denote generalized coordinates.</p>
+
+<p>A holonomic constraint has form</p>
+
+<p>
+<md>\boxed{
+g(q,t)=0.
+}</md>
+</p>
+
+<p>The equations of motion must evolve while preserving this constraint.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-lagrange-multipliers">
+<title>Lagrange Multipliers in Constrained Mechanics</title>
+<p>A constrained mechanical system may be written</p>
+
+<p>
+<md>\boxed{
+M(q)q''
+=
+F(q,q',t)
++
+G(q,t)^T\lambda,
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+g(q,t)=0.
+}</md>
+</p>
+
+<p>Here,</p>
+
+<p>
+<md>G
+=
+\frac{\partial g}{\partial q},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\lambda</md>
+</p>
+
+<p>contains Lagrange multipliers representing constraint forces.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-pendulum-cartesian-dae">
+<title>Pendulum in Cartesian Coordinates</title>
+<p>A pendulum of fixed length <m>L</m> can be described using Cartesian
+coordinates <m>x,y</m>.</p>
+
+<p>The geometric constraint is</p>
+
+<p>
+<md>\boxed{
+x^2+y^2=L^2.
+}</md>
+</p>
+
+<p>Using Newton's laws,</p>
+
+<p>
+<md>\boxed{
+m x''
+=
+-\lambda x,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+m y''
+=
+-mg-\lambda y.
+}</md>
+</p>
+
+<p>Together with the length constraint, these equations form a DAE.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-pendulum-velocity-constraint">
+<title>Velocity Constraint for the Pendulum</title>
+<p>Differentiate</p>
+
+<p>
+<md>x^2+y^2=L^2.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>2xx'
++
+2yy'
+=
+0.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+xx'+yy'=0.
+}</md>
+</p>
+
+<p>The velocity must be tangent to the circle.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-pendulum-acceleration-constraint">
+<title>Acceleration Constraint for the Pendulum</title>
+<p>Differentiate again:</p>
+
+<p>
+<md>x'^2
++
+xx''
++
+y'^2
++
+yy''
+=
+0.</md>
+</p>
+
+<p>Hence,</p>
+
+<p>
+<md>\boxed{
+xx''
++
+yy''
+=
+-
+(x'^2+y'^2).
+}</md>
+</p>
+
+<p>This relation can be combined with the equations of motion to solve for
+the multiplier <m>\lambda</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-constraint-forces-dae">
+<title>Constraint Forces</title>
+<p>The Lagrange multiplier does not represent an independently evolving
+state.</p>
+
+<p>It enforces the constraint.</p>
+
+<p>For the pendulum, it is related to the tension needed to keep the mass on
+the circular path.</p>
+
+<p>Thus algebraic variables often have clear physical meaning.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-mechanical-dae-index">
+<title>Index of Constrained Mechanical DAEs</title>
+<p>The standard position-level constrained mechanical formulation often has
+a higher differentiation index.</p>
+
+<p>The position constraint must be differentiated to obtain velocity and
+acceleration constraints before the multiplier can be determined
+explicitly.</p>
+
+<p>This is one reason constrained mechanical DAEs can be numerically
+challenging.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-electrical-circuit-daes">
+<title>Electrical Circuit DAEs</title>
+<p>Electrical circuits can produce DAEs when Kirchhoff's laws impose
+algebraic constraints.</p>
+
+<p>Dynamic components include:</p>
+
+<p>
+<md>\boxed{
+\text{capacitors},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{inductors}.
+}</md>
+</p>
+
+<p>Algebraic components include ideal resistive or network constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-capacitor-inductor-dae">
+<title>Capacitor and Inductor Relations</title>
+<p>For a capacitor,</p>
+
+<p>
+<md>\boxed{
+i_C
+=
+C
+\frac{dv_C}{dt}.
+}</md>
+</p>
+
+<p>For an inductor,</p>
+
+<p>
+<md>\boxed{
+v_L
+=
+L
+\frac{di_L}{dt}.
+}</md>
+</p>
+
+<p>Kirchhoff's current and voltage laws impose additional algebraic
+relations among currents and voltages.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-kirchhoff-current-law-dae">
+<title>Kirchhoff Current Law</title>
+<p>At a circuit node,</p>
+
+<p>
+<md>\boxed{
+\sum_j i_j=0.
+}</md>
+</p>
+
+<p>This is algebraic in the instantaneous currents.</p>
+
+<p>Combined with differential component laws, it produces a DAE system.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-kirchhoff-voltage-law-dae">
+<title>Kirchhoff Voltage Law</title>
+<p>Around a closed loop,</p>
+
+<p>
+<md>\boxed{
+\sum_j v_j=0.
+}</md>
+</p>
+
+<p>Again, the equation is algebraic.</p>
+
+<p>Circuit simulation software therefore frequently solves DAEs rather than
+explicit ODEs.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-chemical-equilibrium-dae">
+<title>Chemical Equilibrium Constraints</title>
+<p>Some chemical models combine slow dynamic reactions with rapidly
+equilibrating processes.</p>
+
+<p>A reaction may evolve according to differential equations while
+equilibrium relations impose algebraic equations such as</p>
+
+<p>
+<md>\boxed{
+K_{eq}
+=
+\frac{
+[C]^c[D]^d
+}{
+[A]^a[B]^b
+}.
+}</md>
+</p>
+
+<p>This produces differential-algebraic models.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-process-system-daes">
+<title>Process Systems</title>
+<p>Chemical engineering models may contain:</p>
+
+<p>
+<md>\boxed{
+\text{mass balances},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{energy balances},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{equations of state},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{phase-equilibrium constraints}.
+}</md>
+</p>
+
+<p>The conservation laws generate differential equations while constitutive
+relations may be algebraic.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-conservation-constraints-dae">
+<title>Conservation Constraints</title>
+<p>Suppose several state variables satisfy</p>
+
+<p>
+<md>\boxed{
+c_1x_1+\cdots+c_nx_n=C.
+}</md>
+</p>
+
+<p>This conservation law restricts the trajectory to a lower-dimensional
+set.</p>
+
+<p>One may eliminate a variable explicitly, or retain the constraint and
+solve the resulting DAE.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-power-system-daes">
+<title>Power-System DAEs</title>
+<p>Electrical power networks frequently combine dynamic generator models
+with algebraic network-flow equations.</p>
+
+<p>A schematic form is</p>
+
+<p>
+<md>\boxed{
+x'=f(x,z),
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+0=g(x,z).
+}</md>
+</p>
+
+<p>Here <m>x</m> may contain machine states while <m>z</m> contains network voltage
+and phase variables.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-control-theory">
+<title>DAEs in Control Theory</title>
+<p>Descriptor systems are often written</p>
+
+<p>
+<md>\boxed{
+E x'
+=
+Ax+Bu,
+}</md>
+</p>
+
+<p>with output</p>
+
+<p>
+<md>\boxed{
+y=Cx+Du.
+}</md>
+</p>
+
+<p>If <m>E</m> is singular, the system is a descriptor or DAE control system.</p>
+
+<p>Its analysis combines generalized eigenvalues with controllability and
+observability concepts.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-consistent-initialization">
+<title>Consistent Initialization</title>
+<p>A DAE solver generally requires initial values satisfying both explicit
+and hidden constraints.</p>
+
+<p>For a semi-explicit index-1 DAE,</p>
+
+<p>
+<md>\begin{aligned}
+y'&amp;=f(t,y,z),\\
+0&amp;=g(t,y,z),
+\end{aligned}</md>
+</p>
+
+<p>one may choose <m>y_0</m> and solve</p>
+
+<p>
+<md>\boxed{
+g(t_0,y_0,z_0)=0
+}</md>
+</p>
+
+<p>for <m>z_0</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-inconsistent-initial-conditions">
+<title>Inconsistent Initial Conditions</title>
+<p>Suppose the constraint is</p>
+
+<p>
+<md>x+y=1.</md>
+</p>
+
+<p>The initial choice</p>
+
+<p>
+<md>x(0)=1,
+\qquad
+y(0)=1</md>
+</p>
+
+<p>is inconsistent because</p>
+
+<p>
+<md>1+1\neq1.</md>
+</p>
+
+<p>A solver cannot produce a trajectory satisfying the original DAE from
+such data without first modifying the initial state.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-initialization-nonlinear-solve">
+<title>Initialization as a Nonlinear Solve</title>
+<p>For nonlinear constraints,</p>
+
+<p>
+<md>g(t_0,y_0,z_0)=0,</md>
+</p>
+
+<p>consistent initialization may itself require a nonlinear solver.</p>
+
+<p>Newton's method is commonly used.</p>
+
+<p>Thus solving a DAE can begin with solving an algebraic system.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-index-reduction">
+<title>Index Reduction</title>
+<p>Higher-index systems are often transformed into lower-index systems before
+numerical integration.</p>
+
+<p>Methods may involve:</p>
+
+<p>
+<md>\boxed{
+\text{differentiating constraints},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{eliminating variables},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{introducing additional equations}.
+}</md>
+</p>
+
+<p>This process is called index reduction.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-danger-naive-index-reduction">
+<title>Danger of Naive Constraint Differentiation</title>
+<p>Differentiating a constraint may enlarge the solution set.</p>
+
+<p>For example,</p>
+
+<p>
+<md>g(x)=0</md>
+</p>
+
+<p>implies</p>
+
+<p>
+<md>\frac{d}{dt}g(x(t))=0,</md>
+</p>
+
+<p>but the derivative equation alone only guarantees</p>
+
+<p>
+<md>g(x(t))
+=
+\text{constant},</md>
+</p>
+
+<p>not necessarily zero.</p>
+
+<p>Therefore the original constraint must still be enforced.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-constraint-drift">
+<title>Constraint Drift</title>
+<p>A numerical method may approximately satisfy derivative constraints while
+slowly moving away from the original algebraic constraint.</p>
+
+<p>This is called constraint drift.</p>
+
+<p>For example, a numerical pendulum may gradually violate</p>
+
+<p>
+<md>\boxed{
+x^2+y^2=L^2.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-projection">
+<title>Projection onto the Constraint Manifold</title>
+<p>One approach to constraint drift is projection.</p>
+
+<p>After a numerical step produces a tentative state</p>
+
+<p>
+<md>\widetilde{x}_{n+1},</md>
+</p>
+
+<p>replace it with a nearby corrected state <m>x_{n+1}</m> satisfying</p>
+
+<p>
+<md>\boxed{
+g(x_{n+1})=0.
+}</md>
+</p>
+
+<p>The correction projects the numerical solution back onto the constraint
+manifold.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-baumgarte-stabilization-preview">
+<title>Baumgarte Stabilization Preview</title>
+<p>For mechanical constraints</p>
+
+<p>
+<md>g(q)=0,</md>
+</p>
+
+<p>one may modify the differentiated constraint by adding feedback terms.</p>
+
+<p>A schematic form is</p>
+
+<p>
+<md>\boxed{
+\ddot g
++
+2\alpha\dot g
++
+\beta^2g
+=
+0.
+}</md>
+</p>
+
+<p>This encourages constraint errors to decay.</p>
+
+<p>This technique is called Baumgarte stabilization.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-implicit-methods-daes">
+<title>Implicit Numerical Methods</title>
+<p>DAEs are usually solved with implicit methods.</p>
+
+<p>At each time step, the new state must satisfy both:</p>
+
+<p>
+<md>\boxed{
+\text{the discretized differential equations},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{the algebraic constraints}.
+}</md>
+</p>
+
+<p>This produces an algebraic system at every step.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-implicit-euler-dae">
+<title>Implicit Euler for a Semi-Explicit DAE</title>
+<p>Consider</p>
+
+<p>
+<md>\begin{aligned}
+y'&amp;=f(t,y,z),\\
+0&amp;=g(t,y,z).
+\end{aligned}</md>
+</p>
+
+<p>Implicit Euler gives</p>
+
+<p>
+<md>\boxed{
+\frac{
+y_{n+1}-y_n
+}{
+h
+}
+=
+f
+(
+t_{n+1},
+y_{n+1},
+z_{n+1}
+),
+}</md>
+</p>
+
+<p>together with</p>
+
+<p>
+<md>\boxed{
+0
+=
+g
+(
+t_{n+1},
+y_{n+1},
+z_{n+1}
+).
+}</md>
+</p>
+
+<p>Both <m>y_{n+1}</m> and <m>z_{n+1}</m> are solved simultaneously.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-worked-implicit-euler-dae">
+<title>Worked Example: Implicit Euler DAE Step</title>
+<example>
+<title>One Step of an Index-1 DAE</title>
+<p>Consider</p>
+
+<p>
+<md>y'=-y+z,</md>
+</p>
+
+<p>
+<md>0=y+z-1.</md>
+</p>
+
+<p>Using step size <m>h</m>,</p>
+
+<p>
+<md>\frac{
+y_{n+1}-y_n
+}{
+h
+}
+=
+-y_{n+1}+z_{n+1}.</md>
+</p>
+
+<p>The constraint gives</p>
+
+<p>
+<md>z_{n+1}=1-y_{n+1}.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\frac{
+y_{n+1}-y_n
+}{
+h
+}
+=
+1-2y_{n+1}.</md>
+</p>
+
+<p>Multiply by <m>h</m>:</p>
+
+<p>
+<md>y_{n+1}-y_n
+=
+h-2hy_{n+1}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>(1+2h)y_{n+1}
+=
+y_n+h.</md>
+</p>
+
+<p>Hence,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+y_{n+1}
+=
+\frac{
+y_n+h
+}{
+1+2h
+},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+z_{n+1}
+=
+1-y_{n+1}.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-nonlinear-solve">
+<title>Nonlinear Solve at Each Step</title>
+<p>For nonlinear DAEs, implicit discretization produces equations</p>
+
+<p>
+<md>\boxed{
+R(w)=0,
+}</md>
+</p>
+
+<p>where <m>w</m> contains the unknown new-time variables.</p>
+
+<p>Newton iteration may be used:</p>
+
+<p>
+<md>\boxed{
+w^{(k+1)}
+=
+w^{(k)}
+-
+J_R(w^{(k)})^{-1}
+R(w^{(k)}).
+}</md>
+</p>
+
+<p>In practice, the linear Newton system is solved without explicitly forming
+the inverse matrix.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-jacobian-structure">
+<title>Jacobian Structure in DAE Solvers</title>
+<p>For</p>
+
+<p>
+<md>F(t,x,x')=0,</md>
+</p>
+
+<p>an implicit time method often requires matrices involving</p>
+
+<p>
+<md>\boxed{
+F_x
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+F_{x'}.
+}</md>
+</p>
+
+<p>The combination may look like</p>
+
+<p>
+<md>\boxed{
+F_x
++
+\alpha
+F_{x'},
+}</md>
+</p>
+
+<p>where <m>\alpha</m> depends on the time discretization.</p>
+
+<p>Efficient DAE solvers exploit sparsity in these matrices.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-bdf-daes">
+<title>Backward Differentiation Formulas</title>
+<p>Backward differentiation formulas, abbreviated BDF methods, are widely
+used for stiff ODEs and DAEs.</p>
+
+<p>A first-order BDF is implicit Euler.</p>
+
+<p>A second-order BDF approximates</p>
+
+<p>
+<md>x'(t_{n+1})</md>
+</p>
+
+<p>by</p>
+
+<p>
+<md>\boxed{
+\frac{
+3x_{n+1}
+-
+4x_n
++
+x_{n-1}
+}{
+2h
+}.
+}</md>
+</p>
+
+<p>The approximation is inserted into</p>
+
+<p>
+<md>F(t,x,x')=0.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-explicit-euler-dae-problem">
+<title>Why Explicit Euler Is Problematic for DAEs</title>
+<p>An explicit update may advance differential variables without ensuring
+that the new state satisfies</p>
+
+<p>
+<md>\boxed{
+g(y_{n+1},z_{n+1})=0.
+}</md>
+</p>
+
+<p>The algebraic variables may not even have an explicit update rule.</p>
+
+<p>Therefore implicit constraint-aware methods are generally preferred.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-stiffness">
+<title>DAE Stiffness</title>
+<p>DAEs frequently occur in models with widely separated time scales.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{fast electrical transients},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{chemical equilibria},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{mechanical constraints}.
+}</md>
+</p>
+
+<p>Implicit methods are often chosen because they have favorable stability
+properties for stiff systems.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-scaling">
+<title>Scaling of DAE Systems</title>
+<p>Poorly scaled equations can make nonlinear solves difficult.</p>
+
+<p>Suppose one constraint has magnitude</p>
+
+<p>
+<md>10^{-8}</md>
+</p>
+
+<p>while another has magnitude</p>
+
+<p>
+<md>10^6.</md>
+</p>
+
+<p>A solver may treat residuals unevenly.</p>
+
+<p>Nondimensionalization or explicit scaling can improve conditioning.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-residual-formulation">
+<title>Residual Formulation</title>
+<p>A general solver may work directly with</p>
+
+<p>
+<md>\boxed{
+F(t,x,x')=0.
+}</md>
+</p>
+
+<p>Rather than distinguishing every equation manually as differential or
+algebraic, the solver seeks a state and derivative whose residual is near
+zero.</p>
+
+<p>This formulation is flexible for large coupled systems.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-error-control">
+<title>Error Control</title>
+<p>DAE error control must monitor both differential accuracy and algebraic
+constraint satisfaction.</p>
+
+<p>Useful quantities include</p>
+
+<p>
+<md>\boxed{
+\|F(t,x,x')\|,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\|g(t,y,z)\|.
+}</md>
+</p>
+
+<p>Small integration error does not automatically imply small constraint
+error.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-events">
+<title>Events in DAE Models</title>
+<p>Real DAE models may switch structure when an event occurs.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{contact},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{valve opening},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{electrical switching},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{phase change}.
+}</md>
+</p>
+
+<p>After an event, the algebraic constraints may change and consistent
+initialization may need to be performed again.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-hybrid-dae-systems">
+<title>Hybrid DAE Systems</title>
+<p>A hybrid DAE combines continuous constrained dynamics with discrete mode
+changes.</p>
+
+<p>A schematic representation is</p>
+
+<p>
+<md>\boxed{
+F_m(t,x,x')=0,
+}</md>
+</p>
+
+<p>where the active equation set depends on a discrete mode <m>m</m>.</p>
+
+<p>Switching can change:</p>
+
+<p>
+<md>\boxed{
+\text{constraints},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{parameters},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{system dimension}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-optimization-connection">
+<title>DAEs and Optimization</title>
+<p>Algebraic constraints are central to constrained optimization.</p>
+
+<p>For example, the first-order conditions for minimizing</p>
+
+<p>
+<md>f(x)</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>g(x)=0</md>
+</p>
+
+<p>introduce Lagrange multipliers:</p>
+
+<p>
+<md>\boxed{
+\nabla f(x)
++
+G(x)^T\lambda
+=
+0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+g(x)=0.
+}</md>
+</p>
+
+<p>Dynamic optimization combines these ideas with differential equations and
+can produce differential-algebraic optimality systems.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-constrained-dynamical-systems">
+<title>DAEs and Constrained Dynamical Systems</title>
+<p>A DAE can be viewed as a dynamical system restricted to a constraint
+manifold.</p>
+
+<p>The dynamics must satisfy:</p>
+
+<p>
+<md>\boxed{
+\text{evolution equations},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{geometric or physical constraints}.
+}</md>
+</p>
+
+<p>This viewpoint connects DAEs with differential geometry and constrained
+mechanics.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-singular-perturbation">
+<title>DAEs and Singular Perturbations</title>
+<p>Some DAEs arise as limits of ODE systems containing a small parameter.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+y'
+=
+f(y,z),
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\varepsilon z'
+=
+g(y,z).
+}</md>
+</p>
+
+<p>As</p>
+
+<p>
+<md>\varepsilon\to0,</md>
+</p>
+
+<p>the second equation formally becomes</p>
+
+<p>
+<md>\boxed{
+0=g(y,z),
+}</md>
+</p>
+
+<p>producing a DAE.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-fast-slow-variables">
+<title>Fast and Slow Variables</title>
+<p>In</p>
+
+<p>
+<md>\varepsilon z'
+=
+g(y,z),</md>
+</p>
+
+<p>small <m>\varepsilon</m> means <m>z</m> can evolve on a much faster time scale
+than <m>y</m>.</p>
+
+<p>The DAE limit assumes the fast variable has relaxed instantly to the
+constraint</p>
+
+<p>
+<md>\boxed{
+g(y,z)=0.
+}</md>
+</p>
+
+<p>This is the basis of many quasi-steady-state approximations.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-index-numerical-difficulty">
+<title>Differential Index Versus Numerical Difficulty</title>
+<p>Higher index often correlates with numerical difficulty, but index alone
+does not completely determine solver performance.</p>
+
+<p>Other important factors include:</p>
+
+<p>
+<md>\boxed{
+\text{conditioning},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{stiffness},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{scaling},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{constraint geometry}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-modeling-workflow">
+<title>DAE Modeling Workflow</title>
+<p>A practical DAE workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify all dynamic variables;</p>
+</li>
+<li>
+<p>identify algebraic constraints;</p>
+</li>
+<li>
+<p>choose differential and algebraic variables;</p>
+</li>
+<li>
+<p>write the model in implicit or semi-explicit form;</p>
+</li>
+<li>
+<p>inspect the derivative matrix or mass matrix;</p>
+</li>
+<li>
+<p>determine whether the system reduces directly to an ODE;</p>
+</li>
+<li>
+<p>identify consistent initial conditions;</p>
+</li>
+<li>
+<p>determine whether hidden constraints exist;</p>
+</li>
+<li>
+<p>estimate or determine the DAE index when necessary;</p>
+</li>
+<li>
+<p>perform index reduction if required;</p>
+</li>
+<li>
+<p>select an implicit numerical solver;</p>
+</li>
+<li>
+<p>monitor algebraic residuals;</p>
+</li>
+<li>
+<p>monitor constraint drift;</p>
+</li>
+<li>
+<p>use projection or stabilization if appropriate;</p>
+</li>
+<li>
+<p>verify physical conservation laws;</p>
+</li>
+<li>
+<p>test sensitivity to time step and solver tolerances.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-choosing-dae-formulation">
+<title>Choosing a DAE Formulation</title>
+<p>If algebraic variables can be solved easily from</p>
+
+<p>
+<md>g(t,y,z)=0,</md>
+</p>
+
+<p>consider:</p>
+
+<p>
+<md>\boxed{
+\text{local reduction to an ODE}.
+}</md>
+</p>
+
+<p>If the constraint has strong physical meaning, consider retaining it as a
+DAE.</p>
+
+<p>For constrained mechanics, Lagrange multipliers often preserve physical
+interpretation.</p>
+
+<p>For large engineering systems, a residual form</p>
+
+<p>
+<md>\boxed{
+F(t,x,x')=0
+}</md>
+</p>
+
+<p>is often the most natural.</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-calling-every-implicit-ode-a-dae">
+<title>Calling Every Implicit ODE a DAE</title>
+<p>An implicit equation</p>
+
+<p>
+<md>F(t,x,x')=0</md>
+</p>
+
+<p>may still be an ODE if it can be solved locally for <m>x'</m>.</p>
+
+<p>A DAE involves genuine algebraic or singular derivative structure.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-algebraic-constraints-at-the-initial-time">
+<title>Ignoring Algebraic Constraints at the Initial Time</title>
+<p>Initial data must satisfy</p>
+
+<p>
+<md>\boxed{
+g(t_0,y_0,z_0)=0.
+}</md>
+</p>
+
+<p>Otherwise the initial state does not lie on the admissible constraint
+set.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-hidden-constraints">
+<title>Ignoring Hidden Constraints</title>
+<p>Differentiating</p>
+
+<p>
+<md>g(x)=0</md>
+</p>
+
+<p>can reveal required velocity and acceleration conditions.</p>
+
+<p>Satisfying only the position-level constraint may be insufficient.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-differentiating-constraints-and-discarding-the-original-equation">
+<title>Differentiating Constraints and Discarding the Original Equation</title>
+<p>The derivative condition</p>
+
+<p>
+<md>\dot g=0</md>
+</p>
+
+<p>only preserves whatever value of <m>g</m> is initially present.</p>
+
+<p>The original constraint</p>
+
+<p>
+<md>g=0</md>
+</p>
+
+<p>must still be enforced.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-the-mass-matrix-is-invertible">
+<title>Assuming the Mass Matrix Is Invertible</title>
+<p>If</p>
+
+<p>
+<md>M</md>
+</p>
+
+<p>is singular, one cannot simply write</p>
+
+<p>
+<md>x'=M^{-1}f.</md>
+</p>
+
+<p>The singular structure must be analyzed.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-arbitrary-ode-solvers-on-higher-index-daes">
+<title>Using Arbitrary ODE Solvers on Higher-Index DAEs</title>
+<p>Standard explicit ODE methods may violate constraints or fail entirely.</p>
+
+<p>DAE-aware methods are usually necessary.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-algebraic-variables-with-constants">
+<title>Confusing Algebraic Variables with Constants</title>
+<p>An algebraic variable can change with time.</p>
+
+<p>It is called algebraic because its value is determined through an
+algebraic relation rather than an independent differential equation.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-constraint-drift">
+<title>Ignoring Constraint Drift</title>
+<p>A numerical trajectory can appear visually reasonable while slowly
+violating</p>
+
+<p>
+<md>g(x)=0.</md>
+</p>
+
+<p>Constraint residuals should be monitored directly.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-10-differential-equations-dynamical-systems-08-differential-algebraic-equations-subsubsec-ignoring-scaling">
+<title>Ignoring Scaling</title>
+<p>Poorly scaled equations can make Newton iterations or linear systems
+appear nearly singular.</p>
+
+<p>Physical units and variable magnitudes matter numerically.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-dae-index-definitions">
+<title>Confusing DAE Index Definitions</title>
+<p>Differentiation index, tractability index, perturbation index, and other
+definitions are related but not identical.</p>
+
+<p>A stated index should be tied to a specific definition.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-higher-index-means-no-solution-exists">
+<title>Assuming Higher Index Means No Solution Exists</title>
+<p>Higher index means the constraints are more deeply coupled to the
+differential structure.</p>
+
+<p>Solutions can exist, but initialization and numerical treatment become
+more delicate.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-events-that-change-constraints">
+<title>Ignoring Events That Change Constraints</title>
+<p>When contact begins or a circuit switch changes position, the active DAE
+may change.</p>
+
+<p>The post-event state must satisfy the new constraints.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Multibody Mechanics.</em>
+Rigid links, joints, pendulums, gears, and contact constraints naturally
+lead to differential-algebraic systems.</p>
+
+<p>\medskip</p>
+
+<p><em>Electrical Circuits.</em>
+Kirchhoff laws combine algebraically with capacitor and inductor dynamics.</p>
+
+<p>\medskip</p>
+
+<p><em>Power Systems.</em>
+Generator dynamics interact with algebraic network equations for voltage
+and power flow.</p>
+
+<p>\medskip</p>
+
+<p><em>Chemical Engineering.</em>
+Mass and energy balances interact with equilibrium, constitutive, and
+phase constraints.</p>
+
+<p>\medskip</p>
+
+<p><em>Robotics.</em>
+Closed kinematic chains and constrained mechanisms generate DAEs with
+Lagrange multipliers.</p>
+
+<p>\medskip</p>
+
+<p><em>Control Theory.</em>
+Descriptor systems generalize standard state-space equations to singular
+mass matrices.</p>
+
+<p>\medskip</p>
+
+<p><em>Optimization.</em>
+Dynamic optimization and constrained optimal control often produce
+differential-algebraic necessary conditions.</p>
+
+<p>\medskip</p>
+
+<p><em>Scientific Simulation.</em>
+Large multiphysics models frequently combine differential laws with
+instantaneous algebraic constraints.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define a differential-algebraic equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Distinguish an ODE from a DAE.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a differential variable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an algebraic variable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a consistent initial condition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the differentiation index conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a mass-matrix DAE.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a matrix pencil.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the differential and algebraic variables in</p>
+
+<p>
+<md>y'=-y+z,</md>
+</p>
+
+<p>
+<md>0=y+z-1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>y(0)=2,
+\qquad
+z(0)=-1</md>
+</p>
+
+<p>is consistent with</p>
+
+<p>
+<md>y+z=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the consistent values of <m>y(0)</m> if</p>
+
+<p>
+<md>x(0)=\frac12</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>x^2+y^2=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Differentiate the constraint</p>
+
+<p>
+<md>x^2+y^2=4.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Differentiate the same constraint twice and obtain the acceleration-level
+condition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the matrix</p>
+
+<p>
+<md>M
+=
+\begin{pmatrix}
+1&amp;0\\
+0&amp;0
+\end{pmatrix}</md>
+</p>
+
+<p>is singular.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Reduce</p>
+
+<p>
+<md>y'=2y+z,</md>
+</p>
+
+<p>
+<md>0=y-z</md>
+</p>
+
+<p>to an ODE.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the implicit function theorem to explain why nonsingular <m>g_z</m>
+allows local elimination of algebraic variables.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the hidden derivative constraint associated with</p>
+
+<p>
+<md>g(x(t))=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the system</p>
+
+<p>
+<md>x'=v,</md>
+</p>
+
+<p>
+<md>v'=\lambda,</md>
+</p>
+
+<p>
+<md>x=0,</md>
+</p>
+
+<p>derive the hidden constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve the DAE</p>
+
+<p>
+<md>x'=-x+y,</md>
+</p>
+
+<p>
+<md>x+y=1</md>
+</p>
+
+<p>for consistent initial data.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the previous DAE in mass-matrix form.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the generalized eigenvalue equation for</p>
+
+<p>
+<md>Ex'=Ax.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why singular <m>E</m> creates algebraic structure.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate the Cartesian pendulum as a DAE.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the velocity constraint for the Cartesian pendulum.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the acceleration constraint for the Cartesian pendulum.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve algebraically for the pendulum constraint multiplier using the
+acceleration-level constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how Kirchhoff's current law can create algebraic equations in a
+circuit model.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a simple capacitor-resistor circuit DAE.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how chemical-equilibrium relations can create DAEs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the equilibrium condition</p>
+
+<p>
+<md>(I-A)x^*=b</md>
+</p>
+
+<p>for a linear algebraically constrained system where appropriate.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the implicit Euler equations for a semi-explicit index-1 DAE.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply one implicit Euler step to</p>
+
+<p>
+<md>y'=-y+z,</md>
+</p>
+
+<p>
+<md>y+z=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Newton's method is needed in nonlinear implicit DAE
+integration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain constraint drift in a numerical pendulum simulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe a projection step that restores</p>
+
+<p>
+<md>x^2+y^2=L^2.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why differentiating a constraint can enlarge the solution set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show how the singular perturbation system</p>
+
+<p>
+<md>y'=f(y,z),</md>
+</p>
+
+<p>
+<md>\varepsilon z'=g(y,z)</md>
+</p>
+
+<p>formally becomes a DAE as</p>
+
+<p>
+<md>\varepsilon\to0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the Weierstrass canonical form for regular matrix pencils.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Relate nilpotent blocks in the Weierstrass form to DAE index.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Kronecker canonical form for singular matrix pencils.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate tractability and perturbation indices.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study existence and uniqueness theory for nonlinear DAEs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Develop consistent-initialization algorithms for nonlinear DAEs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study index reduction by constraint differentiation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate structural index methods such as graph-based DAE analysis.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study constrained mechanical systems using Lagrange multipliers.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze the index of the Cartesian pendulum DAE.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Baumgarte constraint stabilization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate projection methods for constrained mechanics.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study backward differentiation formulas for DAEs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze convergence of implicit Euler for index-1 DAEs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study numerical difficulties in higher-index DAEs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate descriptor-system controllability and observability.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study generalized eigenvalue stability for descriptor systems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate DAEs arising from modified nodal analysis of electrical
+circuits.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study quasi-steady-state reduction and singular perturbations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate hybrid DAEs with switching constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study dynamic optimization with DAE constraints.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-summary">
+<title>Conceptual Summary</title>
+<p>A differential-algebraic equation combines differential evolution with
+algebraic constraints.</p>
+
+<p>A general implicit form is</p>
+
+<p>
+<md>\boxed{
+F(t,x,x')=0.
+}</md>
+</p>
+
+<p>A semi-explicit DAE has form</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+y'&amp;=f(t,y,z),\\
+0&amp;=g(t,y,z).
+\end{aligned}
+}</md>
+</p>
+
+<p>Consistent initial conditions satisfy</p>
+
+<p>
+<md>\boxed{
+g(t_0,y_0,z_0)=0
+}</md>
+</p>
+
+<p>together with any necessary hidden constraints.</p>
+
+<p>A mass-matrix system is</p>
+
+<p>
+<md>\boxed{
+M x'=f(t,x).
+}</md>
+</p>
+
+<p>If <m>M</m> is singular, algebraic constraints may be present.</p>
+
+<p>A linear DAE is</p>
+
+<p>
+<md>\boxed{
+E x'=Ax+f(t),
+}</md>
+</p>
+
+<p>with matrix pencil</p>
+
+<p>
+<md>\boxed{
+\lambda E-A.
+}</md>
+</p>
+
+<p>Higher-index systems may require differentiation of algebraic constraints
+before explicit derivatives can be determined.</p>
+
+<p>For numerical integration, implicit methods solve differential and
+algebraic equations simultaneously.</p>
+
+<p>Thus DAEs combine</p>
+
+<p>
+<md>\boxed{
+\text{differential equations}
++
+\text{algebraic constraints}
++
+\text{linear algebra}
++
+\text{numerical analysis}
++
+\text{constrained dynamics}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-differential-algebraic-equations-subsec-dae-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Differential-Algebraic Equations complete Chapter 9 by extending
+differential equations to systems subject to instantaneous algebraic
+constraints. They connect ordinary differential equations with
+constrained mechanics, electrical circuits, optimization, singular
+perturbation theory, and numerical simulation. Their mass-matrix and
+generalized-eigenvalue formulations link directly with linear algebra,
+while higher-index constraints reveal why specialized numerical methods
+are required. Chapter 10 develops Optimization and Operations Research,
+where constrained optimization, dynamic programming, stochastic
+optimization, networks, scheduling, decision theory, game theory, and
+optimal control extend many of the structural ideas encountered here.</p>
+</remark>
+</subsection>
+
 </section>

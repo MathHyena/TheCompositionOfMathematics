@@ -1,9 +1,3743 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-11-optimization-operations-research-07-dynamic-programming">
-  <title>Dynamic Programming</title>
+<section xml:id="sec-dynamic-programming">
+<title>Dynamic Programming</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Optimization fundamentals, combinatorial optimization, recursion,
+sequences, discrete mathematics, probability, graph theory, basic
+algorithms, and elementary stochastic processes.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define dynamic programming;</p>
+</li>
+<li>
+<p>identify optimal substructure;</p>
+</li>
+<li>
+<p>identify overlapping subproblems;</p>
+</li>
+<li>
+<p>distinguish recursive search from dynamic programming;</p>
+</li>
+<li>
+<p>define states, actions, stages, and transitions;</p>
+</li>
+<li>
+<p>formulate deterministic finite-horizon dynamic programs;</p>
+</li>
+<li>
+<p>derive Bellman recursions;</p>
+</li>
+<li>
+<p>explain the principle of optimality;</p>
+</li>
+<li>
+<p>distinguish top-down memoization and bottom-up tabulation;</p>
+</li>
+<li>
+<p>understand state-space design;</p>
+</li>
+<li>
+<p>recognize dimensionality of state spaces;</p>
+</li>
+<li>
+<p>formulate shortest-path problems as dynamic programs;</p>
+</li>
+<li>
+<p>solve the <m>0</m>-<m>1</m> knapsack problem by dynamic programming;</p>
+</li>
+<li>
+<p>solve resource-allocation problems by dynamic programming;</p>
+</li>
+<li>
+<p>formulate sequence and alignment problems;</p>
+</li>
+<li>
+<p>understand longest common subsequence recurrences;</p>
+</li>
+<li>
+<p>understand edit-distance recurrences;</p>
+</li>
+<li>
+<p>recognize interval dynamic programming;</p>
+</li>
+<li>
+<p>understand matrix-chain multiplication;</p>
+</li>
+<li>
+<p>recognize subset dynamic programming;</p>
+</li>
+<li>
+<p>formulate the Held--Karp algorithm for the traveling salesperson
+          problem;</p>
+</li>
+<li>
+<p>understand pseudo-polynomial complexity;</p>
+</li>
+<li>
+<p>distinguish polynomial and pseudo-polynomial algorithms;</p>
+</li>
+<li>
+<p>understand infinite-horizon dynamic programming conceptually;</p>
+</li>
+<li>
+<p>formulate deterministic Bellman equations;</p>
+</li>
+<li>
+<p>formulate stochastic Bellman equations;</p>
+</li>
+<li>
+<p>understand expected-value recursions;</p>
+</li>
+<li>
+<p>recognize Markov decision processes;</p>
+</li>
+<li>
+<p>distinguish state-value and action-value functions;</p>
+</li>
+<li>
+<p>understand discounted dynamic programming;</p>
+</li>
+<li>
+<p>understand finite-horizon stochastic control;</p>
+</li>
+<li>
+<p>understand policy evaluation and policy improvement conceptually;</p>
+</li>
+<li>
+<p>recognize value iteration conceptually;</p>
+</li>
+<li>
+<p>understand the curse of dimensionality;</p>
+</li>
+<li>
+<p>recognize state aggregation and approximation methods;</p>
+</li>
+<li>
+<p>understand approximate dynamic programming conceptually;</p>
+</li>
+<li>
+<p>connect dynamic programming with optimal control,
+          reinforcement learning, shortest paths, scheduling, inventory,
+          and stochastic optimization.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-what-is-dynamic-programming">
+<title>What Is Dynamic Programming?</title>
+<p>Dynamic programming is an optimization framework for problems that can be
+decomposed into smaller, related subproblems.</p>
+
+<p>Rather than solving every possible sequence of decisions independently,
+dynamic programming stores and reuses the values of recurring
+subproblems.</p>
+
+<p>A general idea is</p>
+
+<p>
+<md>\boxed{
+\text{large optimization problem}
+\rightarrow
+\text{smaller optimization problems}
+\rightarrow
+\text{Bellman recursion}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-properties">
+<title>Two Fundamental Properties</title>
+<p>Dynamic programming is especially useful when a problem has:</p>
+
+<p>
+<md>\boxed{
+\text{optimal substructure},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{overlapping subproblems}.
+}</md>
+</p>
+
+<p>Optimal substructure means an optimal solution can be constructed from
+optimal solutions to smaller problems.</p>
+
+<p>Overlapping subproblems means the same smaller problems appear repeatedly.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-optimal-substructure">
+<title>Optimal Substructure</title>
+<p>Suppose the best solution from state <m>s</m> begins with action <m>a</m>.</p>
+
+<p>After taking that action, the remaining decisions must form an optimal
+solution for the resulting state.</p>
+
+<p>Otherwise the original solution could be improved.</p>
+
+<p>This principle is the foundation of Bellman's principle of optimality.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-overlapping-subproblems">
+<title>Overlapping Subproblems</title>
+<p>A naive recursion may solve the same subproblem many times.</p>
+
+<p>For example, Fibonacci recursion uses</p>
+
+<p>
+<md>F_n
+=
+F_{n-1}
++
+F_{n-2}.</md>
+</p>
+
+<p>Computing <m>F_{n-1}</m> and <m>F_{n-2}</m> recursively causes many repeated
+evaluations.</p>
+
+<p>Dynamic programming stores already-computed values.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-memoization">
+<title>Memoization</title>
+<p>Memoization is the top-down form of dynamic programming.</p>
+
+<p>One writes the recursive problem naturally and stores the value of each
+state after it is first computed.</p>
+
+<p>If that state appears again, the stored value is reused.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\text{recursion}
++
+\text{memory}
+=
+\text{memoization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-tabulation">
+<title>Tabulation</title>
+<p>Tabulation is the bottom-up form of dynamic programming.</p>
+
+<p>One identifies an order in which smaller states can be solved before larger
+states.</p>
+
+<p>The value table is filled iteratively.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\text{small states}
+\rightarrow
+\text{larger states}
+\rightarrow
+\text{final solution}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-memoization-versus-tabulation">
+<title>Memoization Versus Tabulation</title>
+<p>Memoization:</p>
+
+<p>
+<md>\boxed{
+\text{top-down},
+}</md>
+</p>
+
+<p>and computes only states actually reached.</p>
+
+<p>Tabulation:</p>
+
+<p>
+<md>\boxed{
+\text{bottom-up},
+}</md>
+</p>
+
+<p>and often computes states in a regular predetermined order.</p>
+
+<p>Both implement the same underlying recurrence when formulated correctly.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-state">
+<title>State</title>
+<p>A state contains all information from the past that is needed to make
+optimal future decisions.</p>
+
+<p>A state should summarize the relevant history without storing unnecessary
+detail.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{current location},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{remaining capacity},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{time period},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{current inventory}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-actions">
+<title>Actions</title>
+<p>At state <m>s</m>, the decision maker chooses an action</p>
+
+<p>
+<md>\boxed{
+a\in A(s),
+}</md>
+</p>
+
+<p>where <m>A(s)</m> is the feasible action set.</p>
+
+<p>The action determines:</p>
+
+<p>
+<md>\boxed{
+\text{immediate cost or reward},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{next state}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-transition">
+<title>Transition Function</title>
+<p>In a deterministic problem, the next state can be written</p>
+
+<p>
+<md>\boxed{
+s'
+=
+T(s,a).
+}</md>
+</p>
+
+<p>Thus a dynamic decision has the form</p>
+
+<p>
+<md>\boxed{
+s
+\xrightarrow{a}
+T(s,a).
+}</md>
+</p>
+
+<p>In stochastic problems, the next state is random.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-stage">
+<title>Stage</title>
+<p>Many dynamic programs evolve through stages</p>
+
+<p>
+<md>\boxed{
+t=0,1,\ldots,T.
+}</md>
+</p>
+
+<p>The stage may represent:</p>
+
+<p>
+<md>\boxed{
+\text{time},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{position in a sequence},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{number of items processed},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{decision depth}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-value-function">
+<title>Value Function</title>
+<p>The value function records the best achievable future objective from a
+given state.</p>
+
+<p>For minimization,</p>
+
+<p>
+<md>\boxed{
+V_t(s)
+=
+\text{minimum future cost from state }s\text{ at stage }t.
+}</md>
+</p>
+
+<p>For maximization,</p>
+
+<p>
+<md>\boxed{
+V_t(s)
+=
+\text{maximum future reward from state }s.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-bellman-principle-optimality">
+<title>Bellman's Principle of Optimality</title>
+<definition>
+<title>Bellman's Principle of Optimality</title>
+<statement>
+<p>An optimal policy has the property that, regardless of the initial state
+and first decision, the remaining decisions must constitute an optimal
+policy for the state resulting from that first decision.</p>
+</statement>
+</definition>
+
+<p>This principle permits a global optimization problem to be written
+recursively.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-finite-horizon-bellman-recursion">
+<title>Finite-Horizon Bellman Recursion</title>
+<p>Suppose:</p>
+
+<p>
+<md>c_t(s,a)
+=
+\text{cost at stage }t,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>s'
+=
+T_t(s,a).</md>
+</p>
+
+<p>Then a deterministic finite-horizon recursion is</p>
+
+<p>
+<md>\boxed{
+V_t(s)
+=
+\min_{a\in A_t(s)}
+\left[
+c_t(s,a)
++
+V_{t+1}
+\left(
+T_t(s,a)
+\right)
+\right].
+}</md>
+</p>
+
+<p>A terminal cost may be</p>
+
+<p>
+<md>\boxed{
+V_T(s)=g(s).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-backward-induction">
+<title>Backward Induction</title>
+<p>Finite-horizon dynamic programming is usually solved backward.</p>
+
+<p>First compute</p>
+
+<p>
+<md>V_T.</md>
+</p>
+
+<p>Then compute</p>
+
+<p>
+<md>V_{T-1},</md>
+</p>
+
+<p>followed by</p>
+
+<p>
+<md>V_{T-2},</md>
+</p>
+
+<p>until reaching</p>
+
+<p>
+<md>V_0.</md>
+</p>
+
+<p>This is called backward induction.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-recovering-optimal-policy">
+<title>Recovering the Optimal Policy</title>
+<p>The Bellman recursion gives the optimal objective value.</p>
+
+<p>To recover the decisions, store an optimizer:</p>
+
+<p>
+<md>\boxed{
+\pi_t^*(s)
+\in
+\operatorname*{arg\,min}_{a\in A_t(s)}
+\left[
+c_t(s,a)
++
+V_{t+1}
+(
+T_t(s,a)
+)
+\right].
+}</md>
+</p>
+
+<p>The mapping</p>
+
+<p>
+<md>\pi_t^*</md>
+</p>
+
+<p>is an optimal policy.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-worked-two-stage-dp">
+<title>Worked Example: Two-Stage Decision</title>
+<example>
+<title>Simple Backward Induction</title>
+<p>Suppose at the final stage the costs are</p>
+
+<p>
+<md>V_2(A)=3,
+\qquad
+V_2(B)=7.</md>
+</p>
+
+<p>At stage <m>1</m>, from state <m>S</m>, there are two actions.</p>
+
+<p>Action <m>a_1</m> costs <m>4</m> and moves to <m>A</m>.</p>
+
+<p>Action <m>a_2</m> costs <m>1</m> and moves to <m>B</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>V_1(S)
+=
+\min
+\{
+4+3,
+1+7
+\}.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>V_1(S)
+=
+\min
+\{
+7,8
+\}.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+V_1(S)=7,
+}</md>
+</p>
+
+<p>and the optimal action is</p>
+
+<p>
+<md>\boxed{
+a_1.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-state-space-graph">
+<title>State-Space Graph Interpretation</title>
+<p>A dynamic program can often be represented as a directed graph.</p>
+
+<p>Each vertex represents a state.</p>
+
+<p>Each directed edge represents a feasible transition.</p>
+
+<p>An edge may have cost</p>
+
+<p>
+<md>\boxed{
+c(s,a).
+}</md>
+</p>
+
+<p>Then dynamic programming finds an optimal path through the state-space
+graph.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-acyclic-state-graphs">
+<title>Acyclic State Graphs</title>
+<p>If the state-space graph is acyclic, states can be processed in
+topological order.</p>
+
+<p>The value recurrence becomes</p>
+
+<p>
+<md>\boxed{
+V(v)
+=
+\min_{(v,w)\in E}
+\left[
+c_{vw}+V(w)
+\right].
+}</md>
+</p>
+
+<p>This is a shortest-path dynamic program on a directed acyclic graph.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-shortest-path-dynamic-programming">
+<title>Shortest Path as Dynamic Programming</title>
+<p>Let</p>
+
+<p>
+<md>V(v)</md>
+</p>
+
+<p>denote the shortest remaining distance from vertex <m>v</m> to destination
+<m>t</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V(t)=0,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+V(v)
+=
+\min_{(v,w)\in E}
+\left[
+c_{vw}+V(w)
+\right].
+}</md>
+</p>
+
+<p>This is precisely a Bellman recursion.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-bellman-ford-dynamic-programming">
+<title>Bellman--Ford Connection</title>
+<p>Let</p>
+
+<p>
+<md>V_k(v)</md>
+</p>
+
+<p>denote the minimum cost of a path from source <m>s</m> to <m>v</m> using at most
+<m>k</m> edges.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V_k(v)
+=
+\min
+\left\{
+V_{k-1}(v),
+\;
+\min_{(u,v)\in E}
+[
+V_{k-1}(u)+c_{uv}
+]
+\right\}.
+}</md>
+</p>
+
+<p>This recurrence underlies the Bellman--Ford shortest-path algorithm.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-resource-allocation-dp">
+<title>Resource-Allocation Dynamic Programming</title>
+<p>Suppose <m>B</m> units of a resource must be allocated among <m>n</m> activities.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_i</md>
+</p>
+
+<p>be the amount assigned to activity <m>i</m>, and let</p>
+
+<p>
+<md>r_i(x_i)</md>
+</p>
+
+<p>be its reward.</p>
+
+<p>We seek</p>
+
+<p>
+<md>\boxed{
+\max
+\sum_{i=1}^{n}
+r_i(x_i)
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+\sum_{i=1}^{n}
+x_i
+\leq
+B.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-resource-allocation-recurrence">
+<title>Resource-Allocation Recurrence</title>
+<p>Let</p>
+
+<p>
+<md>V_i(b)</md>
+</p>
+
+<p>be the best reward obtained from the first <m>i</m> activities using at most
+<m>b</m> units.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V_i(b)
+=
+\max_{0\leq x_i\leq b}
+\left[
+r_i(x_i)
++
+V_{i-1}(b-x_i)
+\right].
+}</md>
+</p>
+
+<p>The boundary condition is</p>
+
+<p>
+<md>\boxed{
+V_0(b)=0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-knapsack-dynamic-programming">
+<title>0--1 Knapsack Dynamic Programming</title>
+<p>Suppose item <m>i</m> has value <m>v_i</m> and integer weight <m>w_i</m>.</p>
+
+<p>Let</p>
+
+<p>
+<md>V(i,b)</md>
+</p>
+
+<p>be the maximum value obtainable using the first <m>i</m> items with capacity
+<m>b</m>.</p>
+
+<p>If</p>
+
+<p>
+<md>w_i&gt;b,</md>
+</p>
+
+<p>item <m>i</m> cannot be selected:</p>
+
+<p>
+<md>\boxed{
+V(i,b)
+=
+V(i-1,b).
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>w_i\leq b,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+V(i,b)
+=
+\max
+\left\{
+V(i-1,b),
+\;
+v_i
++
+V(i-1,b-w_i)
+\right\}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-knapsack-boundary-conditions">
+<title>Knapsack Boundary Conditions</title>
+<p>The base cases are</p>
+
+<p>
+<md>\boxed{
+V(0,b)=0
+}</md>
+</p>
+
+<p>for every <m>b</m>, and</p>
+
+<p>
+<md>\boxed{
+V(i,0)=0.
+}</md>
+</p>
+
+<p>The final optimal value is</p>
+
+<p>
+<md>\boxed{
+V(n,W).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-worked-knapsack-dp">
+<title>Worked Example: 0--1 Knapsack</title>
+<example>
+<title>Knapsack Recurrence</title>
+<p>Suppose three items have</p>
+
+<p>
+<md>(w_1,v_1)=(2,4),</md>
+</p>
+
+<p>
+<md>(w_2,v_2)=(3,5),</md>
+</p>
+
+<p>
+<md>(w_3,v_3)=(4,7),</md>
+</p>
+
+<p>with capacity</p>
+
+<p>
+<md>W=5.</md>
+</p>
+
+<p>For the first two items,</p>
+
+<p>
+<md>V(2,5)
+=
+\max
+\{
+V(1,5),
+5+V(1,2)
+\}.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>V(1,5)=4,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>V(1,2)=4,</md>
+</p>
+
+<p>we obtain</p>
+
+<p>
+<md>V(2,5)=9.</md>
+</p>
+
+<p>For item <m>3</m>,</p>
+
+<p>
+<md>V(3,5)
+=
+\max
+\{
+V(2,5),
+7+V(2,1)
+\}.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>V(2,1)=0,</md>
+</p>
+
+<p>
+<md>V(3,5)
+=
+\max
+\{
+9,7
+\}
+=
+9.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+V(3,5)=9.
+}</md>
+</p>
+
+<p>The optimal choice uses items <m>1</m> and <m>2</m>.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-knapsack-dp-complexity">
+<title>Knapsack Complexity</title>
+<p>The table contains approximately</p>
+
+<p>
+<md>nW</md>
+</p>
+
+<p>states.</p>
+
+<p>Each state requires constant work.</p>
+
+<p>Thus the time complexity is</p>
+
+<p>
+<md>\boxed{
+O(nW).
+}</md>
+</p>
+
+<p>The memory complexity is also</p>
+
+<p>
+<md>\boxed{
+O(nW)
+}</md>
+</p>
+
+<p>for the full table.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-pseudo-polynomial">
+<title>Pseudo-Polynomial Complexity</title>
+<p>Although</p>
+
+<p>
+<md>O(nW)</md>
+</p>
+
+<p>looks polynomial, the input contains <m>W</m> in binary.</p>
+
+<p>The number of bits required to represent <m>W</m> is approximately</p>
+
+<p>
+<md>\log_2W.</md>
+</p>
+
+<p>Thus the running time is not polynomial in the formal input length.</p>
+
+<p>It is called</p>
+
+<p>
+<md>\boxed{
+\text{pseudo-polynomial}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-knapsack-memory-reduction">
+<title>Memory Reduction in Knapsack</title>
+<p>The recurrence uses only the previous item row.</p>
+
+<p>Therefore the table can be reduced from</p>
+
+<p>
+<md>O(nW)</md>
+</p>
+
+<p>memory to</p>
+
+<p>
+<md>\boxed{
+O(W).
+}</md>
+</p>
+
+<p>For <m>0</m>-<m>1</m> knapsack, capacities should be updated in decreasing order
+when using one array so that an item is not accidentally used multiple
+times.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-unbounded-knapsack-dp">
+<title>Unbounded Knapsack</title>
+<p>If each item can be selected repeatedly, the recurrence changes.</p>
+
+<p>One form is</p>
+
+<p>
+<md>\boxed{
+V(b)
+=
+\max_{i:w_i\leq b}
+\left[
+v_i+V(b-w_i)
+\right].
+}</md>
+</p>
+
+<p>This illustrates an important principle:</p>
+
+<p>
+<md>\boxed{
+\text{state recurrence depends on whether decisions can be reused}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-longest-common-subsequence">
+<title>Longest Common Subsequence</title>
+<p>Given sequences</p>
+
+<p>
+<md>X=x_1x_2\cdots x_m</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>Y=y_1y_2\cdots y_n,</md>
+</p>
+
+<p>a common subsequence appears in both sequences while preserving order.</p>
+
+<p>Let</p>
+
+<p>
+<md>L(i,j)</md>
+</p>
+
+<p>be the length of the longest common subsequence of the prefixes</p>
+
+<p>
+<md>x_1\cdots x_i</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y_1\cdots y_j.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-lcs-recurrence">
+<title>LCS Recurrence</title>
+<p>If</p>
+
+<p>
+<md>x_i=y_j,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+L(i,j)
+=
+1+L(i-1,j-1).
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>x_i\neq y_j,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+L(i,j)
+=
+\max
+\{
+L(i-1,j),
+L(i,j-1)
+\}.
+}</md>
+</p>
+
+<p>Boundary conditions are</p>
+
+<p>
+<md>\boxed{
+L(i,0)=L(0,j)=0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-lcs-complexity">
+<title>LCS Complexity</title>
+<p>There are</p>
+
+<p>
+<md>(m+1)(n+1)</md>
+</p>
+
+<p>states.</p>
+
+<p>Each state requires constant work.</p>
+
+<p>Thus the basic dynamic program runs in</p>
+
+<p>
+<md>\boxed{
+O(mn)
+}</md>
+</p>
+
+<p>time.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-edit-distance-dynamic-programming">
+<title>Edit Distance</title>
+<p>Edit distance measures the minimum number or cost of operations needed to
+transform one string into another.</p>
+
+<p>Common operations include:</p>
+
+<p>
+<md>\boxed{
+\text{insertion},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{deletion},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{substitution}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-edit-distance-recurrence">
+<title>Edit-Distance Recurrence</title>
+<p>Let</p>
+
+<p>
+<md>D(i,j)</md>
+</p>
+
+<p>be the edit distance between prefixes of lengths <m>i</m> and <m>j</m>.</p>
+
+<p>With unit costs,</p>
+
+<p>
+<md>\boxed{
+D(i,j)
+=
+\min
+\begin{cases}
+D(i-1,j)+1,\\
+D(i,j-1)+1,\\
+D(i-1,j-1)+\delta_{ij},
+\end{cases}
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\delta_{ij}
+=
+\begin{cases}
+0,
+&amp;
+x_i=y_j,
+\\
+1,
+&amp;
+x_i\neq y_j.
+\end{cases}
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-edit-distance-boundary">
+<title>Edit-Distance Boundary Conditions</title>
+<p>Transforming the first <m>i</m> symbols into an empty string requires <m>i</m>
+deletions:</p>
+
+<p>
+<md>\boxed{
+D(i,0)=i.
+}</md>
+</p>
+
+<p>Transforming an empty string into the first <m>j</m> symbols requires <m>j</m>
+insertions:</p>
+
+<p>
+<md>\boxed{
+D(0,j)=j.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-sequence-alignment-dp">
+<title>Sequence Alignment</title>
+<p>Sequence alignment generalizes edit distance by assigning application-
+specific scores or penalties to:</p>
+
+<p>
+<md>\boxed{
+\text{matches},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{mismatches},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{gaps}.
+}</md>
+</p>
+
+<p>Dynamic programming is fundamental in computational biology for aligning
+DNA, RNA, and protein sequences.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-matrix-chain-multiplication">
+<title>Matrix-Chain Multiplication</title>
+<p>Suppose matrices</p>
+
+<p>
+<md>A_1A_2\cdots A_n</md>
+</p>
+
+<p>must be multiplied.</p>
+
+<p>Matrix multiplication is associative, but different parenthesizations
+require different numbers of scalar multiplications.</p>
+
+<p>Dynamic programming finds the cheapest parenthesization.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-matrix-chain-state">
+<title>Matrix-Chain State</title>
+<p>Suppose matrix <m>A_i</m> has dimensions</p>
+
+<p>
+<md>p_{i-1}\times p_i.</md>
+</p>
+
+<p>Let</p>
+
+<p>
+<md>M(i,j)</md>
+</p>
+
+<p>be the minimum number of scalar multiplications required to compute</p>
+
+<p>
+<md>A_iA_{i+1}\cdots A_j.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-matrix-chain-recurrence">
+<title>Matrix-Chain Recurrence</title>
+<p>Split the product between <m>A_k</m> and <m>A_{k+1}</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+M(i,j)
+=
+\min_{i\leq k&lt;j}
+\left[
+M(i,k)
++
+M(k+1,j)
++
+p_{i-1}p_kp_j
+\right].
+}</md>
+</p>
+
+<p>The boundary condition is</p>
+
+<p>
+<md>\boxed{
+M(i,i)=0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-interval-dynamic-programming">
+<title>Interval Dynamic Programming</title>
+<p>Matrix-chain multiplication is an example of interval dynamic programming.</p>
+
+<p>The state describes an interval</p>
+
+<p>
+<md>[i,j].</md>
+</p>
+
+<p>The recurrence chooses a split point</p>
+
+<p>
+<md>k.</md>
+</p>
+
+<p>Other interval-DP problems include:</p>
+
+<p>
+<md>\boxed{
+\text{polygon triangulation},
+}</md>
+</p>
+
+<p>and certain</p>
+
+<p>
+<md>\boxed{
+\text{parsing problems}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-optimal-binary-search-tree-preview">
+<title>Optimal Binary Search Tree Preview</title>
+<p>Suppose keys have different search probabilities.</p>
+
+<p>An optimal binary search tree minimizes expected search cost.</p>
+
+<p>The recurrence chooses a root for each interval of keys.</p>
+
+<p>Thus the problem has the generic interval structure</p>
+
+<p>
+<md>\boxed{
+\text{best interval solution}
+=
+\min_{\text{split}}
+[
+\text{left}
++
+\text{right}
++
+\text{root cost}
+].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-subset-dynamic-programming">
+<title>Subset Dynamic Programming</title>
+<p>Some dynamic programs use a subset itself as part of the state.</p>
+
+<p>For a ground set of <m>n</m> elements, there are</p>
+
+<p>
+<md>\boxed{
+2^n
+}</md>
+</p>
+
+<p>possible subsets.</p>
+
+<p>Subset DP is therefore exponential, but can still be much faster than
+enumerating all permutations.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-held-karp-tsp">
+<title>Held--Karp Dynamic Programming for TSP</title>
+<p>Fix starting vertex <m>1</m>.</p>
+
+<p>Let</p>
+
+<p>
+<md>V(S,j)</md>
+</p>
+
+<p>be the minimum cost of a path that:</p>
+
+<p>
+<ul>
+<li>
+<p>starts at vertex <m>1</m>;</p>
+</li>
+<li>
+<p>visits exactly the vertices in <m>S</m>;</p>
+</li>
+<li>
+<p>ends at vertex <m>j\in S</m>.</p>
+</li>
+</ul>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V(S,j)
+=
+\min_{i\in S\setminus\{j\}}
+\left[
+V(S\setminus\{j\},i)
++
+c_{ij}
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-held-karp-boundary">
+<title>Held--Karp Boundary Condition</title>
+<p>For a singleton destination,</p>
+
+<p>
+<md>\boxed{
+V(\{j\},j)
+=
+c_{1j}.
+}</md>
+</p>
+
+<p>After all nonstarting vertices have been visited, return to vertex <m>1</m>:</p>
+
+<p>
+<md>\boxed{
+C^*
+=
+\min_j
+\left[
+V(V\setminus\{1\},j)
++
+c_{j1}
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-held-karp-complexity">
+<title>Held--Karp Complexity</title>
+<p>The Held--Karp algorithm uses roughly</p>
+
+<p>
+<md>\boxed{
+O(n2^n)
+}</md>
+</p>
+
+<p>states and examines up to <m>n</m> predecessors per state.</p>
+
+<p>Its time complexity is therefore approximately</p>
+
+<p>
+<md>\boxed{
+O(n^2 2^n).
+}</md>
+</p>
+
+<p>This is exponential, but far better than enumerating</p>
+
+<p>
+<md>\boxed{
+(n-1)!
+}</md>
+</p>
+
+<p>possible tours.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-state-design">
+<title>State Design</title>
+<p>The most important modeling question in dynamic programming is often:</p>
+
+<p>
+<md>\boxed{
+\text{What information must the state remember?}
+}</md>
+</p>
+
+<p>A valid state must preserve enough information for optimal future
+decisions.</p>
+
+<p>A poor state may:</p>
+
+<p>
+<md>\boxed{
+\text{omit necessary history},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{store unnecessary detail}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-sufficient-state">
+<title>Principle of Sufficient State</title>
+<p>Two histories can be treated as the same state if they have identical
+effects on all future feasible decisions and future objective values.</p>
+
+<p>Thus the state is a compressed summary of relevant past information.</p>
+
+<p>This is closely related to the Markov property.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-state-space-size">
+<title>State-Space Size</title>
+<p>Suppose a state contains <m>d</m> components, each taking <m>m</m> possible
+values.</p>
+
+<p>The number of possible states can be as large as</p>
+
+<p>
+<md>\boxed{
+m^d.
+}</md>
+</p>
+
+<p>Thus even dynamic programming can become computationally difficult in high
+dimension.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-curse-of-dimensionality">
+<title>Curse of Dimensionality</title>
+<p>The rapid growth of the state space with dimension is called the curse of
+dimensionality.</p>
+
+<p>If each of <m>d</m> state variables is discretized into <m>m</m> values, then</p>
+
+<p>
+<md>\boxed{
+\text{number of states}
+=
+m^d.
+}</md>
+</p>
+
+<p>This exponential dependence on <m>d</m> is a major limitation of classical
+dynamic programming.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-state-dominance">
+<title>State Dominance</title>
+<p>Some states can be discarded if another state is guaranteed to be at
+least as good in all relevant future respects.</p>
+
+<p>This is a dominance rule.</p>
+
+<p>Dominance can reduce computation by eliminating states that cannot lead to
+an optimal solution.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-finite-horizon-deterministic-control">
+<title>Finite-Horizon Deterministic Control</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+x_{t+1}
+=
+f_t(x_t,u_t),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>x_t
+=
+\text{state},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>u_t
+=
+\text{control}.</md>
+</p>
+
+<p>Suppose the total cost is</p>
+
+<p>
+<md>\boxed{
+\sum_{t=0}^{T-1}
+\ell_t(x_t,u_t)
++
+g(x_T).
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V_T(x)=g(x),
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+V_t(x)
+=
+\min_u
+\left[
+\ell_t(x,u)
++
+V_{t+1}
+(
+f_t(x,u)
+)
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-policy">
+<title>Policy</title>
+<p>A policy specifies what action should be taken in each state.</p>
+
+<p>A deterministic policy has form</p>
+
+<p>
+<md>\boxed{
+u_t
+=
+\pi_t(x_t).
+}</md>
+</p>
+
+<p>An optimal policy satisfies</p>
+
+<p>
+<md>\boxed{
+\pi_t^*(x)
+\in
+\operatorname*{arg\,min}_u
+\left[
+\ell_t(x,u)
++
+V_{t+1}(f_t(x,u))
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-open-loop-feedback">
+<title>Open-Loop Versus Feedback Decisions</title>
+<p>An open-loop plan chooses the full decision sequence in advance.</p>
+
+<p>A feedback policy chooses decisions based on the current state.</p>
+
+<p>Dynamic programming naturally produces feedback policies:</p>
+
+<p>
+<md>\boxed{
+u_t=\pi_t(x_t).
+}</md>
+</p>
+
+<p>This is especially valuable when disturbances or uncertainty can change
+the state.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-stochastic-dynamic-programming">
+<title>Stochastic Dynamic Programming</title>
+<p>Suppose the next state depends on random information <m>\xi_t</m>:</p>
+
+<p>
+<md>\boxed{
+x_{t+1}
+=
+f_t
+(
+x_t,
+u_t,
+\xi_t
+).
+}</md>
+</p>
+
+<p>Then the Bellman recursion uses expected future value:</p>
+
+<p>
+<md>\boxed{
+V_t(x)
+=
+\min_u
+\left[
+\ell_t(x,u)
++
+\mathbb{E}
+\left[
+V_{t+1}
+(
+f_t(x,u,\xi_t)
+)
+\right]
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-stochastic-transition-probabilities">
+<title>Discrete Stochastic Transition Probabilities</title>
+<p>Suppose</p>
+
+<p>
+<md>P(s'|s,a)</md>
+</p>
+
+<p>is the probability of moving from state <m>s</m> to <m>s'</m> after action
+<m>a</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V_t(s)
+=
+\min_{a\in A(s)}
+\left[
+c_t(s,a)
++
+\sum_{s'}
+P(s'|s,a)
+V_{t+1}(s')
+\right].
+}</md>
+</p>
+
+<p>This is the basic finite-horizon stochastic Bellman recursion.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-markov-decision-processes">
+<title>Markov Decision Processes</title>
+<p>A Markov decision process, abbreviated MDP, is characterized by:</p>
+
+<p>
+<md>\boxed{
+\text{states},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{actions},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{transition probabilities},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{rewards or costs}.
+}</md>
+</p>
+
+<p>A standard notation is</p>
+
+<p>
+<md>\boxed{
+(\mathcal{S},\mathcal{A},P,r).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-mdp-markov-property">
+<title>Markov Property</title>
+<p>The Markov property means that conditional on the present state and
+action, the distribution of the next state does not depend on the earlier
+history.</p>
+
+<p>Symbolically,</p>
+
+<p>
+<md>\boxed{
+P
+(
+S_{t+1}
+\mid
+S_t,A_t,S_{t-1},A_{t-1},\ldots
+)
+=
+P
+(
+S_{t+1}
+\mid
+S_t,A_t
+).
+}</md>
+</p>
+
+<p>This is precisely why the state is sufficient for future decision making.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-mdp-expected-reward">
+<title>Expected Reward Formulation</title>
+<p>For reward maximization,</p>
+
+<p>
+<md>r(s,a)</md>
+</p>
+
+<p>denotes immediate expected reward.</p>
+
+<p>A finite-horizon recursion is</p>
+
+<p>
+<md>\boxed{
+V_t(s)
+=
+\max_{a\in A(s)}
+\left[
+r_t(s,a)
++
+\sum_{s'}
+P(s'|s,a)
+V_{t+1}(s')
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-discounted-infinite-horizon">
+<title>Discounted Infinite-Horizon Objective</title>
+<p>For an infinite horizon, a common objective is</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}
+\left[
+\sum_{t=0}^{\infty}
+\gamma^t
+r(S_t,A_t)
+\right],
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+0\leq\gamma&lt;1
+}</md>
+</p>
+
+<p>is the discount factor.</p>
+
+<p>Future rewards are weighted by powers of <m>\gamma</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-bellman-optimality-equation">
+<title>Bellman Optimality Equation</title>
+<p>For a discounted MDP,</p>
+
+<p>
+<md>\boxed{
+V^*(s)
+=
+\max_{a}
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^*(s')
+\right].
+}</md>
+</p>
+
+<p>This is the Bellman optimality equation.</p>
+
+<p>It is a fixed-point equation for the optimal value function.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-bellman-operator">
+<title>Bellman Operator</title>
+<p>Define the Bellman optimality operator <m>T</m> by</p>
+
+<p>
+<md>\boxed{
+(TV)(s)
+=
+\max_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V(s')
+\right].
+}</md>
+</p>
+
+<p>Then the optimal value satisfies</p>
+
+<p>
+<md>\boxed{
+V^*=TV^*.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-bellman-contraction">
+<title>Contraction Property</title>
+<p>For discounted finite-state MDPs with</p>
+
+<p>
+<md>0\leq\gamma&lt;1,</md>
+</p>
+
+<p>the Bellman operator is a contraction in the sup norm:</p>
+
+<p>
+<md>\boxed{
+\|TV-TW\|_\infty
+\leq
+\gamma
+\|V-W\|_\infty.
+}</md>
+</p>
+
+<p>Therefore it has a unique fixed point.</p>
+
+<p>This provides the basis for value iteration.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-value-iteration">
+<title>Value Iteration</title>
+<p>Value iteration repeatedly applies the Bellman operator:</p>
+
+<p>
+<md>\boxed{
+V_{k+1}
+=
+TV_k.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+V_{k+1}(s)
+=
+\max_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V_k(s')
+\right].
+}</md>
+</p>
+
+<p>For finite discounted MDPs, this converges to <m>V^*</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-policy-evaluation">
+<title>Policy Evaluation</title>
+<p>Suppose policy <m>\pi</m> is fixed.</p>
+
+<p>Its value function satisfies</p>
+
+<p>
+<md>\boxed{
+V^\pi(s)
+=
+r(s,\pi(s))
++
+\gamma
+\sum_{s'}
+P
+(
+s'|s,\pi(s)
+)
+V^\pi(s').
+}</md>
+</p>
+
+<p>This is a linear system when the state space is finite.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-policy-improvement">
+<title>Policy Improvement</title>
+<p>Given <m>V^\pi</m>, define an improved policy by</p>
+
+<p>
+<md>\boxed{
+\pi_{\mathrm{new}}(s)
+\in
+\operatorname*{arg\,max}_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^\pi(s')
+\right].
+}</md>
+</p>
+
+<p>This chooses actions greedily with respect to the current policy value.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-policy-iteration">
+<title>Policy Iteration</title>
+<p>Policy iteration alternates:</p>
+
+<p>
+<md>\boxed{
+\text{policy evaluation}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{policy improvement}.
+}</md>
+</p>
+
+<p>The process continues until the policy no longer changes.</p>
+
+<p>For finite discounted MDPs, policy iteration reaches an optimal policy in
+finitely many policy improvements.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-action-value-function">
+<title>Action-Value Function</title>
+<p>The action-value function is</p>
+
+<p>
+<md>\boxed{
+Q^\pi(s,a)
+=
+\text{expected discounted return when action }a
+\text{ is taken in state }s
+}</md>
+</p>
+
+<p>followed by policy <m>\pi</m>.</p>
+
+<p>For the optimal function,</p>
+
+<p>
+<md>\boxed{
+Q^*(s,a)
+=
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^*(s').
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-v-q-relation">
+<title>Relation Between <m>V^*</m> and <m>Q^*</m></title>
+<p>The optimal state value is</p>
+
+<p>
+<md>\boxed{
+V^*(s)
+=
+\max_a
+Q^*(s,a).
+}</md>
+</p>
+
+<p>An optimal policy can therefore choose</p>
+
+<p>
+<md>\boxed{
+\pi^*(s)
+\in
+\operatorname*{arg\,max}_a
+Q^*(s,a).
+}</md>
+</p>
+
+<p>This connection leads directly to reinforcement-learning methods.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-worked-stochastic-dp">
+<title>Worked Example: One-Step Stochastic Decision</title>
+<example>
+<title>Expected Future Cost</title>
+<p>Suppose from state <m>s</m>, action <m>a_1</m> has immediate cost <m>2</m>.</p>
+
+<p>It moves to state <m>A</m> with probability</p>
+
+<p>
+<md>0.75</md>
+</p>
+
+<p>and to state <m>B</m> with probability</p>
+
+<p>
+<md>0.25.</md>
+</p>
+
+<p>Suppose</p>
+
+<p>
+<md>V_{t+1}(A)=4,
+\qquad
+V_{t+1}(B)=10.</md>
+</p>
+
+<p>Then the total expected cost of choosing <m>a_1</m> is</p>
+
+<p>
+<md>2
++
+0.75(4)
++
+0.25(10).</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>2+3+2.5
+=
+7.5.</md>
+</p>
+
+<p>Hence,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+Q_t(s,a_1)=7.5.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-inventory-dynamic-programming">
+<title>Inventory Control</title>
+<p>Inventory systems are natural dynamic programs.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_t
+=
+\text{inventory before ordering},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>u_t
+=
+\text{order quantity}.</md>
+</p>
+
+<p>If demand is <m>D_t</m>, then a simple transition is</p>
+
+<p>
+<md>\boxed{
+x_{t+1}
+=
+x_t
++
+u_t
+-
+D_t.
+}</md>
+</p>
+
+<p>Costs may include ordering, holding, and shortage penalties.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-inventory-bellman">
+<title>Inventory Bellman Equation</title>
+<p>For finite horizon,</p>
+
+<p>
+<md>\boxed{
+V_t(x)
+=
+\min_{u\geq0}
+\left[
+c_{\mathrm{order}}(u)
++
+\mathbb{E}
+\left[
+c_{\mathrm{hold}}
+(
+x+u-D_t
+)
++
+V_{t+1}
+(
+x+u-D_t
+)
+\right]
+\right].
+}</md>
+</p>
+
+<p>This is developed more deeply in the later Inventory Theory section.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-equipment-replacement-dp">
+<title>Equipment Replacement</title>
+<p>Suppose equipment becomes more expensive to maintain as it ages.</p>
+
+<p>At each period, choose:</p>
+
+<p>
+<md>\boxed{
+\text{keep}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{replace}.
+}</md>
+</p>
+
+<p>The state may be equipment age.</p>
+
+<p>Dynamic programming compares immediate replacement cost with expected
+future maintenance cost.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-scheduling-dp-connection">
+<title>Scheduling Connection</title>
+<p>Scheduling problems can sometimes be solved by dynamic programming when a
+small state captures:</p>
+
+<p>
+<md>\boxed{
+\text{completed jobs},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{current time},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{remaining resources}.
+}</md>
+</p>
+
+<p>Subset DP can be useful when the number of jobs is modest.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-optimal-control-dp-connection">
+<title>Optimal Control Connection</title>
+<p>Dynamic programming is one of the principal foundations of optimal
+control.</p>
+
+<p>For continuous-state systems, the discrete-time Bellman recursion has a
+continuous-time analogue known as the Hamilton--Jacobi--Bellman equation.</p>
+
+<p>That theory is developed later in Section <xref ref="sec-optimal-control" />.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-continuous-state-dynamic-programming">
+<title>Continuous-State Dynamic Programming</title>
+<p>A state need not be discrete.</p>
+
+<p>Suppose</p>
+
+<p>
+<md>x_t\in\mathbb{R}^n.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V_t(x)
+=
+\min_u
+\left[
+\ell_t(x,u)
++
+V_{t+1}(f_t(x,u))
+\right].
+}</md>
+</p>
+
+<p>The difficulty is that <m>V_t</m> is now a function over a continuous state
+space.</p>
+
+<p>Exact tabulation may be impossible.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dp-state-discretization">
+<title>Discretization of Continuous States</title>
+<p>One approach approximates a continuous state space by a finite grid.</p>
+
+<p>For example,</p>
+
+<p>
+<md>x\in[0,1]</md>
+</p>
+
+<p>might be replaced by</p>
+
+<p>
+<md>\boxed{
+\left\{
+0,
+\frac1N,
+\frac2N,
+\ldots,
+1
+\right\}.
+}</md>
+</p>
+
+<p>A finer grid improves resolution but greatly increases computational
+cost.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-approximate-dynamic-programming">
+<title>Approximate Dynamic Programming</title>
+<p>When exact value functions are too expensive to store, one may approximate</p>
+
+<p>
+<md>\boxed{
+V(s)
+\approx
+\widehat{V}(s;\theta).
+}</md>
+</p>
+
+<p>The approximation may use:</p>
+
+<p>
+<md>\boxed{
+\text{basis functions},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{regression},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{trees},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{neural networks}.
+}</md>
+</p>
+
+<p>This is called approximate dynamic programming.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-value-function-approximation">
+<title>Value-Function Approximation</title>
+<p>A linear approximation may have form</p>
+
+<p>
+<md>\boxed{
+\widehat{V}(s)
+=
+\theta_1\phi_1(s)
++
+\cdots
++
+\theta_k\phi_k(s),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\phi_i(s)</md>
+</p>
+
+<p>are chosen features.</p>
+
+<p>Instead of storing one value for every state, only the coefficients
+<m>\theta_i</m> are stored.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-state-aggregation">
+<title>State Aggregation</title>
+<p>State aggregation groups several similar states into one approximate
+state.</p>
+
+<p>If the original state space is huge,</p>
+
+<p>
+<md>\mathcal{S},</md>
+</p>
+
+<p>replace it by a smaller set</p>
+
+<p>
+<md>\boxed{
+\widetilde{\mathcal{S}}.
+}</md>
+</p>
+
+<p>This reduces computation at the cost of approximation error.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-rolling-horizon-dp">
+<title>Rolling-Horizon Decisions</title>
+<p>A long planning horizon may be approximated by repeatedly solving a
+shorter-horizon problem.</p>
+
+<p>At each time:</p>
+
+<p>
+<ol>
+<li>
+<p>solve a finite-horizon problem;</p>
+</li>
+<li>
+<p>implement only the first action;</p>
+</li>
+<li>
+<p>observe the new state;</p>
+</li>
+<li>
+<p>solve again.</p>
+</li>
+</ol>
+</p>
+
+<p>This is a rolling-horizon strategy.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dp-versus-greedy">
+<title>Dynamic Programming Versus Greedy Methods</title>
+<p>A greedy algorithm commits immediately to a locally best action.</p>
+
+<p>Dynamic programming evaluates the effect of an action on the optimal
+future value.</p>
+
+<p>Thus greedy reasoning uses</p>
+
+<p>
+<md>\boxed{
+\text{immediate benefit},
+}</md>
+</p>
+
+<p>while dynamic programming uses</p>
+
+<p>
+<md>\boxed{
+\text{immediate benefit}
++
+\text{optimal future benefit}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dp-versus-branch-bound">
+<title>Dynamic Programming Versus Branch-and-Bound</title>
+<p>Dynamic programming identifies and merges equivalent subproblems.</p>
+
+<p>Branch-and-bound keeps different subproblems separate but prunes them
+using bounds.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{DP exploits repeated states},
+}</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-bound exploits bounds}.
+}</md>
+</p>
+
+<p>Some algorithms combine both ideas.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dp-versus-divide-conquer">
+<title>Dynamic Programming Versus Divide and Conquer</title>
+<p>Divide-and-conquer also decomposes a problem.</p>
+
+<p>The distinction is that divide-and-conquer usually creates independent
+subproblems.</p>
+
+<p>Dynamic programming is most useful when subproblems overlap.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{independent subproblems}
+\rightarrow
+\text{divide and conquer},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{overlapping subproblems}
+\rightarrow
+\text{dynamic programming}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dp-versus-lp">
+<title>Dynamic Programming Versus Linear Programming</title>
+<p>Dynamic programming and linear programming are different mathematical
+frameworks, but important problems can sometimes be formulated using
+either.</p>
+
+<p>For example:</p>
+
+<p>
+<md>\boxed{
+\text{shortest path}
+}</md>
+</p>
+
+<p>can be solved by:</p>
+
+<p>
+<md>\boxed{
+\text{graph algorithms},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{dynamic programming},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{linear programming}.
+}</md>
+</p>
+
+<p>Different formulations reveal different structures.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-complexity">
+<title>Computational Complexity of DP</title>
+<p>A common complexity estimate is</p>
+
+<p>
+<md>\boxed{
+\text{number of states}
+\times
+\text{work per state}.
+}</md>
+</p>
+
+<p>If there are <m>N</m> states and at most <m>A</m> actions per state, then a
+simple finite-horizon computation may require approximately</p>
+
+<p>
+<md>\boxed{
+O(NA).
+}</md>
+</p>
+
+<p>The challenge is often that <m>N</m> itself can be enormous.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-sparse-state-exploration">
+<title>Sparse State Exploration</title>
+<p>Memoization can be advantageous if only a small portion of the theoretical
+state space is reachable.</p>
+
+<p>Rather than filling every table entry, compute only states reached from
+the initial state.</p>
+
+<p>This can save substantial time and memory.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-state-compression">
+<title>State Compression</title>
+<p>Sometimes a state can be represented more compactly.</p>
+
+<p>For example, if only the parity of a count matters, storing the full count
+is unnecessary.</p>
+
+<p>Good state compression can reduce both:</p>
+
+<p>
+<md>\boxed{
+\text{memory},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{running time}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-reconstructing-dp-solutions">
+<title>Reconstructing Solutions</title>
+<p>Computing the optimal value alone may not identify the actual solution.</p>
+
+<p>To reconstruct decisions, store:</p>
+
+<p>
+<md>\boxed{
+\text{parent states},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{chosen actions},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{split locations}.
+}</md>
+</p>
+
+<p>Then trace backward from the final state.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-ties">
+<title>Tie Handling</title>
+<p>Several actions can produce the same optimal value.</p>
+
+<p>Then</p>
+
+<p>
+<md>\operatorname*{arg\,min}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\operatorname*{arg\,max}</md>
+</p>
+
+<p>may contain multiple actions.</p>
+
+<p>A solver may:</p>
+
+<p>
+<md>\boxed{
+\text{return one optimum},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{record all optimal choices}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-numerical-issues">
+<title>Numerical Issues</title>
+<p>When costs are floating-point numbers, numerical comparisons can be
+sensitive to rounding.</p>
+
+<p>In stochastic problems, repeated expectations can also accumulate
+roundoff.</p>
+
+<p>Practical implementations may require:</p>
+
+<p>
+<md>\boxed{
+\text{tolerances},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{stable summation or scaling}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-workflow">
+<title>Dynamic Programming Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify the stages or recursive structure;</p>
+</li>
+<li>
+<p>define the state;</p>
+</li>
+<li>
+<p>verify that the state contains sufficient information;</p>
+</li>
+<li>
+<p>define feasible actions;</p>
+</li>
+<li>
+<p>define immediate cost or reward;</p>
+</li>
+<li>
+<p>define the transition law;</p>
+</li>
+<li>
+<p>specify terminal or boundary conditions;</p>
+</li>
+<li>
+<p>derive the Bellman recurrence;</p>
+</li>
+<li>
+<p>determine a valid computation order;</p>
+</li>
+<li>
+<p>estimate the number of states;</p>
+</li>
+<li>
+<p>estimate work per state;</p>
+</li>
+<li>
+<p>decide between memoization and tabulation;</p>
+</li>
+<li>
+<p>store decisions if solution reconstruction is required;</p>
+</li>
+<li>
+<p>exploit dominance and state compression;</p>
+</li>
+<li>
+<p>verify the recurrence on small instances;</p>
+</li>
+<li>
+<p>analyze time and memory complexity.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-choosing-dp-formulation">
+<title>Choosing a Dynamic Programming Formulation</title>
+<p>For sequential decisions, use a stage-state formulation.</p>
+
+<p>For string problems, use:</p>
+
+<p>
+<md>\boxed{
+\text{prefix states}.
+}</md>
+</p>
+
+<p>For interval problems, use:</p>
+
+<p>
+<md>\boxed{
+(i,j)
+\text{ states}.
+}</md>
+</p>
+
+<p>For resource constraints, include:</p>
+
+<p>
+<md>\boxed{
+\text{remaining capacity or budget}.
+}</md>
+</p>
+
+<p>For path-dependent discrete problems, consider:</p>
+
+<p>
+<md>\boxed{
+\text{subset states}.
+}</md>
+</p>
+
+<p>For stochastic decisions, include enough information to obtain the Markov
+property.</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-defining-a-state-that-omits-relevant-history">
+<title>Defining a State That Omits Relevant History</title>
+<p>If two histories produce different future possibilities, they cannot be
+merged into the same state.</p>
+
+<p>The Bellman recursion would then be invalid.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-storing-too-much-history">
+<title>Storing Too Much History</title>
+<p>A state that stores the entire decision history may be correct but
+computationally disastrous.</p>
+
+<p>The goal is a sufficient but compact state.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-writing-a-recurrence-without-base-cases">
+<title>Writing a Recurrence Without Base Cases</title>
+<p>A recursive equation is incomplete without terminal or boundary values.</p>
+
+<p>For example,</p>
+
+<p>
+<md>V(0,b)=0</md>
+</p>
+
+<p>is essential in knapsack.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-future-values-before-they-are-available">
+<title>Using Future Values Before They Are Available</title>
+<p>Bottom-up tabulation requires a computation order compatible with the
+recurrence.</p>
+
+<p>Dependencies must already be solved.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-greedy-choice-with-bellman-optimization">
+<title>Confusing Greedy Choice with Bellman Optimization</title>
+<p>Dynamic programming compares:</p>
+
+<p>
+<md>\boxed{
+\text{current cost}
++
+\text{optimal future cost}.
+}</md>
+</p>
+
+<p>Choosing only the smallest immediate cost can be incorrect.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-reusing-an-item-in-0-1-knapsack">
+<title>Reusing an Item in 0--1 Knapsack</title>
+<p>When using a one-dimensional capacity table, updating capacities in
+increasing order can accidentally allow repeated use of the same item.</p>
+
+<p>For <m>0</m>-<m>1</m> knapsack, update capacity in decreasing order.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-calling-o-nw-polynomial-without-qualification">
+<title>Calling <m>O(nW)</m> Polynomial Without Qualification</title>
+<p>For binary-encoded <m>W</m>,</p>
+
+<p>
+<md>O(nW)</md>
+</p>
+
+<p>is pseudo-polynomial.</p>
+
+<p>Formal complexity is measured in input bits.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-dynamic-programming-is-always-efficient">
+<title>Assuming Dynamic Programming Is Always Efficient</title>
+<p>Dynamic programming can still require exponentially many states.</p>
+
+<p>Subset DP and high-dimensional control are important examples.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-11-optimization-operations-research-07-dynamic-programming-subsubsec-ignoring-the-curse-of-dimensionality">
+<title>Ignoring the Curse of Dimensionality</title>
+<p>A continuous or multivariable state space can make direct tabulation
+impossible.</p>
+
+<p>Approximation may be necessary.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-expectation-in-the-wrong-order">
+<title>Using Expectation in the Wrong Order</title>
+<p>In stochastic dynamic programming, the Bellman equation optimizes over
+actions while accounting for the expectation of future value.</p>
+
+<p>The order depends on when uncertainty is observed.</p>
+
+<p>Information timing must be modeled correctly.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-future-information-in-a-policy">
+<title>Using Future Information in a Policy</title>
+<p>A valid decision at stage <m>t</m> may only depend on information available
+at stage <m>t</m>.</p>
+
+<p>Using future random outcomes creates a nonimplementable policy.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-state-value-and-action-value">
+<title>Confusing State Value and Action Value</title>
+<p>
+<md>V(s)</md>
+</p>
+
+<p>values a state under optimal or specified future behavior.</p>
+
+<p>
+<md>Q(s,a)</md>
+</p>
+
+<p>values taking a particular action from that state and then continuing.</p>
+
+<p>They are related but not identical.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-the-discount-factor">
+<title>Forgetting the Discount Factor</title>
+<p>In discounted infinite-horizon models,</p>
+
+<p>
+<md>0\leq\gamma&lt;1</md>
+</p>
+
+<p>is part of the Bellman equation.</p>
+
+<p>Omitting it changes the optimization problem.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-approximate-dp-gives-exact-optimality">
+<title>Assuming Approximate DP Gives Exact Optimality</title>
+<p>Function approximation, state aggregation, and sampling reduce
+computation but introduce approximation error.</p>
+
+<p>Their solutions need not be exactly optimal.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Routing.</em>
+Shortest-path and constrained-path problems can be formulated through
+Bellman recursions.</p>
+
+<p>\medskip</p>
+
+<p><em>Inventory.</em>
+Ordering decisions depend on current stock, uncertain demand, and future
+costs.</p>
+
+<p>\medskip</p>
+
+<p><em>Scheduling.</em>
+Dynamic programs can optimize sequences of jobs when the state dimension
+remains manageable.</p>
+
+<p>\medskip</p>
+
+<p><em>Finance.</em>
+Sequential investment, consumption, and portfolio decisions can be
+modeled using state-dependent value functions.</p>
+
+<p>\medskip</p>
+
+<p><em>Control Theory.</em>
+Dynamic programming constructs optimal feedback policies for deterministic
+and stochastic dynamical systems.</p>
+
+<p>\medskip</p>
+
+<p><em>Machine Learning.</em>
+Reinforcement learning generalizes dynamic-programming ideas when
+transition models or value functions must be learned from data.</p>
+
+<p>\medskip</p>
+
+<p><em>Computational Biology.</em>
+Sequence alignment, edit distance, and biological string comparison use
+dynamic-programming tables.</p>
+
+<p>\medskip</p>
+
+<p><em>Operations Research.</em>
+Resource allocation, replacement, inventory, routing, and multistage
+decision problems are classical dynamic-programming applications.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define optimal substructure.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define overlapping subproblems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a state.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an action.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a value function.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State Bellman's principle of optimality.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Distinguish memoization from tabulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a Bellman recursion for a deterministic finite-horizon problem with
+transition</p>
+
+<p>
+<md>s_{t+1}=T(s_t,a_t).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why backward induction is natural for finite-horizon dynamic
+programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the shortest-path Bellman recursion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the <m>0</m>-<m>1</m> knapsack recurrence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the knapsack base cases.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why <m>0</m>-<m>1</m> knapsack memory can be reduced to <m>O(W)</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why capacities must be processed downward in the one-array
+<m>0</m>-<m>1</m> knapsack implementation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the longest common subsequence recurrence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the edit-distance recurrence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the matrix-chain multiplication recurrence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve a four-item <m>0</m>-<m>1</m> knapsack problem by constructing the full
+dynamic-programming table.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Recover the selected items from the knapsack table.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare full-table and one-dimensional knapsack memory requirements.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve a resource-allocation problem with three activities and a budget of
+five units.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the LCS length of</p>
+
+<p>
+<md>X=\texttt{ABCBDAB}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>Y=\texttt{BDCABA}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct an edit-distance table for two short strings.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use dynamic programming to determine the optimal parenthesization of four
+matrices.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the time complexity of matrix-chain dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the Held--Karp recurrence for a four-city TSP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Held--Karp improves on complete permutation enumeration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the approximate <m>O(n^2 2^n)</m> time complexity of Held--Karp.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a finite-horizon deterministic control problem and derive its
+Bellman recursion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Given a small transition table, compute an optimal policy by backward
+induction.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a finite-horizon stochastic Bellman equation using transition
+probabilities.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute one Bellman update for a two-state stochastic problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the discounted Bellman optimality equation for a finite MDP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform two iterations of value iteration on a small MDP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Evaluate a fixed policy by solving its Bellman equations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one policy-improvement step.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the relationship</p>
+
+<p>
+<md>V^*(s)=\max_aQ^*(s,a).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a simple inventory-control model as a dynamic program.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate an equipment-replacement model.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between open-loop and feedback decisions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of a state that contains unnecessary history and compress
+it.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example where omitting a state variable invalidates the Bellman
+recursion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the curse of dimensionality using a state with six components and
+ten possible values per component.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare dynamic programming and branch-and-bound for a discrete problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare dynamic programming and greedy optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why memoization may outperform tabulation when many states are
+unreachable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove Bellman's principle of optimality for a finite deterministic control
+problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study shortest paths as linear programming and dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove correctness of the <m>0</m>-<m>1</m> knapsack recurrence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the FPTAS for <m>0</m>-<m>1</m> knapsack.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Hirschberg's memory-efficient algorithm for longest common
+subsequence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study sequence alignment with affine gap penalties.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study interval dynamic programming for optimal binary search trees.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study subset dynamic programming for Steiner-tree problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Held--Karp algorithm carefully.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study state-dominance rules in resource-constrained dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study stochastic shortest-path dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that the discounted Bellman operator is a contraction in the sup
+norm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the contraction mapping theorem to prove uniqueness of <m>V^*</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove convergence of value iteration for finite discounted MDPs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study finite termination of policy iteration for finite discounted MDPs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study average-cost dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study stochastic shortest-path MDPs without discounting.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Hamilton--Jacobi--Bellman equation as a continuous-time limit.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study approximate value iteration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate state aggregation error.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study fitted value iteration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate approximate policy iteration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study rollout algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the relationship between dynamic programming and reinforcement
+learning.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study dynamic programming on tree decompositions.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-summary">
+<title>Conceptual Summary</title>
+<p>Dynamic programming solves optimization problems by decomposing them into
+smaller state-dependent problems.</p>
+
+<p>The key objects are</p>
+
+<p>
+<md>\boxed{
+\text{state}
++
+\text{action}
++
+\text{transition}
++
+\text{value}.
+}</md>
+</p>
+
+<p>For deterministic finite-horizon optimization,</p>
+
+<p>
+<md>\boxed{
+V_t(s)
+=
+\min_{a\in A_t(s)}
+\left[
+c_t(s,a)
++
+V_{t+1}
+(
+T_t(s,a)
+)
+\right].
+}</md>
+</p>
+
+<p>This is the Bellman recursion.</p>
+
+<p>Important discrete examples include:</p>
+
+<p>
+<md>\boxed{
+\text{shortest path},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{knapsack},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{sequence alignment},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{matrix-chain multiplication},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{TSP subset DP}.
+}</md>
+</p>
+
+<p>For stochastic systems,</p>
+
+<p>
+<md>\boxed{
+V_t(s)
+=
+\min_a
+\left[
+c_t(s,a)
++
+\sum_{s'}
+P(s'|s,a)V_{t+1}(s')
+\right].
+}</md>
+</p>
+
+<p>For discounted infinite-horizon reward maximization,</p>
+
+<p>
+<md>\boxed{
+V^*(s)
+=
+\max_a
+\left[
+r(s,a)
++
+\gamma
+\sum_{s'}
+P(s'|s,a)
+V^*(s')
+\right].
+}</md>
+</p>
+
+<p>Dynamic programming can dramatically reduce repeated computation, but its
+state space can grow exponentially with dimension.</p>
+
+<p>Thus dynamic programming combines</p>
+
+<p>
+<md>\boxed{
+\text{optimization}
++
+\text{recursion}
++
+\text{algorithms}
++
+\text{probability}
++
+\text{control}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-07-dynamic-programming-subsec-dynamic-programming-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Dynamic Programming develops recursive optimization through Bellman's
+principle of optimality. It connects the discrete search problems of
+Section <xref ref="sec-combinatorial-optimization" /> with sequential decision
+making, stochastic systems, and feedback control. Knapsack, shortest
+paths, sequence problems, and subset optimization illustrate deterministic
+dynamic programming, while Markov decision processes introduce stochastic
+Bellman equations. These ideas become especially important in later
+sections on Stochastic Optimization, Scheduling Theory, Inventory Theory,
+Decision Theory, and Optimal Control. The next section, Stochastic
+Optimization, develops optimization models in which uncertain quantities
+enter objectives, constraints, or future decisions explicitly.</p>
+</remark>
+</subsection>
+
 </section>

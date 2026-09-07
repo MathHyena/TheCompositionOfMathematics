@@ -1,9 +1,3216 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-04-geometry-05-projective-geometry">
-  <title>Projective Geometry</title>
+<section xml:id="sec-projective-geometry">
+<title>Projective Geometry</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Euclidean Geometry from <xref ref="sec-euclidean-geometry" />,
+Analytic / Coordinate Geometry from
+<xref ref="sec-analytic-coordinate-geometry" />,
+Vector Geometry from <xref ref="sec-vector-geometry" />,
+Affine Geometry from <xref ref="sec-affine-geometry" />,
+and Linear Algebra from <xref ref="sec-linear-algebra" />.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain the motivation for projective geometry;</p>
+</li>
+<li>
+<p>describe points at infinity and the projective completion of affine space;</p>
+</li>
+<li>
+<p>interpret projective points using homogeneous coordinates;</p>
+</li>
+<li>
+<p>work with the projective line and projective plane;</p>
+</li>
+<li>
+<p>convert between affine and projective coordinates;</p>
+</li>
+<li>
+<p>represent projective lines by homogeneous equations;</p>
+</li>
+<li>
+<p>compute intersections of projective lines;</p>
+</li>
+<li>
+<p>use cross products to calculate joins and intersections in
+    <m>\mathbb{P}^2</m>;</p>
+</li>
+<li>
+<p>explain the principle of projective duality;</p>
+</li>
+<li>
+<p>define and compute the cross-ratio;</p>
+</li>
+<li>
+<p>identify projective transformations using invertible matrices;</p>
+</li>
+<li>
+<p>distinguish affine and projective transformations;</p>
+</li>
+<li>
+<p>recognize projective invariants;</p>
+</li>
+<li>
+<p>describe conics in projective space;</p>
+</li>
+<li>
+<p>understand how affine conic classifications arise from projective
+    geometry;</p>
+</li>
+<li>
+<p>connect projective geometry with perspective, computer vision,
+    algebraic geometry, and geometry at infinity.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-what-is-projective-geometry">
+<title>What Is Projective Geometry?</title>
+<p>Affine geometry preserves parallelism but treats parallel lines differently
+from intersecting lines.</p>
+
+<p>Projective geometry removes this distinction.</p>
+
+<definition>
+<title>Projective Geometry</title>
+<statement>
+<p><em>Projective geometry</em> studies geometric properties preserved under
+projective transformations.</p>
+
+<p>Its fundamental objects are points, lines, planes, incidence relations, and
+projective invariants such as the cross-ratio.</p>
+</statement>
+</definition>
+
+<p>A central principle is:</p>
+
+<p>
+<md>\boxed{\text{In the projective plane, every two distinct lines intersect.}}</md>
+</p>
+
+<p>Parallel affine lines acquire an intersection at a <em>point at infinity</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-why-points-at-infinity">
+<title>Why Introduce Points at Infinity?</title>
+<p>Consider the affine lines</p>
+
+<p>
+<md>y=0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y=1.</md>
+</p>
+
+<p>They are parallel and therefore have no intersection in the affine plane.</p>
+
+<p>Projective geometry enlarges the affine plane by adding ideal points.</p>
+
+<p>The two lines are then said to meet at a point at infinity representing their
+common direction.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.8]
+\draw[thick] (-4,-1)--(3,-1);
+\draw[thick] (-4,1)--(3,1);</p>
+
+<p>\draw[dashed] (3,-1)--(6,0);
+\draw[dashed] (3,1)--(6,0);</p>
+
+<p>\fill (6,0) circle (2.5pt);
+\node[right] at (6,0) {point at infinity};</p>
+
+<p>\node[left] at (-4,-1) {<m>y=0</m>};
+\node[left] at (-4,1) {<m>y=1</m>};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>The picture is schematic: the point at infinity is not an ordinary distant
+Euclidean point.</p>
+
+<p>It represents a direction.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-perspective-motivation">
+<title>Perspective as Motivation</title>
+<p>Projective geometry is closely connected with perspective drawing.</p>
+
+<p>Railroad tracks are physically parallel, but in a perspective image they
+appear to converge toward a vanishing point.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=0.85]
+\coordinate (V) at (5,3);
+\coordinate (A) at (0,0);
+\coordinate (B) at (2,0);</p>
+
+<p>\draw[thick] (A)--(V);
+\draw[thick] (B)--(V);</p>
+
+<p>\foreach \t in {0.12,0.25,0.4,0.58,0.78}{
+    \coordinate (L) at ($(A)!\t!(V)$);
+    \coordinate (R) at ($(B)!\t!(V)$);
+    \draw (L)--(R);
+}</p>
+
+<p>\fill (V) circle (2.5pt);
+\node[above] at (V) {vanishing point};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>Vanishing points are practical manifestations of projective directions.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-homogeneous-coordinates">
+<title>Homogeneous Coordinates</title>
+<p>Affine Geometry introduced homogeneous coordinates as a convenient way to
+represent affine transformations.</p>
+
+<p>In projective geometry they become intrinsic.</p>
+
+<definition>
+<title>Homogeneous Coordinates</title>
+<statement>
+<p>A point of the real projective plane is represented by a nonzero triple</p>
+
+<p>
+<md>(X,Y,Z)\in\R^3\setminus\{\mathbf{0}\},</md>
+</p>
+
+<p>where proportional triples represent the same projective point:</p>
+
+<p>
+<md>\boxed{
+[X:Y:Z]=[\lambda X:\lambda Y:\lambda Z],
+\qquad
+\lambda\neq0.
+}</md>
+</p>
+
+<p>The notation <m>[X:Y:Z]</m> is called <em>homogeneous coordinates</em>.</p>
+</statement>
+</definition>
+
+<p>Thus</p>
+
+<p>
+<md>[1:2:3]
+=
+[2:4:6]
+=
+[-1:-2:-3].</md>
+</p>
+
+<p>These are different vectors in <m>\R^3</m>, but they represent the same
+projective point.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-scaling-equivalence">
+<title>Why Scaling Does Not Change a Projective Point</title>
+<p>A projective point corresponds to a one-dimensional linear subspace through
+the origin.</p>
+
+<p>For example,</p>
+
+<p>
+<md>[1:2:3]</md>
+</p>
+
+<p>represents the line</p>
+
+<p>
+<md>\{(t,2t,3t):t\in\R\}</md>
+</p>
+
+<p>through the origin in <m>\R^3</m>.</p>
+
+<p>Multiplying the coordinates by a nonzero scalar merely chooses a different
+nonzero vector on the same line.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\text{projective point}
+\longleftrightarrow
+\text{one-dimensional linear subspace}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-space">
+<title>Projective Space</title>
+<definition>
+<title>Real Projective Space</title>
+<statement>
+<p>The <m>n</m>-dimensional real projective space is</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}^{n}(\R)
+=
+\left(\R^{n+1}\setminus\{\mathbf{0}\}\right)/\sim,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\mathbf{x}\sim\lambda\mathbf{x}</md>
+</p>
+
+<p>for every nonzero scalar <m>\lambda</m>.</p>
+</statement>
+</definition>
+
+<p>The symbol</p>
+
+<p>
+<md>\mathbb{P}^{n}</md>
+</p>
+
+<p>is read <q>projective @@PROTECTED0@@-space.</q></p>
+
+<p>Common examples are</p>
+
+<p>
+<md>\mathbb{P}^{1},\qquad
+\mathbb{P}^{2},\qquad
+\mathbb{P}^{3}.</md>
+</p>
+
+<p>They are called the projective line, projective plane, and projective
+three-space.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-line">
+<title>The Projective Line</title>
+<p>A point of</p>
+
+<p>
+<md>\mathbb{P}^{1}(\R)</md>
+</p>
+
+<p>has coordinates</p>
+
+<p>
+<md>[X:Z],</md>
+</p>
+
+<p>not both zero.</p>
+
+<p>When <m>Z\neq0</m>, divide by <m>Z</m>:</p>
+
+<p>
+<md>[X:Z]
+=
+\left[\frac{X}{Z}:1\right].</md>
+</p>
+
+<p>Thus the corresponding affine coordinate is</p>
+
+<p>
+<md>x=\frac{X}{Z}.</md>
+</p>
+
+<p>When</p>
+
+<p>
+<md>Z=0,</md>
+</p>
+
+<p>the only projective point is</p>
+
+<p>
+<md>[1:0].</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}^{1}(\R)
+=
+\R\cup\{\infty\}
+}</md>
+</p>
+
+<p>as a set, after choosing an affine coordinate chart.</p>
+
+<p>The point</p>
+
+<p>
+<md>[1:0]</md>
+</p>
+
+<p>is the point at infinity of the real projective line.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-plane">
+<title>The Projective Plane</title>
+<p>Points of the real projective plane have coordinates</p>
+
+<p>
+<md>[X:Y:Z].</md>
+</p>
+
+<p>When</p>
+
+<p>
+<md>Z\neq0,</md>
+</p>
+
+<p>we may divide by <m>Z</m>:</p>
+
+<p>
+<md>[X:Y:Z]
+=
+\left[
+\frac{X}{Z}:
+\frac{Y}{Z}:
+1
+\right].</md>
+</p>
+
+<p>This corresponds to the affine point</p>
+
+<p>
+<md>\boxed{
+(x,y)=
+\left(
+\frac{X}{Z},
+\frac{Y}{Z}
+\right).
+}</md>
+</p>
+
+<p>Thus ordinary affine points correspond to projective points with</p>
+
+<p>
+<md>Z\neq0.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-line-at-infinity">
+<title>The Line at Infinity</title>
+<p>Points satisfying</p>
+
+<p>
+<md>\boxed{Z=0}</md>
+</p>
+
+<p>do not correspond to ordinary affine points.</p>
+
+<p>They form the <em>line at infinity</em>.</p>
+
+<p>A typical point at infinity has the form</p>
+
+<p>
+<md>[X:Y:0].</md>
+</p>
+
+<p>Because homogeneous coordinates are defined only up to nonzero scaling,</p>
+
+<p>
+<md>[X:Y:0]
+=
+[\lambda X:\lambda Y:0].</md>
+</p>
+
+<p>Thus points at infinity encode directions in the affine plane.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-affine-directions-projective">
+<title>Affine Directions as Projective Points</title>
+<p>An affine line with direction vector</p>
+
+<p>
+<md>(a,b)</md>
+</p>
+
+<p>has corresponding projective point at infinity</p>
+
+<p>
+<md>\boxed{[a:b:0].}</md>
+</p>
+
+<p>All parallel lines with direction <m>(a,b)</m> pass through this same
+projective point.</p>
+
+<p>For example, all horizontal lines have direction</p>
+
+<p>
+<md>(1,0),</md>
+</p>
+
+<p>so their common point at infinity is</p>
+
+<p>
+<md>\boxed{[1:0:0].}</md>
+</p>
+
+<p>All vertical lines have direction</p>
+
+<p>
+<md>(0,1),</md>
+</p>
+
+<p>so their common point at infinity is</p>
+
+<p>
+<md>\boxed{[0:1:0].}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-affine-to-projective">
+<title>From Affine to Projective Coordinates</title>
+<p>An affine point</p>
+
+<p>
+<md>(x,y)</md>
+</p>
+
+<p>is embedded into projective space by</p>
+
+<p>
+<md>\boxed{
+(x,y)\longmapsto[x:y:1].
+}</md>
+</p>
+
+<p>For example,</p>
+
+<p>
+<md>(2,-3)
+\longmapsto
+[2:-3:1].</md>
+</p>
+
+<p>Because homogeneous coordinates may be rescaled,</p>
+
+<p>
+<md>[2:-3:1]
+=
+[4:-6:2].</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-to-affine">
+<title>From Projective to Affine Coordinates</title>
+<p>If</p>
+
+<p>
+<md>[X:Y:Z]</md>
+</p>
+
+<p>has <m>Z\neq0</m>, then</p>
+
+<p>
+<md>\boxed{
+(x,y)=
+\left(
+\frac{X}{Z},
+\frac{Y}{Z}
+\right).
+}</md>
+</p>
+
+<p>For example,</p>
+
+<p>
+<md>[6:9:3]
+=
+[2:3:1],</md>
+</p>
+
+<p>so the corresponding affine point is</p>
+
+<p>
+<md>\boxed{(2,3).}</md>
+</p>
+
+<p>If <m>Z=0</m>, no affine point is obtained in this coordinate chart.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-worked-projective-homogeneous">
+<title>Worked Example: Homogeneous Coordinates</title>
+<example>
+<title>Converting Projective Coordinates</title>
+<p>Convert</p>
+
+<p>
+<md>P=[8:-4:2]</md>
+</p>
+
+<p>to affine coordinates.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{P=(4,-2)}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-lines">
+<title>Projective Lines</title>
+<p>A projective line in <m>\mathbb{P}^{2}</m> is represented by a homogeneous
+linear equation</p>
+
+<p>
+<md>\boxed{
+aX+bY+cZ=0,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>(a,b,c)\neq(0,0,0).</md>
+</p>
+
+<p>Multiplying all coefficients by a nonzero scalar does not change the line.</p>
+
+<p>Thus</p>
+
+<p>
+<md>aX+bY+cZ=0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\lambda aX+\lambda bY+\lambda cZ=0</md>
+</p>
+
+<p>represent the same projective line.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-affine-lines-projective-plane">
+<title>Affine Lines Inside the Projective Plane</title>
+<p>An affine line</p>
+
+<p>
+<md>ax+by+c=0</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>\boxed{
+aX+bY+cZ=0
+}</md>
+</p>
+
+<p>after homogenization.</p>
+
+<p>Indeed, substituting</p>
+
+<p>
+<md>x=\frac{X}{Z},
+\qquad
+y=\frac{Y}{Z}</md>
+</p>
+
+<p>and multiplying by <m>Z</m> gives the homogeneous equation.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-homogenization">
+<title>Homogenization</title>
+<p>The process of converting an affine polynomial equation into a homogeneous
+projective equation is called <em>homogenization</em>.</p>
+
+<p>For example,</p>
+
+<p>
+<md>x^2+y^2=1</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>\boxed{
+X^2+Y^2=Z^2.
+}</md>
+</p>
+
+<p>Similarly,</p>
+
+<p>
+<md>y=x^2</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>\boxed{
+YZ=X^2.
+}</md>
+</p>
+
+<p>Every term in the homogenized equation has the same total degree.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-dehomogenization">
+<title>Dehomogenization</title>
+<p>To recover an affine equation in the chart <m>Z\neq0</m>, set</p>
+
+<p>
+<md>Z=1.</md>
+</p>
+
+<p>For example,</p>
+
+<p>
+<md>X^2+Y^2-Z^2=0</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>x^2+y^2-1=0.</md>
+</p>
+
+<p>This process is called <em>dehomogenization</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-incidence">
+<title>Incidence</title>
+<p>A point</p>
+
+<p>
+<md>P=[X:Y:Z]</md>
+</p>
+
+<p>lies on the line</p>
+
+<p>
+<md>\ell=[a:b:c]</md>
+</p>
+
+<p>when</p>
+
+<p>
+<md>\boxed{
+aX+bY+cZ=0.
+}</md>
+</p>
+
+<p>The word <em>incidence</em> refers to relationships such as:</p>
+
+<p>
+<ul>
+<li>
+<p>a point lying on a line;</p>
+</li>
+<li>
+<p>a line passing through a point;</p>
+</li>
+<li>
+<p>several lines meeting at one point.</p>
+</li>
+</ul>
+</p>
+
+<p>Incidence is one of the central structures preserved by projective
+transformations.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-line-homogeneous-coordinates">
+<title>Lines as Homogeneous Coordinates</title>
+<p>A projective line</p>
+
+<p>
+<md>aX+bY+cZ=0</md>
+</p>
+
+<p>may itself be represented by the homogeneous triple</p>
+
+<p>
+<md>\boxed{\ell=[a:b:c].}</md>
+</p>
+
+<p>This creates a remarkable symmetry:</p>
+
+<p>
+<md>\text{point }P=[X:Y:Z],</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>\text{line }\ell=[a:b:c].</md>
+</p>
+
+<p>Incidence becomes</p>
+
+<p>
+<md>\boxed{\ell^{T}P=0.}</md>
+</p>
+
+<p>This symmetry is the basis of projective duality.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-line-through-points">
+<title>The Line Through Two Points</title>
+<p>Let</p>
+
+<p>
+<md>P=[X_1:Y_1:Z_1]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>Q=[X_2:Y_2:Z_2].</md>
+</p>
+
+<p>The line through them can be computed using the cross product:</p>
+
+<p>
+<md>\boxed{
+\ell=P\times Q.
+}</md>
+</p>
+
+<p>Writing the homogeneous coordinate vectors as columns,</p>
+
+<p>
+<md>P=
+\begin{pmatrix}
+X_1\\Y_1\\Z_1
+\end{pmatrix},
+\qquad
+Q=
+\begin{pmatrix}
+X_2\\Y_2\\Z_2
+\end{pmatrix},</md>
+</p>
+
+<p>the vector</p>
+
+<p>
+<md>P\times Q</md>
+</p>
+
+<p>gives the coefficients of the line equation.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-worked-projective-line-two-points">
+<title>Worked Example: Line Through Two Points</title>
+<example>
+<title>Finding a Projective Line</title>
+<p>Find the projective line through</p>
+
+<p>
+<md>P=[1:0:1],
+\qquad
+Q=[0:1:1].</md>
+</p>
+
+<p>Compute</p>
+
+<p>
+<md>P\times Q
+=
+\begin{pmatrix}
+1\\0\\1
+\end{pmatrix}
+\times
+\begin{pmatrix}
+0\\1\\1
+\end{pmatrix}.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{X+Y-Z=0}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-intersection-projective-lines">
+<title>Intersection of Two Lines</title>
+<p>The dual operation is equally simple.</p>
+
+<p>If</p>
+
+<p>
+<md>\ell_1=[a_1:b_1:c_1]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\ell_2=[a_2:b_2:c_2],</md>
+</p>
+
+<p>then their intersection point is</p>
+
+<p>
+<md>\boxed{
+P=\ell_1\times\ell_2.
+}</md>
+</p>
+
+<p>This formula works even when the corresponding affine lines are parallel.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-worked-parallel-lines-infinity">
+<title>Worked Example: Parallel Lines Meet at Infinity</title>
+<example>
+<title>Finding the Intersection of Parallel Lines</title>
+<p>Consider</p>
+
+<p>
+<md>y=1</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y=3.</md>
+</p>
+
+<p>Their projective equations are</p>
+
+<p>
+<md>Y-Z=0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>Y-3Z=0.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\ell_1=[0:1:-1],
+\qquad
+\ell_2=[0:1:-3].</md>
+</p>
+
+<p>Compute</p>
+
+<p>
+<md>\ell_1\times\ell_2.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{[1:0:0]}</md>
+</p>
+
+<p>The horizontal lines meet at the projective point representing the
+horizontal direction.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-every-two-projective-lines-intersect">
+<title>Every Two Lines Intersect</title>
+<p>Two distinct projective lines correspond to two linearly independent
+coefficient vectors</p>
+
+<p>
+<md>\ell_1,\ell_2\in\R^3.</md>
+</p>
+
+<p>Their cross product is nonzero:</p>
+
+<p>
+<md>\ell_1\times\ell_2\neq0.</md>
+</p>
+
+<p>Therefore it represents a projective point.</p>
+
+<p>Hence:</p>
+
+<p>\begin{theorem}[Intersection Property of the Projective Plane]
+Every two distinct projective lines in <m>\mathbb{P}^{2}(\R)</m> intersect in
+exactly one projective point.
+\end{theorem}</p>
+
+<p>This removes the exceptional parallel case found in affine geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-two-points-projective-line">
+<title>Every Two Points Determine a Line</title>
+<p>Similarly:</p>
+
+<p>\begin{theorem}[Join Property of the Projective Plane]
+Every two distinct points in <m>\mathbb{P}^{2}(\R)</m> lie on exactly one
+projective line.
+\end{theorem}</p>
+
+<p>The line is</p>
+
+<p>
+<md>\boxed{\ell=P\times Q.}</md>
+</p>
+
+<p>The operation of constructing the line through two points is often called
+their <em>join</em>.</p>
+
+<p>The intersection of two lines is often called their <em>meet</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-join-meet">
+<title>Join and Meet</title>
+<p>In the projective plane:</p>
+
+<p>
+<md>\boxed{
+\text{join of points: }
+P\vee Q=P\times Q
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{meet of lines: }
+\ell_1\wedge\ell_2=\ell_1\times\ell_2.
+}</md>
+</p>
+
+<p>The symbols</p>
+
+<p>
+<md>\vee
+\qquad\text{and}\qquad
+\wedge</md>
+</p>
+
+<p>are read <q>join</q> and <q>meet</q> in this context.</p>
+
+<p>These operations emphasize the dual roles of points and lines.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-duality">
+<title>Projective Duality</title>
+<p>Projective geometry exhibits a deep symmetry between points and lines.</p>
+
+<p>A statement such as</p>
+
+<p>
+<md>\text{two points determine a unique line}</md>
+</p>
+
+<p>has the dual statement</p>
+
+<p>
+<md>\text{two lines determine a unique point}.</md>
+</p>
+
+<p>\begin{importantbox}
+The <em>principle of projective duality</em> states, roughly, that many valid
+theorems in the projective plane remain valid after interchanging the roles
+of points and lines, together with the corresponding incidence relations.
+\end{importantbox}</p>
+
+<p>This is not merely a linguistic coincidence.</p>
+
+<p>It reflects the linear-algebraic duality between one-dimensional and
+codimension-one subspaces.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-collinearity">
+<title>Collinearity</title>
+<p>Three projective points</p>
+
+<p>
+<md>P,\qquad Q,\qquad R</md>
+</p>
+
+<p>are collinear precisely when their homogeneous coordinate vectors are
+linearly dependent.</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+\det
+\begin{pmatrix}
+X_P&amp;Y_P&amp;Z_P\\
+X_Q&amp;Y_Q&amp;Z_Q\\
+X_R&amp;Y_R&amp;Z_R
+\end{pmatrix}
+=0.
+}</md>
+</p>
+
+<p>Thus projective incidence questions can often be reduced to determinant
+computations.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-concurrency">
+<title>Concurrency</title>
+<p>Three projective lines</p>
+
+<p>
+<md>\ell_1,\qquad\ell_2,\qquad\ell_3</md>
+</p>
+
+<p>are concurrent if they pass through one common point.</p>
+
+<p>If</p>
+
+<p>
+<md>\ell_i=[a_i:b_i:c_i],</md>
+</p>
+
+<p>then concurrency occurs precisely when</p>
+
+<p>
+<md>\boxed{
+\det
+\begin{pmatrix}
+a_1&amp;b_1&amp;c_1\\
+a_2&amp;b_2&amp;c_2\\
+a_3&amp;b_3&amp;c_3
+\end{pmatrix}
+=0.
+}</md>
+</p>
+
+<p>This is the dual form of the collinearity criterion.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-transformations">
+<title>Projective Transformations</title>
+<p>Affine transformations use matrices together with translations.</p>
+
+<p>Projective transformations arise naturally from invertible linear maps on
+homogeneous coordinates.</p>
+
+<definition>
+<title>Projective Transformation</title>
+<statement>
+<p>Let</p>
+
+<p>
+<md>A\in GL(n+1,\R).</md>
+</p>
+
+<p>The transformation</p>
+
+<p>
+<md>\boxed{
+[\mathbf{x}]
+\longmapsto
+[A\mathbf{x}]
+}</md>
+</p>
+
+<p>defines a <em>projective transformation</em> of
+<m>\mathbb{P}^{n}(\R)</m>.</p>
+</statement>
+</definition>
+
+<p>Because homogeneous coordinates are defined up to nonzero scalar
+multiplication, scalar multiples of <m>A</m> define the same projective
+transformation.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-linear-group">
+<title>The Projective Linear Group</title>
+<p>The group of projective linear transformations is denoted</p>
+
+<p>
+<md>\boxed{
+PGL(n+1,\R).
+}</md>
+</p>
+
+<p>The notation is read <q>projective general linear group.</q></p>
+
+<p>Conceptually,</p>
+
+<p>
+<md>PGL(n+1,\R)
+=
+GL(n+1,\R)
+/\{\lambda I:\lambda\neq0\}.</md>
+</p>
+
+<p>Matrices differing by a nonzero scalar represent the same projective
+transformation.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-affine-as-projective">
+<title>Affine Transformations as Projective Transformations</title>
+<p>An affine transformation</p>
+
+<p>
+<md>\mathbf{x}\mapsto A\mathbf{x}+\mathbf{b}</md>
+</p>
+
+<p>has homogeneous matrix</p>
+
+<p>
+<md>\begin{pmatrix}
+A&amp;\mathbf{b}\\
+\mathbf{0}^{T}&amp;1
+\end{pmatrix}.</md>
+</p>
+
+<p>Therefore every invertible affine transformation extends to a projective
+transformation.</p>
+
+<p>However, projective transformations are more general.</p>
+
+<p>A general projective transformation need not preserve the affine line at
+infinity.</p>
+
+<p>Consequently, it need not preserve parallelism.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-transformation-affine-coordinates">
+<title>Projective Transformation in Affine Coordinates</title>
+<p>Consider a projective transformation of <m>\mathbb{P}^{2}</m> represented by</p>
+
+<p>
+<md>H=
+\begin{pmatrix}
+a&amp;b&amp;c\\
+d&amp;e&amp;f\\
+g&amp;h&amp;i
+\end{pmatrix}.</md>
+</p>
+
+<p>An affine point is represented by</p>
+
+<p>
+<md>[x:y:1].</md>
+</p>
+
+<p>After multiplication,</p>
+
+<p>
+<md>H
+\begin{pmatrix}
+x\\y\\1
+\end{pmatrix}
+=
+\begin{pmatrix}
+ax+by+c\\
+dx+ey+f\\
+gx+hy+i
+\end{pmatrix}.</md>
+</p>
+
+<p>If the final coordinate is nonzero, the transformed affine point is</p>
+
+<p>
+<md>\boxed{
+x'
+=
+\frac{ax+by+c}{gx+hy+i},
+\qquad
+y'
+=
+\frac{dx+ey+f}{gx+hy+i}.
+}</md>
+</p>
+
+<p>Unlike affine transformations, the coordinates may involve division by
+linear expressions.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-homographies">
+<title>Homographies</title>
+<p>Projective transformations are also called <em>homographies</em> or
+<em>projectivities</em> in many contexts.</p>
+
+<p>On the projective line, a projective transformation has the form</p>
+
+<p>
+<md>\boxed{
+x\longmapsto\frac{ax+b}{cx+d},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>ad-bc\neq0.</md>
+</p>
+
+<p>These are also known as fractional linear or Möbius transformations.</p>
+
+<p>Their complex-analytic theory is developed more fully in Complex Analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-worked-projective-transformation">
+<title>Worked Example: Projective Transformation</title>
+<example>
+<title>Applying a Projective Transformation</title>
+<p>Let</p>
+
+<p>
+<md>H=
+\begin{pmatrix}
+1&amp;0&amp;2\\
+0&amp;1&amp;1\\
+1&amp;0&amp;1
+\end{pmatrix}</md>
+</p>
+
+<p>and let</p>
+
+<p>
+<md>P=(1,2).</md>
+</p>
+
+<p>Write <m>P</m> homogeneously:</p>
+
+<p>
+<md>P=[1:2:1].</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>H
+\begin{pmatrix}
+1\\2\\1
+\end{pmatrix}
+=
+\begin{pmatrix}
+3\\3\\2
+\end{pmatrix}.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>P'=[3:3:2].</md>
+</p>
+
+<p>Dehomogenizing gives</p>
+
+<p>
+<md>P'=
+\left(
+\frac32,
+\frac32
+\right).</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+T(1,2)=
+\left(\frac32,\frac32\right)
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-invariants">
+<title>Projective Invariants</title>
+<p>Projective transformations preserve less structure than affine
+transformations.</p>
+
+<p>They preserve:</p>
+
+<p>
+<ul>
+<li>
+<p>points;</p>
+</li>
+<li>
+<p>lines;</p>
+</li>
+<li>
+<p>incidence;</p>
+</li>
+<li>
+<p>collinearity;</p>
+</li>
+<li>
+<p>concurrency;</p>
+</li>
+<li>
+<p>projective dimension;</p>
+</li>
+<li>
+<p>cross-ratios of four collinear points;</p>
+</li>
+<li>
+<p>projective equivalence of nondegenerate conics.</p>
+</li>
+</ul>
+</p>
+
+<p>They do not generally preserve:</p>
+
+<p>
+<ul>
+<li>
+<p>lengths;</p>
+</li>
+<li>
+<p>angles;</p>
+</li>
+<li>
+<p>perpendicularity;</p>
+</li>
+<li>
+<p>midpoints;</p>
+</li>
+<li>
+<p>ordinary ratios of lengths;</p>
+</li>
+<li>
+<p>parallelism;</p>
+</li>
+<li>
+<p>affine area.</p>
+</li>
+</ul>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-cross-ratio">
+<title>The Cross-Ratio</title>
+<p>Ordinary distance ratios are not preserved by general projective
+transformations.</p>
+
+<p>A special combination of ratios is preserved.</p>
+
+<definition>
+<title>Cross-Ratio</title>
+<statement>
+<p>For four distinct collinear affine points with coordinates</p>
+
+<p>
+<md>a,b,c,d,</md>
+</p>
+
+<p>their <em>cross-ratio</em> is</p>
+
+<p>
+<md>\boxed{
+(a,b;c,d)
+=
+\frac{(c-a)(d-b)}
+     {(c-b)(d-a)}.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>The notation</p>
+
+<p>
+<md>(a,b;c,d)</md>
+</p>
+
+<p>is read <q>the cross-ratio of @@PROTECTED0@@.</q></p>
+
+<p>Different ordering conventions occur in the literature, so the chosen
+formula should always be stated explicitly.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-worked-cross-ratio">
+<title>Worked Example: Cross-Ratio</title>
+<example>
+<title>Computing a Cross-Ratio</title>
+<p>Compute</p>
+
+<p>
+<md>(0,1;2,3).</md>
+</p>
+
+<p>Using</p>
+
+<p>
+<md>(a,b;c,d)
+=
+\frac{(c-a)(d-b)}
+     {(c-b)(d-a)},</md>
+</p>
+
+<p>we obtain</p>
+
+<p>
+<md>(0,1;2,3)
+=
+\frac{(2-0)(3-1)}
+     {(2-1)(3-0)}.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>=
+\frac{2\cdot2}{1\cdot3}
+=
+\frac43.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{(0,1;2,3)=\frac43}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-cross-ratio-invariance">
+<title>Cross-Ratio Invariance</title>
+<p>\begin{theorem}[Cross-Ratio Invariance]
+Let</p>
+
+<p>
+<md>T(x)=\frac{\alpha x+\beta}{\gamma x+\delta}</md>
+</p>
+
+<p>be a projective transformation of the projective line.</p>
+
+<p>Then, whenever the expressions are defined,</p>
+
+<p>
+<md>\boxed{
+(T(a),T(b);T(c),T(d))
+=
+(a,b;c,d).
+}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>Thus the cross-ratio replaces ordinary length ratios as a fundamental
+one-dimensional projective invariant.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-harmonic-division">
+<title>Harmonic Division</title>
+<p>A particularly important configuration occurs when the cross-ratio is</p>
+
+<p>
+<md>-1.</md>
+</p>
+
+<definition>
+<title>Harmonic Range</title>
+<statement>
+<p>Four collinear points form a <em>harmonic range</em> when, under the convention
+used in this section,</p>
+
+<p>
+<md>\boxed{
+(A,B;C,D)=-1.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>Harmonic configurations are preserved by projective transformations and play
+an important role in classical projective geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-frames">
+<title>Projective Frames</title>
+<p>Just as affine frames provide coordinate systems in affine geometry,
+projective frames provide coordinate systems in projective geometry.</p>
+
+<p>In <m>\mathbb{P}^{n}</m>, a projective frame consists of <m>n+2</m> suitably
+positioned points.</p>
+
+<p>In the projective plane, four points in general position determine a
+projective coordinate frame.</p>
+
+<p>This is one reason projective transformations have more freedom than affine
+transformations.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-four-points-projectivity">
+<title>Four Points Determine a Projectivity</title>
+<p>On the projective line, a projective transformation is uniquely determined
+by the images of three distinct points.</p>
+
+<p>In the projective plane, a projective transformation is determined by the
+images of a projective frame: four points in general position.</p>
+
+<p>The phrase <em>general position</em> here means that no three of the four
+points are collinear.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-fundamental-theorem-projective-geometry">
+<title>The Fundamental Theorem of Projective Geometry</title>
+<p>A central structural result explains why linear algebra appears throughout
+projective geometry.</p>
+
+<p>\begin{theorem}[Fundamental Theorem of Projective Geometry]
+For projective spaces of dimension at least <m>2</m>, incidence-preserving
+bijections are induced, under the standard hypotheses, by invertible
+semilinear transformations of the underlying vector spaces.
+\end{theorem}</p>
+
+<p>Over <m>\R</m>, with the usual regularity assumptions encountered in elementary
+real projective geometry, this leads to the matrix-based projective
+transformations developed above.</p>
+
+<p>The full semilinear formulation belongs to a more advanced treatment.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-conics">
+<title>Conics in Projective Geometry</title>
+<p>A projective conic is described by a homogeneous quadratic equation</p>
+
+<p>
+<md>\boxed{
+aX^2+bXY+cY^2+dXZ+eYZ+fZ^2=0.
+}</md>
+</p>
+
+<p>This can also be written using a symmetric matrix <m>Q</m>:</p>
+
+<p>
+<md>\boxed{
+\mathbf{X}^{T}Q\mathbf{X}=0,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\mathbf{X}
+=
+\begin{pmatrix}
+X\\Y\\Z
+\end{pmatrix}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-affine-conics-projective">
+<title>Affine Conics as Projective Conics</title>
+<p>The familiar affine conics arise by choosing an affine chart from a
+projective conic.</p>
+
+<p>For example:</p>
+
+<p>
+<md>x^2+y^2=1</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>X^2+Y^2-Z^2=0.</md>
+</p>
+
+<p>The parabola</p>
+
+<p>
+<md>y=x^2</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>YZ-X^2=0.</md>
+</p>
+
+<p>The hyperbola</p>
+
+<p>
+<md>xy=1</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>XY-Z^2=0.</md>
+</p>
+
+<p>Projective geometry places these apparently different affine curves into one
+common framework.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-conics-points-at-infinity">
+<title>Points at Infinity of Conics</title>
+<p>To find the points at infinity of a projective conic, set</p>
+
+<p>
+<md>Z=0.</md>
+</p>
+
+<p>For the projective parabola</p>
+
+<p>
+<md>YZ=X^2,</md>
+</p>
+
+<p>setting <m>Z=0</m> gives</p>
+
+<p>
+<md>X^2=0.</md>
+</p>
+
+<p>Hence</p>
+
+<p>
+<md>X=0,</md>
+</p>
+
+<p>and the point at infinity is</p>
+
+<p>
+<md>\boxed{[0:1:0].}</md>
+</p>
+
+<p>Thus a parabola has one projective point at infinity, counted with
+multiplicity.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-hyperbola-at-infinity">
+<title>Hyperbola at Infinity</title>
+<p>For</p>
+
+<p>
+<md>XY=Z^2,</md>
+</p>
+
+<p>setting</p>
+
+<p>
+<md>Z=0</md>
+</p>
+
+<p>gives</p>
+
+<p>
+<md>XY=0.</md>
+</p>
+
+<p>Therefore the points at infinity are</p>
+
+<p>
+<md>\boxed{
+[1:0:0]
+\qquad\text{and}\qquad
+[0:1:0].
+}</md>
+</p>
+
+<p>These correspond to the two asymptotic directions of the affine hyperbola.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-ellipse-at-infinity">
+<title>Ellipse at Infinity</title>
+<p>For the real projective circle</p>
+
+<p>
+<md>X^2+Y^2=Z^2,</md>
+</p>
+
+<p>setting <m>Z=0</m> gives</p>
+
+<p>
+<md>X^2+Y^2=0.</md>
+</p>
+
+<p>Over <m>\R</m>, this has no nonzero solution.</p>
+
+<p>Thus a real ellipse has no real points at infinity.</p>
+
+<p>Over <m>\C</m>, however,</p>
+
+<p>
+<md>X^2+Y^2=0</md>
+</p>
+
+<p>does have solutions.</p>
+
+<p>This illustrates why the underlying field matters in projective geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-classification-conics">
+<title>Projective Classification of Conics</title>
+<p>The affine distinction between</p>
+
+<p>
+<md>\text{ellipse},
+\qquad
+\text{parabola},
+\qquad
+\text{hyperbola}</md>
+</p>
+
+<p>depends on how the conic intersects the chosen line at infinity.</p>
+
+<p>Projectively, nondegenerate conics over a suitable field are much more
+closely related.</p>
+
+<p>Over <m>\R</m>, every nonempty nondegenerate real projective conic is
+projectively equivalent to a standard real conic.</p>
+
+<p>Thus much of the affine classification comes from the choice of which
+projective line is declared to be <q>at infinity.</q></p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-degenerate-projective-conics">
+<title>Degenerate Conics</title>
+<p>A homogeneous quadratic equation may fail to define a nondegenerate conic.</p>
+
+<p>For example,</p>
+
+<p>
+<md>X^2-Y^2=0</md>
+</p>
+
+<p>factors as</p>
+
+<p>
+<md>(X-Y)(X+Y)=0.</md>
+</p>
+
+<p>Thus it represents the union of two projective lines.</p>
+
+<p>The determinant of the associated symmetric matrix provides a useful test:
+a projective conic is nondegenerate when its matrix is nonsingular.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-pascals-theorem">
+<title>Pascal's Theorem</title>
+<p>Projective geometry contains powerful incidence theorems involving conics.</p>
+
+<p>\begin{theorem}[Pascal's Theorem]
+Let six points</p>
+
+<p>
+<md>A,B,C,D,E,F</md>
+</p>
+
+<p>lie on a nondegenerate projective conic.</p>
+
+<p>Let</p>
+
+<p>
+<md>P=AB\cap DE,</md>
+</p>
+
+<p>
+<md>Q=BC\cap EF,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>R=CD\cap FA.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{P,Q,R\text{ are collinear}.}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>The line containing these three points is called the <em>Pascal line</em>.</p>
+
+<p>Pascal's theorem is fundamentally projective: it depends on incidence rather
+than metric quantities.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-brianchons-theorem">
+<title>Brianchon's Theorem</title>
+<p>Projective duality transforms Pascal's theorem into another classical result.</p>
+
+<p>\begin{theorem}[Brianchon's Theorem]
+For a hexagon circumscribed about a nondegenerate conic, the three lines
+joining opposite vertices are concurrent.
+\end{theorem}</p>
+
+<p>Pascal and Brianchon illustrate the power of point-line duality.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-desargues-theorem">
+<title>Desargues' Theorem</title>
+<p>Another foundational projective theorem concerns two triangles.</p>
+
+<p>\begin{theorem}[Desargues' Theorem]
+Suppose two triangles are perspective from a point; that is, the lines
+joining corresponding vertices are concurrent.</p>
+
+<p>Then the intersections of corresponding sides are collinear.
+\end{theorem}</p>
+
+<p>Schematically,</p>
+
+<p>
+<md>\boxed{
+\text{perspective from a point}
+\Longrightarrow
+\text{perspective from a line}.
+}</md>
+</p>
+
+<p>The converse is the dual statement.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-linear-algebra">
+<title>Projective Geometry and Linear Algebra</title>
+<p>Much of projective geometry is linear algebra viewed modulo nonzero scalar
+multiplication.</p>
+
+<p>The correspondence includes:</p>
+
+<p>
+<md>\begin{array}{c|c}
+\textbf{Projective Geometry} &amp; \textbf{Linear Algebra}\\
+\hline
+\text{point of }\mathbb{P}^{n} &amp;
+\text{one-dimensional subspace of }\R^{n+1}\\
+\text{projective line} &amp;
+\text{two-dimensional subspace}\\
+\text{projective hyperplane} &amp;
+\text{kernel of a nonzero linear functional}\\
+\text{projective transformation} &amp;
+\text{invertible linear map modulo scalars}\\
+\text{incidence} &amp;
+\text{subspace containment}
+\end{array}</md>
+</p>
+
+<p>This relationship allows geometric questions to be translated into matrix
+and subspace computations.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-subspaces">
+<title>Projective Subspaces</title>
+<p>Let</p>
+
+<p>
+<md>W\subseteq\R^{n+1}</md>
+</p>
+
+<p>be a linear subspace of dimension <m>k+1</m>.</p>
+
+<p>Its one-dimensional subspaces form a projective subspace</p>
+
+<p>
+<md>\mathbb{P}(W)</md>
+</p>
+
+<p>of projective dimension <m>k</m>.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\dim\mathbb{P}(W)=\dim W-1.
+}</md>
+</p>
+
+<p>This one-dimension shift is fundamental in projective geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-hyperplanes">
+<title>Projective Hyperplanes</title>
+<p>A projective hyperplane in <m>\mathbb{P}^{n}</m> is given by</p>
+
+<p>
+<md>\boxed{
+a_0X_0+\cdots+a_nX_n=0,
+}</md>
+</p>
+
+<p>where the coefficients are not all zero.</p>
+
+<p>Its projective dimension is</p>
+
+<p>
+<md>n-1.</md>
+</p>
+
+<p>In <m>\mathbb{P}^{2}</m>, hyperplanes are projective lines.</p>
+
+<p>In <m>\mathbb{P}^{3}</m>, hyperplanes are projective planes.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-dimension-formula">
+<title>Dimension Formula</title>
+<p>Linear algebra provides an important guide to projective intersections.</p>
+
+<p>If projective subspaces <m>A</m> and <m>B</m> intersect in the expected way, their
+dimensions satisfy the heuristic</p>
+
+<p>
+<md>\boxed{
+\dim(A\cap B)
+\geq
+\dim A+\dim B-n.
+}</md>
+</p>
+
+<p>For example, two projective lines in <m>\mathbb{P}^{2}</m> have</p>
+
+<p>
+<md>1+1-2=0,</md>
+</p>
+
+<p>so their intersection is expected to be zero-dimensional: a point.</p>
+
+<p>This is the linear-algebraic reason that projective lines in the plane always
+meet.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-affine-space-projective-chart">
+<title>Affine Space as a Projective Chart</title>
+<p>The affine plane is not separate from the projective plane.</p>
+
+<p>It appears as the subset</p>
+
+<p>
+<md>Z\neq0.</md>
+</p>
+
+<p>By normalizing <m>Z=1</m>, we obtain</p>
+
+<p>
+<md>[X:Y:Z]
+\longmapsto
+\left(\frac{X}{Z},\frac{Y}{Z}\right).</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}^{2}(\R)
+=
+\text{affine chart}
+\cup
+\text{line at infinity}.
+}</md>
+</p>
+
+<p>More precisely,</p>
+
+<p>
+<md>\mathbb{P}^{2}(\R)\setminus\{Z=0\}
+\cong
+\R^2.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-other-affine-charts">
+<title>Other Affine Charts</title>
+<p>The choice</p>
+
+<p>
+<md>Z\neq0</md>
+</p>
+
+<p>is not special.</p>
+
+<p>Projective space can be covered by coordinate charts</p>
+
+<p>
+<md>U_i=\{[X_0:\cdots:X_n]:X_i\neq0\}.</md>
+</p>
+
+<p>Inside <m>U_i</m>, normalize</p>
+
+<p>
+<md>X_i=1.</md>
+</p>
+
+<p>Each <m>U_i</m> behaves like affine <m>n</m>-space.</p>
+
+<p>For the projective plane,</p>
+
+<p>
+<md>U_X,\qquad U_Y,\qquad U_Z</md>
+</p>
+
+<p>provide three standard affine charts.</p>
+
+<p>This viewpoint becomes fundamental in Algebraic Geometry and manifold
+theory.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-closure">
+<title>Projective Closure</title>
+<p>An affine geometric object can often be completed by adding its points at
+infinity.</p>
+
+<p>This enlarged object is its <em>projective closure</em>.</p>
+
+<p>For example, the affine curve</p>
+
+<p>
+<md>xy=1</md>
+</p>
+
+<p>has projective closure</p>
+
+<p>
+<md>XY=Z^2.</md>
+</p>
+
+<p>The projective closure includes the two points</p>
+
+<p>
+<md>[1:0:0],
+\qquad
+[0:1:0].</md>
+</p>
+
+<p>These points encode information about the asymptotic behavior of the affine
+curve.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-algebraic-geometry">
+<title>Projective Geometry and Algebraic Geometry</title>
+<p>Projective geometry plays a central role in algebraic geometry.</p>
+
+<p>Polynomial equations often behave better after projective completion because
+intersections that escape to infinity in affine space become visible.</p>
+
+<p>For example, two affine curves may appear not to intersect because their
+intersection occurs at infinity.</p>
+
+<p>Projective geometry provides a setting in which such behavior can be studied
+uniformly.</p>
+
+<p>The systematic theory of projective varieties, homogeneous ideals, and
+projective schemes belongs to Algebraic Geometry and Commutative Algebra.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-bezout-preview">
+<title>Bézout's Theorem Preview</title>
+<p>One of the most important reasons for projective completion is intersection
+theory.</p>
+
+<p>Very roughly, over an algebraically closed field:</p>
+
+<p>\begin{theorem}[Bézout's Theorem --- Plane-Curve Form]
+Two projective plane curves of degrees <m>m</m> and <m>n</m>, having no common
+component, intersect in exactly</p>
+
+<p>
+<md>\boxed{mn}</md>
+</p>
+
+<p>points when intersections are counted with appropriate multiplicities.
+\end{theorem}</p>
+
+<p>This theorem requires concepts developed later in Algebraic Geometry.</p>
+
+<p>Its projective form is much cleaner than the corresponding affine statement
+because intersections at infinity are included automatically.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-curves-meeting-infinity">
+<title>Example: Curves Meeting at Infinity</title>
+<p>Consider the affine curves</p>
+
+<p>
+<md>y=x^2</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y=x^2+1.</md>
+</p>
+
+<p>They have no affine intersection.</p>
+
+<p>Homogenizing gives</p>
+
+<p>
+<md>YZ=X^2</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>YZ=X^2+Z^2.</md>
+</p>
+
+<p>At infinity, set</p>
+
+<p>
+<md>Z=0.</md>
+</p>
+
+<p>Both equations reduce to</p>
+
+<p>
+<md>X=0.</md>
+</p>
+
+<p>Thus both projective closures contain</p>
+
+<p>
+<md>\boxed{[0:1:0].}</md>
+</p>
+
+<p>The curves therefore meet at infinity, with intersection multiplicity
+accounting for the full projective intersection count.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-computer-vision">
+<title>Projective Geometry and Computer Vision</title>
+<p>Camera images naturally produce projective transformations.</p>
+
+<p>A three-dimensional scene is projected onto a two-dimensional image plane.</p>
+
+<p>Straight lines in space typically appear as straight lines in the image, but:</p>
+
+<p>
+<ul>
+<li>
+<p>lengths change;</p>
+</li>
+<li>
+<p>angles change;</p>
+</li>
+<li>
+<p>parallel lines may appear to meet;</p>
+</li>
+<li>
+<p>shapes undergo perspective distortion.</p>
+</li>
+</ul>
+</p>
+
+<p>These are precisely the kinds of changes modeled by projective geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-image-homographies">
+<title>Homographies in Images</title>
+<p>Two images of the same planar surface are related, under the ideal pinhole
+camera model, by a projective transformation called a <em>homography</em>.</p>
+
+<p>In homogeneous coordinates,</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}'
+\sim
+H\mathbf{x},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>H</md>
+</p>
+
+<p>is an invertible <m>3\times3</m> matrix.</p>
+
+<p>The symbol</p>
+
+<p>
+<md>\sim</md>
+</p>
+
+<p>here means equality up to multiplication by a nonzero scalar.</p>
+
+<p>This differs from its use for asymptotic equivalence in Analytic Number
+Theory; the intended meaning is determined by context.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-vanishing-points">
+<title>Vanishing Points</title>
+<p>Parallel lines in a three-dimensional scene often project to image lines
+meeting at a common vanishing point.</p>
+
+<p>Different families of parallel lines produce different vanishing points.</p>
+
+<p>For example, a rectangular room may produce three principal vanishing
+directions corresponding to its three spatial axes.</p>
+
+<p>Vanishing points can be used to infer:</p>
+
+<p>
+<ul>
+<li>
+<p>camera orientation;</p>
+</li>
+<li>
+<p>perspective structure;</p>
+</li>
+<li>
+<p>scene geometry;</p>
+</li>
+<li>
+<p>horizon lines.</p>
+</li>
+</ul>
+</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-horizon-line">
+<title>The Horizon Line</title>
+<p>In perspective geometry, vanishing points corresponding to directions within
+a common plane lie on a projective line.</p>
+
+<p>For the ground plane, this line is often visually interpreted as the horizon.</p>
+
+<p>Thus the horizon is a projective image of the line at infinity of a plane in
+the scene.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-art">
+<title>Projective Geometry and Art</title>
+<p>The mathematical development of projective geometry was strongly motivated
+by perspective.</p>
+
+<p>Artists learned to represent three-dimensional scenes using:</p>
+
+<p>
+<ul>
+<li>
+<p>horizon lines;</p>
+</li>
+<li>
+<p>vanishing points;</p>
+</li>
+<li>
+<p>perspective grids;</p>
+</li>
+<li>
+<p>foreshortening.</p>
+</li>
+</ul>
+</p>
+
+<p>Projective geometry provides a mathematical framework for these constructions.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-transformation-hierarchy">
+<title>Hierarchy of Transformation Groups</title>
+<p>Different geometries can be characterized by the transformations they allow.</p>
+
+<p>A useful hierarchy is</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[
+node distance=8mm,
+every node/.style={
+draw,
+rounded corners,
+minimum width=4.7cm,
+minimum height=8mm,
+align=center
+}
+]
+\node (e) {Euclidean / Isometric};
+\node (s) [below=of e] {Similarity};
+\node (a) [below=of s] {Affine};
+\node (p) [below=of a] {Projective};</p>
+
+<p>\draw[-{Latex[length=3mm]},thick] (e)--(s);
+\draw[-{Latex[length=3mm]},thick] (s)--(a);
+\draw[-{Latex[length=3mm]},thick] (a)--(p);
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>As the transformation group grows, fewer geometric quantities remain
+invariant.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-comparison-geometric-invariants">
+<title>Comparison of Geometric Invariants</title>
+<p>
+<md>\begin{array}{c|c|c|c}
+\textbf{Property}
+&amp; \textbf{Euclidean}
+&amp; \textbf{Affine}
+&amp; \textbf{Projective}\\
+\hline
+incidence &amp; \checkmark &amp; \checkmark &amp; \checkmark\\
+collinearity &amp; \checkmark &amp; \checkmark &amp; \checkmark\\
+parallelism &amp; \checkmark &amp; \checkmark &amp; \text{no}\\
+length ratios on a line &amp; \checkmark &amp; \checkmark &amp; \text{no}\\
+cross-ratio &amp; \checkmark &amp; \checkmark &amp; \checkmark\\
+angles &amp; \checkmark &amp; \text{no} &amp; \text{no}\\
+lengths &amp; \checkmark &amp; \text{no} &amp; \text{no}
+\end{array}</md>
+</p>
+
+<p>Here <q>Euclidean</q> refers specifically to isometries when lengths are listed
+as preserved.</p>
+
+<p>Similarity transformations preserve angles and ratios of lengths but may
+rescale absolute length.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-treating-homogeneous-coordinates-as-unique">
+<title>Treating Homogeneous Coordinates as Unique</title>
+<p>The triples</p>
+
+<p>
+<md>[X:Y:Z]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>[\lambda X:\lambda Y:\lambda Z]</md>
+</p>
+
+<p>represent the same projective point whenever</p>
+
+<p>
+<md>\lambda\neq0.</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-allowing-the-zero-vector">
+<title>Allowing the Zero Vector</title>
+<p>The triple</p>
+
+<p>
+<md>[0:0:0]</md>
+</p>
+
+<p>does not define a projective point.</p>
+
+<p>Homogeneous coordinates must not all vanish simultaneously.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-dividing-by-z-when-z-0">
+<title>Dividing by <m>Z</m> When <m>Z=0</m></title>
+<p>The conversion</p>
+
+<p>
+<md>(x,y)=
+\left(
+\frac{X}{Z},
+\frac{Y}{Z}
+\right)</md>
+</p>
+
+<p>is valid only when</p>
+
+<p>
+<md>Z\neq0.</md>
+</p>
+
+<p>Points with <m>Z=0</m> lie on the line at infinity of the chosen affine chart.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-thinking-points-at-infinity-are-extremely-distant-points">
+<title>Thinking Points at Infinity Are Extremely Distant Points</title>
+<p>A point at infinity is not an ordinary Euclidean point located at an
+infinitely large distance.</p>
+
+<p>It represents a projective direction.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-all-parallel-lines-share-one-point-at-infinity">
+<title>Assuming All Parallel Lines Share One Point at Infinity</title>
+<p>Only parallel lines with the same direction share the same point at infinity.</p>
+
+<p>Different directions correspond to different points on the line at infinity.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-projective-transformations-preserve-parallelism">
+<title>Assuming Projective Transformations Preserve Parallelism</title>
+<p>General projective transformations do not preserve the distinguished affine
+line at infinity.</p>
+
+<p>Thus parallel lines may become intersecting affine lines and conversely.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-projective-transformations-preserve-midpoints">
+<title>Assuming Projective Transformations Preserve Midpoints</title>
+<p>Midpoints depend on affine ratios.</p>
+
+<p>General projective transformations do not preserve ordinary midpoint
+structure.</p>
+
+<p>The cross-ratio, not ordinary distance ratio, is the appropriate projective
+invariant.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-to-homogenize-every-term-to-the-same-degree">
+<title>Forgetting to Homogenize Every Term to the Same Degree</title>
+<p>If an affine polynomial has degree <m>d</m>, every term of its projective
+homogenization must have total degree <m>d</m>.</p>
+
+<p>For example,</p>
+
+<p>
+<md>y=x^2+1</md>
+</p>
+
+<p>does not become</p>
+
+<p>
+<md>Y=X^2+Z.</md>
+</p>
+
+<p>The correct homogeneous equation is</p>
+
+<p>
+<md>\boxed{YZ=X^2+Z^2.}</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-projective-and-affine-equivalence">
+<title>Confusing Projective and Affine Equivalence</title>
+<p>Affine transformations form a proper subclass of projective
+transformations.</p>
+
+<p>Two figures may be projectively equivalent without being affinely equivalent.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-applications">
+<title>Applications and Connections</title>
+<p>\begin{applicationbox}
+<em>Affine Geometry.</em>
+Affine space appears as a coordinate chart inside projective space. Points at
+infinity encode affine directions.</p>
+
+<p>\medskip</p>
+
+<p><em>Linear Algebra.</em>
+Projective points are one-dimensional vector subspaces, projective
+transformations arise from invertible matrices, and incidence can be studied
+using determinants and linear dependence.</p>
+
+<p>\medskip</p>
+
+<p><em>Algebraic Geometry.</em>
+Projective completion adds points at infinity to algebraic varieties and
+provides a natural setting for intersection theory.</p>
+
+<p>\medskip</p>
+
+<p><em>Computer Vision.</em>
+Camera projection, planar homographies, vanishing points, and perspective
+reconstruction are fundamentally projective.</p>
+
+<p>\medskip</p>
+
+<p><em>Computer Graphics.</em>
+Homogeneous coordinates make perspective transformations compatible with
+matrix computation.</p>
+
+<p>\medskip</p>
+
+<p><em>Art and Architecture.</em>
+Perspective drawing uses vanishing points, horizon lines, and projective
+constructions.</p>
+
+<p>\medskip</p>
+
+<p><em>Conic Sections.</em>
+Ellipses, parabolas, and hyperbolas become manifestations of projective
+conics viewed relative to different affine charts.</p>
+
+<p>\medskip</p>
+
+<p><em>Topology.</em>
+Real and complex projective spaces are important topological spaces whose
+global structure differs significantly from ordinary Euclidean space.</p>
+
+<p>\medskip</p>
+
+<p><em>Differential Geometry.</em>
+Projective structures and projective transformations appear in the study of
+manifolds, geodesics, and geometric structures.
+\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>[1:2:3]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>[2:4:6]</md>
+</p>
+
+<p>represent the same projective point.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>[1:2:3]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>[2:4:5]</md>
+</p>
+
+<p>represent the same projective point.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why</p>
+
+<p>
+<md>[0:0:0]</md>
+</p>
+
+<p>is not a projective point.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Convert</p>
+
+<p>
+<md>(3,-2)</md>
+</p>
+
+<p>to homogeneous projective coordinates.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Convert</p>
+
+<p>
+<md>[12:6:3]</md>
+</p>
+
+<p>to affine coordinates.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why</p>
+
+<p>
+<md>[2:5:0]</md>
+</p>
+
+<p>cannot be converted to affine coordinates in the chart <m>Z\neq0</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the projective point at infinity corresponding to direction</p>
+
+<p>
+<md>(3,4).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the point at infinity shared by all lines of slope <m>2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Homogenize</p>
+
+<p>
+<md>x+y=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Homogenize</p>
+
+<p>
+<md>x^2+xy+y^2=4.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Homogenize</p>
+
+<p>
+<md>y=x^3+x.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Dehomogenize</p>
+
+<p>
+<md>X^2+XY+Y^2-4Z^2=0</md>
+</p>
+
+<p>in the chart <m>Z=1</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the projective line through</p>
+
+<p>
+<md>[1:0:1]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>[1:1:1].</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the line through</p>
+
+<p>
+<md>[2:1:1]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>[0:3:1].</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the intersection of</p>
+
+<p>
+<md>X+Y-Z=0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>X-Y=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the projective intersection of the affine parallel lines</p>
+
+<p>
+<md>y=2x+1</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y=2x-4.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the common point at infinity of the lines</p>
+
+<p>
+<md>x=1</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>x=7.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>[1:0:1],\qquad
+[0:1:1],\qquad
+[1:1:2]</md>
+</p>
+
+<p>are collinear.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use a determinant to determine whether</p>
+
+<p>
+<md>[1:1:1],\qquad
+[2:3:1],\qquad
+[3:5:1]</md>
+</p>
+
+<p>are collinear.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the lines</p>
+
+<p>
+<md>X=0,\qquad
+Y=0,\qquad
+X+Y=0</md>
+</p>
+
+<p>are concurrent.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the cross-ratio</p>
+
+<p>
+<md>(0,1;3,4)</md>
+</p>
+
+<p>using the convention from this section.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>(-1,0;1,2).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find <m>d</m> such that</p>
+
+<p>
+<md>(0,1;2,d)=-1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the transformation</p>
+
+<p>
+<md>x\mapsto\frac{x+1}{x+2}</md>
+</p>
+
+<p>is a projective transformation of the projective line.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the matrix representing</p>
+
+<p>
+<md>x\mapsto\frac{2x+3}{x+4}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine the image of</p>
+
+<p>
+<md>[1:2:1]</md>
+</p>
+
+<p>under</p>
+
+<p>
+<md>H=
+\begin{pmatrix}
+1&amp;1&amp;0\\
+0&amp;1&amp;2\\
+0&amp;0&amp;1
+\end{pmatrix}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Convert the result of the previous exercise to affine coordinates.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the points at infinity of</p>
+
+<p>
+<md>XY=Z^2.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the real points at infinity of</p>
+
+<p>
+<md>X^2+4Y^2=Z^2.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the point at infinity of</p>
+
+<p>
+<md>YZ=X^2.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the projective closure of</p>
+
+<p>
+<md>y=x^2+2x+1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the projective closure of</p>
+
+<p>
+<md>x^2-y^2=1</md>
+</p>
+
+<p>and determine its points at infinity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain geometrically why the points at infinity of a hyperbola are related
+to its asymptotic directions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that an invertible projective transformation maps projective lines to
+projective lines.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that multiplying a projective transformation matrix by a nonzero scalar
+does not change the induced projective transformation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why every invertible affine transformation determines a projective
+transformation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of a projective transformation that does not preserve
+parallelism in an affine chart.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the duality between the statements</p>
+
+<p>
+<md>\text{two points determine a line}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\text{two lines determine a point}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a projective point in <m>\mathbb{P}^{n}</m> corresponds to a
+one-dimensional subspace of <m>\R^{n+1}</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If <m>W\subseteq\R^{6}</m> has dimension <m>4</m>, determine the dimension of
+<m>\mathbb{P}(W)</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why</p>
+
+<p>
+<md>\mathbb{P}^{2}(\R)\setminus\{Z=0\}</md>
+</p>
+
+<p>is naturally identified with <m>\R^2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe how a vanishing point in a perspective image can be interpreted
+projectively.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate how the six possible orderings of four points change the value
+of their cross-ratio. Show that only six values can arise from a fixed
+cross-ratio <m>\lambda</m>:</p>
+
+<p>
+<md>\lambda,\qquad
+\frac1{\lambda},\qquad
+1-\lambda,\qquad
+\frac1{1-\lambda},\qquad
+\frac{\lambda}{\lambda-1},\qquad
+\frac{\lambda-1}{\lambda}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the cross-ratio invariance theorem for</p>
+
+<p>
+<md>T(x)=\frac{ax+b}{cx+d}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explore the projective closure of two parallel affine lines and show
+algebraically that they intersect on the line at infinity.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-summary">
+<title>Conceptual Summary</title>
+<p>Projective geometry enlarges affine geometry by adding points at infinity.</p>
+
+<p>A projective point is represented by homogeneous coordinates</p>
+
+<p>
+<md>\boxed{
+[X_0:\cdots:X_n]
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>[X_0:\cdots:X_n]
+=
+[\lambda X_0:\cdots:\lambda X_n],
+\qquad
+\lambda\neq0.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}^{n}(\R)
+=
+(\R^{n+1}\setminus\{\mathbf{0}\})/\sim.
+}</md>
+</p>
+
+<p>Affine space appears as a projective chart.</p>
+
+<p>For the projective plane,</p>
+
+<p>
+<md>(x,y)
+\longleftrightarrow
+[x:y:1].</md>
+</p>
+
+<p>The line at infinity is</p>
+
+<p>
+<md>\boxed{Z=0.}</md>
+</p>
+
+<p>A direction</p>
+
+<p>
+<md>(a,b)</md>
+</p>
+
+<p>corresponds to the point</p>
+
+<p>
+<md>\boxed{[a:b:0].}</md>
+</p>
+
+<p>A projective line has equation</p>
+
+<p>
+<md>\boxed{
+aX+bY+cZ=0.
+}</md>
+</p>
+
+<p>The line through two points is</p>
+
+<p>
+<md>\boxed{\ell=P\times Q,}</md>
+</p>
+
+<p>while the intersection of two lines is</p>
+
+<p>
+<md>\boxed{P=\ell_1\times\ell_2.}</md>
+</p>
+
+<p>Projective transformations are induced by invertible matrices:</p>
+
+<p>
+<md>\boxed{
+[\mathbf{x}]
+\mapsto
+[A\mathbf{x}].
+}</md>
+</p>
+
+<p>Matrices differing by nonzero scalar multiples define the same projective
+transformation.</p>
+
+<p>General projective transformations preserve incidence and cross-ratio but
+not lengths, angles, ordinary ratios, or parallelism.</p>
+
+<p>The cross-ratio</p>
+
+<p>
+<md>\boxed{
+(a,b;c,d)
+=
+\frac{(c-a)(d-b)}
+     {(c-b)(d-a)}
+}</md>
+</p>
+
+<p>is a fundamental projective invariant.</p>
+
+<p>Affine polynomial equations are embedded into projective geometry by
+homogenization.</p>
+
+<p>For example,</p>
+
+<p>
+<md>x^2+y^2=1</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>\boxed{
+X^2+Y^2=Z^2.
+}</md>
+</p>
+
+<p>Projective completion makes points at infinity part of the geometry and
+provides a unified framework for conics, intersections, perspective,
+computer vision, and algebraic geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-05-projective-geometry-subsec-projective-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Projective Geometry extends Affine Geometry from
+<xref ref="sec-affine-geometry" /> by adding points at infinity and treating
+parallel and intersecting lines uniformly. Homogeneous coordinates connect
+projective geometry directly with Linear Algebra, where projective points
+correspond to one-dimensional subspaces and projective transformations arise
+from invertible matrices modulo scalar multiplication. The projective
+completion of affine polynomial equations anticipates Algebraic Geometry,
+where projective varieties and intersection theory become fundamental.
+Projective conics also unify many constructions from Euclidean and Analytic
+Geometry. The next section, Non-Euclidean Geometry, changes a different part
+of the classical geometric framework by replacing Euclid's parallel
+postulate and studying geometries of nonzero curvature.</p>
+</remark>
+</subsection>
+
 </section>

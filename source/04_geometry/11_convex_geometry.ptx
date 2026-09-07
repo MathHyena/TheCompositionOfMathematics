@@ -1,9 +1,3159 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-04-geometry-11-convex-geometry">
-  <title>Convex Geometry</title>
+<section xml:id="sec-convex-geometry">
+<title>Convex Geometry</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Euclidean Geometry, Analytic Geometry, Vector Geometry,
+Affine Geometry, and basic Linear Algebra.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define convex sets and recognize common examples;</p>
+</li>
+<li>
+<p>test whether a set is convex;</p>
+</li>
+<li>
+<p>distinguish convex combinations from affine combinations;</p>
+</li>
+<li>
+<p>construct and interpret convex hulls;</p>
+</li>
+<li>
+<p>define extreme points and supporting hyperplanes;</p>
+</li>
+<li>
+<p>work with half-spaces and hyperplanes;</p>
+</li>
+<li>
+<p>define convex cones and polyhedral sets;</p>
+</li>
+<li>
+<p>distinguish polytopes and polyhedra;</p>
+</li>
+<li>
+<p>describe polytopes using vertices and inequalities;</p>
+</li>
+<li>
+<p>state and apply Carath\'eodory's theorem;</p>
+</li>
+<li>
+<p>explain Helly's theorem and Radon's theorem;</p>
+</li>
+<li>
+<p>state the hyperplane separation principle;</p>
+</li>
+<li>
+<p>define convex functions geometrically;</p>
+</li>
+<li>
+<p>explain the epigraph of a convex function;</p>
+</li>
+<li>
+<p>recognize strictly and strongly convex behavior;</p>
+</li>
+<li>
+<p>understand the geometric role of supporting functions;</p>
+</li>
+<li>
+<p>explain dual and polar convex sets;</p>
+</li>
+<li>
+<p>work with Minkowski sums;</p>
+</li>
+<li>
+<p>recognize basic volume and symmetry ideas in convex bodies;</p>
+</li>
+<li>
+<p>explain connections with optimization, computational geometry,
+    probability, and functional analysis.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-what-is-convex-geometry">
+<title>What Is Convex Geometry?</title>
+<p>Convex geometry studies geometric sets that contain the entire line segment
+between any two of their points.</p>
+
+<p>This apparently simple condition produces a remarkably rich theory.</p>
+
+<p>Convexity appears throughout</p>
+
+<p>
+<md>\boxed{
+\text{geometry},
+\quad
+\text{optimization},
+\quad
+\text{linear algebra},
+\quad
+\text{analysis},
+\quad
+\text{probability},
+\quad
+\text{economics},
+\quad
+\text{data science}.
+}</md>
+</p>
+
+<p>The fundamental idea can be stated informally:</p>
+
+<p>\begin{conceptbox}
+A set is convex if traveling along a straight line from one point of the set
+to another never requires leaving the set.
+\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-line-segments">
+<title>Line Segments in Vector Spaces</title>
+<p>Let</p>
+
+<p>
+<md>x,y\in\R^n.</md>
+</p>
+
+<p>The line segment joining <m>x</m> and <m>y</m> consists of points</p>
+
+<p>
+<md>\boxed{
+(1-t)x+ty,
+\qquad
+0\leq t\leq1.
+}</md>
+</p>
+
+<p>When</p>
+
+<p>
+<md>t=0,</md>
+</p>
+
+<p>the point is <m>x</m>, and when</p>
+
+<p>
+<md>t=1,</md>
+</p>
+
+<p>the point is <m>y</m>.</p>
+
+<p>Values between <m>0</m> and <m>1</m> trace the segment connecting them.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-sets">
+<title>Convex Sets</title>
+<definition>
+<title>Convex Set</title>
+<statement>
+<p>A set</p>
+
+<p>
+<md>C\subseteq\R^n</md>
+</p>
+
+<p>is <em>convex</em> if for every <m>x,y\in C</m> and every <m>t\in[0,1]</m>,</p>
+
+<p>
+<md>\boxed{
+(1-t)x+ty\in C.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>Thus the complete segment between any two points of <m>C</m> lies inside <m>C</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-visualizing-convexity">
+<title>Visualizing Convexity</title>
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=.9]</p>
+
+<p>\begin{scope}[xshift=-3.8cm]
+\draw[thick,fill=gray!12]
+plot[smooth cycle,tension=.8]
+coordinates{
+(-1.7,0)
+(-1.1,1.4)
+(.5,1.7)
+(1.7,.7)
+(1.5,-1)
+(0,-1.5)
+(-1.4,-1)
+};</p>
+
+<p>\fill (-.9,.7) circle (2pt) node[above left] {$x$};
+\fill (.9,-.6) circle (2pt) node[below right] {$y$};
+\draw[thick] (-.9,.7)--(.9,-.6);</p>
+
+<p>\node at (0,-2.1) {<em>Convex</em>};
+\end{scope}</p>
+
+<p>\begin{scope}[xshift=3.8cm]
+\draw[thick,fill=gray!12]
+plot[smooth cycle,tension=.7]
+coordinates{
+(-1.8,.2)
+(-1.2,1.5)
+(.2,1)
+(1.6,1.5)
+(1.2,.1)
+(1.7,-1.3)
+(.2,-.8)
+(-1.4,-1.5)
+};</p>
+
+<p>\fill (-1,.8) circle (2pt) node[above left] {$x$};
+\fill (1,-.8) circle (2pt) node[below right] {$y$};
+\draw[thick] (-1,.8)--(1,-.8);</p>
+
+<p>\node at (0,-2.1) {<em>Nonconvex</em>};
+\end{scope}</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>For the convex set, every segment connecting points of the set remains
+inside.</p>
+
+<p>For the nonconvex set, some connecting segment leaves the set.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-basic-examples">
+<title>Basic Examples of Convex Sets</title>
+<p>Common convex sets include:</p>
+
+<p>
+<md>\boxed{\R^n}</md>
+</p>
+
+<p>and the empty set,</p>
+
+<p>
+<md>\boxed{\varnothing}.</md>
+</p>
+
+<p>Every affine subspace is convex.</p>
+
+<p>Every line and line segment is convex.</p>
+
+<p>Every closed Euclidean ball</p>
+
+<p>
+<md>\boxed{
+B=
+\{x\in\R^n:\|x-c\|\leq r\}
+}</md>
+</p>
+
+<p>is convex.</p>
+
+<p>Every half-space is convex.</p>
+
+<p>Triangles, rectangles, and ordinary solid polygons without inward
+indentations are convex.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-nonconvex-examples">
+<title>Examples of Nonconvex Sets</title>
+<p>A circle considered only as its boundary,</p>
+
+<p>
+<md>\boxed{
+\{x\in\R^2:\|x\|=1\},
+}</md>
+</p>
+
+<p>is not convex.</p>
+
+<p>Two disconnected disks are generally not convex.</p>
+
+<p>An annulus</p>
+
+<p>
+<md>\boxed{
+\{x\in\R^2:1\leq\|x\|\leq2\}
+}</md>
+</p>
+
+<p>is not convex because a segment between opposite points may pass through the
+missing center.</p>
+
+<p>A polygon containing an inward indentation is not convex.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-testing-convexity">
+<title>Testing Convexity</title>
+<p>To prove that <m>C</m> is convex, begin with arbitrary</p>
+
+<p>
+<md>x,y\in C</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>t\in[0,1].</md>
+</p>
+
+<p>Then show that</p>
+
+<p>
+<md>\boxed{
+(1-t)x+ty\in C.
+}</md>
+</p>
+
+<p>To prove that a set is not convex, it is enough to find</p>
+
+<p>
+<md>x,y\in C</md>
+</p>
+
+<p>and some</p>
+
+<p>
+<md>t\in(0,1)</md>
+</p>
+
+<p>such that</p>
+
+<p>
+<md>\boxed{
+(1-t)x+ty\notin C.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-worked-convex-interval">
+<title>Worked Example: A Convex Interval</title>
+<example>
+<title>Prove That an Interval Is Convex</title>
+<p>Consider</p>
+
+<p>
+<md>C=[a,b]\subseteq\R.</md>
+</p>
+
+<p>Take</p>
+
+<p>
+<md>x,y\in[a,b]</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>t\in[0,1].</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>a\leq x\leq b</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>a\leq y\leq b,</md>
+</p>
+
+<p>multiplying by the nonnegative quantities <m>1-t</m> and <m>t</m> gives</p>
+
+<p>
+<md>(1-t)a\leq(1-t)x\leq(1-t)b</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>ta\leq ty\leq tb.</md>
+</p>
+
+<p>Adding,</p>
+
+<p>
+<md>a
+\leq
+(1-t)x+ty
+\leq
+b.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>(1-t)x+ty\in[a,b].</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+[a,b]\text{ is convex.}
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-worked-nonconvex-set">
+<title>Worked Example: A Nonconvex Set</title>
+<example>
+<title>Show That the Unit Circle Is Not Convex</title>
+<p>Consider</p>
+
+<p>
+<md>C=
+\{(x,y)\in\R^2:x^2+y^2=1\}.</md>
+</p>
+
+<p>Choose</p>
+
+<p>
+<md>u=(1,0)</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>v=(-1,0).</md>
+</p>
+
+<p>Both belong to <m>C</m>.</p>
+
+<p>Their midpoint is</p>
+
+<p>
+<md>\frac12u+\frac12v
+=
+(0,0).</md>
+</p>
+
+<p>But</p>
+
+<p>
+<md>0^2+0^2\neq1.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>(0,0)\notin C.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+C\text{ is not convex.}
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-combinations">
+<title>Convex Combinations</title>
+<definition>
+<title>Convex Combination</title>
+<statement>
+<p>A <em>convex combination</em> of points</p>
+
+<p>
+<md>x_1,\ldots,x_m</md>
+</p>
+
+<p>is an expression</p>
+
+<p>
+<md>\boxed{
+\lambda_1x_1+\cdots+\lambda_mx_m
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\lambda_i\geq0
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\lambda_1+\cdots+\lambda_m=1.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>The lowercase Greek letter</p>
+
+<p>
+<md>\lambda</md>
+</p>
+
+<p>is read <q>lambda.</q></p>
+
+<p>The coefficients <m>\lambda_i</m> are called <em>weights</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-vs-affine-combinations">
+<title>Convex Versus Affine Combinations</title>
+<p>An affine combination satisfies</p>
+
+<p>
+<md>\sum_{i=1}^{m}\lambda_i=1,</md>
+</p>
+
+<p>but the coefficients may be negative.</p>
+
+<p>A convex combination additionally requires</p>
+
+<p>
+<md>\boxed{
+\lambda_i\geq0.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\text{convex combination}
+\Longrightarrow
+\text{affine combination}.
+}</md>
+</p>
+
+<p>The converse is not generally true.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-combination-characterization">
+<title>Characterization by Convex Combinations</title>
+<p>A set <m>C</m> is convex if and only if every finite convex combination of
+points of <m>C</m> remains in <m>C</m>.</p>
+
+<p>Thus if</p>
+
+<p>
+<md>x_1,\ldots,x_m\in C,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\sum_{i=1}^{m}\lambda_ix_i\in C
+}</md>
+</p>
+
+<p>whenever</p>
+
+<p>
+<md>\lambda_i\geq0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\sum_i\lambda_i=1.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-hulls">
+<title>Convex Hulls</title>
+<definition>
+<title>Convex Hull</title>
+<statement>
+<p>The <em>convex hull</em> of a set <m>S\subseteq\R^n</m>, written</p>
+
+<p>
+<md>\boxed{
+\operatorname{conv}(S),
+}</md>
+</p>
+
+<p>is the smallest convex set containing <m>S</m>.</p>
+</statement>
+</definition>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+\operatorname{conv}(S)
+=
+\left\{
+\sum_{i=1}^{m}\lambda_ix_i:
+x_i\in S,\;
+\lambda_i\geq0,\;
+\sum_{i=1}^{m}\lambda_i=1
+\right\}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-hull-geometric-meaning">
+<title>Geometric Meaning of the Convex Hull</title>
+<p>Informally, imagine placing an elastic band around a collection of points.</p>
+
+<p>When released, the band contracts around the outermost points.</p>
+
+<p>The enclosed region represents their convex hull.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=1]</p>
+
+<p>\coordinate (A) at (-2,-1);
+\coordinate (B) at (-1.5,1.2);
+\coordinate (C) at (.2,1.7);
+\coordinate (D) at (2,.6);
+\coordinate (E) at (1.6,-1.3);
+\coordinate (F) at (-.3,-1.5);</p>
+
+<p>\fill[gray!15]
+(A)--(B)--(C)--(D)--(E)--(F)--cycle;</p>
+
+<p>\draw[thick]
+(A)--(B)--(C)--(D)--(E)--(F)--cycle;</p>
+
+<p>\foreach \P in {A,B,C,D,E,F}
+    \fill (\P) circle (2.2pt);</p>
+
+<p>\fill (-.6,.3) circle (2.2pt);
+\fill (.5,-.4) circle (2.2pt);
+\fill (.8,.5) circle (2.2pt);
+\fill (-.4,.9) circle (2.2pt);</p>
+
+<p>\node at (0,-2.05) {$\operatorname{conv}(S)$};</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>Interior points do not affect the outer boundary of the convex hull.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-intersection-convex-sets">
+<title>Intersection of Convex Sets</title>
+<p>\begin{theorem}
+The intersection of any collection of convex sets is convex.
+\end{theorem}</p>
+
+<p>Suppose</p>
+
+<p>
+<md>C=\bigcap_{\alpha}C_\alpha</md>
+</p>
+
+<p>where every <m>C_\alpha</m> is convex.</p>
+
+<p>If</p>
+
+<p>
+<md>x,y\in C,</md>
+</p>
+
+<p>then <m>x,y</m> belong to every <m>C_\alpha</m>.</p>
+
+<p>Therefore</p>
+
+<p>
+<md>(1-t)x+ty\in C_\alpha</md>
+</p>
+
+<p>for every <m>\alpha</m>.</p>
+
+<p>Hence</p>
+
+<p>
+<md>\boxed{
+(1-t)x+ty\in C.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-union-convex-sets">
+<title>Unions Need Not Be Convex</title>
+<p>The union of convex sets need not be convex.</p>
+
+<p>For example, two disjoint disks are individually convex, but their union is
+not convex.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+C_1,C_2\text{ convex}
+\not\Longrightarrow
+C_1\cup C_2\text{ convex}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-affine-images-convex">
+<title>Affine Images of Convex Sets</title>
+<p>Let</p>
+
+<p>
+<md>T(x)=Ax+b</md>
+</p>
+
+<p>be an affine transformation.</p>
+
+<p>If <m>C</m> is convex, then</p>
+
+<p>
+<md>\boxed{
+T(C)
+}</md>
+</p>
+
+<p>is convex.</p>
+
+<p>Indeed,</p>
+
+<p>
+<md>T((1-t)x+ty)
+=
+(1-t)T(x)+tT(y).</md>
+</p>
+
+<p>Therefore affine transformations preserve convexity.</p>
+
+<p>This explains the close relationship between convex geometry and affine
+geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-hyperplanes">
+<title>Hyperplanes</title>
+<p>A hyperplane in <m>\R^n</m> has the form</p>
+
+<p>
+<md>\boxed{
+H=
+\{x\in\R^n:a\cdot x=b\},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>a\neq0.</md>
+</p>
+
+<p>The vector <m>a</m> is normal to the hyperplane.</p>
+
+<p>In <m>\R^2</m>, a hyperplane is a line.</p>
+
+<p>In <m>\R^3</m>, a hyperplane is a plane.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-halfspaces">
+<title>Half-Spaces</title>
+<p>A hyperplane divides space into two half-spaces.</p>
+
+<p>The closed half-spaces are</p>
+
+<p>
+<md>\boxed{
+H^-=
+\{x:a\cdot x\leq b\}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+H^+=
+\{x:a\cdot x\geq b\}.
+}</md>
+</p>
+
+<p>Both are convex.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-supporting-hyperplanes">
+<title>Supporting Hyperplanes</title>
+<definition>
+<title>Supporting Hyperplane</title>
+<statement>
+<p>Let <m>C\subseteq\R^n</m> be convex.</p>
+
+<p>A hyperplane</p>
+
+<p>
+<md>H=\{x:a\cdot x=b\}</md>
+</p>
+
+<p>is a <em>supporting hyperplane</em> of <m>C</m> if</p>
+
+<p>
+<md>C</md>
+</p>
+
+<p>lies entirely in one of the corresponding closed half-spaces and</p>
+
+<p>
+<md>\boxed{
+C\cap H\neq\varnothing.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>A supporting hyperplane touches a convex set without cutting through its
+interior.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=1]</p>
+
+<p>\draw[thick,fill=gray!12]
+plot[smooth cycle,tension=.8]
+coordinates{
+(-1.8,-.5)
+(-1.2,1.1)
+(.1,1.6)
+(1.5,.8)
+(1.8,-.5)
+(.6,-1.4)
+(-1,-1.3)
+};</p>
+
+<p>\draw[thick] (-2.6,1.75)--(2.5,1.75);
+\node[right] at (2.5,1.75) {$H$};</p>
+
+<p>\fill (.1,1.6) circle (2pt);
+\node[below right] at (.1,1.6) {contact point};</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-extreme-points">
+<title>Extreme Points</title>
+<definition>
+<title>Extreme Point</title>
+<statement>
+<p>A point <m>x\in C</m> is an <em>extreme point</em> of a convex set <m>C</m> if it
+cannot be written as</p>
+
+<p>
+<md>\boxed{
+x=(1-t)y+tz
+}</md>
+</p>
+
+<p>for distinct <m>y,z\in C</m> and <m>0&lt;t&lt;1</m>.</p>
+</statement>
+</definition>
+
+<p>Intuitively, extreme points are the <q>corners</q> or irreducible boundary
+points of a convex set.</p>
+
+<p>For a triangle, the three vertices are its extreme points.</p>
+
+<p>For a closed disk, every point on the boundary circle is an extreme point.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-faces">
+<title>Faces</title>
+<p>A supporting hyperplane determines part of the boundary of a convex set.</p>
+
+<definition>
+<title>Face</title>
+<statement>
+<p>A <em>face</em> of a convex set <m>C</m> is a subset obtained by intersecting
+<m>C</m> with a supporting hyperplane:</p>
+
+<p>
+<md>\boxed{
+F=C\cap H.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>For a three-dimensional polytope, familiar examples include:</p>
+
+<p>
+<md>\boxed{
+\text{vertices},
+\quad
+\text{edges},
+\quad
+\text{two-dimensional faces}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-cones">
+<title>Convex Cones</title>
+<definition>
+<title>Convex Cone</title>
+<statement>
+<p>A set <m>K\subseteq\R^n</m> is a <em>convex cone</em> if</p>
+
+<p>
+<md>x,y\in K,
+\qquad
+\alpha,\beta\geq0</md>
+</p>
+
+<p>imply</p>
+
+<p>
+<md>\boxed{
+\alpha x+\beta y\in K.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>In particular, if <m>x\in K</m>, then</p>
+
+<p>
+<md>\boxed{
+\lambda x\in K
+\qquad
+\text{for every }\lambda\geq0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-conic-hulls">
+<title>Conic Hulls</title>
+<p>The <em>conic hull</em> of vectors</p>
+
+<p>
+<md>v_1,\ldots,v_m</md>
+</p>
+
+<p>is</p>
+
+<p>
+<md>\boxed{
+\operatorname{cone}(v_1,\ldots,v_m)
+=
+\left\{
+\sum_{i=1}^{m}\lambda_iv_i:
+\lambda_i\geq0
+\right\}.
+}</md>
+</p>
+
+<p>Unlike a convex combination, the coefficients do not need to sum to <m>1</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-polyhedra">
+<title>Polyhedra</title>
+<definition>
+<title>Polyhedron</title>
+<statement>
+<p>A <em>polyhedron</em> is an intersection of finitely many closed half-spaces.</p>
+</statement>
+</definition>
+
+<p>Thus a polyhedron can be written as</p>
+
+<p>
+<md>\boxed{
+P=
+\{x\in\R^n:Ax\leq b\}.
+}</md>
+</p>
+
+<p>Since half-spaces are convex and intersections of convex sets are convex,</p>
+
+<p>
+<md>\boxed{
+\text{every polyhedron is convex}.
+}</md>
+</p>
+
+<p>A polyhedron may be bounded or unbounded.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-polytopes">
+<title>Polytopes</title>
+<definition>
+<title>Polytope</title>
+<statement>
+<p>A <em>polytope</em> is the convex hull of finitely many points:</p>
+
+<p>
+<md>\boxed{
+P=
+\operatorname{conv}
+\{v_1,\ldots,v_m\}.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>Every polytope is bounded.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{line segments},
+\quad
+\text{triangles},
+\quad
+\text{polygons},
+\quad
+\text{tetrahedra},
+\quad
+\text{cubes}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-vertex-halfspace-descriptions">
+<title>Vertex and Half-Space Descriptions</title>
+<p>A polytope may often be described in two complementary ways.</p>
+
+<p>The <em>vertex description</em>, or <m>V</m>-representation, is</p>
+
+<p>
+<md>\boxed{
+P=
+\operatorname{conv}\{v_1,\ldots,v_m\}.
+}</md>
+</p>
+
+<p>The <em>half-space description</em>, or <m>H</m>-representation, is</p>
+
+<p>
+<md>\boxed{
+P=
+\{x:Ax\leq b\}.
+}</md>
+</p>
+
+<p>These two descriptions are fundamental in computational geometry and linear
+optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-minkowski-weyl">
+<title>Minkowski--Weyl Theorem</title>
+<p>A central theorem connects finite geometric generation with systems of
+linear inequalities.</p>
+
+<p>\begin{theorem}[Minkowski--Weyl Theorem]
+A set <m>P\subseteq\R^n</m> is a polyhedron if and only if it can be written as</p>
+
+<p>
+<md>\boxed{
+P=
+\operatorname{conv}\{v_1,\ldots,v_k\}
++
+\operatorname{cone}\{r_1,\ldots,r_m\}.
+}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>The vectors <m>r_i</m> describe the unbounded directions of the polyhedron.</p>
+
+<p>For a bounded polyhedron, no nonzero recession directions are needed, and
+the set is a polytope.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-simplices">
+<title>Simplices</title>
+<p>A simplex is the higher-dimensional analogue of a triangle.</p>
+
+<p>In dimension <m>n</m>, an <m>n</m>-simplex is the convex hull of <m>n+1</m> affinely
+independent points:</p>
+
+<p>
+<md>\boxed{
+\Delta
+=
+\operatorname{conv}
+\{v_0,\ldots,v_n\}.
+}</md>
+</p>
+
+<p>Examples are:</p>
+
+<p>
+<md>\begin{array}{c|c}
+n &amp; n\text{-simplex}\\
+\hline
+0 &amp; \text{point}\\
+1 &amp; \text{line segment}\\
+2 &amp; \text{triangle}\\
+3 &amp; \text{tetrahedron}
+\end{array}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-barycentric-coordinates">
+<title>Barycentric Coordinates</title>
+<p>A point <m>x</m> in a simplex can be written as</p>
+
+<p>
+<md>\boxed{
+x=
+\lambda_0v_0+\cdots+\lambda_nv_n
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\lambda_i\geq0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\sum_{i=0}^{n}\lambda_i=1.
+}</md>
+</p>
+
+<p>The coefficients</p>
+
+<p>
+<md>\lambda_0,\ldots,\lambda_n</md>
+</p>
+
+<p>are the barycentric coordinates of <m>x</m> relative to the simplex.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-caratheodory-theorem">
+<title>Carath\'eodory's Theorem</title>
+<p>Although a convex hull may be generated by many points, each individual
+point requires only a limited number of them.</p>
+
+<p>\begin{theorem}[Carath\'eodory's Theorem]
+If</p>
+
+<p>
+<md>x\in\operatorname{conv}(S)</md>
+</p>
+
+<p>for some</p>
+
+<p>
+<md>S\subseteq\R^n,</md>
+</p>
+
+<p>then there exist at most <m>n+1</m> points</p>
+
+<p>
+<md>x_0,\ldots,x_n\in S</md>
+</p>
+
+<p>such that</p>
+
+<p>
+<md>\boxed{
+x\in
+\operatorname{conv}\{x_0,\ldots,x_n\}.
+}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>Thus every point in a planar convex hull requires at most three generating
+points.</p>
+
+<p>Every point in a convex hull in <m>\R^3</m> requires at most four.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-radon-theorem">
+<title>Radon's Theorem</title>
+<p>\begin{theorem}[Radon's Theorem]
+Any collection of <m>n+2</m> points in <m>\R^n</m> can be partitioned into two
+disjoint subsets whose convex hulls intersect.
+\end{theorem}</p>
+
+<p>Symbolically, there exists a partition</p>
+
+<p>
+<md>S=A\cup B,
+\qquad
+A\cap B=\varnothing,</md>
+</p>
+
+<p>such that</p>
+
+<p>
+<md>\boxed{
+\operatorname{conv}(A)
+\cap
+\operatorname{conv}(B)
+\neq
+\varnothing.
+}</md>
+</p>
+
+<p>Radon's theorem is one of the foundational results of combinatorial convex
+geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-helly-theorem">
+<title>Helly's Theorem</title>
+<p>Helly's theorem gives a powerful local-to-global intersection principle.</p>
+
+<p>\begin{theorem}[Helly's Theorem]
+Let</p>
+
+<p>
+<md>C_1,\ldots,C_m</md>
+</p>
+
+<p>be convex subsets of <m>\R^n</m>, with</p>
+
+<p>
+<md>m\geq n+1.</md>
+</p>
+
+<p>If every <m>n+1</m> of these sets have nonempty intersection, then</p>
+
+<p>
+<md>\boxed{
+\bigcap_{i=1}^{m}C_i\neq\varnothing.
+}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>In the plane, it is enough to check every collection of three convex sets.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-separation">
+<title>Separation of Convex Sets</title>
+<p>One of the most important principles in convex geometry is that disjoint
+convex sets can often be separated by hyperplanes.</p>
+
+<p>Geometrically, a hyperplane can be placed between the sets so that they lie
+on opposite sides.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=.9]</p>
+
+<p>\draw[thick,fill=gray!12]
+(-3,-1) ellipse (1.2 and .8);</p>
+
+<p>\draw[thick,fill=gray!12]
+(3,.8) ellipse (1.3 and .9);</p>
+
+<p>\draw[thick] (0,-2.3)--(0,2.4);
+\node[above] at (0,2.4) {$H$};</p>
+
+<p>\node at (-3,-1) {$C_1$};
+\node at (3,.8) {$C_2$};</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-strict-separation">
+<title>Strict Separation</title>
+<p>Under suitable hypotheses, two disjoint convex sets can be strictly
+separated.</p>
+
+<p>This means there exist</p>
+
+<p>
+<md>a\neq0</md>
+</p>
+
+<p>and <m>b\in\R</m> such that</p>
+
+<p>
+<md>\boxed{
+a\cdot x&lt;b&lt;a\cdot y
+}</md>
+</p>
+
+<p>for all</p>
+
+<p>
+<md>x\in C_1,
+\qquad
+y\in C_2.</md>
+</p>
+
+<p>The exact hypotheses required depend on whether the sets are open, closed,
+compact, or unbounded.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-point-set-separation">
+<title>Point--Set Separation</title>
+<p>A particularly useful case occurs when</p>
+
+<p>
+<md>x_0\notin C</md>
+</p>
+
+<p>and <m>C</m> is a nonempty closed convex set.</p>
+
+<p>Then there exists a hyperplane separating <m>x_0</m> from <m>C</m>.</p>
+
+<p>Under standard finite-dimensional hypotheses, one can find <m>a\neq0</m> and
+<m>b</m> such that</p>
+
+<p>
+<md>\boxed{
+a\cdot x_0&gt;b
+}</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>\boxed{
+a\cdot x\leq b
+\qquad
+\text{for all }x\in C.
+}</md>
+</p>
+
+<p>This principle is fundamental in convex optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-projection">
+<title>Nearest Points and Projection</title>
+<p>Let <m>C\subseteq\R^n</m> be nonempty, closed, and convex.</p>
+
+<p>For every <m>x\in\R^n</m>, there exists a unique point</p>
+
+<p>
+<md>P_C(x)\in C</md>
+</p>
+
+<p>minimizing the Euclidean distance to <m>x</m>:</p>
+
+<p>
+<md>\boxed{
+\|x-P_C(x)\|
+=
+\min_{y\in C}\|x-y\|.
+}</md>
+</p>
+
+<p>The point</p>
+
+<p>
+<md>P_C(x)</md>
+</p>
+
+<p>is called the <em>metric projection</em> of <m>x</m> onto <m>C</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-projection-characterization">
+<title>Projection Characterization</title>
+<p>For a closed convex set <m>C</m>,</p>
+
+<p>
+<md>p=P_C(x)</md>
+</p>
+
+<p>if and only if</p>
+
+<p>
+<md>\boxed{
+(x-p)\cdot(y-p)\leq0
+\qquad
+\text{for every }y\in C.
+}</md>
+</p>
+
+<p>Thus the displacement from the projection point toward <m>x</m> determines a
+supporting direction for the convex set.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-bodies">
+<title>Convex Bodies</title>
+<definition>
+<title>Convex Body</title>
+<statement>
+<p>A <em>convex body</em> in <m>\R^n</m> is a compact convex set with nonempty
+interior.</p>
+</statement>
+</definition>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{closed balls},
+\quad
+\text{solid ellipsoids},
+\quad
+\text{solid cubes},
+\quad
+\text{full-dimensional polytopes}.
+}</md>
+</p>
+
+<p>Convex bodies are central objects in classical convex geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-strictly-convex-sets">
+<title>Strictly Convex Sets</title>
+<p>A convex set is <em>strictly convex</em> if every nontrivial segment between
+distinct points lies in the interior except possibly at its endpoints.</p>
+
+<p>A Euclidean ball is strictly convex.</p>
+
+<p>A square is convex but not strictly convex because its boundary contains
+nontrivial line segments.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-centrally-symmetric-convex">
+<title>Centrally Symmetric Convex Sets</title>
+<p>A set <m>C</m> is centrally symmetric about <m>c</m> if</p>
+
+<p>
+<md>\boxed{
+x\in C
+\Longrightarrow
+2c-x\in C.
+}</md>
+</p>
+
+<p>If the center is the origin, this becomes</p>
+
+<p>
+<md>\boxed{
+x\in C
+\Longrightarrow
+-x\in C.
+}</md>
+</p>
+
+<p>Examples include balls, ellipsoids, rectangles, and centrally positioned
+cubes.</p>
+
+<p>A general simplex is not centrally symmetric.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-minkowski-sums">
+<title>Minkowski Sums</title>
+<definition>
+<title>Minkowski Sum</title>
+<statement>
+<p>For sets <m>A,B\subseteq\R^n</m>, their <em>Minkowski sum</em> is</p>
+
+<p>
+<md>\boxed{
+A+B
+=
+\{a+b:a\in A,\ b\in B\}.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>If <m>A</m> and <m>B</m> are convex, then</p>
+
+<p>
+<md>\boxed{
+A+B
+}</md>
+</p>
+
+<p>is convex.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-scalar-convex-sets">
+<title>Scalar Multiplication of Convex Sets</title>
+<p>For</p>
+
+<p>
+<md>\lambda\in\R,</md>
+</p>
+
+<p>define</p>
+
+<p>
+<md>\boxed{
+\lambda C
+=
+\{\lambda x:x\in C\}.
+}</md>
+</p>
+
+<p>For nonnegative scalars <m>\alpha,\beta</m>,</p>
+
+<p>
+<md>\alpha A+\beta B</md>
+</p>
+
+<p>plays an important role in the algebraic study of convex bodies.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-support-functions">
+<title>Support Functions</title>
+<p>Let <m>C\subseteq\R^n</m> be a nonempty compact convex set.</p>
+
+<p>Its <em>support function</em> is</p>
+
+<p>
+<md>\boxed{
+h_C(u)
+=
+\sup_{x\in C}u\cdot x.
+}</md>
+</p>
+
+<p>For compact <m>C</m>, the supremum is attained, so it may be written as a
+maximum.</p>
+
+<p>Geometrically, <m>h_C(u)</m> measures how far <m>C</m> extends in the direction
+<m>u</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-support-function-properties">
+<title>Properties of Support Functions</title>
+<p>Support functions satisfy</p>
+
+<p>
+<md>\boxed{
+h_C(\lambda u)=\lambda h_C(u)
+\qquad
+(\lambda\geq0)
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+h_{A+B}(u)
+=
+h_A(u)+h_B(u).
+}</md>
+</p>
+
+<p>Thus Minkowski addition becomes ordinary addition at the level of support
+functions.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-polar-convex-sets">
+<title>Polar Sets</title>
+<p>Suppose</p>
+
+<p>
+<md>C\subseteq\R^n</md>
+</p>
+
+<p>contains the origin.</p>
+
+<p>The <em>polar set</em> of <m>C</m> is</p>
+
+<p>
+<md>\boxed{
+C^\circ
+=
+\{
+y\in\R^n:
+x\cdot y\leq1
+\text{ for every }x\in C
+\}.
+}</md>
+</p>
+
+<p>The symbol</p>
+
+<p>
+<md>C^\circ</md>
+</p>
+
+<p>is read <q>@@PROTECTED0@@ polar.</q></p>
+
+<p>The polar set is always closed and convex.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-polar-euclidean-ball">
+<title>Example: Polar of the Euclidean Ball</title>
+<p>Let</p>
+
+<p>
+<md>B=
+\{x:\|x\|_2\leq1\}.</md>
+</p>
+
+<p>By the Cauchy--Schwarz inequality,</p>
+
+<p>
+<md>x\cdot y
+\leq
+\|x\|_2\|y\|_2.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>x\cdot y\leq1</md>
+</p>
+
+<p>for every <m>x\in B</m> exactly when</p>
+
+<p>
+<md>\|y\|_2\leq1.</md>
+</p>
+
+<p>Hence</p>
+
+<p>
+<md>\boxed{
+B^\circ=B.
+}</md>
+</p>
+
+<p>The Euclidean unit ball is self-polar.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-functions-geometry">
+<title>Convex Functions</title>
+<p>Convexity also applies to functions.</p>
+
+<definition>
+<title>Convex Function</title>
+<statement>
+<p>Let <m>C\subseteq\R^n</m> be convex.</p>
+
+<p>A function</p>
+
+<p>
+<md>f:C\to\R</md>
+</p>
+
+<p>is <em>convex</em> if</p>
+
+<p>
+<md>\boxed{
+f((1-t)x+ty)
+\leq
+(1-t)f(x)+tf(y)
+}</md>
+</p>
+
+<p>for every</p>
+
+<p>
+<md>x,y\in C</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>t\in[0,1].</md>
+</p>
+</statement>
+</definition>
+
+<p>Geometrically, the graph of a convex function lies below the chord joining
+any two points on its graph.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-visualizing-convex-function">
+<title>Visualizing a Convex Function</title>
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=.85]
+\draw[-{Latex[length=3mm]}] (-3.2,0)--(3.4,0)
+node[right] {$x$};
+\draw[-{Latex[length=3mm]}] (0,-.4)--(0,4)
+node[above] {$y$};</p>
+
+<p>\draw[thick,domain=-2.4:2.4,samples=100]
+plot (\x,{.55*\x*\x+.4});</p>
+
+<p>\coordinate (A) at (-1.8,2.182);
+\coordinate (B) at (1.8,2.182);</p>
+
+<p>\fill (A) circle (2pt);
+\fill (B) circle (2pt);
+\draw[dashed,thick] (A)--(B);</p>
+
+<p>\node[right] at (1.9,2.35) {chord};
+\node[right] at (1.7,3.35) {$y=f(x)$};
+\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-epigraphs">
+<title>Epigraphs</title>
+<definition>
+<title>Epigraph</title>
+<statement>
+<p>The <em>epigraph</em> of a function</p>
+
+<p>
+<md>f:C\to\R</md>
+</p>
+
+<p>is</p>
+
+<p>
+<md>\boxed{
+\operatorname{epi}(f)
+=
+\{
+(x,t)\in C\times\R:
+t\geq f(x)
+\}.
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>A fundamental characterization is</p>
+
+<p>
+<md>\boxed{
+f\text{ is convex}
+\iff
+\operatorname{epi}(f)\text{ is convex}.
+}</md>
+</p>
+
+<p>This converts questions about convex functions into questions about convex
+sets.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-differentiable-convex-functions">
+<title>Differentiable Convex Functions</title>
+<p>If <m>f</m> is differentiable on a convex domain, then <m>f</m> is convex if and,
+under the usual open-domain hypotheses, only if</p>
+
+<p>
+<md>\boxed{
+f(y)
+\geq
+f(x)
++
+\nabla f(x)\cdot(y-x)
+}</md>
+</p>
+
+<p>for all <m>x,y</m> in the domain.</p>
+
+<p>Thus the tangent hyperplane lies below the graph of a differentiable convex
+function.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-hessian-convexity">
+<title>Second-Derivative Test for Convexity</title>
+<p>Suppose</p>
+
+<p>
+<md>f:\R^n\to\R</md>
+</p>
+
+<p>is twice differentiable on a convex open set.</p>
+
+<p>If its Hessian matrix satisfies</p>
+
+<p>
+<md>\boxed{
+\nabla^2f(x)\succeq0
+}</md>
+</p>
+
+<p>for every <m>x</m>, then <m>f</m> is convex.</p>
+
+<p>The notation</p>
+
+<p>
+<md>\nabla^2f(x)\succeq0</md>
+</p>
+
+<p>means that the Hessian is positive semidefinite.</p>
+
+<p>If</p>
+
+<p>
+<md>\boxed{
+\nabla^2f(x)\succ0
+}</md>
+</p>
+
+<p>everywhere, then <m>f</m> is strictly convex under standard domain conditions.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-strictly-convex-functions">
+<title>Strictly Convex Functions</title>
+<p>A function <m>f</m> is strictly convex if</p>
+
+<p>
+<md>\boxed{
+f((1-t)x+ty)
+&lt;
+(1-t)f(x)+tf(y)
+}</md>
+</p>
+
+<p>for distinct <m>x,y</m> and</p>
+
+<p>
+<md>0&lt;t&lt;1.</md>
+</p>
+
+<p>Strict convexity is important because it gives uniqueness of minimizers when
+a minimum exists.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-strong-convexity">
+<title>Strong Convexity</title>
+<p>A differentiable function is <m>m</m>-strongly convex, for <m>m&gt;0</m>, if</p>
+
+<p>
+<md>\boxed{
+f(y)
+\geq
+f(x)
++
+\nabla f(x)\cdot(y-x)
++
+\frac{m}{2}\|y-x\|^2.
+}</md>
+</p>
+
+<p>Strong convexity provides a quantitative lower bound on how rapidly the
+function curves upward.</p>
+
+<p>For twice differentiable functions, a standard sufficient condition is</p>
+
+<p>
+<md>\boxed{
+\nabla^2f(x)\succeq mI.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convexity-optimization">
+<title>Why Convexity Matters in Optimization</title>
+<p>Suppose <m>f</m> is convex and <m>C</m> is convex.</p>
+
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\min_{x\in C}f(x).
+}</md>
+</p>
+
+<p>Convexity dramatically simplifies the problem.</p>
+
+<p>\begin{theorem}
+Every local minimum of a convex function over a convex feasible set is a
+global minimum.
+\end{theorem}</p>
+
+<p>If <m>f</m> is strictly convex, there can be at most one minimizer.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-worked-convex-quadratic">
+<title>Worked Example: Convex Quadratic</title>
+<example>
+<title>Determine Whether a Quadratic Is Convex</title>
+<p>Consider</p>
+
+<p>
+<md>f(x)=x^2-4x+7.</md>
+</p>
+
+<p>Differentiate twice:</p>
+
+<p>
+<md>f'(x)=2x-4,</md>
+</p>
+
+<p>
+<md>f''(x)=2.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>f''(x)&gt;0</md>
+</p>
+
+<p>for every <m>x</m>,</p>
+
+<p>
+<md>f</md>
+</p>
+
+<p>is strictly convex.</p>
+
+<p>The unique critical point satisfies</p>
+
+<p>
+<md>2x-4=0,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>x=2.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>f(2)=3.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+f\text{ is strictly convex and has the unique global minimum }
+f(2)=3.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-jensen-convex-geometry">
+<title>Jensen's Inequality</title>
+<p>Convex combinations lead naturally to one of the fundamental inequalities
+of analysis and probability.</p>
+
+<p>\begin{theorem}[Jensen's Inequality]
+If <m>f</m> is convex and</p>
+
+<p>
+<md>\lambda_i\geq0,
+\qquad
+\sum_{i=1}^{m}\lambda_i=1,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+f\left(
+\sum_{i=1}^{m}\lambda_ix_i
+\right)
+\leq
+\sum_{i=1}^{m}\lambda_if(x_i).
+}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>This is the finite-dimensional form of Jensen's inequality.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convexity-norms">
+<title>Convexity and Norms</title>
+<p>Every norm</p>
+
+<p>
+<md>\|\cdot\|</md>
+</p>
+
+<p>is a convex function.</p>
+
+<p>Indeed,</p>
+
+<p>
+<md>\|(1-t)x+ty\|
+\leq
+(1-t)\|x\|+t\|y\|</md>
+</p>
+
+<p>by homogeneity and the triangle inequality.</p>
+
+<p>Consequently, every norm ball</p>
+
+<p>
+<md>\boxed{
+\{x:\|x\|\leq r\}
+}</md>
+</p>
+
+<p>is convex.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-different-norm-balls">
+<title>Different Norm Balls</title>
+<p>In <m>\R^2</m>, common unit balls include</p>
+
+<p>
+<md>\boxed{
+\|x\|_1
+=
+|x_1|+|x_2|
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\|x\|_2
+=
+\sqrt{x_1^2+x_2^2}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\|x\|_\infty
+=
+\max\{|x_1|,|x_2|\}.
+}</md>
+</p>
+
+<p>Their unit balls have different shapes but are all convex.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=.75]</p>
+
+<p>\begin{scope}[xshift=-4.5cm]
+\draw[-{Latex[length=2mm]}] (-1.7,0)--(1.7,0);
+\draw[-{Latex[length=2mm]}] (0,-1.7)--(0,1.7);
+\draw[thick]
+(0,1)--(1,0)--(0,-1)--(-1,0)--cycle;
+\node at (0,-2) {$\ell^1$};
+\end{scope}</p>
+
+<p>\begin{scope}
+\draw[-{Latex[length=2mm]}] (-1.7,0)--(1.7,0);
+\draw[-{Latex[length=2mm]}] (0,-1.7)--(0,1.7);
+\draw[thick] (0,0) circle (1);
+\node at (0,-2) {$\ell^2$};
+\end{scope}</p>
+
+<p>\begin{scope}[xshift=4.5cm]
+\draw[-{Latex[length=2mm]}] (-1.7,0)--(1.7,0);
+\draw[-{Latex[length=2mm]}] (0,-1.7)--(0,1.7);
+\draw[thick] (-1,-1) rectangle (1,1);
+\node at (0,-2) {$\ell^\infty$};
+\end{scope}</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convexity-probability">
+<title>Convexity and Probability</title>
+<p>Probabilities naturally form convex combinations.</p>
+
+<p>If</p>
+
+<p>
+<md>p_i\geq0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\sum_i p_i=1,</md>
+</p>
+
+<p>then an expected value has the form</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[X]
+=
+\sum_i p_ix_i.
+}</md>
+</p>
+
+<p>Thus expectation is a weighted convex combination.</p>
+
+<p>Jensen's inequality becomes</p>
+
+<p>
+<md>\boxed{
+f(\mathbb{E}[X])
+\leq
+\mathbb{E}[f(X)]
+}</md>
+</p>
+
+<p>for a convex function <m>f</m>, under appropriate integrability assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convexity-linear-programming">
+<title>Convexity and Linear Programming</title>
+<p>A linear programming problem has the form</p>
+
+<p>
+<md>\boxed{
+\text{minimize }c^Tx
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+Ax\leq b.
+}</md>
+</p>
+
+<p>The feasible region is a polyhedron and is therefore convex.</p>
+
+<p>When a finite optimum exists for a linear objective over a polytope, an
+optimal solution can be found at an extreme point, although the optimum may
+also occur along an entire face.</p>
+
+<p>This geometric fact is one of the foundations of linear programming.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convexity-data-geometry">
+<title>Convexity and Data Geometry</title>
+<p>Given data points</p>
+
+<p>
+<md>x_1,\ldots,x_m\in\R^n,</md>
+</p>
+
+<p>their convex hull describes all possible convex mixtures of those points.</p>
+
+<p>This appears in:</p>
+
+<p>
+<md>\boxed{
+\text{classification},
+\quad
+\text{clustering},
+\quad
+\text{mixture models},
+\quad
+\text{computer graphics},
+\quad
+\text{geometric data analysis}.
+}</md>
+</p>
+
+<p>Whether convex hulls intersect can also provide information about linear
+separability.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convexity-classification">
+<title>Convexity and Classification</title>
+<p>Suppose two classes of data have disjoint convex hulls.</p>
+
+<p>Under suitable finite-dimensional hypotheses, a separating hyperplane can
+be placed between them.</p>
+
+<p>This is the geometric idea underlying linear classifiers.</p>
+
+<p>The goal is to find</p>
+
+<p>
+<md>a\in\R^n,
+\qquad
+b\in\R</md>
+</p>
+
+<p>so that points from the two classes satisfy inequalities such as</p>
+
+<p>
+<md>a\cdot x+b&gt;0</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>a\cdot y+b&lt;0.</md>
+</p>
+
+<p>This idea is central to support vector machines.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-brunn-minkowski-preview">
+<title>Brunn--Minkowski Theory</title>
+<p>Minkowski addition interacts deeply with volume.</p>
+
+<p>For nonempty measurable sets <m>A,B\subseteq\R^n</m>, the
+Brunn--Minkowski inequality states, under its standard hypotheses,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Vol}(A+B)^{1/n}
+\geq
+\operatorname{Vol}(A)^{1/n}
++
+\operatorname{Vol}(B)^{1/n}.
+}</md>
+</p>
+
+<p>This inequality is one of the central results of convex geometry.</p>
+
+<p>It connects geometry with analysis, probability, and inequalities.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-john-ellipsoids-preview">
+<title>John Ellipsoids</title>
+<p>Every convex body contains ellipsoids.</p>
+
+<p>A particularly important result states that every convex body has a unique
+maximum-volume inscribed ellipsoid.</p>
+
+<p>This is called the <em>John ellipsoid</em>.</p>
+
+<p>It provides a way to approximate complicated convex bodies by geometrically
+simpler ellipsoids.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-krein-milman-preview">
+<title>Krein--Milman Principle</title>
+<p>In finite dimensions, compact convex sets are determined by their extreme
+points in a strong sense.</p>
+
+<p>A broader functional-analytic version is the Krein--Milman theorem.</p>
+
+<p>Very roughly,</p>
+
+<p>
+<md>\boxed{
+\text{compact convex set}
+\approx
+\text{closed convex hull of its extreme points}.
+}</md>
+</p>
+
+<p>The precise theorem is especially important in infinite-dimensional
+functional analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-geometric-duality">
+<title>Convex Geometry and Duality</title>
+<p>Many constructions in convex geometry come in dual pairs.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{points}
+\longleftrightarrow
+\text{supporting hyperplanes},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{convex bodies}
+\longleftrightarrow
+\text{polar bodies},
+}</md>
+</p>
+
+<p>and, in optimization,</p>
+
+<p>
+<md>\boxed{
+\text{primal problems}
+\longleftrightarrow
+\text{dual problems}.
+}</md>
+</p>
+
+<p>This dual viewpoint connects convex geometry with projective geometry,
+linear algebra, and optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-computational-geometry">
+<title>Convex Geometry and Computational Geometry</title>
+<p>Computing a convex hull is one of the fundamental problems of computational
+geometry.</p>
+
+<p>Given finitely many points, an algorithm seeks the extreme points and the
+faces forming their convex hull.</p>
+
+<p>In two dimensions, the result is a convex polygon.</p>
+
+<p>In three dimensions, the result is a convex polyhedron.</p>
+
+<p>Higher-dimensional convex hull algorithms are important in optimization,
+statistics, graphics, and data analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-geometry-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-confusing-convex-sets-with-connected-sets">
+<title>Confusing Convex Sets with Connected Sets</title>
+<p>Every convex set is path connected.</p>
+
+<p>However, a connected set need not be convex.</p>
+
+<p>For example, a circle is connected but not convex.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-checking-only-the-midpoint">
+<title>Checking Only the Midpoint</title>
+<p>Showing that</p>
+
+<p>
+<md>\frac{x+y}{2}\in C</md>
+</p>
+
+<p>for every <m>x,y\in C</m> is not, without additional assumptions, sufficient
+to establish ordinary convexity.</p>
+
+<p>The definition requires</p>
+
+<p>
+<md>\boxed{
+(1-t)x+ty\in C
+}</md>
+</p>
+
+<p>for every</p>
+
+<p>
+<md>t\in[0,1].</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-convex-and-affine-combinations">
+<title>Confusing Convex and Affine Combinations</title>
+<p>An affine combination allows negative coefficients.</p>
+
+<p>A convex combination requires</p>
+
+<p>
+<md>\boxed{
+\lambda_i\geq0.
+}</md>
+</p>
+
+<p>Both require the coefficients to sum to <m>1</m>.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-a-circle-with-a-disk">
+<title>Confusing a Circle with a Disk</title>
+<p>The circle</p>
+
+<p>
+<md>x^2+y^2=1</md>
+</p>
+
+<p>is not convex.</p>
+
+<p>The closed disk</p>
+
+<p>
+<md>x^2+y^2\leq1</md>
+</p>
+
+<p>is convex.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-every-boundary-point-is-extreme">
+<title>Assuming Every Boundary Point Is Extreme</title>
+<p>For a square, points in the interior of an edge are boundary points but are
+not extreme points.</p>
+
+<p>The extreme points are the four vertices.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-extreme-points-must-look-like-corners">
+<title>Assuming Extreme Points Must Look Like Corners</title>
+<p>For a Euclidean disk, every boundary point is extreme even though the
+boundary is smooth.</p>
+
+<p>Thus an extreme point does not need to be visually sharp.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-polyhedra-and-polytopes">
+<title>Confusing Polyhedra and Polytopes</title>
+<p>A polyhedron may be unbounded.</p>
+
+<p>A polytope is bounded and can be represented as the convex hull of finitely
+many points.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\text{polytope}
+\Longrightarrow
+\text{polyhedron},
+}</md>
+</p>
+
+<p>but an unbounded polyhedron is not a polytope.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-unions-preserve-convexity">
+<title>Assuming Unions Preserve Convexity</title>
+<p>Intersections of convex sets are convex.</p>
+
+<p>Unions generally are not.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-convex-sets-and-convex-functions">
+<title>Confusing Convex Sets and Convex Functions</title>
+<p>A convex set is defined through line segments between points.</p>
+
+<p>A convex function satisfies</p>
+
+<p>
+<md>f((1-t)x+ty)
+\leq
+(1-t)f(x)+tf(y).</md>
+</p>
+
+<p>The two ideas are related through the epigraph.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-reversing-the-convexity-inequality">
+<title>Reversing the Convexity Inequality</title>
+<p>For a convex function,</p>
+
+<p>
+<md>\boxed{
+f((1-t)x+ty)
+\leq
+(1-t)f(x)+tf(y).
+}</md>
+</p>
+
+<p>The graph lies below its chords, not above them.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-convex-functions-always-have-minima">
+<title>Assuming Convex Functions Always Have Minima</title>
+<p>Convexity guarantees that local minima are global.</p>
+
+<p>It does not guarantee that a minimum exists.</p>
+
+<p>For example,</p>
+
+<p>
+<md>f(x)=e^x</md>
+</p>
+
+<p>is convex on <m>\R</m>, but it does not attain a minimum on <m>\R</m>.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-strict-convexity-is-necessary-for-uniqueness">
+<title>Assuming Strict Convexity Is Necessary for Uniqueness</title>
+<p>Strict convexity is a useful sufficient condition for uniqueness of a
+minimizer.</p>
+
+<p>It is not necessary in every individual optimization problem.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-geometry-applications">
+<title>Applications and Connections</title>
+<p>\begin{applicationbox}
+<em>Optimization.</em>
+Convex feasible regions and convex objective functions produce optimization
+problems with powerful global guarantees.</p>
+
+<p>\medskip</p>
+
+<p><em>Linear Programming.</em>
+Systems of linear inequalities define convex polyhedra, while linear
+objectives interact directly with their faces and extreme points.</p>
+
+<p>\medskip</p>
+
+<p><em>Computational Geometry.</em>
+Convex hulls, half-space intersections, collision detection, and geometric
+algorithms rely heavily on convexity.</p>
+
+<p>\medskip</p>
+
+<p><em>Statistics.</em>
+Convex combinations appear in expectations, mixtures, estimators, and
+probability distributions.</p>
+
+<p>\medskip</p>
+
+<p><em>Machine Learning.</em>
+Many loss functions and regularization methods are convex. Hyperplane
+separation is central to linear classification and support vector machines.</p>
+
+<p>\medskip</p>
+
+<p><em>Economics.</em>
+Convex sets model feasible allocations and preferences, while convex and
+concave functions appear throughout utility theory and optimization.</p>
+
+<p>\medskip</p>
+
+<p><em>Functional Analysis.</em>
+Convex sets, separation theorems, duality, extreme points, and weak
+topologies play central roles in infinite-dimensional analysis.</p>
+
+<p>\medskip</p>
+
+<p><em>Geometry of Numbers.</em>
+Convex bodies are used to study lattices and integer points, leading to
+Minkowski's theorems and major applications in Number Theory.</p>
+
+<p>\medskip</p>
+
+<p><em>Probability and Inequalities.</em>
+Jensen's inequality and Brunn--Minkowski-type results connect convexity with
+expectations, concentration, entropy, and geometric inequalities.</p>
+
+<p>\medskip</p>
+
+<p><em>Operations Research.</em>
+Scheduling, resource allocation, transportation, network design, and
+planning frequently lead to convex or polyhedral feasible regions.
+\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-geometry-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>State the definition of a convex set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>[2,7]</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>(-\infty,4)</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>(-\infty,-1]\cup[1,\infty)</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the unit disk</p>
+
+<p>
+<md>x^2+y^2\leq1</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the unit circle</p>
+
+<p>
+<md>x^2+y^2=1</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What additional condition distinguishes a convex combination from an affine
+combination?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>\frac14x+\frac34y</md>
+</p>
+
+<p>is a convex combination of <m>x</m> and <m>y</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>-2x+3y</md>
+</p>
+
+<p>is a convex combination.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that every affine subspace of <m>\R^n</m> is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that every half-space is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that every Euclidean ball is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that the intersection of two convex sets is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example showing that the union of two convex sets need not be
+convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the convex hull of three noncollinear points in <m>\R^2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the convex hull of four points forming the corners of a rectangle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the extreme points of a triangle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the extreme points of a square.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe the extreme points of a closed Euclidean disk.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the half-space description of the square</p>
+
+<p>
+<md>[-1,1]^2.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Is the set</p>
+
+<p>
+<md>\{(x,y):x\geq0,\ y\geq0\}</md>
+</p>
+
+<p>a convex cone? Explain.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find</p>
+
+<p>
+<md>\operatorname{cone}\{(1,0),(0,1)\}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between a polyhedron and a polytope.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is the dimension of a simplex having five affinely independent
+vertices?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a general convex combination of the vertices of a triangle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State Carath\'eodory's theorem in <m>\R^2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State Carath\'eodory's theorem in <m>\R^5</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State Helly's theorem for convex sets in the plane.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain geometrically what a supporting hyperplane does.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the Minkowski sum</p>
+
+<p>
+<md>[0,2]+[1,4].</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the Minkowski sum of two convex sets is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the Euclidean norm is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>f(x)=x^2</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>f(x)=-x^2</md>
+</p>
+
+<p>is convex on <m>\R</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>f(x)=e^x</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the epigraph of</p>
+
+<p>
+<md>f(x)=x^2.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that affine images of convex sets are convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that the convex hull of a set is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>\operatorname{conv}(S)</md>
+</p>
+
+<p>is the intersection of all convex sets containing <m>S</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that the epigraph of a convex function is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the converse: if the epigraph of <m>f</m> is convex, then <m>f</m> is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the Hessian to determine whether</p>
+
+<p>
+<md>f(x,y)=x^2+4y^2</md>
+</p>
+
+<p>is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the Hessian to investigate the convexity of</p>
+
+<p>
+<md>f(x,y)=x^2-y^2.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that a strictly convex function has at most one minimizer on a convex
+set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that every local minimum of a convex function on a convex domain is a
+global minimum.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the polar of</p>
+
+<p>
+<md>[-1,1]\subseteq\R.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the polar of a set containing the origin is convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that support functions satisfy</p>
+
+<p>
+<md>h_{A+B}(u)=h_A(u)+h_B(u)</md>
+</p>
+
+<p>for nonempty compact sets <m>A</m> and <m>B</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose <m>C</m> is nonempty, closed, and convex. Explain why the nearest point
+projection onto <m>C</m> is unique.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how a separating hyperplane can be used for binary classification.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Jensen's inequality with</p>
+
+<p>
+<md>f(x)=x^2</md>
+</p>
+
+<p>to show that</p>
+
+<p>
+<md>\left(
+\frac{x_1+\cdots+x_n}{n}
+\right)^2
+\leq
+\frac{x_1^2+\cdots+x_n^2}{n}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove Carath\'eodory's theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate the relationship among Radon's theorem, Helly's theorem, and
+Carath\'eodory's theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research the Minkowski--Weyl theorem and explain how it connects
+<m>V</m>-representations and <m>H</m>-representations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate the Brunn--Minkowski inequality and give a geometric
+interpretation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research John's ellipsoid theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate the Krein--Milman theorem and explain why it is important in
+functional analysis.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research Minkowski's convex body theorem and explain its importance in the
+geometry of numbers.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate convex duality in optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research one convex hull algorithm and describe its computational
+complexity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate how convex geometry is used in support vector machines.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-geometry-summary">
+<title>Conceptual Summary</title>
+<p>A set <m>C\subseteq\R^n</m> is convex when</p>
+
+<p>
+<md>\boxed{
+x,y\in C,\quad0\leq t\leq1
+\Longrightarrow
+(1-t)x+ty\in C.
+}</md>
+</p>
+
+<p>Convex combinations have the form</p>
+
+<p>
+<md>\boxed{
+\sum_i\lambda_ix_i,
+\qquad
+\lambda_i\geq0,
+\qquad
+\sum_i\lambda_i=1.
+}</md>
+</p>
+
+<p>The convex hull</p>
+
+<p>
+<md>\boxed{
+\operatorname{conv}(S)
+}</md>
+</p>
+
+<p>is the smallest convex set containing <m>S</m>.</p>
+
+<p>Intersections and affine images preserve convexity, while arbitrary unions
+do not.</p>
+
+<p>Hyperplanes and half-spaces provide fundamental descriptions of convex
+sets.</p>
+
+<p>Supporting hyperplanes reveal boundary structure, while extreme points
+identify geometrically irreducible points.</p>
+
+<p>A polyhedron is an intersection of finitely many half-spaces:</p>
+
+<p>
+<md>\boxed{
+P=\{x:Ax\leq b\}.
+}</md>
+</p>
+
+<p>A polytope is the convex hull of finitely many points:</p>
+
+<p>
+<md>\boxed{
+P=\operatorname{conv}\{v_1,\ldots,v_m\}.
+}</md>
+</p>
+
+<p>The Minkowski--Weyl theorem connects these descriptions.</p>
+
+<p>Carath\'eodory's theorem limits the number of points needed in convex
+representations.</p>
+
+<p>Radon's theorem concerns intersecting convex hulls of partitions.</p>
+
+<p>Helly's theorem converts small-subcollection intersection information into a
+global intersection conclusion.</p>
+
+<p>Separation theorems allow convex sets and external points to be distinguished
+by hyperplanes.</p>
+
+<p>Minkowski sums provide an algebraic operation on convex sets:</p>
+
+<p>
+<md>\boxed{
+A+B=\{a+b:a\in A,\ b\in B\}.
+}</md>
+</p>
+
+<p>Support functions encode directional extent, while polar sets provide a
+natural geometric duality.</p>
+
+<p>A function <m>f</m> is convex when</p>
+
+<p>
+<md>\boxed{
+f((1-t)x+ty)
+\leq
+(1-t)f(x)+tf(y).
+}</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+f\text{ convex}
+\iff
+\operatorname{epi}(f)\text{ convex}.
+}</md>
+</p>
+
+<p>Convex optimization is especially powerful because local minima are global
+minima.</p>
+
+<p>Thus convex geometry forms a bridge between</p>
+
+<p>
+<md>\boxed{
+\text{pure geometry}
+\quad\text{and}\quad
+\text{optimization, analysis, computation, and probability}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-convex-geometry-subsec-convex-geometry-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Convex Geometry builds on Euclidean, Vector, and Affine Geometry because
+convex combinations and convex hulls depend fundamentally on affine
+structure. Hyperplanes and supporting hyperplanes connect the subject with
+Linear Algebra and geometric duality. Polytopes lead directly into Discrete
+Geometry, while algorithms for convex hulls and half-space intersections
+lead into Computational Geometry. Convex functions, separation theorems,
+duality, and projections are developed further in Analysis and Optimization.
+Convex bodies and lattices reconnect with Number Theory through the Geometry
+of Numbers. These ideas provide the foundation for the next section,
+Discrete Geometry.</p>
+</remark>
+</subsection>
+
 </section>

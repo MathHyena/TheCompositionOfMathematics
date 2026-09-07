@@ -1,9 +1,4960 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-09-statistics-19-computational-statistics">
-  <title>Computational Statistics</title>
+<section xml:id="sec-computational-statistics">
+<title>Computational Statistics</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Probability, random variables, statistical estimation, hypothesis
+testing, regression, mathematical statistics, Bayesian statistics,
+statistical learning, numerical methods, optimization, linear algebra,
+and basic programming concepts.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain why computation is fundamental to modern statistics;</p>
+</li>
+<li>
+<p>distinguish exact analytical methods from numerical methods;</p>
+</li>
+<li>
+<p>understand floating-point and numerical-precision issues;</p>
+</li>
+<li>
+<p>recognize numerical instability;</p>
+</li>
+<li>
+<p>understand numerical optimization in statistical estimation;</p>
+</li>
+<li>
+<p>recognize gradient, Hessian, and Newton-type methods;</p>
+</li>
+<li>
+<p>understand constrained optimization conceptually;</p>
+</li>
+<li>
+<p>understand Monte Carlo integration;</p>
+</li>
+<li>
+<p>understand Monte Carlo error and convergence rates;</p>
+</li>
+<li>
+<p>generate random variables using inverse transforms;</p>
+</li>
+<li>
+<p>understand acceptance--rejection sampling;</p>
+</li>
+<li>
+<p>understand importance sampling;</p>
+</li>
+<li>
+<p>recognize weight degeneracy;</p>
+</li>
+<li>
+<p>understand variance reduction conceptually;</p>
+</li>
+<li>
+<p>understand bootstrap resampling;</p>
+</li>
+<li>
+<p>distinguish parametric and nonparametric bootstrap methods;</p>
+</li>
+<li>
+<p>estimate bootstrap standard errors;</p>
+</li>
+<li>
+<p>understand percentile and basic bootstrap intervals;</p>
+</li>
+<li>
+<p>recognize bias-corrected bootstrap methods;</p>
+</li>
+<li>
+<p>understand jackknife resampling;</p>
+</li>
+<li>
+<p>understand permutation and randomization tests;</p>
+</li>
+<li>
+<p>distinguish exact and Monte Carlo permutation procedures;</p>
+</li>
+<li>
+<p>understand the plus-one correction for sampled permutations;</p>
+</li>
+<li>
+<p>understand Markov chain Monte Carlo;</p>
+</li>
+<li>
+<p>recognize Metropolis--Hastings;</p>
+</li>
+<li>
+<p>recognize Gibbs sampling;</p>
+</li>
+<li>
+<p>understand autocorrelation in MCMC;</p>
+</li>
+<li>
+<p>understand effective sample size;</p>
+</li>
+<li>
+<p>understand Monte Carlo standard errors;</p>
+</li>
+<li>
+<p>recognize importance sampling and sequential Monte Carlo;</p>
+</li>
+<li>
+<p>understand expectation--maximization;</p>
+</li>
+<li>
+<p>recognize latent-variable estimation;</p>
+</li>
+<li>
+<p>understand numerical differentiation;</p>
+</li>
+<li>
+<p>understand automatic differentiation conceptually;</p>
+</li>
+<li>
+<p>understand simulation studies;</p>
+</li>
+<li>
+<p>design computational experiments for estimator comparison;</p>
+</li>
+<li>
+<p>understand reproducibility and random seeds;</p>
+</li>
+<li>
+<p>understand parallel computation conceptually;</p>
+</li>
+<li>
+<p>recognize computational limitations in high-dimensional
+          statistics;</p>
+</li>
+<li>
+<p>understand matrix decompositions used in statistical
+          computation;</p>
+</li>
+<li>
+<p>understand iterative algorithms for regression and
+          regularization;</p>
+</li>
+<li>
+<p>recognize coordinate descent;</p>
+</li>
+<li>
+<p>understand stochastic-gradient methods conceptually;</p>
+</li>
+<li>
+<p>understand computational diagnostics;</p>
+</li>
+<li>
+<p>connect computational statistics with numerical analysis,
+          Bayesian statistics, statistical learning, and scientific
+          computing.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-what-is-computational-statistics">
+<title>What Is Computational Statistics?</title>
+<p>Computational statistics studies numerical algorithms for statistical
+estimation, inference, simulation, prediction, and uncertainty
+quantification.</p>
+
+<p>Many statistical problems cannot be solved using closed-form formulas.</p>
+
+<p>Instead, one must compute approximations to quantities such as</p>
+
+<p>
+<md>\boxed{
+\widehat{\theta}
+=
+\arg\max_\theta
+L(\theta),
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}
+[
+g(\theta)
+\mid x
+],
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+P
+(
+T^*\geq T_{obs}
+).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-why-statistical-computation">
+<title>Why Statistical Computation Is Necessary</title>
+<p>Computation becomes necessary when:</p>
+
+<p>
+<md>\boxed{
+\text{likelihood equations have no closed form},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{posterior integrals are intractable},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{sampling distributions are unknown},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{datasets are high dimensional},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{models require iterative estimation}.
+}</md>
+</p>
+
+<p>Modern statistics therefore combines theory with numerical algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-analytical-versus-computational">
+<title>Analytical Versus Computational Solutions</title>
+<p>An analytical solution produces an exact symbolic formula.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\widehat{\mu}
+=
+\overline{X}.
+}</md>
+</p>
+
+<p>A computational solution may instead produce a sequence</p>
+
+<p>
+<md>\boxed{
+\theta^{(0)},
+\theta^{(1)},
+\ldots
+}</md>
+</p>
+
+<p>that converges toward the desired estimate.</p>
+
+<p>The output is then an approximation whose accuracy depends on the
+algorithm and numerical precision.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-numerical-error-statistics">
+<title>Numerical Error</title>
+<p>Computational error can arise from several sources:</p>
+
+<p>
+<md>\boxed{
+\text{roundoff error},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{truncation error},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{optimization error},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Monte Carlo error},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{approximation error}.
+}</md>
+</p>
+
+<p>These are distinct from sampling error in the statistical model.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-sampling-versus-computational-error">
+<title>Sampling Error Versus Computational Error</title>
+<p>Sampling error arises because only a finite random sample is observed.</p>
+
+<p>Computational error arises because the statistical procedure is
+implemented approximately.</p>
+
+<p>Thus a reported estimate may contain both:</p>
+
+<p>
+<md>\boxed{
+\text{statistical uncertainty}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{numerical uncertainty}.
+}</md>
+</p>
+
+<p>A reliable analysis controls both.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-floating-point-statistics">
+<title>Floating-Point Arithmetic</title>
+<p>Computers store most real numbers using finite binary representations.</p>
+
+<p>Therefore many real numbers cannot be represented exactly.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+0.1
+}</md>
+</p>
+
+<p>does not generally have an exact finite binary representation.</p>
+
+<p>Repeated calculations can accumulate small numerical errors.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-catastrophic-cancellation">
+<title>Catastrophic Cancellation</title>
+<p>Catastrophic cancellation can occur when subtracting nearly equal
+floating-point numbers.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+a-b
+}</md>
+</p>
+
+<p>may lose significant digits when <m>a</m> and <m>b</m> are very close.</p>
+
+<p>Statistically equivalent formulas may therefore have very different
+numerical stability.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-stable-variance-computation">
+<title>Stable Variance Computation</title>
+<p>The identity</p>
+
+<p>
+<md>\operatorname{Var}(X)
+=
+\mathbb{E}[X^2]
+-
+\mathbb{E}[X]^2</md>
+</p>
+
+<p>is mathematically correct.</p>
+
+<p>But computing sample variance as</p>
+
+<p>
+<md>\frac1n\sum x_i^2
+-
+\overline{x}^2</md>
+</p>
+
+<p>can suffer cancellation when the observations are large but tightly
+clustered.</p>
+
+<p>A centered calculation is generally more stable:</p>
+
+<p>
+<md>\boxed{
+\sum
+(
+x_i-\overline{x}
+)^2.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-logarithmic-computation">
+<title>Logarithmic Computation</title>
+<p>Likelihoods often involve products of many small probabilities:</p>
+
+<p>
+<md>\boxed{
+L(\theta)
+=
+\prod_{i=1}^{n}
+f_\theta(x_i).
+}</md>
+</p>
+
+<p>This product may underflow numerically.</p>
+
+<p>Instead compute</p>
+
+<p>
+<md>\boxed{
+\ell(\theta)
+=
+\sum_{i=1}^{n}
+\log
+f_\theta(x_i).
+}</md>
+</p>
+
+<p>Log-likelihoods are both numerically more stable and easier to optimize.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-log-sum-exp">
+<title>Log-Sum-Exp Trick</title>
+<p>Suppose one must compute</p>
+
+<p>
+<md>\log
+\left(
+\sum_{i=1}^{n}
+e^{a_i}
+\right).</md>
+</p>
+
+<p>Direct exponentiation may overflow.</p>
+
+<p>Let</p>
+
+<p>
+<md>m
+=
+\max_i a_i.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\log
+\left(
+\sum_i e^{a_i}
+\right)
+=
+m
++
+\log
+\left(
+\sum_i
+e^{a_i-m}
+\right).
+}</md>
+</p>
+
+<p>This is known as the log-sum-exp stabilization.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-numerical-optimization-statistics">
+<title>Numerical Optimization in Statistics</title>
+<p>Many estimators solve</p>
+
+<p>
+<md>\boxed{
+\widehat{\theta}
+=
+\arg\min_\theta
+Q(\theta)
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\widehat{\theta}
+=
+\arg\max_\theta
+\ell(\theta).
+}</md>
+</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{maximum likelihood},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{penalized regression},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{MAP estimation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-statistical-gradient">
+<title>Gradient</title>
+<p>For</p>
+
+<p>
+<md>Q:
+\mathbb{R}^p
+\to
+\mathbb{R},</md>
+</p>
+
+<p>the gradient is</p>
+
+<p>
+<md>\boxed{
+\nabla Q(\boldsymbol{\theta})
+=
+\begin{pmatrix}
+\partial Q/\partial\theta_1\\
+\vdots\\
+\partial Q/\partial\theta_p
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>At an interior differentiable optimum,</p>
+
+<p>
+<md>\boxed{
+\nabla Q(\widehat{\boldsymbol{\theta}})
+=
+\mathbf{0}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-statistical-hessian">
+<title>Hessian Matrix</title>
+<p>The Hessian is</p>
+
+<p>
+<md>\boxed{
+H(\boldsymbol{\theta})
+=
+\nabla^2
+Q(\boldsymbol{\theta}).
+}</md>
+</p>
+
+<p>It contains second derivatives.</p>
+
+<p>At a local minimum, a positive definite Hessian indicates positive local
+curvature.</p>
+
+<p>For log-likelihood maximization, the negative Hessian is closely related
+to observed Fisher information.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-gradient-descent-statistics">
+<title>Gradient Descent</title>
+<p>Gradient descent iterates</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
+-
+\eta_k
+\nabla
+Q
+(
+\boldsymbol{\theta}^{(k)}
+),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\eta_k&gt;0</md>
+</p>
+
+<p>is the step size or learning rate.</p>
+
+<p>The update moves in the direction of steepest local decrease.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-optimization-step-size">
+<title>Step Size</title>
+<p>If the step size is too large, the algorithm may:</p>
+
+<p>
+<md>\boxed{
+\text{overshoot},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{oscillate},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{diverge}.
+}</md>
+</p>
+
+<p>If it is too small, convergence may be extremely slow.</p>
+
+<p>Step-size selection is therefore an important computational issue.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-newtons-method-statistics">
+<title>Newton's Method</title>
+<p>Newton's method uses both gradient and curvature:</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
+-
+H
+(
+\boldsymbol{\theta}^{(k)}
+)^{-1}
+\nabla
+Q
+(
+\boldsymbol{\theta}^{(k)}
+).
+}</md>
+</p>
+
+<p>Near a well-behaved optimum, Newton's method can converge rapidly.</p>
+
+<p>However, computing and inverting the Hessian may be expensive.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-newton-raphson-likelihood">
+<title>Newton--Raphson for Likelihood</title>
+<p>For log-likelihood</p>
+
+<p>
+<md>\ell(\theta),</md>
+</p>
+
+<p>Newton--Raphson uses</p>
+
+<p>
+<md>\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\frac{
+\ell'(\theta^{(k)})
+}{
+\ell''(\theta^{(k)})
+}.
+}</md>
+</p>
+
+<p>For vector parameters,</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
+-
+[
+\nabla^2\ell
+(
+\boldsymbol{\theta}^{(k)}
+)
+]^{-1}
+\nabla\ell
+(
+\boldsymbol{\theta}^{(k)}
+).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-fisher-scoring">
+<title>Fisher Scoring</title>
+<p>Fisher scoring replaces the observed negative Hessian by expected Fisher
+information.</p>
+
+<p>The update is</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\theta}^{(k+1)}
+=
+\boldsymbol{\theta}^{(k)}
++
+I
+(
+\boldsymbol{\theta}^{(k)}
+)^{-1}
+U
+(
+\boldsymbol{\theta}^{(k)}
+).
+}</md>
+</p>
+
+<p>This method is important in generalized linear models.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-irls">
+<title>Iteratively Reweighted Least Squares</title>
+<p>Many generalized linear models can be fitted using iteratively reweighted
+least squares, abbreviated IRLS.</p>
+
+<p>At each iteration, the algorithm solves a weighted least-squares problem</p>
+
+<p>
+<md>\boxed{
+\min_{\boldsymbol{\beta}}
+(
+\mathbf{z}
+-
+X\boldsymbol{\beta}
+)^T
+W
+(
+\mathbf{z}
+-
+X\boldsymbol{\beta}
+).
+}</md>
+</p>
+
+<p>The working response <m>\mathbf{z}</m> and weights <m>W</m> are updated
+iteratively.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-optimization-convergence-criteria">
+<title>Convergence Criteria</title>
+<p>An iterative algorithm may stop when:</p>
+
+<p>
+<md>\boxed{
+\|
+\boldsymbol{\theta}^{(k+1)}
+-
+\boldsymbol{\theta}^{(k)}
+\|
+&lt;
+\varepsilon,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+|
+Q^{(k+1)}
+-
+Q^{(k)}
+|
+&lt;
+\varepsilon,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\|
+\nabla Q
+(
+\boldsymbol{\theta}^{(k)}
+)
+\|
+&lt;
+\varepsilon.
+}</md>
+</p>
+
+<p>Multiple criteria are often checked together.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-local-global-optima-statistics">
+<title>Local Versus Global Optima</title>
+<p>A local optimum is best only in a neighborhood.</p>
+
+<p>A global optimum is best over the full parameter space.</p>
+
+<p>Nonconvex statistical models may contain several local optima.</p>
+
+<p>Therefore initialization can materially affect the final estimate.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-multiple-starting-values">
+<title>Multiple Starting Values</title>
+<p>For nonconvex problems, one can run an optimizer from several initial
+points.</p>
+
+<p>If many runs converge to the same optimum, confidence in the numerical
+solution increases.</p>
+
+<p>Different solutions may indicate:</p>
+
+<p>
+<md>\boxed{
+\text{multiple local optima},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{identifiability problems}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-constrained-optimization-statistics">
+<title>Constrained Optimization</title>
+<p>Statistical parameters often satisfy constraints such as</p>
+
+<p>
+<md>\boxed{
+\sigma^2&gt;0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+0&lt;p&lt;1,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\sum_jp_j=1.
+}</md>
+</p>
+
+<p>Optimization algorithms must respect these constraints.</p>
+
+<p>One strategy is reparameterization.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-optimization-reparameterization">
+<title>Reparameterization</title>
+<p>Instead of optimizing directly over</p>
+
+<p>
+<md>\sigma&gt;0,</md>
+</p>
+
+<p>let</p>
+
+<p>
+<md>\boxed{
+\eta
+=
+\log\sigma.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\sigma
+=
+e^\eta
+}</md>
+</p>
+
+<p>automatically satisfies positivity.</p>
+
+<p>Similarly, probabilities can be represented using logistic or softmax
+transformations.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-coordinate-descent">
+<title>Coordinate Descent</title>
+<p>Coordinate descent updates one parameter at a time while holding the
+others fixed.</p>
+
+<p>For parameters</p>
+
+<p>
+<md>\beta_1,\ldots,\beta_p,</md>
+</p>
+
+<p>one cycles through</p>
+
+<p>
+<md>\boxed{
+\beta_1
+\rightarrow
+\beta_2
+\rightarrow
+\cdots
+\rightarrow
+\beta_p.
+}</md>
+</p>
+
+<p>Coordinate descent is especially useful for lasso and elastic-net
+regression.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-soft-thresholding">
+<title>Soft Thresholding</title>
+<p>The soft-thresholding operator is</p>
+
+<p>
+<md>\boxed{
+S(z,\lambda)
+=
+\operatorname{sign}(z)
+\max
+(
+|z|-\lambda,
+0
+).
+}</md>
+</p>
+
+<p>It appears naturally in coordinate-descent updates for the lasso.</p>
+
+<p>Values sufficiently close to zero are set exactly to zero.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-stochastic-gradient-descent">
+<title>Stochastic Gradient Descent</title>
+<p>If</p>
+
+<p>
+<md>Q(\theta)
+=
+\frac1n
+\sum_{i=1}^{n}
+Q_i(\theta),</md>
+</p>
+
+<p>ordinary gradient descent computes the full gradient.</p>
+
+<p>Stochastic gradient descent, abbreviated SGD, uses one observation or a
+small batch:</p>
+
+<p>
+<md>\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\eta_k
+\nabla
+Q_{i_k}
+(
+\theta^{(k)}
+).
+}</md>
+</p>
+
+<p>This can dramatically reduce the cost per iteration for large datasets.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-minibatch-optimization">
+<title>Mini-Batch Optimization</title>
+<p>A mini-batch method uses a subset</p>
+
+<p>
+<md>B_k</md>
+</p>
+
+<p>of observations at iteration <m>k</m>:</p>
+
+<p>
+<md>\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\eta_k
+\frac1{|B_k|}
+\sum_{i\in B_k}
+\nabla Q_i
+(
+\theta^{(k)}
+).
+}</md>
+</p>
+
+<p>This balances computational efficiency and gradient stability.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-numerical-differentiation-statistics">
+<title>Numerical Differentiation</title>
+<p>If an analytic derivative is unavailable, a numerical approximation may
+be used.</p>
+
+<p>A forward difference is</p>
+
+<p>
+<md>\boxed{
+f'(x)
+\approx
+\frac{
+f(x+h)-f(x)
+}{
+h
+}.
+}</md>
+</p>
+
+<p>A centered difference is</p>
+
+<p>
+<md>\boxed{
+f'(x)
+\approx
+\frac{
+f(x+h)-f(x-h)
+}{
+2h
+}.
+}</md>
+</p>
+
+<p>The choice of <m>h</m> balances truncation and roundoff error.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-automatic-differentiation">
+<title>Automatic Differentiation Preview</title>
+<p>Automatic differentiation computes derivatives by systematically applying
+the chain rule through a sequence of elementary operations.</p>
+
+<p>It is neither symbolic differentiation nor finite differencing.</p>
+
+<p>It can produce derivatives accurate to machine precision and is widely
+used in modern optimization and Bayesian computation.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-matrix-computation-statistics">
+<title>Matrix Computation in Statistics</title>
+<p>Many statistical procedures require solving linear systems</p>
+
+<p>
+<md>\boxed{
+A\mathbf{x}
+=
+\mathbf{b}.
+}</md>
+</p>
+
+<p>Explicitly calculating</p>
+
+<p>
+<md>A^{-1}</md>
+</p>
+
+<p>is often less stable and less efficient than solving the system directly.</p>
+
+<p>Thus numerical linear algebra is central to statistical computation.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-qr-statistics">
+<title>QR Decomposition</title>
+<p>For a design matrix</p>
+
+<p>
+<md>X,</md>
+</p>
+
+<p>a QR decomposition writes</p>
+
+<p>
+<md>\boxed{
+X
+=
+QR,
+}</md>
+</p>
+
+<p>where <m>Q</m> has orthonormal columns and <m>R</m> is upper triangular.</p>
+
+<p>Least squares can then be solved from</p>
+
+<p>
+<md>\boxed{
+R\widehat{\boldsymbol{\beta}}
+=
+Q^T\mathbf{y}.
+}</md>
+</p>
+
+<p>This is often more numerically stable than forming</p>
+
+<p>
+<md>X^TX.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-svd-statistics">
+<title>Singular Value Decomposition</title>
+<p>The singular value decomposition is</p>
+
+<p>
+<md>\boxed{
+X
+=
+U
+D
+V^T.
+}</md>
+</p>
+
+<p>Here,</p>
+
+<p>
+<md>U</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>V</md>
+</p>
+
+<p>contain orthonormal singular vectors, and</p>
+
+<p>
+<md>D</md>
+</p>
+
+<p>contains nonnegative singular values.</p>
+
+<p>SVD is fundamental for:</p>
+
+<p>
+<md>\boxed{
+\text{least squares},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{PCA},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{rank determination},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{regularization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-condition-number-statistics">
+<title>Condition Number</title>
+<p>For a nonsingular matrix <m>A</m>, the condition number in the Euclidean norm
+is</p>
+
+<p>
+<md>\boxed{
+\kappa(A)
+=
+\frac{
+\sigma_{\max}(A)
+}{
+\sigma_{\min}(A)
+}.
+}</md>
+</p>
+
+<p>A large condition number indicates that small perturbations can cause
+large changes in the solution.</p>
+
+<p>This is a major issue under multicollinearity.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-monte-carlo-methods-statistics">
+<title>Monte Carlo Methods</title>
+<p>Monte Carlo methods approximate mathematical quantities through random
+simulation.</p>
+
+<p>Suppose</p>
+
+<p>
+<md>X_1,\ldots,X_M
+\overset{\text{i.i.d.}}{\sim}
+p(x).</md>
+</p>
+
+<p>To estimate</p>
+
+<p>
+<md>\mu
+=
+\mathbb{E}
+[
+g(X)
+],</md>
+</p>
+
+<p>use</p>
+
+<p>
+<md>\boxed{
+\widehat{\mu}_M
+=
+\frac1M
+\sum_{m=1}^{M}
+g(X_m).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-monte-carlo-consistency">
+<title>Monte Carlo Consistency</title>
+<p>By the law of large numbers,</p>
+
+<p>
+<md>\boxed{
+\widehat{\mu}_M
+\xrightarrow{P}
+\mu.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\operatorname{Var}
+[
+g(X)
+]
+=
+\sigma_g^2
+&lt;
+\infty,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+\widehat{\mu}_M
+)
+=
+\frac{
+\sigma_g^2
+}{
+M
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-monte-carlo-se-independent">
+<title>Monte Carlo Standard Error</title>
+<p>The Monte Carlo standard error is approximately</p>
+
+<p>
+<md>\boxed{
+MCSE
+=
+\frac{
+s_g
+}{
+\sqrt{M}
+},
+}</md>
+</p>
+
+<p>where <m>s_g</m> is the sample standard deviation of</p>
+
+<p>
+<md>g(X_1),
+\ldots,
+g(X_M).</md>
+</p>
+
+<p>Thus computational accuracy improves at rate</p>
+
+<p>
+<md>\boxed{
+M^{-1/2}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-monte-carlo-cost-precision">
+<title>Monte Carlo Cost of Precision</title>
+<p>Because</p>
+
+<p>
+<md>MCSE
+\propto
+M^{-1/2},</md>
+</p>
+
+<p>reducing Monte Carlo error by a factor of <m>2</m> requires approximately</p>
+
+<p>
+<md>\boxed{
+4
+}</md>
+</p>
+
+<p>times as many simulations.</p>
+
+<p>Reducing it by a factor of <m>10</m> requires approximately</p>
+
+<p>
+<md>\boxed{
+100
+}</md>
+</p>
+
+<p>times as many simulations.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-worked-monte-carlo-integration">
+<title>Worked Example: Monte Carlo Integration</title>
+<example>
+<title>Estimating an Integral</title>
+<p>Suppose</p>
+
+<p>
+<md>U
+\sim
+\operatorname{Uniform}(0,1).</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\int_0^1
+x^2\,dx
+=
+\mathbb{E}
+[
+U^2
+].</md>
+</p>
+
+<p>Generate</p>
+
+<p>
+<md>U_1,\ldots,U_M</md>
+</p>
+
+<p>and calculate</p>
+
+<p>
+<md>\widehat{I}
+=
+\frac1M
+\sum_{m=1}^{M}
+U_m^2.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>\int_0^1x^2\,dx
+=
+\frac13,</md>
+</p>
+
+<p>the Monte Carlo estimate should approach</p>
+
+<p>
+<md>\begin{answerbox}
+\[
+\boxed{
+\frac13.
+}</md>
+</p>
+
+<p>\end{answerbox}</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-pseudorandom-numbers">
+<title>Pseudo-Random Numbers</title>
+<p>Computer-generated random numbers are generally produced by deterministic
+algorithms designed to imitate randomness.</p>
+
+<p>These are called pseudo-random number generators.</p>
+
+<p>A generator begins from an internal state, often initialized by a seed.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-random-seeds">
+<title>Random Seeds</title>
+<p>Setting a random seed can reproduce the same pseudo-random sequence.</p>
+
+<p>This is useful for:</p>
+
+<p>
+<md>\boxed{
+\text{debugging},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{verification},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{reproducible research}.
+}</md>
+</p>
+
+<p>A fixed seed does not make the statistical procedure itself deterministic
+in a conceptual sense; it fixes one reproducible simulation realization.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-uniform-random-generation">
+<title>Uniform Random Variables</title>
+<p>Many random-generation algorithms begin with</p>
+
+<p>
+<md>\boxed{
+U
+\sim
+\operatorname{Uniform}(0,1).
+}</md>
+</p>
+
+<p>Other distributions are generated by transforming or accepting/rejecting
+uniform random variables.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-inverse-transform-sampling">
+<title>Inverse Transform Sampling</title>
+<p>Suppose <m>F</m> is a continuous strictly increasing CDF.</p>
+
+<p>If</p>
+
+<p>
+<md>U
+\sim
+\operatorname{Uniform}(0,1),</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+X
+=
+F^{-1}(U)
+}</md>
+</p>
+
+<p>has CDF <m>F</m>.</p>
+
+<p>This is inverse transform sampling.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-worked-exponential-simulation">
+<title>Worked Example: Exponential Simulation</title>
+<example>
+<title>Inverse Transform Method</title>
+<p>For</p>
+
+<p>
+<md>X
+\sim
+\operatorname{Exponential}(\lambda),</md>
+</p>
+
+<p>the CDF is</p>
+
+<p>
+<md>F(x)
+=
+1-e^{-\lambda x}.</md>
+</p>
+
+<p>Set</p>
+
+<p>
+<md>U
+=
+1-e^{-\lambda X}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>e^{-\lambda X}
+=
+1-U.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>X
+=
+-\frac1\lambda
+\log(1-U).</md>
+</p>
+
+<p>Since <m>1-U</m> is also uniform,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+X
+=
+-\frac1\lambda
+\log U
+}</md>
+</p>
+
+<p>generates an exponential random variable.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-acceptance-rejection">
+<title>Acceptance--Rejection Sampling</title>
+<p>Suppose target density <m>f</m> is difficult to sample from.</p>
+
+<p>Choose proposal density <m>g</m> and constant <m>M</m> such that</p>
+
+<p>
+<md>\boxed{
+f(x)
+\leq
+Mg(x)
+}</md>
+</p>
+
+<p>for all <m>x</m>.</p>
+
+<p>Generate</p>
+
+<p>
+<md>Y\sim g</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>U\sim
+\operatorname{Uniform}(0,1).</md>
+</p>
+
+<p>Accept <m>Y</m> if</p>
+
+<p>
+<md>\boxed{
+U
+\leq
+\frac{
+f(Y)
+}{
+Mg(Y)
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-acceptance-rejection-rate">
+<title>Acceptance Rate</title>
+<p>If <m>f</m> and <m>g</m> are normalized densities, the average acceptance
+probability is</p>
+
+<p>
+<md>\boxed{
+\frac1M.
+}</md>
+</p>
+
+<p>Thus efficiency depends on choosing a proposal <m>g</m> that closely covers
+the target.</p>
+
+<p>A very large <m>M</m> produces many rejected proposals.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-importance-sampling">
+<title>Importance Sampling</title>
+<p>Suppose</p>
+
+<p>
+<md>\mu
+=
+\int
+g(x)
+p(x)\,dx</md>
+</p>
+
+<p>but sampling from <m>p</m> is difficult.</p>
+
+<p>Choose proposal density <m>q</m> with support covering the important regions
+of <m>p</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>\mu
+=
+\int
+g(x)
+\frac{
+p(x)
+}{
+q(x)
+}
+q(x)\,dx.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\mu
+=
+\mathbb{E}_q
+[
+g(X)w(X)
+],
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+w(x)
+=
+\frac{
+p(x)
+}{
+q(x)
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-importance-sampling-estimator">
+<title>Importance Sampling Estimator</title>
+<p>If</p>
+
+<p>
+<md>X_1,\ldots,X_M
+\sim
+q,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\widehat{\mu}
+=
+\frac1M
+\sum_{m=1}^{M}
+g(X_m)
+w(X_m).
+}</md>
+</p>
+
+<p>This estimator works well only if <m>q</m> provides sufficient coverage of
+important target regions.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-self-normalized-importance">
+<title>Self-Normalized Importance Sampling</title>
+<p>If the target density is known only up to a constant,</p>
+
+<p>
+<md>p(x)
+\propto
+\widetilde{p}(x),</md>
+</p>
+
+<p>define unnormalized weights</p>
+
+<p>
+<md>\widetilde{w}_m
+=
+\frac{
+\widetilde{p}(X_m)
+}{
+q(X_m)
+}.</md>
+</p>
+
+<p>Normalize them:</p>
+
+<p>
+<md>\boxed{
+w_m
+=
+\frac{
+\widetilde{w}_m
+}{
+\sum_{r=1}^{M}
+\widetilde{w}_r
+}.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\widehat{\mu}
+=
+\sum_{m=1}^{M}
+w_m
+g(X_m).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-importance-weight-degeneracy">
+<title>Importance Weight Degeneracy</title>
+<p>If a few observations receive nearly all the importance weight, the
+estimate becomes unstable.</p>
+
+<p>This is called weight degeneracy.</p>
+
+<p>It occurs when proposal <m>q</m> poorly matches the target.</p>
+
+<p>Diagnostics should examine the distribution of weights.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-importance-sampling-ess">
+<title>Effective Sample Size for Importance Sampling</title>
+<p>For normalized weights</p>
+
+<p>
+<md>w_1,\ldots,w_M,</md>
+</p>
+
+<p>a common heuristic effective sample size is</p>
+
+<p>
+<md>\boxed{
+ESS
+=
+\frac1{
+\sum_{m=1}^{M}
+w_m^2
+}.
+}</md>
+</p>
+
+<p>If all weights are equal,</p>
+
+<p>
+<md>ESS=M.</md>
+</p>
+
+<p>If one weight dominates,</p>
+
+<p>
+<md>ESS</md>
+</p>
+
+<p>approaches <m>1</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-monte-carlo-variance-reduction">
+<title>Variance Reduction</title>
+<p>Monte Carlo accuracy can be improved without simply increasing <m>M</m>.</p>
+
+<p>Variance-reduction methods include:</p>
+
+<p>
+<md>\boxed{
+\text{antithetic variables},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{control variates},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{importance sampling},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{stratified simulation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-control-variates">
+<title>Control Variates</title>
+<p>Suppose one wants</p>
+
+<p>
+<md>\mu
+=
+\mathbb{E}[Y]</md>
+</p>
+
+<p>and has another variable <m>X</m> with known mean</p>
+
+<p>
+<md>\mu_X.</md>
+</p>
+
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+Y^*
+=
+Y
+-
+c
+(
+X-\mu_X
+).
+}</md>
+</p>
+
+<p>Its expectation remains <m>\mu</m>.</p>
+
+<p>Choosing <m>c</m> appropriately can reduce variance when <m>X</m> and <m>Y</m> are
+correlated.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-optimal-control-variate">
+<title>Optimal Control-Variate Coefficient</title>
+<p>The variance-minimizing coefficient is</p>
+
+<p>
+<md>\boxed{
+c^*
+=
+\frac{
+\operatorname{Cov}(Y,X)
+}{
+\operatorname{Var}(X)
+}.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(Y^*)
+=
+\operatorname{Var}(Y)
+(
+1-\rho_{XY}^2
+).
+}</md>
+</p>
+
+<p>Strong correlation can therefore yield substantial variance reduction.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-antithetic-variables">
+<title>Antithetic Variables</title>
+<p>Suppose</p>
+
+<p>
+<md>U
+\sim
+\operatorname{Uniform}(0,1).</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>1-U</md>
+</p>
+
+<p>has the same distribution.</p>
+
+<p>A simulation may pair</p>
+
+<p>
+<md>g(U)</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>g(1-U).</md>
+</p>
+
+<p>If these outputs are negatively correlated, their average can have
+smaller variance.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bootstrap">
+<title>Bootstrap</title>
+<p>The bootstrap approximates a sampling distribution by repeatedly
+resampling from an estimated population distribution.</p>
+
+<p>For a statistic</p>
+
+<p>
+<md>\widehat{\theta}
+=
+T(X_1,\ldots,X_n),</md>
+</p>
+
+<p>generate bootstrap datasets</p>
+
+<p>
+<md>\boxed{
+X_1^{*(b)},
+\ldots,
+X_n^{*(b)},
+}</md>
+</p>
+
+<p>and calculate</p>
+
+<p>
+<md>\boxed{
+\widehat{\theta}^{*(b)}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-nonparametric-bootstrap">
+<title>Nonparametric Bootstrap</title>
+<p>The nonparametric bootstrap samples with replacement from the observed
+dataset.</p>
+
+<p>Each bootstrap observation is drawn from the empirical distribution</p>
+
+<p>
+<md>\boxed{
+F_n.
+}</md>
+</p>
+
+<p>Thus every original observation receives probability</p>
+
+<p>
+<md>\boxed{
+\frac1n
+}</md>
+</p>
+
+<p>on each bootstrap draw.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bootstrap-algorithm">
+<title>Bootstrap Algorithm</title>
+<p>A basic nonparametric bootstrap procedure is:</p>
+
+<p>
+<ol>
+<li>
+<p>observe data <m>X_1,\ldots,X_n</m>;</p>
+</li>
+<li>
+<p>calculate <m>\widehat{\theta}</m>;</p>
+</li>
+<li>
+<p>sample <m>n</m> observations with replacement from the data;</p>
+</li>
+<li>
+<p>calculate <m>\widehat{\theta}^*</m>;</p>
+</li>
+<li>
+<p>repeat steps 3--4 for <m>B</m> bootstrap samples;</p>
+</li>
+<li>
+<p>use the empirical distribution of
+          <m>\widehat{\theta}^{*(1)},\ldots,\widehat{\theta}^{*(B)}</m>.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bootstrap-standard-error">
+<title>Bootstrap Standard Error</title>
+<p>The bootstrap standard error is</p>
+
+<p>
+<md>\boxed{
+\widehat{SE}_{boot}
+=
+\sqrt{
+\frac1{B-1}
+\sum_{b=1}^{B}
+\left(
+\widehat{\theta}^{*(b)}
+-
+\overline{\widehat{\theta}^*}
+\right)^2
+}.
+}</md>
+</p>
+
+<p>Here,</p>
+
+<p>
+<md>\boxed{
+\overline{\widehat{\theta}^*}
+=
+\frac1B
+\sum_{b=1}^{B}
+\widehat{\theta}^{*(b)}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-worked-bootstrap-concept">
+<title>Worked Example: Bootstrap Concept</title>
+<example>
+<title>Resampling a Small Dataset</title>
+<p>Suppose the observed sample is</p>
+
+<p>
+<md>\{2,4,7\}.</md>
+</p>
+
+<p>One bootstrap sample might be</p>
+
+<p>
+<md>\{4,4,2\}.</md>
+</p>
+
+<p>Another might be</p>
+
+<p>
+<md>\{7,2,7\}.</md>
+</p>
+
+<p>Each sample has size <m>3</m> and is drawn with replacement from the original
+observations.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\text{Bootstrap samples may contain repeated observations and omit
+others.}
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bootstrap-bias-estimate">
+<title>Bootstrap Bias Estimate</title>
+<p>A bootstrap estimate of estimator bias is</p>
+
+<p>
+<md>\boxed{
+\widehat{\operatorname{Bias}}_{boot}
+=
+\overline{\widehat{\theta}^*}
+-
+\widehat{\theta}.
+}</md>
+</p>
+
+<p>A simple bias-corrected point estimate is</p>
+
+<p>
+<md>\boxed{
+\widehat{\theta}_{BC}
+=
+\widehat{\theta}
+-
+\widehat{\operatorname{Bias}}_{boot}.
+}</md>
+</p>
+
+<p>Bias correction is not always beneficial because it can increase
+variance.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-percentile-bootstrap">
+<title>Percentile Bootstrap Interval</title>
+<p>Let</p>
+
+<p>
+<md>\widehat{\theta}^{*}_{(\alpha/2)}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\widehat{\theta}^{*}_{(1-\alpha/2)}</md>
+</p>
+
+<p>be empirical bootstrap quantiles.</p>
+
+<p>The percentile interval is</p>
+
+<p>
+<md>\boxed{
+\left[
+\widehat{\theta}^{*}_{(\alpha/2)},
+\widehat{\theta}^{*}_{(1-\alpha/2)}
+\right].
+}</md>
+</p>
+
+<p>This is simple but can have poor coverage in biased or highly skewed
+settings.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-basic-bootstrap-interval">
+<title>Basic Bootstrap Interval</title>
+<p>The basic bootstrap interval reflects the bootstrap distribution around
+the observed estimate:</p>
+
+<p>
+<md>\boxed{
+\left[
+2\widehat{\theta}
+-
+\widehat{\theta}^{*}_{(1-\alpha/2)},
+\,
+2\widehat{\theta}
+-
+\widehat{\theta}^{*}_{(\alpha/2)}
+\right].
+}</md>
+</p>
+
+<p>It is sometimes called the reverse-percentile interval.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bootstrap-normal-interval">
+<title>Bootstrap Normal Interval</title>
+<p>Using bootstrap standard error,</p>
+
+<p>
+<md>\boxed{
+\widehat{\theta}
+\pm
+z_{1-\alpha/2}
+\widehat{SE}_{boot}
+}</md>
+</p>
+
+<p>gives a normal-approximation bootstrap interval.</p>
+
+<p>This assumes the estimator distribution is sufficiently symmetric and
+approximately normal.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bca-bootstrap-preview">
+<title>BCa Bootstrap Preview</title>
+<p>The bias-corrected and accelerated, or BCa, interval adjusts bootstrap
+quantiles for:</p>
+
+<p>
+<md>\boxed{
+\text{median bias}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{skewness-related acceleration}.
+}</md>
+</p>
+
+<p>It often improves coverage but requires additional computation.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-parametric-bootstrap">
+<title>Parametric Bootstrap</title>
+<p>The parametric bootstrap assumes a fitted parametric model</p>
+
+<p>
+<md>F_{\widehat{\theta}}.</md>
+</p>
+
+<p>Bootstrap samples are generated from</p>
+
+<p>
+<md>\boxed{
+F_{\widehat{\theta}}
+}</md>
+</p>
+
+<p>rather than directly from the empirical distribution.</p>
+
+<p>This can be more efficient when the parametric model is correct.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-parametric-versus-nonparametric-bootstrap">
+<title>Parametric Versus Nonparametric Bootstrap</title>
+<p>The nonparametric bootstrap relies less on parametric distributional
+assumptions.</p>
+
+<p>The parametric bootstrap can model features not well represented by a
+small empirical sample, but its validity depends strongly on model
+specification.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bootstrap-regression">
+<title>Bootstrap for Regression</title>
+<p>Regression bootstrapping may resample:</p>
+
+<p>
+<md>\boxed{
+\text{observation pairs},
+}</md>
+</p>
+
+<p>or under suitable assumptions,</p>
+
+<p>
+<md>\boxed{
+\text{residuals}.
+}</md>
+</p>
+
+<p>The appropriate scheme depends on the regression design and error
+structure.</p>
+
+<p>Resampling must preserve the data-generating assumptions relevant to the
+inferential target.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-bootstrap-dependence">
+<title>Bootstrap and Dependence</title>
+<p>Ordinary observation-level bootstrap assumes independent sampling.</p>
+
+<p>For time series, spatial data, clustered data, or repeated measurements,
+independent resampling destroys dependence.</p>
+
+<p>Specialized schemes include:</p>
+
+<p>
+<md>\boxed{
+\text{block bootstrap},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{cluster bootstrap},
+}</md>
+</p>
+
+<p>or model-based resampling.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-block-bootstrap-preview">
+<title>Block Bootstrap Preview</title>
+<p>For dependent sequential data, blocks of consecutive observations are
+resampled rather than individual observations.</p>
+
+<p>This preserves short-range dependence within blocks.</p>
+
+<p>The block length creates a bias--variance and dependence-preservation
+tradeoff.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-jackknife">
+<title>Jackknife</title>
+<p>The jackknife systematically removes one observation at a time.</p>
+
+<p>Let</p>
+
+<p>
+<md>\widehat{\theta}_{(-i)}</md>
+</p>
+
+<p>be the estimate computed without observation <m>i</m>.</p>
+
+<p>There are</p>
+
+<p>
+<md>\boxed{
+n
+}</md>
+</p>
+
+<p>leave-one-out estimates.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-jackknife-mean">
+<title>Jackknife Mean</title>
+<p>Define</p>
+
+<p>
+<md>\boxed{
+\overline{\theta}_{(\cdot)}
+=
+\frac1n
+\sum_{i=1}^{n}
+\widehat{\theta}_{(-i)}.
+}</md>
+</p>
+
+<p>A jackknife bias estimate is</p>
+
+<p>
+<md>\boxed{
+\widehat{\operatorname{Bias}}_{jack}
+=
+(n-1)
+\left(
+\overline{\theta}_{(\cdot)}
+-
+\widehat{\theta}
+\right).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-jackknife-standard-error">
+<title>Jackknife Standard Error</title>
+<p>A jackknife standard-error estimate is</p>
+
+<p>
+<md>\boxed{
+\widehat{SE}_{jack}
+=
+\sqrt{
+\frac{
+n-1
+}{
+n
+}
+\sum_{i=1}^{n}
+\left(
+\widehat{\theta}_{(-i)}
+-
+\overline{\theta}_{(\cdot)}
+\right)^2
+}.
+}</md>
+</p>
+
+<p>Jackknife methods work especially well for sufficiently smooth
+statistics.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-permutation-tests-computational">
+<title>Permutation Tests</title>
+<p>Permutation tests construct a null distribution by rearranging labels or
+assignments in a manner justified by the null hypothesis.</p>
+
+<p>Suppose a statistic is</p>
+
+<p>
+<md>\boxed{
+T_{obs}.
+}</md>
+</p>
+
+<p>For each valid permutation <m>\pi</m>, compute</p>
+
+<p>
+<md>\boxed{
+T_\pi.
+}</md>
+</p>
+
+<p>The permutation distribution provides the null reference distribution.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-exact-permutation-test">
+<title>Exact Permutation Test</title>
+<p>If all valid permutations can be enumerated, the exact permutation
+<m>p</m>-value for a right-tailed test is</p>
+
+<p>
+<md>\boxed{
+p
+=
+\frac{
+\#\{
+T_\pi\geq T_{obs}
+\}
+}{
+\#\{
+\text{valid permutations}
+\}
+}.
+}</md>
+</p>
+
+<p>The permutation scheme must reflect the null exchangeability structure.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-monte-carlo-permutation-test">
+<title>Monte Carlo Permutation Test</title>
+<p>When the number of permutations is too large, sample</p>
+
+<p>
+<md>B</md>
+</p>
+
+<p>random valid permutations.</p>
+
+<p>If</p>
+
+<p>
+<md>B_{extreme}</md>
+</p>
+
+<p>sampled statistics are at least as extreme as the observed statistic, a
+common finite-simulation correction is</p>
+
+<p>
+<md>\boxed{
+p
+=
+\frac{
+B_{extreme}+1
+}{
+B+1
+}.
+}</md>
+</p>
+
+<p>The plus-one correction avoids reporting an impossible Monte Carlo
+<m>p</m>-value of exactly zero.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-randomization-tests-computational">
+<title>Randomization Tests</title>
+<p>In randomized experiments, the treatment-assignment mechanism defines a
+natural reference distribution.</p>
+
+<p>Under a sharp null hypothesis, outcomes are fixed and treatment labels
+are reassigned according to the original randomization scheme.</p>
+
+<p>This produces a design-based randomization distribution.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-permutation-versus-bootstrap">
+<title>Permutation Versus Bootstrap</title>
+<p>Bootstrap methods approximate sampling distributions by resampling data
+from an estimated population.</p>
+
+<p>Permutation methods approximate null distributions by rearranging labels
+or assignments under a null invariance principle.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{bootstrap}
+\rightarrow
+\text{sampling uncertainty},
+}</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>\boxed{
+\text{permutation}
+\rightarrow
+\text{null reference distribution}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-mcmc-computational-statistics">
+<title>Markov Chain Monte Carlo</title>
+<p>Markov chain Monte Carlo constructs a dependent sequence</p>
+
+<p>
+<md>\boxed{
+\theta^{(1)},
+\theta^{(2)},
+\ldots
+}</md>
+</p>
+
+<p>whose stationary distribution is a target distribution</p>
+
+<p>
+<md>\pi(\theta).</md>
+</p>
+
+<p>In Bayesian statistics,</p>
+
+<p>
+<md>\pi(\theta)</md>
+</p>
+
+<p>is usually the posterior distribution.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-why-mcmc-useful">
+<title>Why MCMC Is Useful</title>
+<p>Suppose the posterior is</p>
+
+<p>
+<md>\pi(\theta\mid x)
+=
+\frac{
+h(\theta)
+}{
+C
+},</md>
+</p>
+
+<p>where the normalizing constant <m>C</m> is unknown.</p>
+
+<p>Many MCMC methods require only ratios of posterior densities.</p>
+
+<p>Then <m>C</m> cancels.</p>
+
+<p>This makes MCMC useful for high-dimensional intractable posteriors.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-metropolis-hastings-computational">
+<title>Metropolis--Hastings Algorithm</title>
+<p>At current state</p>
+
+<p>
+<md>\theta^{(m)},</md>
+</p>
+
+<p>propose</p>
+
+<p>
+<md>\theta'
+\sim
+q
+(
+\theta'\mid\theta^{(m)}
+).</md>
+</p>
+
+<p>Accept <m>\theta'</m> with probability</p>
+
+<p>
+<md>\boxed{
+\alpha
+=
+\min
+\left\{
+1,
+\frac{
+\pi(\theta')
+q
+(
+\theta^{(m)}\mid\theta'
+)
+}{
+\pi
+(
+\theta^{(m)}
+)
+q
+(
+\theta'\mid\theta^{(m)}
+)
+}
+\right\}.
+}</md>
+</p>
+
+<p>If rejected,</p>
+
+<p>
+<md>\boxed{
+\theta^{(m+1)}
+=
+\theta^{(m)}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-symmetric-mh-proposal">
+<title>Symmetric Proposal</title>
+<p>If</p>
+
+<p>
+<md>q
+(
+\theta'\mid\theta
+)
+=
+q
+(
+\theta\mid\theta'
+),</md>
+</p>
+
+<p>the proposal terms cancel.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\alpha
+=
+\min
+\left\{
+1,
+\frac{
+\pi(\theta')
+}{
+\pi(\theta)
+}
+\right\}.
+}</md>
+</p>
+
+<p>Random-walk proposals are common examples.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-detailed-balance">
+<title>Detailed Balance</title>
+<p>A transition kernel satisfies detailed balance with respect to <m>\pi</m> if</p>
+
+<p>
+<md>\boxed{
+\pi(x)
+P(x,dy)
+=
+\pi(y)
+P(y,dx).
+}</md>
+</p>
+
+<p>Detailed balance implies that <m>\pi</m> is stationary.</p>
+
+<p>Metropolis--Hastings is constructed to satisfy this relationship under
+appropriate conditions.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-gibbs-sampling-computational">
+<title>Gibbs Sampling</title>
+<p>Suppose</p>
+
+<p>
+<md>\boldsymbol{\theta}
+=
+(
+\theta_1,\ldots,\theta_p
+).</md>
+</p>
+
+<p>Gibbs sampling repeatedly draws each component from its full conditional:</p>
+
+<p>
+<md>\boxed{
+\theta_j
+\sim
+\pi
+(
+\theta_j
+\mid
+\boldsymbol{\theta}_{-j},
+x
+).
+}</md>
+</p>
+
+<p>If all full conditionals are easy to sample from, Gibbs sampling can be
+simple to implement.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-mcmc-burnin-computational">
+<title>MCMC Burn-In and Warmup</title>
+<p>Early iterations may depend strongly on initialization or be used for
+algorithm adaptation.</p>
+
+<p>These are often treated as warmup iterations.</p>
+
+<p>Discarding warmup does not guarantee convergence.</p>
+
+<p>The post-warmup chain must still mix adequately.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-mcmc-autocorrelation-computational">
+<title>MCMC Autocorrelation</title>
+<p>MCMC draws are dependent.</p>
+
+<p>Let</p>
+
+<p>
+<md>\rho_k</md>
+</p>
+
+<p>denote autocorrelation at lag <m>k</m> in the simulated chain.</p>
+
+<p>Strong positive autocorrelation means the chain explores the target
+slowly.</p>
+
+<p>This reduces effective information.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-integrated-autocorrelation-time">
+<title>Integrated Autocorrelation Time</title>
+<p>A conceptual integrated autocorrelation time is</p>
+
+<p>
+<md>\boxed{
+\tau
+=
+1
++
+2
+\sum_{k=1}^{\infty}
+\rho_k,
+}</md>
+</p>
+
+<p>when the series is well-defined.</p>
+
+<p>Then approximately</p>
+
+<p>
+<md>\boxed{
+ESS
+\approx
+\frac{
+M
+}{
+\tau
+}.
+}</md>
+</p>
+
+<p>Thus highly correlated chains have smaller effective sample sizes.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-mcmc-mcse">
+<title>MCMC Monte Carlo Standard Error</title>
+<p>If posterior quantity <m>g(\theta)</m> has variance</p>
+
+<p>
+<md>\sigma_g^2,</md>
+</p>
+
+<p>a rough MCMC standard error is</p>
+
+<p>
+<md>\boxed{
+MCSE
+\approx
+\sqrt{
+\frac{
+\sigma_g^2
+}{
+ESS
+}
+}.
+}</md>
+</p>
+
+<p>Thus increasing raw iterations is useful only if the chain produces
+additional effective information.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-mcmc-diagnostics-computational">
+<title>MCMC Diagnostics</title>
+<p>Useful diagnostics include:</p>
+
+<p>
+<md>\boxed{
+\text{trace plots},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{autocorrelation plots},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{effective sample sizes},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\widehat{R},
+}</md>
+</p>
+
+<p>and comparisons across multiple chains.</p>
+
+<p>No single diagnostic proves convergence.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-sequential-monte-carlo-preview">
+<title>Sequential Monte Carlo Preview</title>
+<p>Sequential Monte Carlo represents a sequence of target distributions
+using weighted particles.</p>
+
+<p>At each stage, particles may undergo:</p>
+
+<p>
+<md>\boxed{
+\text{weighting},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{resampling},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{propagation}.
+}</md>
+</p>
+
+<p>These methods are widely used in state-space and dynamic models.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-particle-filtering-preview">
+<title>Particle Filtering Preview</title>
+<p>A particle filter approximates the filtering distribution</p>
+
+<p>
+<md>\boxed{
+p
+(
+x_t
+\mid
+y_1,\ldots,y_t
+)
+}</md>
+</p>
+
+<p>using a weighted collection of simulated states.</p>
+
+<p>Unlike the Kalman filter, particle methods can handle nonlinear and
+non-Gaussian state-space models.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-em-algorithm">
+<title>Expectation--Maximization Algorithm</title>
+<p>The expectation--maximization, or EM, algorithm is used when a model
+contains latent or missing data.</p>
+
+<p>Let</p>
+
+<p>
+<md>Z</md>
+</p>
+
+<p>denote latent variables and</p>
+
+<p>
+<md>X</md>
+</p>
+
+<p>the observed data.</p>
+
+<p>The complete-data log-likelihood is</p>
+
+<p>
+<md>\boxed{
+\ell_c
+(
+\theta;X,Z
+).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-em-e-step">
+<title>E-Step</title>
+<p>Given current parameter estimate</p>
+
+<p>
+<md>\theta^{(k)},</md>
+</p>
+
+<p>the E-step calculates</p>
+
+<p>
+<md>\boxed{
+Q
+(
+\theta\mid\theta^{(k)}
+)
+=
+\mathbb{E}
+\left[
+\ell_c
+(
+\theta;X,Z
+)
+\mid
+X,\theta^{(k)}
+\right].
+}</md>
+</p>
+
+<p>This replaces missing or latent information by its conditional expected
+log-likelihood contribution.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-em-m-step">
+<title>M-Step</title>
+<p>The M-step sets</p>
+
+<p>
+<md>\boxed{
+\theta^{(k+1)}
+=
+\arg\max_\theta
+Q
+(
+\theta\mid\theta^{(k)}
+).
+}</md>
+</p>
+
+<p>Thus EM alternates:</p>
+
+<p>
+<md>\boxed{
+\text{Expectation}
+\rightarrow
+\text{Maximization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-em-monotonicity">
+<title>EM Monotonicity</title>
+<p>Under standard conditions, each EM iteration does not decrease the
+observed-data likelihood:</p>
+
+<p>
+<md>\boxed{
+L
+(
+\theta^{(k+1)}
+)
+\geq
+L
+(
+\theta^{(k)}
+).
+}</md>
+</p>
+
+<p>However, EM can converge slowly and may converge to a local optimum.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-em-mixture-model">
+<title>Mixture-Model Example</title>
+<p>Suppose</p>
+
+<p>
+<md>X_i</md>
+</p>
+
+<p>arises from one of <m>K</m> latent mixture components.</p>
+
+<p>Introduce latent indicator</p>
+
+<p>
+<md>\boxed{
+Z_i
+\in
+\{1,\ldots,K\}.
+}</md>
+</p>
+
+<p>The E-step estimates posterior probabilities of component membership.</p>
+
+<p>The M-step updates component parameters using those probabilities as
+weights.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-simulation-studies">
+<title>Simulation Studies</title>
+<p>A simulation study evaluates statistical procedures under controlled
+data-generating conditions.</p>
+
+<p>Typical goals include estimating:</p>
+
+<p>
+<md>\boxed{
+\text{bias},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{variance},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{MSE},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{coverage},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Type I error},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{power}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-simulation-study-design">
+<title>Basic Simulation Study Design</title>
+<p>A simulation study may proceed as follows:</p>
+
+<p>
+<ol>
+<li>
+<p>choose known population parameters;</p>
+</li>
+<li>
+<p>generate a synthetic dataset;</p>
+</li>
+<li>
+<p>apply the statistical procedure;</p>
+</li>
+<li>
+<p>save the estimate or test result;</p>
+</li>
+<li>
+<p>repeat many times;</p>
+</li>
+<li>
+<p>summarize the repeated results.</p>
+</li>
+</ol>
+</p>
+
+<p>Because the true parameter is known, estimator properties can be measured
+directly.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-simulation-bias">
+<title>Monte Carlo Bias Estimate</title>
+<p>Suppose simulation replication <m>r</m> produces estimator</p>
+
+<p>
+<md>\widehat{\theta}^{(r)}.</md>
+</p>
+
+<p>Across <m>R</m> simulations,</p>
+
+<p>
+<md>\boxed{
+\widehat{\operatorname{Bias}}
+=
+\frac1R
+\sum_{r=1}^{R}
+\widehat{\theta}^{(r)}
+-
+\theta.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-simulation-mse">
+<title>Monte Carlo MSE Estimate</title>
+<p>The simulation estimate of MSE is</p>
+
+<p>
+<md>\boxed{
+\widehat{MSE}
+=
+\frac1R
+\sum_{r=1}^{R}
+\left(
+\widehat{\theta}^{(r)}
+-
+\theta
+\right)^2.
+}</md>
+</p>
+
+<p>This approximates the true repeated-sampling mean squared error.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-coverage-simulation">
+<title>Coverage Simulation</title>
+<p>Suppose interval</p>
+
+<p>
+<md>C_r</md>
+</p>
+
+<p>is constructed in simulation <m>r</m>.</p>
+
+<p>The empirical coverage is</p>
+
+<p>
+<md>\boxed{
+\widehat{Coverage}
+=
+\frac1R
+\sum_{r=1}^{R}
+\mathbf{1}
+\{
+\theta\in C_r
+\}.
+}</md>
+</p>
+
+<p>A nominal <m>95\%</m> interval should ideally yield coverage near</p>
+
+<p>
+<md>\boxed{
+0.95.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-simulation-type-i">
+<title>Simulating Type I Error</title>
+<p>Generate data under the null hypothesis.</p>
+
+<p>Apply the test and record whether it rejects.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\widehat{\alpha}
+=
+\frac{
+\text{number of rejections}
+}{
+R
+}.
+}</md>
+</p>
+
+<p>This evaluates whether the procedure maintains its nominal significance
+level.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-simulation-power">
+<title>Simulating Power</title>
+<p>Generate data under a specified alternative.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\widehat{Power}
+=
+\frac{
+\text{number of rejections}
+}{
+R
+}.
+}</md>
+</p>
+
+<p>Repeating this for several effect sizes produces an empirical power curve.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-simulation-monte-carlo-error">
+<title>Monte Carlo Error in Simulation Studies</title>
+<p>Simulation summaries themselves contain Monte Carlo error.</p>
+
+<p>For a simulated rejection proportion</p>
+
+<p>
+<md>\widehat{p},</md>
+</p>
+
+<p>the approximate Monte Carlo standard error is</p>
+
+<p>
+<md>\boxed{
+\sqrt{
+\frac{
+\widehat{p}
+(
+1-\widehat{p}
+)
+}{
+R
+}
+}.
+}</md>
+</p>
+
+<p>Thus reported simulation results should use enough replications for the
+desired precision.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-reproducible-simulation">
+<title>Reproducible Simulation</title>
+<p>A reproducible simulation should document:</p>
+
+<p>
+<md>\boxed{
+\text{data-generating mechanism},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{parameter values},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{sample sizes},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{number of replications},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{random-number settings},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{analysis procedure}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-parallel-computation-statistics">
+<title>Parallel Computation</title>
+<p>Many simulation and resampling tasks contain independent repetitions.</p>
+
+<p>For example:</p>
+
+<p>
+<md>\boxed{
+\text{bootstrap replications},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{permutation samples},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{simulation-study replications}.
+}</md>
+</p>
+
+<p>These can often be distributed across multiple processors.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-parallel-random-number-generation">
+<title>Parallel Random Number Generation</title>
+<p>Parallel simulation requires care with pseudo-random streams.</p>
+
+<p>Simply reusing the same seed on every worker can generate identical
+sequences.</p>
+
+<p>Reliable parallel random-number methods use independent or appropriately
+separated streams.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-vectorization-statistics">
+<title>Vectorization</title>
+<p>Vectorized computation performs operations on entire arrays or matrices
+rather than using explicit scalar loops.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+X^T\mathbf{y}
+}</md>
+</p>
+
+<p>is a matrix operation.</p>
+
+<p>Vectorization can improve both clarity and speed when supported by
+optimized numerical libraries.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-sparse-matrices-statistics">
+<title>Sparse Matrices</title>
+<p>A sparse matrix contains mostly zero entries.</p>
+
+<p>Large models involving:</p>
+
+<p>
+<md>\boxed{
+\text{networks},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{spatial adjacency},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{high-dimensional design matrices}
+}</md>
+</p>
+
+<p>may benefit greatly from sparse storage and algorithms.</p>
+
+<p>Storing every zero explicitly can waste enormous memory.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-complexity-statistics">
+<title>Computational Complexity</title>
+<p>Algorithms can be compared by how computational cost grows with problem
+size.</p>
+
+<p>For example, dense matrix inversion is often roughly</p>
+
+<p>
+<md>\boxed{
+O(p^3).
+}</md>
+</p>
+
+<p>Thus doubling <m>p</m> can increase computational cost by approximately a
+factor of</p>
+
+<p>
+<md>\boxed{
+8.
+}</md>
+</p>
+
+<p>Complexity becomes critical in high-dimensional problems.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-memory-complexity-statistics">
+<title>Memory Complexity</title>
+<p>A dense <m>p\times p</m> matrix requires storage proportional to</p>
+
+<p>
+<md>\boxed{
+p^2.
+}</md>
+</p>
+
+<p>For very large <m>p</m>, covariance and kernel matrices can become
+impractical even before arithmetic becomes too slow.</p>
+
+<p>Algorithms may therefore rely on:</p>
+
+<p>
+<md>\boxed{
+\text{sparsity},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{low-rank approximations},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{iterative matrix methods}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-numerical-stability-least-squares">
+<title>Numerical Stability in Least Squares</title>
+<p>The normal-equation estimator is</p>
+
+<p>
+<md>\widehat{\boldsymbol{\beta}}
+=
+(
+X^TX
+)^{-1}
+X^T\mathbf{y}.</md>
+</p>
+
+<p>But forming</p>
+
+<p>
+<md>X^TX</md>
+</p>
+
+<p>can worsen conditioning.</p>
+
+<p>QR or SVD-based least-squares solutions are usually more stable.</p>
+
+<p>Thus mathematically equivalent formulas need not be computationally
+equivalent.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-iterative-linear-solvers-statistics">
+<title>Iterative Solvers</title>
+<p>For extremely large systems, direct matrix decompositions may be too
+expensive.</p>
+
+<p>Iterative solvers approximate the solution to</p>
+
+<p>
+<md>\boxed{
+A\mathbf{x}
+=
+\mathbf{b}
+}</md>
+</p>
+
+<p>through successive updates.</p>
+
+<p>Such methods can exploit matrix sparsity and avoid storing dense
+factorizations.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-numerical-integration-statistics">
+<title>Numerical Integration</title>
+<p>Statistical expectations often have the form</p>
+
+<p>
+<md>\boxed{
+\int
+g(\theta)
+p(\theta)
+\,d\theta.
+}</md>
+</p>
+
+<p>Low-dimensional integrals may be approximated using deterministic
+quadrature.</p>
+
+<p>High-dimensional integrals often require Monte Carlo or other specialized
+methods.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-quadrature-preview">
+<title>Quadrature Preview</title>
+<p>A numerical quadrature rule approximates</p>
+
+<p>
+<md>\int_a^b
+f(x)\,dx</md>
+</p>
+
+<p>using weighted evaluations:</p>
+
+<p>
+<md>\boxed{
+\int_a^b
+f(x)\,dx
+\approx
+\sum_{j=1}^{m}
+w_j
+f(x_j).
+}</md>
+</p>
+
+<p>Examples include trapezoidal, Simpson-type, and Gaussian quadrature
+methods.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-integration-curse-dimensionality">
+<title>Curse of Dimensionality in Integration</title>
+<p>A deterministic grid using <m>m</m> points per dimension requires</p>
+
+<p>
+<md>\boxed{
+m^d
+}</md>
+</p>
+
+<p>evaluations in <m>d</m> dimensions.</p>
+
+<p>Thus quadrature becomes rapidly infeasible as dimension grows.</p>
+
+<p>Monte Carlo methods are attractive because their basic convergence rate
+does not directly deteriorate exponentially with dimension in this way.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-optimization-statistical-learning">
+<title>Optimization in Statistical Learning</title>
+<p>Modern predictive models frequently solve penalized objectives such as</p>
+
+<p>
+<md>\boxed{
+\min_{\boldsymbol{\beta}}
+\left[
+L
+(
+\boldsymbol{\beta}
+)
++
+\lambda
+P
+(
+\boldsymbol{\beta}
+)
+\right].
+}</md>
+</p>
+
+<p>Different penalties require different numerical algorithms.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{gradient methods},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{coordinate descent},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{proximal algorithms}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-proximal-methods-preview">
+<title>Proximal Methods Preview</title>
+<p>Suppose an objective is</p>
+
+<p>
+<md>f(\theta)+g(\theta),</md>
+</p>
+
+<p>where <m>f</m> is smooth and <m>g</m> may be nonsmooth.</p>
+
+<p>A proximal-gradient update has form</p>
+
+<p>
+<md>\boxed{
+\theta^{(k+1)}
+=
+\operatorname{prox}_{\eta g}
+\left[
+\theta^{(k)}
+-
+\eta
+\nabla f
+(
+\theta^{(k)}
+)
+\right].
+}</md>
+</p>
+
+<p>This framework is useful for <m>\ell_1</m>-penalized problems.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-reproducible-statistical-computation">
+<title>Reproducible Statistical Computation</title>
+<p>A reproducible analysis should record:</p>
+
+<p>
+<md>\boxed{
+\text{data version},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{code},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{software versions},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{random seeds},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{model settings},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{preprocessing decisions}.
+}</md>
+</p>
+
+<p>Reproducibility is part of statistical validity.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-diagnostics">
+<title>Computational Diagnostics</title>
+<p>A statistical result should not be trusted solely because software
+returned a number.</p>
+
+<p>Check for:</p>
+
+<p>
+<md>\boxed{
+\text{optimizer convergence},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{gradient size},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{boundary estimates},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{singular matrices},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{MCMC mixing},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{simulation error}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-algorithm-verification">
+<title>Algorithm Verification</title>
+<p>When possible, verify a computational method using a problem with a known
+analytical answer.</p>
+
+<p>For example, an MCMC algorithm can be tested on a simple normal target
+whose moments are known.</p>
+
+<p>Agreement does not prove correctness for all problems, but disagreement
+reveals implementation errors.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-sensitivity-initialization">
+<title>Sensitivity to Initialization</title>
+<p>Some algorithms depend strongly on starting values.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{mixture-model EM},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+k\text{-means},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{nonconvex likelihood optimization}.
+}</md>
+</p>
+
+<p>Multiple initializations can expose instability.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-sensitivity-tolerance">
+<title>Sensitivity to Tolerance</title>
+<p>A convergence tolerance that is too loose may stop an algorithm before
+adequate accuracy is reached.</p>
+
+<p>An excessively strict tolerance can waste computation or fail because of
+floating-point limitations.</p>
+
+<p>Important analyses should be checked for stability across reasonable
+tolerances.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-high-dimensional-statistical-computation">
+<title>High-Dimensional Statistical Computation</title>
+<p>When</p>
+
+<p>
+<md>p</md>
+</p>
+
+<p>is extremely large, standard dense computations may become infeasible.</p>
+
+<p>Possible strategies include:</p>
+
+<p>
+<md>\boxed{
+\text{regularization},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{sparse matrices},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{iterative solvers},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{low-rank approximations},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{distributed computation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-low-rank-approximation-statistics">
+<title>Low-Rank Approximation</title>
+<p>If a matrix is approximately low rank, one can retain only its largest
+singular components.</p>
+
+<p>For</p>
+
+<p>
+<md>X
+=
+UDV^T,</md>
+</p>
+
+<p>a rank-<m>r</m> approximation is</p>
+
+<p>
+<md>\boxed{
+X_r
+=
+U_r
+D_r
+V_r^T.
+}</md>
+</p>
+
+<p>This reduces storage and computation while retaining dominant structure.</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-statistics-workflow">
+<title>Computational Statistical Workflow</title>
+<p>A practical computational workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>formulate the statistical target;</p>
+</li>
+<li>
+<p>determine whether an analytical solution exists;</p>
+</li>
+<li>
+<p>choose an appropriate numerical algorithm;</p>
+</li>
+<li>
+<p>choose a numerically stable parameterization;</p>
+</li>
+<li>
+<p>initialize the algorithm carefully;</p>
+</li>
+<li>
+<p>set convergence tolerances;</p>
+</li>
+<li>
+<p>monitor objective values or diagnostic quantities;</p>
+</li>
+<li>
+<p>verify convergence;</p>
+</li>
+<li>
+<p>compare multiple initializations when appropriate;</p>
+</li>
+<li>
+<p>quantify Monte Carlo error if simulation is used;</p>
+</li>
+<li>
+<p>verify the method on known special cases;</p>
+</li>
+<li>
+<p>assess sensitivity to algorithm settings;</p>
+</li>
+<li>
+<p>use stable matrix factorizations;</p>
+</li>
+<li>
+<p>preserve random seeds and software settings;</p>
+</li>
+<li>
+<p>document computational limitations.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-choosing-computational-method">
+<title>Choosing a Computational Method</title>
+<p>For smooth likelihood optimization:</p>
+
+<p>
+<md>\boxed{
+\text{Newton, quasi-Newton, or gradient methods}.
+}</md>
+</p>
+
+<p>For lasso-type penalization:</p>
+
+<p>
+<md>\boxed{
+\text{coordinate descent or proximal methods}.
+}</md>
+</p>
+
+<p>For uncertainty from repeated sampling:</p>
+
+<p>
+<md>\boxed{
+\text{bootstrap}.
+}</md>
+</p>
+
+<p>For null distributions under exchangeability:</p>
+
+<p>
+<md>\boxed{
+\text{permutation or randomization tests}.
+}</md>
+</p>
+
+<p>For ordinary integrals under known simulation distributions:</p>
+
+<p>
+<md>\boxed{
+\text{Monte Carlo}.
+}</md>
+</p>
+
+<p>For difficult posterior distributions:</p>
+
+<p>
+<md>\boxed{
+\text{MCMC}.
+}</md>
+</p>
+
+<p>For latent-variable likelihoods:</p>
+
+<p>
+<md>\boxed{
+\text{EM}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-statistics-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-assuming-software-output-is-automatically-correct">
+<title>Assuming Software Output Is Automatically Correct</title>
+<p>A numerical optimizer may stop at:</p>
+
+<p>
+<md>\boxed{
+\text{a local optimum},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{a boundary},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{a nonconverged point}.
+}</md>
+</p>
+
+<p>Diagnostic messages must be inspected.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-numerical-precision">
+<title>Ignoring Numerical Precision</title>
+<p>Very large or very small numbers can cause overflow or underflow.</p>
+
+<p>Likelihood calculations should often use logarithmic forms.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-explicitly-inverting-matrices-unnecessarily">
+<title>Explicitly Inverting Matrices Unnecessarily</title>
+<p>Solving</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b}</md>
+</p>
+
+<p>directly is usually preferable to computing</p>
+
+<p>
+<md>A^{-1}</md>
+</p>
+
+<p>and multiplying.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-normal-equations-in-ill-conditioned-problems">
+<title>Using Normal Equations in Ill-Conditioned Problems</title>
+<p>Forming</p>
+
+<p>
+<md>X^TX</md>
+</p>
+
+<p>can worsen conditioning.</p>
+
+<p>QR or SVD methods are often more stable.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-multiple-local-optima">
+<title>Ignoring Multiple Local Optima</title>
+<p>Mixture models, clustering, and nonconvex objectives can have several
+local solutions.</p>
+
+<p>One starting point may not be enough.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-stopping-optimization-too-early">
+<title>Stopping Optimization Too Early</title>
+<p>A small number of iterations does not guarantee convergence.</p>
+
+<p>The gradient, parameter changes, and objective changes should be checked.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-reporting-monte-carlo-estimates-without-monte-carlo-error">
+<title>Reporting Monte Carlo Estimates Without Monte Carlo Error</title>
+<p>A simulation result such as</p>
+
+<p>
+<md>0.0317</md>
+</p>
+
+<p>has finite-simulation uncertainty.</p>
+
+<p>Report or at least assess its Monte Carlo standard error.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-reporting-a-monte-carlo-p-value-of-zero">
+<title>Reporting a Monte Carlo <m>p</m>-Value of Zero</title>
+<p>If only <m>B</m> random permutations are sampled, use a finite-simulation
+correction such as</p>
+
+<p>
+<md>\boxed{
+\frac{
+B_{extreme}+1
+}{
+B+1
+}.
+}</md>
+</p>
+
+<p>The true <m>p</m>-value has not been established as exactly zero.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-ordinary-bootstrap-for-dependent-data">
+<title>Using Ordinary Bootstrap for Dependent Data</title>
+<p>Independent resampling destroys serial, spatial, or cluster dependence.</p>
+
+<p>Use a resampling scheme appropriate to the sampling structure.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-bootstrap-always-works">
+<title>Assuming Bootstrap Always Works</title>
+<p>The bootstrap can fail for irregular estimators, boundary problems,
+extreme-value statistics, or inappropriate resampling schemes.</p>
+
+<p>Its validity depends on the statistic and data-generating process.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-bootstrap-monte-carlo-error">
+<title>Ignoring Bootstrap Monte Carlo Error</title>
+<p>The estimated bootstrap quantiles themselves depend on finite <m>B</m>.</p>
+
+<p>Too few bootstrap samples can create unstable intervals.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-permutation-and-bootstrap-logic">
+<title>Confusing Permutation and Bootstrap Logic</title>
+<p>Bootstrap resampling approximates sampling variation.</p>
+
+<p>Permutation resampling constructs a null reference distribution.</p>
+
+<p>They answer different inferential questions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-mcmc-draws-are-independent">
+<title>Assuming MCMC Draws Are Independent</title>
+<p>MCMC samples are generally autocorrelated.</p>
+
+<p>Raw iteration count overstates effective information.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-only-one-mcmc-chain">
+<title>Using Only One MCMC Chain</title>
+<p>A single chain can remain trapped in one region without revealing the
+problem.</p>
+
+<p>Multiple dispersed chains provide stronger diagnostics.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-warmup-fixes-poor-mixing">
+<title>Assuming Warmup Fixes Poor Mixing</title>
+<p>Discarding early iterations does not correct an algorithm that fails to
+explore the target distribution.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-09-statistics-19-computational-statistics-subsubsec-thinning-automatically">
+<title>Thinning Automatically</title>
+<p>Thinning often discards useful draws.</p>
+
+<p>It should be used only for a justified computational reason.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-importance-weight-degeneracy">
+<title>Ignoring Importance Weight Degeneracy</title>
+<p>A small number of huge weights can make importance-sampling estimates
+effectively depend on only a few simulations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-the-same-random-stream-improperly-in-parallel-code">
+<title>Using the Same Random Stream Improperly in Parallel Code</title>
+<p>Duplicated random streams can make apparently independent simulation
+replications identical or correlated.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-comparing-algorithms-without-equal-computational-budgets">
+<title>Comparing Algorithms Without Equal Computational Budgets</title>
+<p>One method may appear more accurate simply because it used much more
+computation.</p>
+
+<p>Runtime, memory, convergence quality, and statistical accuracy should be
+considered together.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-reproducibility">
+<title>Ignoring Reproducibility</title>
+<p>Without code, software settings, preprocessing details, and random-number
+information, a computational statistical result may be impossible to
+verify.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-statistics-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Bayesian Inference.</em>
+MCMC, importance sampling, quadrature, and optimization make complex
+posterior distributions computationally accessible.</p>
+
+<p>\medskip</p>
+
+<p><em>Statistical Learning.</em>
+Regularized regression, boosting, kernel methods, and high-dimensional
+models rely on numerical optimization.</p>
+
+<p>\medskip</p>
+
+<p><em>Environmental Science.</em>
+Bootstrap, Monte Carlo simulation, spatial computation, and stochastic
+models quantify uncertainty in environmental data.</p>
+
+<p>\medskip</p>
+
+<p><em>Engineering.</em>
+Simulation studies evaluate system reliability, estimator performance,
+and uncertainty under complicated failure processes.</p>
+
+<p>\medskip</p>
+
+<p><em>Medicine.</em>
+Computational methods fit survival models, hierarchical models,
+longitudinal models, and high-dimensional predictive systems.</p>
+
+<p>\medskip</p>
+
+<p><em>Finance.</em>
+Monte Carlo methods estimate risk, option values, portfolio uncertainty,
+and stochastic-model quantities.</p>
+
+<p>\medskip</p>
+
+<p><em>Operations Research.</em>
+Simulation and optimization are central to queueing, scheduling,
+inventory, and stochastic decision problems.</p>
+
+<p>\medskip</p>
+
+<p><em>Scientific Computing.</em>
+Matrix decompositions, iterative methods, parallel simulation, and
+numerical integration support large-scale quantitative research.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-statistics-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define computational statistics.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Distinguish sampling error and computational error.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define numerical instability.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define Monte Carlo integration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define bootstrap resampling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a permutation test.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define Markov chain Monte Carlo.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the EM algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a random seed.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define effective sample size.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define importance sampling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a condition number.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose an ordinary Monte Carlo estimator has standard deviation <m>8</m>
+per simulated draw and uses</p>
+
+<p>
+<md>M=400.</md>
+</p>
+
+<p>Compute its Monte Carlo standard error.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many simulations are required to reduce Monte Carlo standard error by
+one-half, approximately?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>U=0.25</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\lambda=2.</md>
+</p>
+
+<p>Use inverse transform sampling to generate an exponential random variable
+using</p>
+
+<p>
+<md>X=-\frac1\lambda\log U.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose normalized importance weights are</p>
+
+<p>
+<md>0.5,\ 0.25,\ 0.25.</md>
+</p>
+
+<p>Compute the heuristic ESS</p>
+
+<p>
+<md>\frac1{\sum w_i^2}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose bootstrap estimates have standard deviation</p>
+
+<p>
+<md>2.4.</md>
+</p>
+
+<p>What quantity does this approximate?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose <m>1000</m> random permutations are sampled and <m>19</m> produce
+statistics at least as extreme as the observed statistic.</p>
+
+<p>Compute the plus-one Monte Carlo permutation <m>p</m>-value.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose an MCMC run contains <m>10000</m> draws with estimated integrated
+autocorrelation time <m>5</m>.</p>
+
+<p>Approximate its effective sample size.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose a dense matrix has dimension</p>
+
+<p>
+<md>p=1000.</md>
+</p>
+
+<p>Approximately how many entries must be stored?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If dense matrix inversion scales approximately as <m>p^3</m>, by what factor
+does computational cost increase when <m>p</m> doubles?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why log-likelihood computation is often more numerically stable
+than direct likelihood computation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the log-sum-exp identity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why subtracting nearly equal floating-point numbers can be
+unstable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the gradient-descent update from the local direction of steepest
+descent.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive Newton's method using a second-order Taylor expansion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare Newton--Raphson and Fisher scoring.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why reparameterizing <m>\sigma=e^\eta</m> removes a positivity
+constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the soft-thresholding solution for a one-dimensional lasso
+problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why QR decomposition is numerically preferable to the normal
+equations in ill-conditioned least-squares problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how SVD identifies rank deficiency.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the statistical meaning of a large matrix condition number.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove consistency of the basic Monte Carlo estimator using the law of
+large numbers.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the variance of the basic Monte Carlo mean.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Monte Carlo error decreases at rate <m>M^{-1/2}</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive inverse transform sampling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that acceptance--rejection sampling produces draws from the target
+density.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the importance-sampling identity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why poor proposal-tail coverage can cause infinite or enormous
+importance-sampling variance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the optimal control-variate coefficient.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how antithetic variables can reduce variance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the bootstrap standard-error formula.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare percentile, basic, and normal bootstrap confidence intervals.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between parametric and nonparametric bootstrap.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why an ordinary bootstrap is inappropriate for strongly
+autocorrelated time-series data.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the jackknife standard-error formula.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the null exchangeability condition underlying permutation tests.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why the plus-one permutation correction is used in Monte Carlo
+permutation tests.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between exact and sampled permutation tests.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Metropolis--Hastings does not require the posterior
+normalizing constant.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain detailed balance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why MCMC autocorrelation reduces effective sample size.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the E-step and M-step of the EM algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why EM likelihood values generally increase across iterations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Design a simulation study to estimate the bias and MSE of two competing
+estimators.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how to estimate coverage probability through simulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why random seeds matter for reproducibility.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why parallel simulation requires independent random-number
+streams.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why sparse matrices can dramatically reduce memory usage.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study convergence rates of gradient descent under strong convexity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive quasi-Newton methods and the BFGS update.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study trust-region optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate constrained optimization using Lagrange multipliers and
+interior-point methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study automatic differentiation using computational graphs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive coordinate-descent updates for elastic-net regression.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study proximal-gradient methods for lasso estimation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate stochastic-gradient convergence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study variance-reduced stochastic-gradient methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive acceptance--rejection efficiency.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study importance-sampling central limit theorems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate adaptive importance sampling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study sequential Monte Carlo algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive particle-filter recursions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study theoretical validity of the nonparametric bootstrap.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate bootstrap inconsistency for extreme-value statistics.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the block bootstrap for stationary time series.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the BCa bootstrap interval.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study permutation inference under restricted randomization schemes.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive Metropolis--Hastings invariance using detailed balance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study geometric ergodicity of Markov chains.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate MCMC central limit theorems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Hamiltonian Monte Carlo computationally.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive EM using Jensen's inequality.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study acceleration methods for slow EM algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate numerical linear algebra for very large least-squares
+problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study randomized low-rank matrix decompositions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate distributed statistical computation.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-statistics-summary">
+<title>Conceptual Summary</title>
+<p>Computational statistics provides algorithms for statistical problems
+that cannot be solved conveniently in closed form.</p>
+
+<p>Optimization solves problems such as</p>
+
+<p>
+<md>\boxed{
+\widehat{\theta}
+=
+\arg\max_\theta
+\ell(\theta).
+}</md>
+</p>
+
+<p>Gradient descent uses</p>
+
+<p>
+<md>\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+\eta_k
+\nabla Q
+(
+\theta^{(k)}
+).
+}</md>
+</p>
+
+<p>Newton's method uses curvature:</p>
+
+<p>
+<md>\boxed{
+\theta^{(k+1)}
+=
+\theta^{(k)}
+-
+H^{-1}
+\nabla Q.
+}</md>
+</p>
+
+<p>Monte Carlo approximates expectations by</p>
+
+<p>
+<md>\boxed{
+\widehat{\mu}
+=
+\frac1M
+\sum_{m=1}^{M}
+g(X_m).
+}</md>
+</p>
+
+<p>Its standard error decreases at rate</p>
+
+<p>
+<md>\boxed{
+M^{-1/2}.
+}</md>
+</p>
+
+<p>Bootstrap methods approximate sampling distributions by resampling.</p>
+
+<p>Permutation methods approximate null distributions through valid
+rearrangements.</p>
+
+<p>MCMC constructs dependent draws from difficult target distributions.</p>
+
+<p>EM alternates expected latent-data completion and maximization.</p>
+
+<p>Stable statistical computation relies on:</p>
+
+<p>
+<md>\boxed{
+\text{numerical analysis}
++
+\text{optimization}
++
+\text{simulation}
++
+\text{resampling}
++
+\text{linear algebra}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-19-computational-statistics-subsec-computational-statistics-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Computational Statistics completes Chapter <xref ref="chap-statistics" /> by
+providing the numerical machinery needed to implement the methods
+developed throughout the chapter. Likelihood estimation requires
+optimization, bootstrap and permutation methods provide computational
+inference when analytic sampling distributions are unavailable, Bayesian
+statistics relies heavily on Monte Carlo and MCMC, and statistical
+learning requires scalable optimization and matrix algorithms. These
+ideas connect directly with Chapter 10 on optimization and Chapter 11 on
+numerical and computational mathematics, where the algorithms underlying
+large-scale scientific computation are developed in greater depth.</p>
+</remark>
+</subsection>
+
 </section>

@@ -1,9 +1,3824 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-11-optimization-operations-research-08-stochastic-optimization">
-  <title>Stochastic Optimization</title>
+<section xml:id="sec-stochastic-optimization">
+<title>Stochastic Optimization</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Optimization fundamentals, probability, random variables, expectation,
+conditional probability, convex optimization, nonlinear programming,
+dynamic programming, basic statistics, and Monte Carlo methods.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define stochastic optimization;</p>
+</li>
+<li>
+<p>distinguish deterministic and stochastic optimization;</p>
+</li>
+<li>
+<p>identify uncertain parameters and random variables in an
+          optimization model;</p>
+</li>
+<li>
+<p>formulate expected-value objectives;</p>
+</li>
+<li>
+<p>understand risk-neutral optimization;</p>
+</li>
+<li>
+<p>recognize stochastic constraints;</p>
+</li>
+<li>
+<p>distinguish static and multistage decisions;</p>
+</li>
+<li>
+<p>understand first-stage and recourse decisions;</p>
+</li>
+<li>
+<p>formulate two-stage stochastic programs;</p>
+</li>
+<li>
+<p>recognize scenario-based models;</p>
+</li>
+<li>
+<p>construct deterministic equivalents for finite scenario sets;</p>
+</li>
+<li>
+<p>understand nonanticipativity constraints;</p>
+</li>
+<li>
+<p>define the expected value of perfect information;</p>
+</li>
+<li>
+<p>define the value of the stochastic solution;</p>
+</li>
+<li>
+<p>distinguish here-and-now and wait-and-see decisions;</p>
+</li>
+<li>
+<p>understand recourse functions;</p>
+</li>
+<li>
+<p>recognize relatively complete recourse;</p>
+</li>
+<li>
+<p>understand sample-average approximation;</p>
+</li>
+<li>
+<p>recognize Monte Carlo estimation of stochastic objectives;</p>
+</li>
+<li>
+<p>understand stochastic gradients;</p>
+</li>
+<li>
+<p>formulate stochastic gradient descent;</p>
+</li>
+<li>
+<p>understand minibatching;</p>
+</li>
+<li>
+<p>recognize variance in gradient estimates;</p>
+</li>
+<li>
+<p>understand Robbins--Monro stochastic approximation conceptually;</p>
+</li>
+<li>
+<p>recognize convergence conditions for stochastic approximation;</p>
+</li>
+<li>
+<p>distinguish stochastic programming from robust optimization;</p>
+</li>
+<li>
+<p>understand chance-constrained optimization;</p>
+</li>
+<li>
+<p>recognize probabilistic feasibility requirements;</p>
+</li>
+<li>
+<p>understand scenario approximations of chance constraints;</p>
+</li>
+<li>
+<p>define risk measures conceptually;</p>
+</li>
+<li>
+<p>distinguish expectation, variance, Value-at-Risk, and
+          Conditional Value-at-Risk;</p>
+</li>
+<li>
+<p>formulate CVaR optimization;</p>
+</li>
+<li>
+<p>recognize mean--variance optimization;</p>
+</li>
+<li>
+<p>understand risk-averse stochastic optimization;</p>
+</li>
+<li>
+<p>recognize multistage stochastic programs;</p>
+</li>
+<li>
+<p>understand scenario trees;</p>
+</li>
+<li>
+<p>formulate nonanticipativity on scenario trees;</p>
+</li>
+<li>
+<p>recognize stochastic dynamic programming connections;</p>
+</li>
+<li>
+<p>understand decomposition methods conceptually;</p>
+</li>
+<li>
+<p>recognize Benders and L-shaped methods;</p>
+</li>
+<li>
+<p>understand stochastic dual dynamic programming conceptually;</p>
+</li>
+<li>
+<p>recognize distributionally robust optimization;</p>
+</li>
+<li>
+<p>understand ambiguity sets conceptually;</p>
+</li>
+<li>
+<p>distinguish aleatoric uncertainty from model uncertainty
+          conceptually;</p>
+</li>
+<li>
+<p>understand sensitivity to probability models;</p>
+</li>
+<li>
+<p>connect stochastic optimization with finance, supply chains,
+          energy, inventory, machine learning, and control.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-what-is-stochastic-optimization">
+<title>What Is Stochastic Optimization?</title>
+<p>Stochastic optimization studies optimization problems involving uncertain
+quantities represented by random variables.</p>
+
+<p>A generic problem has form</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}\in X}
+\mathbb{E}
+\left[
+F(\mathbf{x},\boldsymbol{\xi})
+\right],
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\mathbf{x}
+=
+\text{decision variables},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boldsymbol{\xi}
+=
+\text{random data or uncertainty}.</md>
+</p>
+
+<p>The decision is chosen while accounting for the probability distribution
+of uncertain outcomes.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-deterministic-versus-stochastic-optimization">
+<title>Deterministic Versus Stochastic Optimization</title>
+<p>A deterministic optimization problem assumes all model quantities are
+known:</p>
+
+<p>
+<md>\boxed{
+\min_x
+f(x).
+}</md>
+</p>
+
+<p>A stochastic optimization problem allows some quantities to be random:</p>
+
+<p>
+<md>\boxed{
+\min_x
+\mathbb{E}
+[
+F(x,\xi)
+].
+}</md>
+</p>
+
+<p>Thus stochastic optimization explicitly models uncertainty rather than
+replacing it immediately by a fixed estimate.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-sources-of-uncertainty">
+<title>Sources of Uncertainty</title>
+<p>Uncertainty can enter through:</p>
+
+<p>
+<md>\boxed{
+\text{demand},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{prices},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{travel times},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{equipment failures},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{weather},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{returns},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{measurement noise}.
+}</md>
+</p>
+
+<p>The probability model attempts to describe these uncertain quantities.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-risk-neutral-objective">
+<title>Risk-Neutral Objective</title>
+<p>A risk-neutral decision maker minimizes expected cost:</p>
+
+<p>
+<md>\boxed{
+\min_x
+\mathbb{E}
+[
+C(x,\xi)
+].
+}</md>
+</p>
+
+<p>Equivalently, for reward maximization,</p>
+
+<p>
+<md>\boxed{
+\max_x
+\mathbb{E}
+[
+R(x,\xi)
+].
+}</md>
+</p>
+
+<p>Only the expected value enters the objective directly.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-expected-objective-discrete-scenarios">
+<title>Expected Objective with Discrete Scenarios</title>
+<p>Suppose uncertainty has scenarios</p>
+
+<p>
+<md>\omega=1,\ldots,N</md>
+</p>
+
+<p>with probabilities</p>
+
+<p>
+<md>p_\omega,
+\qquad
+p_\omega\geq0,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\sum_{\omega=1}^{N}
+p_\omega=1.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}
+[
+F(x,\xi)
+]
+=
+\sum_{\omega=1}^{N}
+p_\omega
+F(x,\xi^\omega).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-expected-cost">
+<title>Worked Example: Expected Cost</title>
+<example>
+<title>Choosing Between Two Plans</title>
+<p>Suppose plan <m>A</m> has costs</p>
+
+<p>
+<md>10</md>
+</p>
+
+<p>with probability</p>
+
+<p>
+<md>0.8,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>30</md>
+</p>
+
+<p>with probability</p>
+
+<p>
+<md>0.2.</md>
+</p>
+
+<p>Its expected cost is</p>
+
+<p>
+<md>0.8(10)+0.2(30)
+=
+14.</md>
+</p>
+
+<p>Plan <m>B</m> always costs</p>
+
+<p>
+<md>16.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\mathbb{E}[C_A]=14,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\mathbb{E}[C_B]=16.</md>
+</p>
+
+<p>A risk-neutral decision maker chooses</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\text{Plan }A.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-expectation-not-all-risk">
+<title>Expectation Does Not Describe All Risk</title>
+<p>Two decisions can have the same expected cost but very different
+distributions.</p>
+
+<p>For example:</p>
+
+<p>
+<md>C_A
+=
+10</md>
+</p>
+
+<p>with certainty,</p>
+
+<p>while</p>
+
+<p>
+<md>C_B
+=
+\begin{cases}
+0,
+&amp;
+\text{with probability }\frac12,
+\\
+20,
+&amp;
+\text{with probability }\frac12.
+\end{cases}</md>
+</p>
+
+<p>Both have expectation</p>
+
+<p>
+<md>\boxed{
+10.
+}</md>
+</p>
+
+<p>Yet decision <m>B</m> is more variable.</p>
+
+<p>This motivates risk-averse optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-here-and-now-decisions">
+<title>Here-and-Now Decisions</title>
+<p>A here-and-now decision must be chosen before uncertainty is observed.</p>
+
+<p>For example:</p>
+
+<p>
+<md>\boxed{
+\text{capacity installed before demand is known}.
+}</md>
+</p>
+
+<p>Such decisions cannot depend on the realized scenario.</p>
+
+<p>They are often called first-stage decisions.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-recourse-decisions">
+<title>Recourse Decisions</title>
+<p>After uncertainty is observed, additional corrective decisions may be
+allowed.</p>
+
+<p>These are recourse decisions.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{overtime},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{emergency purchasing},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{rerouting},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{inventory adjustment}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-two-stage-stochastic-programming">
+<title>Two-Stage Stochastic Programming</title>
+<p>A two-stage stochastic program has:</p>
+
+<p>
+<md>\boxed{
+\text{first-stage decisions before uncertainty},
+}</md>
+</p>
+
+<p>followed by</p>
+
+<p>
+<md>\boxed{
+\text{second-stage decisions after uncertainty}.
+}</md>
+</p>
+
+<p>A standard form is</p>
+
+<p>
+<md>\boxed{
+\min_x
+\left[
+c^Tx
++
+\mathbb{E}_{\xi}
+[
+Q(x,\xi)
+]
+\right],
+}</md>
+</p>
+
+<p>subject to first-stage constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-recourse-function">
+<title>Recourse Function</title>
+<p>The second-stage recourse value can be defined as</p>
+
+<p>
+<md>\boxed{
+Q(x,\xi)
+=
+\min_y
+\left\{
+q(\xi)^Ty:
+W(\xi)y
+=
+h(\xi)-T(\xi)x,
+\;
+y\geq0
+\right\}.
+}</md>
+</p>
+
+<p>The first-stage problem becomes</p>
+
+<p>
+<md>\boxed{
+\min_x
+c^Tx
++
+\mathbb{E}
+[
+Q(x,\xi)
+].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-meaning-of-recourse">
+<title>Meaning of Recourse</title>
+<p>The variable <m>x</m> prepares for uncertain future conditions.</p>
+
+<p>After scenario <m>\xi</m> occurs, the recourse decision <m>y</m> adjusts the
+system.</p>
+
+<p>Thus stochastic programming balances:</p>
+
+<p>
+<md>\boxed{
+\text{cost of preparation}
+}</md>
+</p>
+
+<p>against</p>
+
+<p>
+<md>\boxed{
+\text{expected cost of future correction}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-simple-recourse">
+<title>Worked Example: Simple Recourse</title>
+<example>
+<title>Capacity and Emergency Supply</title>
+<p>Suppose a company chooses capacity <m>x</m> before demand <m>D</m> is known.</p>
+
+<p>Installed capacity costs</p>
+
+<p>
+<md>2x.</md>
+</p>
+
+<p>If demand exceeds capacity, emergency supply costs</p>
+
+<p>
+<md>5</md>
+</p>
+
+<p>per unit.</p>
+
+<p>The recourse quantity is</p>
+
+<p>
+<md>y(D)
+=
+\max
+\{
+D-x,0
+\}.</md>
+</p>
+
+<p>Therefore the stochastic objective is</p>
+
+<p>
+<md>\boxed{
+\min_{x\geq0}
+\left[
+2x
++
+5
+\mathbb{E}
+\left[
+(D-x)_+
+\right]
+\right],
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>(u)_+
+=
+\max\{u,0\}.</md>
+</p>
+
+<p>This model trades fixed capacity against expected shortage cost.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-finite-scenario-deterministic-equivalent">
+<title>Finite-Scenario Deterministic Equivalent</title>
+<p>Suppose there are scenarios</p>
+
+<p>
+<md>\omega=1,\ldots,N.</md>
+</p>
+
+<p>For each scenario, introduce second-stage variables</p>
+
+<p>
+<md>y^\omega.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{x,\{y^\omega\}}
+\quad&amp;
+c^Tx
++
+\sum_{\omega=1}^{N}
+p_\omega
+q_\omega^T
+y^\omega
+\\
+\text{subject to}
+\quad&amp;
+Ax=b,
+\\
+&amp;
+T_\omega x
++
+W_\omega y^\omega
+=
+h_\omega,
+\qquad
+\omega=1,\ldots,N,
+\\
+&amp;
+x\geq0,
+\qquad
+y^\omega\geq0.
+\end{aligned}
+}</md>
+</p>
+
+<p>This is called the deterministic equivalent.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-scenario-expansion">
+<title>Scenario Expansion</title>
+<p>Each scenario receives its own recourse variables.</p>
+
+<p>Thus the number of variables can increase approximately in proportion to
+the number of scenarios.</p>
+
+<p>Large scenario sets can therefore produce very large optimization models.</p>
+
+<p>This motivates decomposition and sampling methods.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-nonanticipativity">
+<title>Nonanticipativity</title>
+<p>A decision cannot depend on information that has not yet been observed.</p>
+
+<p>This is the principle of nonanticipativity.</p>
+
+<p>If two scenarios are indistinguishable at stage <m>t</m>, then the decisions
+made at that stage must be identical.</p>
+
+<p>Symbolically,</p>
+
+<p>
+<md>\boxed{
+x_t^\omega
+=
+x_t^{\omega'}
+}</md>
+</p>
+
+<p>whenever scenarios <m>\omega</m> and <m>\omega'</m> share the same history up to
+stage <m>t</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-scenario-trees">
+<title>Scenario Trees</title>
+<p>A multistage stochastic process can be represented by a scenario tree.</p>
+
+<p>Each node represents the information available at a stage.</p>
+
+<p>Branches represent possible future realizations.</p>
+
+<p>A decision at a node depends only on the history leading to that node.</p>
+
+<p>Thus scenario trees encode nonanticipativity structurally.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-multistage-stochastic-programming">
+<title>Multistage Stochastic Programming</title>
+<p>A multistage problem alternates between decisions and observations:</p>
+
+<p>
+<md>\boxed{
+x_0
+\rightarrow
+\xi_1
+\rightarrow
+x_1
+\rightarrow
+\xi_2
+\rightarrow
+x_2
+\rightarrow
+\cdots.
+}</md>
+</p>
+
+<p>Each decision <m>x_t</m> may depend on uncertainty observed through stage
+<m>t</m>, but not on future realizations.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-nested-expectation-stochastic">
+<title>Nested Expectation Form</title>
+<p>A multistage objective may be written schematically as</p>
+
+<p>
+<md>\boxed{
+\min
+\mathbb{E}
+\left[
+c_0(x_0)
++
+c_1(x_1,\xi_1)
++
+\cdots
++
+c_T(x_T,\xi_T)
+\right].
+}</md>
+</p>
+
+<p>The decision rule at each stage must respect the information available at
+that stage.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-dp-connection">
+<title>Stochastic Dynamic Programming Connection</title>
+<p>Multistage stochastic optimization can often be written through Bellman
+recursions.</p>
+
+<p>For state <m>s_t</m>,</p>
+
+<p>
+<md>\boxed{
+V_t(s_t)
+=
+\min_{a_t}
+\left[
+c_t(s_t,a_t)
++
+\mathbb{E}
+\left[
+V_{t+1}(S_{t+1})
+\mid
+s_t,a_t
+\right]
+\right].
+}</md>
+</p>
+
+<p>Thus stochastic programming and stochastic dynamic programming are closely
+related.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-wait-and-see-solution">
+<title>Wait-and-See Solution</title>
+<p>The wait-and-see problem assumes future uncertainty is known before the
+decision is made.</p>
+
+<p>For each scenario <m>\xi</m>, solve</p>
+
+<p>
+<md>\boxed{
+\min_x
+F(x,\xi).
+}</md>
+</p>
+
+<p>Then average the optimal scenario values:</p>
+
+<p>
+<md>\boxed{
+WS
+=
+\mathbb{E}
+\left[
+\min_x
+F(x,\xi)
+\right].
+}</md>
+</p>
+
+<p>This represents perfect information.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-solution">
+<title>Stochastic Solution</title>
+<p>The true stochastic solution solves</p>
+
+<p>
+<md>\boxed{
+RP
+=
+\min_x
+\mathbb{E}
+[
+F(x,\xi)
+],
+}</md>
+</p>
+
+<p>where <m>RP</m> is often called the recourse problem value in standard
+two-stage terminology.</p>
+
+<p>The decision must be chosen before the uncertain realization is known.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-expected-value-problem">
+<title>Expected Value Problem</title>
+<p>A common approximation replaces the random quantity by its expectation:</p>
+
+<p>
+<md>\boxed{
+\bar{\xi}
+=
+\mathbb{E}[\xi].
+}</md>
+</p>
+
+<p>Then solve</p>
+
+<p>
+<md>\boxed{
+\min_x
+F(x,\bar{\xi}).
+}</md>
+</p>
+
+<p>Let the resulting decision be</p>
+
+<p>
+<md>\bar{x}.</md>
+</p>
+
+<p>This is the expected-value solution.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-eev">
+<title>Expected Result of the Expected-Value Solution</title>
+<p>Evaluate the expected-value decision under the actual stochastic model:</p>
+
+<p>
+<md>\boxed{
+EEV
+=
+\mathbb{E}
+[
+F(\bar{x},\xi)
+].
+}</md>
+</p>
+
+<p>This measures how the deterministic expected-value solution performs under
+uncertainty.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-value-of-stochastic-solution">
+<title>Value of the Stochastic Solution</title>
+<p>For a minimization problem,</p>
+
+<p>
+<md>\boxed{
+VSS
+=
+EEV-RP.
+}</md>
+</p>
+
+<p>Since the stochastic solution is optimized over the full uncertainty
+model,</p>
+
+<p>
+<md>\boxed{
+VSS\geq0
+}</md>
+</p>
+
+<p>under the standard definitions.</p>
+
+<p>A large VSS means explicit stochastic modeling provides substantial value.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-expected-value-perfect-information">
+<title>Expected Value of Perfect Information</title>
+<p>For minimization,</p>
+
+<p>
+<md>\boxed{
+EVPI
+=
+RP-WS.
+}</md>
+</p>
+
+<p>Because perfect information cannot make the optimum worse,</p>
+
+<p>
+<md>\boxed{
+WS\leq RP.
+}</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+EVPI\geq0.
+}</md>
+</p>
+
+<p>EVPI is the maximum amount one should be willing to pay for perfect
+information under the model.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-evpi">
+<title>Worked Example: EVPI</title>
+<example>
+<title>Value of Perfect Information</title>
+<p>Suppose the optimal stochastic expected cost is</p>
+
+<p>
+<md>RP=120.</md>
+</p>
+
+<p>If future uncertainty were known perfectly before deciding, suppose the
+expected wait-and-see cost would be</p>
+
+<p>
+<md>WS=100.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>EVPI
+=
+120-100.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>Under the model, perfect information is worth at most <m>20</m> units of
+expected cost reduction.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+EVPI=20.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-relatively-complete-recourse">
+<title>Relatively Complete Recourse</title>
+<p>A two-stage model has relatively complete recourse if every first-stage
+decision satisfying the first-stage constraints admits a feasible
+second-stage response for almost every scenario.</p>
+
+<p>Conceptually,</p>
+
+<p>
+<md>\boxed{
+\text{every admissible first-stage decision can be repaired later}.
+}</md>
+</p>
+
+<p>Without this property, some first-stage decisions may lead to infeasible
+future scenarios.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-complete-recourse">
+<title>Complete Recourse</title>
+<p>Complete recourse is a stronger structural condition on the second-stage
+system.</p>
+
+<p>Roughly, the recourse matrix permits a feasible second-stage correction
+for every required right-hand-side vector.</p>
+
+<p>Precise definitions depend on the recourse model.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-scenario-generation">
+<title>Scenario Generation</title>
+<p>When uncertainty is continuous or extremely large, one often approximates
+it with a finite collection of scenarios.</p>
+
+<p>Scenarios may be generated from:</p>
+
+<p>
+<md>\boxed{
+\text{historical data},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{probability models},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Monte Carlo sampling},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{expert-defined stress cases}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-scenario-reduction">
+<title>Scenario Reduction</title>
+<p>A large scenario set may be compressed to a smaller representative set.</p>
+
+<p>Scenario reduction attempts to preserve the important features of the
+uncertainty distribution while reducing computational burden.</p>
+
+<p>This creates a tradeoff between:</p>
+
+<p>
+<md>\boxed{
+\text{statistical fidelity}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{computational cost}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-sample-average-approximation">
+<title>Sample-Average Approximation</title>
+<p>Suppose</p>
+
+<p>
+<md>\xi^{(1)},
+\ldots,
+\xi^{(N)}</md>
+</p>
+
+<p>are independent samples from the uncertainty distribution.</p>
+
+<p>The true problem</p>
+
+<p>
+<md>\boxed{
+\min_x
+\mathbb{E}
+[
+F(x,\xi)
+]
+}</md>
+</p>
+
+<p>is approximated by</p>
+
+<p>
+<md>\boxed{
+\min_x
+\frac1N
+\sum_{i=1}^{N}
+F
+(
+x,\xi^{(i)}
+).
+}</md>
+</p>
+
+<p>This is called sample-average approximation, abbreviated SAA.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-saa-law-large-numbers">
+<title>Law of Large Numbers Connection</title>
+<p>For a fixed <m>x</m>, under suitable conditions,</p>
+
+<p>
+<md>\boxed{
+\frac1N
+\sum_{i=1}^{N}
+F
+(
+x,\xi^{(i)}
+)
+\to
+\mathbb{E}
+[
+F(x,\xi)
+]
+}</md>
+</p>
+
+<p>as</p>
+
+<p>
+<md>N\to\infty.</md>
+</p>
+
+<p>This follows from laws of large numbers.</p>
+
+<p>Optimization adds additional questions about convergence of minimizers and
+optimal values.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-sample-average">
+<title>Worked Example: Sample Average</title>
+<example>
+<title>Monte Carlo Objective Estimate</title>
+<p>Suppose a decision <m>x</m> produces sampled costs</p>
+
+<p>
+<md>12,\quad
+15,\quad
+9,\quad
+14,\quad
+10.</md>
+</p>
+
+<p>The sample-average estimate is</p>
+
+<p>
+<md>\frac{
+12+15+9+14+10
+}{
+5
+}
+=
+12.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\widehat{\mathbb{E}[C(x,\xi)]}
+=
+12.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-out-of-sample-evaluation-stochastic">
+<title>Out-of-Sample Evaluation</title>
+<p>A solution optimized on one sample may fit that sample too closely.</p>
+
+<p>Therefore it should be evaluated on independent scenarios not used during
+optimization.</p>
+
+<p>This is called out-of-sample evaluation.</p>
+
+<p>It estimates how the decision performs under new realizations of
+uncertainty.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-training-validation-stochastic">
+<title>Training and Validation Analogy</title>
+<p>Sample-average optimization resembles statistical learning:</p>
+
+<p>
+<md>\boxed{
+\text{optimization sample}
+\leftrightarrow
+\text{training data},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{evaluation sample}
+\leftrightarrow
+\text{validation or test data}.
+}</md>
+</p>
+
+<p>This analogy is especially important in data-driven optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-approximation">
+<title>Stochastic Approximation</title>
+<p>Suppose the objective is</p>
+
+<p>
+<md>\boxed{
+f(x)
+=
+\mathbb{E}
+[
+F(x,\xi)
+],
+}</md>
+</p>
+
+<p>but evaluating the expectation exactly is expensive.</p>
+
+<p>If an unbiased gradient estimate is available,</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}
+[
+G(x,\xi)
+]
+=
+\nabla f(x),
+}</md>
+</p>
+
+<p>one can update using random samples.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-gradient-descent">
+<title>Stochastic Gradient Descent</title>
+<p>Stochastic gradient descent, abbreviated SGD, uses</p>
+
+<p>
+<md>\boxed{
+x_{k+1}
+=
+x_k
+-
+\alpha_k
+G(x_k,\xi_k),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\xi_k</md>
+</p>
+
+<p>is a random sample and</p>
+
+<p>
+<md>G(x_k,\xi_k)</md>
+</p>
+
+<p>is a stochastic gradient estimate.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-unbiased-stochastic-gradient">
+<title>Unbiased Stochastic Gradient</title>
+<p>An ideal stochastic gradient satisfies</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}
+[
+G(x,\xi)
+]
+=
+\nabla f(x).
+}</md>
+</p>
+
+<p>Individual gradient estimates can be noisy.</p>
+
+<p>Their average direction, however, matches the true gradient.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-stochastic-gradient">
+<title>Worked Example: Stochastic Gradient</title>
+<example>
+<title>One SGD Step</title>
+<p>Suppose</p>
+
+<p>
+<md>x_k=4,</md>
+</p>
+
+<p>the sampled stochastic gradient is</p>
+
+<p>
+<md>G(x_k,\xi_k)=6,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\alpha_k=0.1.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>x_{k+1}
+=
+4-0.1(6).</md>
+</p>
+
+<p>Thus,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+x_{k+1}=3.4.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-minibatches-stochastic-optimization">
+<title>Minibatches</title>
+<p>Instead of using one sample, use a minibatch</p>
+
+<p>
+<md>B_k.</md>
+</p>
+
+<p>The gradient estimate is</p>
+
+<p>
+<md>\boxed{
+G_k
+=
+\frac1{|B_k|}
+\sum_{i\in B_k}
+\nabla
+F
+(
+x_k,\xi_i
+).
+}</md>
+</p>
+
+<p>Larger batches generally reduce gradient variance but require more work per
+iteration.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-gradient-estimate-variance">
+<title>Variance of Gradient Estimates</title>
+<p>Suppose</p>
+
+<p>
+<md>\mathbb{E}
+[
+G(x,\xi)
+]
+=
+\nabla f(x).</md>
+</p>
+
+<p>The noise is</p>
+
+<p>
+<md>\boxed{
+G(x,\xi)
+-
+\nabla f(x).
+}</md>
+</p>
+
+<p>Its variance affects convergence.</p>
+
+<p>High-variance estimates can cause highly irregular iterates.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-step-size-sequences">
+<title>Step-Size Sequences</title>
+<p>Classical stochastic approximation often uses decreasing step sizes
+satisfying conditions such as</p>
+
+<p>
+<md>\boxed{
+\sum_{k=1}^{\infty}
+\alpha_k
+=
+\infty,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\sum_{k=1}^{\infty}
+\alpha_k^2
+&lt;
+\infty.
+}</md>
+</p>
+
+<p>A common example is approximately</p>
+
+<p>
+<md>\boxed{
+\alpha_k
+=
+\frac{c}{k}.
+}</md>
+</p>
+
+<p>Exact convergence requirements depend on the problem assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-robbins-monro">
+<title>Robbins--Monro Stochastic Approximation</title>
+<p>The Robbins--Monro method was introduced for solving equations involving
+expectations when only noisy observations are available.</p>
+
+<p>A generic stochastic approximation update is</p>
+
+<p>
+<md>\boxed{
+x_{k+1}
+=
+x_k
+-
+\alpha_k
+G_k.
+}</md>
+</p>
+
+<p>Modern stochastic gradient methods are closely related to this framework.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-constant-step-size-sgd">
+<title>Constant Step Sizes</title>
+<p>A constant step size can produce rapid early progress.</p>
+
+<p>However, persistent gradient noise may prevent exact convergence to a
+single optimum.</p>
+
+<p>Instead, iterates may fluctuate in a neighborhood.</p>
+
+<p>Decreasing step sizes can reduce these fluctuations asymptotically.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-iterate-averaging">
+<title>Iterate Averaging</title>
+<p>An averaged iterate may be defined by</p>
+
+<p>
+<md>\boxed{
+\bar{x}_N
+=
+\frac1N
+\sum_{k=1}^{N}
+x_k.
+}</md>
+</p>
+
+<p>Averaging can improve stability and theoretical convergence properties in
+stochastic approximation.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-variance-reduction">
+<title>Variance Reduction Preview</title>
+<p>For finite-sum objectives,</p>
+
+<p>
+<md>\boxed{
+f(x)
+=
+\frac1N
+\sum_{i=1}^{N}
+f_i(x),
+}</md>
+</p>
+
+<p>variance-reduced stochastic methods attempt to retain the low per-step cost
+of SGD while reducing stochastic gradient noise.</p>
+
+<p>Examples include methods based on periodically refreshed full-gradient
+information or stored component gradients.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-chance-constrained-optimization">
+<title>Chance-Constrained Optimization</title>
+<p>A chance constraint requires a constraint to hold with a specified
+probability.</p>
+
+<p>A standard form is</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}
+\left(
+g(x,\xi)\leq0
+\right)
+\geq
+1-\varepsilon,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>0&lt;\varepsilon&lt;1.</md>
+</p>
+
+<p>Thus constraint violation is allowed only with probability at most
+<m>\varepsilon</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-chance-constraint-reliability">
+<title>Reliability Interpretation</title>
+<p>If</p>
+
+<p>
+<md>\varepsilon=0.05,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}
+(
+g(x,\xi)\leq0
+)
+\geq0.95.
+}</md>
+</p>
+
+<p>The constraint must therefore hold with at least <m>95\%</m> probability.</p>
+
+<p>Chance constraints are useful when absolute robustness would be too
+conservative.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-chance-constraint">
+<title>Worked Example: Capacity Reliability</title>
+<example>
+<title>Demand Coverage</title>
+<p>Suppose capacity <m>x</m> must cover random demand <m>D</m> with probability at
+least <m>0.99</m>.</p>
+
+<p>The chance constraint is</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}
+(
+D\leq x
+)
+\geq
+0.99.
+}</md>
+</p>
+
+<p>If <m>F_D</m> is the demand cumulative distribution function, then</p>
+
+<p>
+<md>F_D(x)\geq0.99.</md>
+</p>
+
+<p>Thus a smallest feasible capacity is the <m>0.99</m>-quantile:</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+x
+\geq
+F_D^{-1}(0.99)
+}</md>
+</p>
+
+<p>under the appropriate quantile definition.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-gaussian-chance-constraint">
+<title>Gaussian Chance Constraint Example</title>
+<p>Suppose</p>
+
+<p>
+<md>D
+\sim
+N(\mu,\sigma^2).</md>
+</p>
+
+<p>To require</p>
+
+<p>
+<md>\mathbb{P}(D\leq x)
+\geq
+1-\varepsilon,</md>
+</p>
+
+<p>one may write</p>
+
+<p>
+<md>\boxed{
+x
+\geq
+\mu
++
+z_{1-\varepsilon}\sigma,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>z_{1-\varepsilon}</md>
+</p>
+
+<p>is the corresponding standard-normal quantile.</p>
+
+<p>Thus some chance constraints admit deterministic reformulations.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-joint-chance-constraints">
+<title>Joint Chance Constraints</title>
+<p>A joint chance constraint requires several inequalities to hold
+simultaneously:</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}
+\left(
+g_i(x,\xi)\leq0
+\text{ for all }i
+\right)
+\geq
+1-\varepsilon.
+}</md>
+</p>
+
+<p>Joint chance constraints are generally more difficult than individual
+chance constraints.</p>
+
+<p>Dependence among uncertain quantities becomes important.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-scenario-approximation-chance">
+<title>Scenario Approximation of Chance Constraints</title>
+<p>One practical approximation draws samples</p>
+
+<p>
+<md>\xi^{(1)},\ldots,\xi^{(N)}</md>
+</p>
+
+<p>and enforces</p>
+
+<p>
+<md>\boxed{
+g
+(
+x,\xi^{(i)}
+)
+\leq0,
+\qquad
+i=1,\ldots,N.
+}</md>
+</p>
+
+<p>This replaces a probabilistic constraint with many deterministic sampled
+constraints.</p>
+
+<p>The statistical reliability of the resulting solution depends on sample
+size and assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-risk-measures-stochastic">
+<title>Risk Measures</title>
+<p>A risk measure maps a random loss <m>L</m> to a number:</p>
+
+<p>
+<md>\boxed{
+\rho(L).
+}</md>
+</p>
+
+<p>Possible risk measures include:</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[L],
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(L),
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\operatorname{VaR}_{\alpha}(L),
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\operatorname{CVaR}_{\alpha}(L).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-mean-variance-optimization">
+<title>Mean--Variance Optimization</title>
+<p>A mean--variance objective may balance expected cost and variance:</p>
+
+<p>
+<md>\boxed{
+\min_x
+\left[
+\mathbb{E}
+[
+C(x,\xi)
+]
++
+\lambda
+\operatorname{Var}
+[
+C(x,\xi)
+]
+\right].
+}</md>
+</p>
+
+<p>The parameter</p>
+
+<p>
+<md>\lambda\geq0</md>
+</p>
+
+<p>controls risk aversion.</p>
+
+<p>Larger <m>\lambda</m> penalizes variability more strongly.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-mean-variance-portfolio">
+<title>Mean--Variance Portfolio Model</title>
+<p>Let</p>
+
+<p>
+<md>w</md>
+</p>
+
+<p>be portfolio weights,</p>
+
+<p>
+<md>\mu</md>
+</p>
+
+<p>expected returns, and</p>
+
+<p>
+<md>\Sigma</md>
+</p>
+
+<p>the covariance matrix.</p>
+
+<p>A common model minimizes variance subject to a return target:</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_w
+\quad&amp;
+w^T\Sigma w
+\\
+\text{subject to}
+\quad&amp;
+\mu^Tw
+\geq
+r_0,
+\\
+&amp;
+\mathbf{1}^Tw=1.
+\end{aligned}
+}</md>
+</p>
+
+<p>When</p>
+
+<p>
+<md>\Sigma\succeq0,</md>
+</p>
+
+<p>this is a convex quadratic program.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-value-at-risk">
+<title>Value-at-Risk</title>
+<p>For random loss <m>L</m>, Value-at-Risk at level <m>\alpha</m> is a quantile of
+the loss distribution.</p>
+
+<p>A common definition is</p>
+
+<p>
+<md>\boxed{
+\operatorname{VaR}_{\alpha}(L)
+=
+\inf
+\{
+\ell:
+\mathbb{P}(L\leq\ell)
+\geq\alpha
+\}.
+}</md>
+</p>
+
+<p>Thus VaR identifies a loss threshold not exceeded with probability at
+least <m>\alpha</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-limitations-var">
+<title>Limitations of Value-at-Risk</title>
+<p>VaR describes a quantile but does not directly describe the severity of
+losses beyond that quantile.</p>
+
+<p>Two loss distributions may have the same VaR while having very different
+tail losses.</p>
+
+<p>This motivates Conditional Value-at-Risk.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-conditional-value-at-risk">
+<title>Conditional Value-at-Risk</title>
+<p>Conditional Value-at-Risk, abbreviated CVaR, measures average loss in the
+upper tail beyond a specified confidence level.</p>
+
+<p>For sufficiently regular continuous distributions, it may be interpreted
+as</p>
+
+<p>
+<md>\boxed{
+\operatorname{CVaR}_{\alpha}(L)
+=
+\mathbb{E}
+[
+L
+\mid
+L\geq
+\operatorname{VaR}_{\alpha}(L)
+].
+}</md>
+</p>
+
+<p>For general distributions, a more careful optimization-based definition
+is preferable.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-cvar-optimization-representation">
+<title>Optimization Representation of CVaR</title>
+<p>For loss <m>L(x,\xi)</m>, CVaR can be represented as</p>
+
+<p>
+<md>\boxed{
+\operatorname{CVaR}_{\alpha}
+(
+L(x,\xi)
+)
+=
+\min_{\eta\in\mathbb{R}}
+\left[
+\eta
++
+\frac{
+1
+}{
+1-\alpha
+}
+\mathbb{E}
+\left[
+(
+L(x,\xi)-\eta
+)_+
+\right]
+\right].
+}</md>
+</p>
+
+<p>Here</p>
+
+<p>
+<md>(u)_+
+=
+\max\{u,0\}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-scenario-cvar-formulation">
+<title>Scenario CVaR Formulation</title>
+<p>Suppose losses under scenarios are</p>
+
+<p>
+<md>L_\omega(x),</md>
+</p>
+
+<p>with probabilities</p>
+
+<p>
+<md>p_\omega.</md>
+</p>
+
+<p>Introduce variables</p>
+
+<p>
+<md>z_\omega\geq0</md>
+</p>
+
+<p>such that</p>
+
+<p>
+<md>\boxed{
+z_\omega
+\geq
+L_\omega(x)-\eta.
+}</md>
+</p>
+
+<p>Then minimize</p>
+
+<p>
+<md>\boxed{
+\eta
++
+\frac{
+1
+}{
+1-\alpha
+}
+\sum_{\omega}
+p_\omega z_\omega.
+}</md>
+</p>
+
+<p>This often produces a tractable convex formulation.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-cvar">
+<title>Worked Example: CVaR Auxiliary Variables</title>
+<example>
+<title>Tail-Loss Linearization</title>
+<p>Suppose scenario losses are</p>
+
+<p>
+<md>L_1(x),
+\quad
+L_2(x),
+\quad
+L_3(x),</md>
+</p>
+
+<p>with equal probabilities.</p>
+
+<p>Introduce</p>
+
+<p>
+<md>z_i
+\geq
+L_i(x)-\eta,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>z_i\geq0.</md>
+</p>
+
+<p>Then a sample CVaR objective is</p>
+
+<p>
+<md>\boxed{
+\eta
++
+\frac{
+1
+}{
+3(1-\alpha)
+}
+\sum_{i=1}^{3}
+z_i.
+}</md>
+</p>
+
+<p>The positive-part terms have been represented using linear inequalities.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-risk-averse-stochastic-optimization">
+<title>Risk-Averse Stochastic Optimization</title>
+<p>Instead of minimizing expected cost alone,</p>
+
+<p>
+<md>\mathbb{E}[L],</md>
+</p>
+
+<p>a risk-averse model may solve</p>
+
+<p>
+<md>\boxed{
+\min_x
+\rho
+(
+L(x,\xi)
+),
+}</md>
+</p>
+
+<p>where <m>\rho</m> penalizes undesirable uncertainty.</p>
+
+<p>One may also combine expectation and tail risk:</p>
+
+<p>
+<md>\boxed{
+\min_x
+\left[
+\mathbb{E}[L]
++
+\lambda
+\operatorname{CVaR}_{\alpha}(L)
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-coherent-risk-measures">
+<title>Coherent Risk Measures Preview</title>
+<p>A coherent risk measure satisfies properties such as:</p>
+
+<p>
+<md>\boxed{
+\text{monotonicity},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{subadditivity},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{positive homogeneity},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{translation invariance}.
+}</md>
+</p>
+
+<p>CVaR is an important example under standard formulations.</p>
+
+<p>VaR is not generally coherent because it may fail subadditivity.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-robust-optimization-stochastic">
+<title>Robust Optimization</title>
+<p>Robust optimization does not necessarily assign probabilities to
+uncertain parameters.</p>
+
+<p>Instead, assume</p>
+
+<p>
+<md>\boxed{
+\xi\in\mathcal{U},
+}</md>
+</p>
+
+<p>where <m>\mathcal{U}</m> is an uncertainty set.</p>
+
+<p>A robust constraint requires</p>
+
+<p>
+<md>\boxed{
+g(x,\xi)\leq0
+\qquad
+\text{for every }
+\xi\in\mathcal{U}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-versus-robust">
+<title>Stochastic Versus Robust Optimization</title>
+<p>Stochastic optimization uses:</p>
+
+<p>
+<md>\boxed{
+\text{probability distributions}.
+}</md>
+</p>
+
+<p>Robust optimization uses:</p>
+
+<p>
+<md>\boxed{
+\text{uncertainty sets}.
+}</md>
+</p>
+
+<p>A stochastic model may optimize average or probabilistic performance.</p>
+
+<p>A robust model protects against all uncertainty realizations in the chosen
+set.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-robust-conservatism">
+<title>Conservatism in Robust Optimization</title>
+<p>If <m>\mathcal{U}</m> is very large, robust solutions may be overly
+conservative.</p>
+
+<p>If <m>\mathcal{U}</m> is too small, important uncertainty may be ignored.</p>
+
+<p>Thus uncertainty-set design controls the tradeoff between:</p>
+
+<p>
+<md>\boxed{
+\text{protection}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{performance}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-distributionally-robust-optimization">
+<title>Distributionally Robust Optimization</title>
+<p>Distributionally robust optimization, abbreviated DRO, assumes the exact
+probability distribution is unknown.</p>
+
+<p>Instead,</p>
+
+<p>
+<md>\boxed{
+P
+\in
+\mathcal{P},
+}</md>
+</p>
+
+<p>where <m>\mathcal{P}</m> is an ambiguity set of distributions.</p>
+
+<p>A typical problem is</p>
+
+<p>
+<md>\boxed{
+\min_x
+\sup_{P\in\mathcal{P}}
+\mathbb{E}_{P}
+[
+F(x,\xi)
+].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-ambiguity-sets">
+<title>Ambiguity Sets</title>
+<p>An ambiguity set may contain distributions satisfying information such as:</p>
+
+<p>
+<md>\boxed{
+\text{known moments},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{support restrictions},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{distance from an empirical distribution},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{confidence-region constraints}.
+}</md>
+</p>
+
+<p>DRO protects against distributional misspecification.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-aleatoric-epistemic-uncertainty">
+<title>Aleatoric and Epistemic Uncertainty</title>
+<p>Aleatoric uncertainty refers to intrinsic randomness in the system.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{random demand}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{random failures}.
+}</md>
+</p>
+
+<p>Epistemic uncertainty refers to imperfect knowledge about the model or its
+parameters.</p>
+
+<p>Distributionally robust methods are particularly relevant when the
+probability law itself is uncertain.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-decomposition-two-stage-stochastic">
+<title>Decomposition of Two-Stage Problems</title>
+<p>A large finite-scenario two-stage model can have many scenario-specific
+variables.</p>
+
+<p>However, scenarios are often coupled only through the first-stage
+decision.</p>
+
+<p>This special structure allows decomposition.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-benders-stochastic">
+<title>Benders Decomposition Connection</title>
+<p>Fix a first-stage decision <m>x</m>.</p>
+
+<p>Each scenario recourse problem can then be solved independently.</p>
+
+<p>Dual information from the recourse problems generates cuts for a master
+problem in <m>x</m>.</p>
+
+<p>In stochastic programming, this leads to the L-shaped method.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-l-shaped-method">
+<title>L-Shaped Method</title>
+<p>For suitable two-stage stochastic linear programs, the L-shaped method
+iteratively:</p>
+
+<p>
+<ol>
+<li>
+<p>solves a first-stage master problem;</p>
+</li>
+<li>
+<p>evaluates scenario recourse subproblems;</p>
+</li>
+<li>
+<p>generates feasibility cuts if recourse is infeasible;</p>
+</li>
+<li>
+<p>generates optimality cuts estimating expected recourse cost;</p>
+</li>
+<li>
+<p>resolves the master problem.</p>
+</li>
+</ol>
+</p>
+
+<p>It is a specialized Benders-decomposition method.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-recourse-approximation">
+<title>Recourse Approximation</title>
+<p>The expected recourse function</p>
+
+<p>
+<md>\boxed{
+Q(x)
+=
+\mathbb{E}
+[
+Q(x,\xi)
+]
+}</md>
+</p>
+
+<p>may be difficult to evaluate directly.</p>
+
+<p>Decomposition methods construct lower approximations using supporting
+cuts.</p>
+
+<p>The approximation becomes tighter as more recourse information is added.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-dual-dynamic-programming">
+<title>Stochastic Dual Dynamic Programming Preview</title>
+<p>Stochastic Dual Dynamic Programming, abbreviated SDDP, is used for large
+multistage stochastic linear or convex problems with suitable structure.</p>
+
+<p>It approximates future value functions using collections of cuts.</p>
+
+<p>A typical iteration includes:</p>
+
+<p>
+<md>\boxed{
+\text{forward simulation},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{backward cut generation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-sddp-forward-pass">
+<title>Forward Pass in SDDP</title>
+<p>The forward pass samples uncertainty and generates a candidate policy
+trajectory through the stages.</p>
+
+<p>It identifies states where improved value-function approximations may be
+useful.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-sddp-backward-pass">
+<title>Backward Pass in SDDP</title>
+<p>The backward pass solves stage subproblems and uses dual information to
+construct new supporting cuts.</p>
+
+<p>These cuts improve the approximations of future cost functions.</p>
+
+<p>Repeated iterations gradually strengthen the policy.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-programming-convexity">
+<title>Stochastic Programming and Convexity</title>
+<p>If</p>
+
+<p>
+<md>F(x,\xi)</md>
+</p>
+
+<p>is convex in <m>x</m> for every <m>\xi</m>, then under appropriate integrability
+conditions,</p>
+
+<p>
+<md>\boxed{
+f(x)
+=
+\mathbb{E}
+[
+F(x,\xi)
+]
+}</md>
+</p>
+
+<p>is convex.</p>
+
+<p>Thus expectations preserve convexity.</p>
+
+<p>This is one reason many stochastic programs remain tractable.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-expectation-preserves-convexity">
+<title>Proof that Expectation Preserves Convexity</title>
+<p>Suppose <m>F(\cdot,\xi)</m> is convex for every <m>\xi</m>.</p>
+
+<p>Then</p>
+
+<p>
+<md>F
+(
+\theta x+(1-\theta)y,
+\xi
+)
+\leq
+\theta F(x,\xi)
++
+(1-\theta)F(y,\xi).</md>
+</p>
+
+<p>Take expectations:</p>
+
+<p>
+<md>\mathbb{E}
+[
+F
+(
+\theta x+(1-\theta)y,
+\xi
+)
+]
+\leq
+\theta
+\mathbb{E}
+[
+F(x,\xi)
+]
++
+(1-\theta)
+\mathbb{E}
+[
+F(y,\xi)
+].</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[F(x,\xi)]
+\text{ is convex in }x.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-gradient-expectation-interchange">
+<title>Interchanging Gradient and Expectation</title>
+<p>Under suitable differentiability, integrability, and domination
+conditions,</p>
+
+<p>
+<md>\boxed{
+\nabla
+\mathbb{E}
+[
+F(x,\xi)
+]
+=
+\mathbb{E}
+[
+\nabla_xF(x,\xi)
+].
+}</md>
+</p>
+
+<p>This identity justifies stochastic gradient methods.</p>
+
+<p>It should not be assumed without appropriate regularity.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-jensen-stochastic-optimization">
+<title>Jensen's Inequality Connection</title>
+<p>For convex <m>f</m>,</p>
+
+<p>
+<md>\boxed{
+f
+(
+\mathbb{E}[X]
+)
+\leq
+\mathbb{E}
+[
+f(X)
+].
+}</md>
+</p>
+
+<p>Therefore replacing uncertainty by its mean can systematically
+underestimate the expected value of a convex cost.</p>
+
+<p>This explains one way in which the expected-value problem can differ from
+the true stochastic problem.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-worked-jensen-stochastic">
+<title>Worked Example: Jensen's Inequality</title>
+<example>
+<title>Cost of Random Demand</title>
+<p>Let</p>
+
+<p>
+<md>f(D)=D^2.</md>
+</p>
+
+<p>Suppose</p>
+
+<p>
+<md>\mathbb{E}[D]=10</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\operatorname{Var}(D)=4.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\mathbb{E}[D^2]
+=
+\operatorname{Var}(D)
++
+(\mathbb{E}[D])^2.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\mathbb{E}[D^2]
+=
+4+100
+=
+104.</md>
+</p>
+
+<p>But</p>
+
+<p>
+<md>f(\mathbb{E}[D])
+=
+10^2
+=
+100.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+f(\mathbb{E}[D])
+=
+100
+&lt;
+104
+=
+\mathbb{E}[f(D)].
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-decision-rules">
+<title>Decision Rules</title>
+<p>In multistage problems, a future decision is a function of observed
+information.</p>
+
+<p>Thus instead of optimizing a finite vector alone, one may optimize a
+policy:</p>
+
+<p>
+<md>\boxed{
+x_t
+=
+\pi_t
+(
+\xi_1,\ldots,\xi_t
+).
+}</md>
+</p>
+
+<p>The full space of possible functions can be enormous.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-affine-decision-rules">
+<title>Affine Decision Rules Preview</title>
+<p>A tractable approximation restricts decisions to affine functions of
+observed uncertainty:</p>
+
+<p>
+<md>\boxed{
+x_t
+=
+a_t
++
+B_t
+\boldsymbol{\xi}_{1:t}.
+}</md>
+</p>
+
+<p>This reduces an infinite-dimensional policy problem to a finite number of
+parameters.</p>
+
+<p>The resulting policy is approximate but computationally manageable.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-rolling-horizon-stochastic">
+<title>Rolling-Horizon Stochastic Optimization</title>
+<p>A model can be repeatedly re-solved as new information becomes available.</p>
+
+<p>At each stage:</p>
+
+<p>
+<ol>
+<li>
+<p>update forecasts or distributions;</p>
+</li>
+<li>
+<p>solve the optimization model;</p>
+</li>
+<li>
+<p>implement the first decision;</p>
+</li>
+<li>
+<p>observe new information;</p>
+</li>
+<li>
+<p>repeat.</p>
+</li>
+</ol>
+</p>
+
+<p>This creates an adaptive rolling-horizon policy.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-forecast-error-optimization">
+<title>Forecast Error and Optimization</title>
+<p>A forecast provides an estimate such as</p>
+
+<p>
+<md>\widehat{D}.</md>
+</p>
+
+<p>A stochastic model instead represents forecast uncertainty through a
+distribution or scenario set.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{forecast}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{uncertainty model}
+}</md>
+</p>
+
+<p>are distinct components.</p>
+
+<p>Optimization quality depends on both.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-probability-estimation-error">
+<title>Probability Estimation Error</title>
+<p>Scenario probabilities are rarely known exactly.</p>
+
+<p>They may be estimated from finite data.</p>
+
+<p>Therefore the optimization problem itself can be sensitive to statistical
+estimation error.</p>
+
+<p>This motivates:</p>
+
+<p>
+<md>\boxed{
+\text{out-of-sample testing},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{regularization},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{distributionally robust optimization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-rare-events-stochastic-optimization">
+<title>Rare Events</title>
+<p>Rare but severe outcomes may contribute little to ordinary sample averages
+unless very large samples are used.</p>
+
+<p>Yet they may dominate risk.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{extreme financial losses},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{system failures},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{natural disasters}.
+}</md>
+</p>
+
+<p>Tail-risk measures and importance-sampling ideas may therefore be useful.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-importance-sampling-stochastic-optimization">
+<title>Importance Sampling Preview</title>
+<p>Importance sampling changes the sampling distribution to generate
+important rare events more frequently.</p>
+
+<p>Statistical weights correct for the altered distribution.</p>
+
+<p>This can reduce variance when estimating rare-event probabilities or tail
+costs.</p>
+
+<p>The method is developed more deeply with Monte Carlo techniques in
+Chapter 11.</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-optimization-workflow">
+<title>Stochastic Optimization Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify uncertain quantities;</p>
+</li>
+<li>
+<p>determine when each uncertain quantity becomes observable;</p>
+</li>
+<li>
+<p>define here-and-now and recourse decisions;</p>
+</li>
+<li>
+<p>choose a probability model, scenario model, or ambiguity set;</p>
+</li>
+<li>
+<p>formulate expected cost, risk, or chance constraints;</p>
+</li>
+<li>
+<p>enforce nonanticipativity;</p>
+</li>
+<li>
+<p>identify whether the problem is static, two-stage, or multistage;</p>
+</li>
+<li>
+<p>exploit convexity where available;</p>
+</li>
+<li>
+<p>determine whether exact expectations are tractable;</p>
+</li>
+<li>
+<p>use scenarios or sample-average approximation when needed;</p>
+</li>
+<li>
+<p>choose decomposition for large scenario models;</p>
+</li>
+<li>
+<p>compute or estimate statistical error;</p>
+</li>
+<li>
+<p>evaluate solutions out of sample;</p>
+</li>
+<li>
+<p>examine tail risk and rare events;</p>
+</li>
+<li>
+<p>compare stochastic and deterministic expected-value solutions;</p>
+</li>
+<li>
+<p>calculate VSS or EVPI when useful;</p>
+</li>
+<li>
+<p>perform sensitivity analysis on distributions and probabilities;</p>
+</li>
+<li>
+<p>interpret the final policy rather than only the objective value.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-choosing-stochastic-method">
+<title>Choosing a Stochastic Optimization Method</title>
+<p>For finite scenario two-stage linear models, consider:</p>
+
+<p>
+<md>\boxed{
+\text{deterministic equivalent}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{L-shaped decomposition}.
+}</md>
+</p>
+
+<p>For large expectations estimated from data, consider:</p>
+
+<p>
+<md>\boxed{
+\text{sample-average approximation}.
+}</md>
+</p>
+
+<p>For very large smooth expected objectives, consider:</p>
+
+<p>
+<md>\boxed{
+\text{stochastic gradient methods}.
+}</md>
+</p>
+
+<p>For multistage problems with manageable states, consider:</p>
+
+<p>
+<md>\boxed{
+\text{stochastic dynamic programming}.
+}</md>
+</p>
+
+<p>For large multistage convex problems, consider methods such as:</p>
+
+<p>
+<md>\boxed{
+\text{SDDP}.
+}</md>
+</p>
+
+<p>For probabilistic reliability requirements, consider:</p>
+
+<p>
+<md>\boxed{
+\text{chance constraints}.
+}</md>
+</p>
+
+<p>For uncertain probability distributions, consider:</p>
+
+<p>
+<md>\boxed{
+\text{distributionally robust optimization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-optimization-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-replacing-random-data-by-its-mean-automatically">
+<title>Replacing Random Data by Its Mean Automatically</title>
+<p>In general,</p>
+
+<p>
+<md>\boxed{
+\min_x
+F
+(
+x,\mathbb{E}[\xi]
+)
+}</md>
+</p>
+
+<p>is not equivalent to</p>
+
+<p>
+<md>\boxed{
+\min_x
+\mathbb{E}
+[
+F(x,\xi)
+].
+}</md>
+</p>
+
+<p>Nonlinearity and recourse can make the solutions very different.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-information-timing">
+<title>Ignoring Information Timing</title>
+<p>A decision may depend only on uncertainty already observed.</p>
+
+<p>Using future information violates nonanticipativity.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-letting-first-stage-decisions-vary-by-scenario">
+<title>Letting First-Stage Decisions Vary by Scenario</title>
+<p>If a decision is made before uncertainty occurs, it must be identical
+across scenarios.</p>
+
+<p>Creating separate first-stage values without nonanticipativity gives the
+model impossible foresight.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-expected-cost-controls-tail-risk">
+<title>Assuming Expected Cost Controls Tail Risk</title>
+<p>A small expected cost does not guarantee small worst-case or tail losses.</p>
+
+<p>Risk measures should match the application.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-var-and-cvar">
+<title>Confusing VaR and CVaR</title>
+<p>VaR is fundamentally a quantile.</p>
+
+<p>CVaR describes upper-tail loss through an averaging or optimization
+construction.</p>
+
+<p>They are not interchangeable.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-treating-a-sample-average-as-the-exact-expectation">
+<title>Treating a Sample Average as the Exact Expectation</title>
+<p>An SAA objective contains sampling error.</p>
+
+<p>Different random samples may produce different solutions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-evaluating-on-the-same-scenarios-used-for-optimization">
+<title>Evaluating on the Same Scenarios Used for Optimization</title>
+<p>This can make a solution appear better than it performs on new data.</p>
+
+<p>Independent out-of-sample evaluation is important.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-too-few-scenarios">
+<title>Using Too Few Scenarios</title>
+<p>A small scenario set may miss important regions of the uncertainty
+distribution.</p>
+
+<p>The resulting optimization model can produce unstable decisions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-scenario-probabilities">
+<title>Ignoring Scenario Probabilities</title>
+<p>For unequal probabilities,</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[F]
+=
+\sum_\omega
+p_\omega F_\omega.
+}</md>
+</p>
+
+<p>Using an unweighted average changes the model.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-stochastic-and-robust-optimization">
+<title>Confusing Stochastic and Robust Optimization</title>
+<p>Stochastic optimization uses probability information.</p>
+
+<p>Robust optimization protects against all uncertainty in a chosen set.</p>
+
+<p>The resulting decisions can be very different.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-chance-constraints-guarantee-zero-violations">
+<title>Assuming Chance Constraints Guarantee Zero Violations</title>
+<p>A chance constraint permits violation probability up to <m>\varepsilon</m>.</p>
+
+<p>It is not a hard constraint for every realization.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-dependence-in-joint-chance-constraints">
+<title>Ignoring Dependence in Joint Chance Constraints</title>
+<p>Individual reliability levels do not automatically determine joint
+reliability.</p>
+
+<p>Dependence among uncertain constraints matters.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-stochastic-gradients-equal-exact-gradients">
+<title>Assuming Stochastic Gradients Equal Exact Gradients</title>
+<p>Individual stochastic gradients are noisy estimates.</p>
+
+<p>Only their expectation may equal the true gradient under suitable
+assumptions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-a-large-constant-sgd-step-size-indefinitely">
+<title>Using a Large Constant SGD Step Size Indefinitely</title>
+<p>Persistent gradient noise can cause continued fluctuations.</p>
+
+<p>Step-size design affects convergence.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interchanging-expectation-and-differentiation-without-conditions">
+<title>Interchanging Expectation and Differentiation Without Conditions</title>
+<p>The identity</p>
+
+<p>
+<md>\nabla
+\mathbb{E}[F]
+=
+\mathbb{E}[\nabla F]</md>
+</p>
+
+<p>requires regularity assumptions.</p>
+
+<p>It is not purely algebraic.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interpreting-evpi-with-the-wrong-sign">
+<title>Interpreting EVPI with the Wrong Sign</title>
+<p>For standard minimization notation,</p>
+
+<p>
+<md>\boxed{
+EVPI=RP-WS\geq0.
+}</md>
+</p>
+
+<p>The sign changes if a different maximization convention is used.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interpreting-vss-with-the-wrong-sign">
+<title>Interpreting VSS with the Wrong Sign</title>
+<p>For standard minimization notation,</p>
+
+<p>
+<md>\boxed{
+VSS=EEV-RP\geq0.
+}</md>
+</p>
+
+<p>The definition must be consistent with the optimization direction.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-optimization-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Supply Chains.</em>
+Production, inventory, transportation, and capacity decisions are made
+before uncertain demand and disruptions are fully known.</p>
+
+<p>\medskip</p>
+
+<p><em>Energy Systems.</em>
+Generation planning must account for uncertain demand, renewable output,
+fuel prices, and outages.</p>
+
+<p>\medskip</p>
+
+<p><em>Finance.</em>
+Portfolio and asset-allocation models balance uncertain returns with risk
+measures such as variance and CVaR.</p>
+
+<p>\medskip</p>
+
+<p><em>Transportation.</em>
+Routing, fleet allocation, and scheduling may depend on uncertain travel
+times and demand.</p>
+
+<p>\medskip</p>
+
+<p><em>Inventory.</em>
+Order quantities must be chosen while future demand remains uncertain.</p>
+
+<p>\medskip</p>
+
+<p><em>Machine Learning.</em>
+Training objectives are commonly expectations over data distributions and
+are optimized using stochastic gradients.</p>
+
+<p>\medskip</p>
+
+<p><em>Healthcare.</em>
+Staffing, capacity, and resource allocation may need to account for
+uncertain patient arrivals and treatment demand.</p>
+
+<p>\medskip</p>
+
+<p><em>Control.</em>
+Stochastic control optimizes feedback policies for systems affected by
+random disturbances.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-optimization-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define stochastic optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a here-and-now decision.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a recourse decision.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a scenario.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define nonanticipativity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define sample-average approximation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a chance constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define Value-at-Risk conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define Conditional Value-at-Risk conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define distributionally robust optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose a cost is <m>20</m> with probability <m>0.7</m> and <m>50</m> with
+probability <m>0.3</m>. Compute its expected value.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the finite-scenario expectation for three scenarios with
+probabilities <m>0.2</m>, <m>0.5</m>, and <m>0.3</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between first-stage and second-stage decisions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of a recourse action in transportation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why first-stage variables must satisfy nonanticipativity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a chance constraint requiring at least <m>95\%</m> service reliability.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If demand has distribution function <m>F_D</m>, write a capacity requirement
+that covers demand with probability at least <m>0.9</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the sample average of costs</p>
+
+<p>
+<md>8,\ 11,\ 13,\ 10,\ 8.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Take one SGD step from <m>x_0=5</m> using stochastic gradient <m>4</m> and step
+size <m>0.2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a two-stage capacity-expansion model with emergency recourse.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the deterministic equivalent of a two-scenario stochastic linear
+program.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how the deterministic equivalent changes as the number of
+scenarios increases.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a three-stage scenario tree with two branches at each uncertain
+stage.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify which decisions must be equal under nonanticipativity in the
+previous tree.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>RP=85,
+\qquad
+WS=70.</md>
+</p>
+
+<p>Compute EVPI.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>EEV=96,
+\qquad
+RP=85.</md>
+</p>
+
+<p>Compute VSS.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the practical meaning of a large VSS.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the practical meaning of a large EVPI.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct an SAA problem using <m>N</m> sampled scenarios.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why SAA solutions should be tested out of sample.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the sample mean is an unbiased estimator of an expected cost
+under independent identically distributed sampling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the variance tradeoff between single-sample SGD and minibatch SGD.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify whether</p>
+
+<p>
+<md>\alpha_k=\frac1k</md>
+</p>
+
+<p>satisfies</p>
+
+<p>
+<md>\sum_k\alpha_k=\infty</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\sum_k\alpha_k^2&lt;\infty.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a mean--variance optimization objective.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a minimum-variance portfolio problem with a target expected
+return.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For a loss distribution, identify the difference between VaR and CVaR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the auxiliary-variable representation of CVaR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a finite-scenario CVaR optimization model.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why CVaR focuses more directly on tail losses than expectation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare a chance constraint with a robust constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>D\sim N(100,15^2).</md>
+</p>
+
+<p>Write the capacity requirement for <m>99\%</m> service using the standard
+normal quantile <m>z_{0.99}</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why joint chance constraints require dependence information.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that expectation preserves convexity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Jensen's inequality to explain why replacing a random input by its mean
+may underestimate convex expected cost.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a distributionally robust expected-cost problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give examples of possible ambiguity-set information.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between aleatoric and epistemic uncertainty.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe the major steps of the L-shaped method.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why scenario recourse problems can often be solved independently
+once the first-stage decision is fixed.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the basic forward and backward passes of SDDP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study existence theory for two-stage stochastic programs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study convexity and continuity of recourse functions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the deterministic equivalent of a multistage scenario-tree model.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study relatively complete and complete recourse.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive L-shaped optimality cuts from dual recourse solutions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study feasibility cuts for stochastic programs without relatively complete
+recourse.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study convergence theory for sample-average approximation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct statistical confidence bounds for an SAA optimal value.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Robbins--Monro stochastic approximation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove convergence results for stochastic gradient descent under convexity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study strongly convex stochastic-gradient convergence rates.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Polyak--Ruppert averaging.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate stochastic variance-reduction methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study deterministic reformulations of Gaussian chance constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study scenario-approach guarantees for chance-constrained optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study coherent risk measures.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the optimization representation of CVaR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study time-consistent dynamic risk measures.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study robust counterparts of linear programs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study ellipsoidal uncertainty sets and robust optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Wasserstein ambiguity sets in distributionally robust optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study moment-based distributionally robust optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study affine decision rules for multistage uncertainty.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study stochastic dual dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate rare-event simulation for stochastic optimization.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-optimization-summary">
+<title>Conceptual Summary</title>
+<p>Stochastic optimization incorporates uncertain quantities directly into
+optimization models.</p>
+
+<p>A basic expected-value problem is</p>
+
+<p>
+<md>\boxed{
+\min_x
+\mathbb{E}
+[
+F(x,\xi)
+].
+}</md>
+</p>
+
+<p>A two-stage model separates:</p>
+
+<p>
+<md>\boxed{
+\text{here-and-now decisions}
+}</md>
+</p>
+
+<p>from</p>
+
+<p>
+<md>\boxed{
+\text{recourse decisions}.
+}</md>
+</p>
+
+<p>A finite-scenario objective takes form</p>
+
+<p>
+<md>\boxed{
+c^Tx
++
+\sum_{\omega}
+p_\omega
+Q_\omega(x).
+}</md>
+</p>
+
+<p>Multistage models must satisfy nonanticipativity:</p>
+
+<p>
+<md>\boxed{
+\text{decisions cannot use future information}.
+}</md>
+</p>
+
+<p>Sample-average approximation replaces an expectation by</p>
+
+<p>
+<md>\boxed{
+\frac1N
+\sum_{i=1}^{N}
+F(x,\xi^{(i)}).
+}</md>
+</p>
+
+<p>Stochastic gradient descent uses</p>
+
+<p>
+<md>\boxed{
+x_{k+1}
+=
+x_k
+-
+\alpha_k
+G(x_k,\xi_k).
+}</md>
+</p>
+
+<p>Chance constraints impose reliability:</p>
+
+<p>
+<md>\boxed{
+\mathbb{P}
+(
+g(x,\xi)\leq0
+)
+\geq
+1-\varepsilon.
+}</md>
+</p>
+
+<p>Risk-averse models can use measures such as</p>
+
+<p>
+<md>\boxed{
+\operatorname{CVaR}_{\alpha}.
+}</md>
+</p>
+
+<p>Stochastic optimization therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{optimization}
++
+\text{probability}
++
+\text{statistics}
++
+\text{simulation}
++
+\text{sequential decision making}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-08-stochastic-optimization-subsec-stochastic-optimization-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Stochastic Optimization extends the deterministic optimization framework
+of Chapter 10 by allowing objectives, constraints, and future decisions to
+depend explicitly on uncertainty. Two-stage recourse models connect
+directly with linear and convex optimization, while multistage models
+connect with Dynamic Programming and stochastic processes from
+Chapter 7. Sample-average approximation and stochastic-gradient methods
+connect optimization with statistical learning and Monte Carlo methods.
+Risk measures such as CVaR link stochastic optimization with finance and
+decision theory. The next section, Multiobjective Optimization, develops
+problems with several competing objective functions and introduces Pareto
+optimality, tradeoff frontiers, scalarization, and compromise solutions.</p>
+</remark>
+</subsection>
+
 </section>

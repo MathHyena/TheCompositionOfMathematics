@@ -1,9 +1,2974 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-11-optimization-operations-research-10-network-optimization">
-  <title>Network Optimization</title>
+<section xml:id="sec-network-optimization">
+<title>Network Optimization</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Graph theory, linear programming, combinatorial optimization, integer
+programming, shortest paths, matrices, systems of linear equations, and
+basic algorithmic complexity.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define a network optimization problem;</p>
+</li>
+<li>
+<p>distinguish directed and undirected networks;</p>
+</li>
+<li>
+<p>define nodes, arcs, capacities, costs, supplies, and demands;</p>
+</li>
+<li>
+<p>formulate flow-conservation constraints;</p>
+</li>
+<li>
+<p>formulate shortest-path problems as network flows;</p>
+</li>
+<li>
+<p>understand shortest-path optimality conditions;</p>
+</li>
+<li>
+<p>distinguish Dijkstra and Bellman--Ford methods;</p>
+</li>
+<li>
+<p>define maximum-flow problems;</p>
+</li>
+<li>
+<p>understand residual networks;</p>
+</li>
+<li>
+<p>understand augmenting paths;</p>
+</li>
+<li>
+<p>state the max-flow min-cut theorem;</p>
+</li>
+<li>
+<p>identify minimum cuts;</p>
+</li>
+<li>
+<p>formulate minimum-cost flow problems;</p>
+</li>
+<li>
+<p>understand node potentials and reduced arc costs;</p>
+</li>
+<li>
+<p>formulate transportation and transshipment problems;</p>
+</li>
+<li>
+<p>formulate assignment as a network problem;</p>
+</li>
+<li>
+<p>recognize circulation problems;</p>
+</li>
+<li>
+<p>formulate flows with lower and upper bounds;</p>
+</li>
+<li>
+<p>understand feasibility of circulations conceptually;</p>
+</li>
+<li>
+<p>formulate bipartite matching as network flow;</p>
+</li>
+<li>
+<p>understand network integrality;</p>
+</li>
+<li>
+<p>recognize total unimodularity of network matrices conceptually;</p>
+</li>
+<li>
+<p>understand minimum spanning trees as network design;</p>
+</li>
+<li>
+<p>distinguish flow problems from network-design problems;</p>
+</li>
+<li>
+<p>formulate fixed-charge network-design models conceptually;</p>
+</li>
+<li>
+<p>understand multicommodity flow;</p>
+</li>
+<li>
+<p>recognize capacity-sharing constraints;</p>
+</li>
+<li>
+<p>understand network interdiction conceptually;</p>
+</li>
+<li>
+<p>formulate time-expanded networks;</p>
+</li>
+<li>
+<p>recognize dynamic flow problems;</p>
+</li>
+<li>
+<p>understand residual optimality conditions;</p>
+</li>
+<li>
+<p>recognize cycle-canceling methods;</p>
+</li>
+<li>
+<p>understand successive shortest-path methods conceptually;</p>
+</li>
+<li>
+<p>recognize network simplex methods;</p>
+</li>
+<li>
+<p>distinguish primal and dual network interpretations;</p>
+</li>
+<li>
+<p>understand shadow prices at nodes;</p>
+</li>
+<li>
+<p>understand sensitivity to capacities and costs;</p>
+</li>
+<li>
+<p>connect network optimization with transportation, logistics,
+          telecommunications, energy, scheduling, and supply chains.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-10-network-optimization-subsec-what-is-network-optimization">
+<title>What Is Network Optimization?</title>
+<p>Network optimization studies optimization problems defined on graphs or
+networks.</p>
+
+<p>A directed network is written</p>
+
+<p>
+<md>\boxed{
+G=(V,A),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>V
+=
+\text{set of nodes},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>A
+=
+\text{set of directed arcs}.</md>
+</p>
+
+<p>Each arc may have quantities such as:</p>
+
+<p>
+<md>\boxed{
+\text{cost},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{capacity},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{lower bound},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{travel time}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-directed-undirected-networks">
+<title>Directed and Undirected Networks</title>
+<p>A directed arc</p>
+
+<p>
+<md>(i,j)</md>
+</p>
+
+<p>allows movement from node <m>i</m> to node <m>j</m>.</p>
+
+<p>An undirected edge</p>
+
+<p>
+<md>\{i,j\}</md>
+</p>
+
+<p>allows connection without a preferred direction.</p>
+
+<p>Many undirected network problems can be represented by replacing each
+edge with two directed arcs.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-flow-variables">
+<title>Flow Variables</title>
+<p>Let</p>
+
+<p>
+<md>\boxed{
+x_{ij}
+=
+\text{flow sent along arc }(i,j).
+}</md>
+</p>
+
+<p>Typical restrictions are</p>
+
+<p>
+<md>\boxed{
+x_{ij}\geq0,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+0\leq x_{ij}\leq u_{ij},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>u_{ij}</md>
+</p>
+
+<p>is the arc capacity.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-supply-demand">
+<title>Supply and Demand at Nodes</title>
+<p>Associate each node <m>i</m> with a balance value</p>
+
+<p>
+<md>b_i.</md>
+</p>
+
+<p>We use the convention:</p>
+
+<p>
+<md>\boxed{
+b_i&gt;0
+\Rightarrow
+\text{node }i\text{ supplies flow},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+b_i&lt;0
+\Rightarrow
+\text{node }i\text{ demands flow},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+b_i=0
+\Rightarrow
+\text{transshipment node}.
+}</md>
+</p>
+
+<p>For a balanced network,</p>
+
+<p>
+<md>\boxed{
+\sum_{i\in V}
+b_i=0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-flow-conservation">
+<title>Flow Conservation</title>
+<p>At each node,</p>
+
+<p>
+<md>\boxed{
+\text{outflow}
+-
+\text{inflow}
+=
+\text{supply}.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\sum_{j:(i,j)\in A}
+x_{ij}
+-
+\sum_{j:(j,i)\in A}
+x_{ji}
+=
+b_i.
+}</md>
+</p>
+
+<p>When</p>
+
+<p>
+<md>b_i=0,</md>
+</p>
+
+<p>we obtain</p>
+
+<p>
+<md>\boxed{
+\text{inflow}
+=
+\text{outflow}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-incidence-matrix">
+<title>Network Incidence Matrix</title>
+<p>The node-arc incidence matrix <m>B</m> records how arcs connect nodes.</p>
+
+<p>For arc</p>
+
+<p>
+<md>a=(i,j),</md>
+</p>
+
+<p>a common convention places</p>
+
+<p>
+<md>\boxed{
++1
+}</md>
+</p>
+
+<p>in row <m>i</m>,</p>
+
+<p>
+<md>\boxed{
+-1
+}</md>
+</p>
+
+<p>in row <m>j</m>,</p>
+
+<p>and zero elsewhere.</p>
+
+<p>Then flow conservation becomes</p>
+
+<p>
+<md>\boxed{
+B\mathbf{x}
+=
+\mathbf{b}.
+}</md>
+</p>
+
+<p>Different sign conventions are possible if used consistently.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-generic-minimum-cost-network-flow">
+<title>Generic Minimum-Cost Network Flow</title>
+<p>A basic network-flow model is</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&amp;
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}
+\\
+\text{subject to}
+\quad&amp;
+\sum_{j:(i,j)\in A}
+x_{ij}
+-
+\sum_{j:(j,i)\in A}
+x_{ji}
+=
+b_i,
+\qquad
+i\in V,
+\\
+&amp;
+0\leq x_{ij}\leq u_{ij}.
+\end{aligned}
+}</md>
+</p>
+
+<p>This is the minimum-cost flow problem.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-shortest-path">
+<title>Shortest-Path Problem</title>
+<p>Given source <m>s</m>, destination <m>t</m>, and arc lengths <m>c_{ij}</m>, the
+shortest-path problem minimizes total path cost.</p>
+
+<p>Define</p>
+
+<p>
+<md>x_{ij}
+=
+\begin{cases}
+1,
+&amp;
+\text{arc }(i,j)\text{ is used},
+\\
+0,
+&amp;
+\text{otherwise}.
+\end{cases}</md>
+</p>
+
+<p>The objective is</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-shortest-path-unit-flow">
+<title>Shortest Path as a Unit Flow</title>
+<p>Send one unit of flow from <m>s</m> to <m>t</m>.</p>
+
+<p>Set</p>
+
+<p>
+<md>\boxed{
+b_s=1,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+b_t=-1,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+b_i=0
+}</md>
+</p>
+
+<p>for every other node.</p>
+
+<p>Then solve</p>
+
+<p>
+<md>\boxed{
+B\mathbf{x}
+=
+\mathbf{b},
+\qquad
+\mathbf{x}\geq0.
+}</md>
+</p>
+
+<p>With appropriate assumptions, an optimal extreme-point solution gives an
+<m>s</m>-to-<m>t</m> path.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-shortest-path-labeling">
+<title>Shortest-Path Labeling</title>
+<p>Let</p>
+
+<p>
+<md>d(v)</md>
+</p>
+
+<p>denote the current estimate of the shortest distance from source <m>s</m> to
+vertex <m>v</m>.</p>
+
+<p>Relaxing arc <m>(u,v)</m> means checking whether</p>
+
+<p>
+<md>\boxed{
+d(v)
+&gt;
+d(u)+c_{uv}.
+}</md>
+</p>
+
+<p>If so, update</p>
+
+<p>
+<md>\boxed{
+d(v)
+\leftarrow
+d(u)+c_{uv}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-dijkstra-network">
+<title>Dijkstra's Algorithm</title>
+<p>For nonnegative arc lengths,</p>
+
+<p>
+<md>\boxed{
+c_{ij}\geq0,
+}</md>
+</p>
+
+<p>Dijkstra's algorithm repeatedly selects an unsettled node with smallest
+tentative distance and relaxes its outgoing arcs.</p>
+
+<p>Once a node is permanently labeled, its distance is optimal.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-dijkstra-limitation">
+<title>Limitation of Dijkstra's Algorithm</title>
+<p>Dijkstra's algorithm requires nonnegative edge lengths.</p>
+
+<p>If negative edges are present, a node that appears final may later receive
+a shorter path.</p>
+
+<p>Thus one must use another method, such as Bellman--Ford, when negative
+weights are permitted.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-bellman-ford-network">
+<title>Bellman--Ford Algorithm</title>
+<p>Bellman--Ford repeatedly relaxes every arc.</p>
+
+<p>For a graph with <m>n</m> vertices, shortest simple paths contain at most</p>
+
+<p>
+<md>n-1</md>
+</p>
+
+<p>edges.</p>
+
+<p>Thus after at most <m>n-1</m> full relaxation passes, shortest distances are
+obtained when no reachable negative cycle exists.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-negative-cycles">
+<title>Negative Cycles</title>
+<p>A directed cycle has negative total cost if</p>
+
+<p>
+<md>\boxed{
+\sum_{(i,j)\in C}
+c_{ij}
+&lt;
+0.
+}</md>
+</p>
+
+<p>If such a cycle is reachable and can be inserted arbitrarily into a
+shortest-path walk, path cost can decrease without bound.</p>
+
+<p>Bellman--Ford can detect reachable negative cycles by checking for an
+additional improvement after the standard relaxation passes.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-worked-network-shortest-path">
+<title>Worked Example: Shortest Path</title>
+<example>
+<title>Comparing Routes</title>
+<p>Suppose the network contains arcs</p>
+
+<p>
+<md>A\to B
+\quad\text{with cost }2,</md>
+</p>
+
+<p>
+<md>A\to C
+\quad\text{with cost }5,</md>
+</p>
+
+<p>
+<md>B\to C
+\quad\text{with cost }1,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>C\to D
+\quad\text{with cost }3.</md>
+</p>
+
+<p>The route</p>
+
+<p>
+<md>A\to C\to D</md>
+</p>
+
+<p>has cost</p>
+
+<p>
+<md>5+3=8.</md>
+</p>
+
+<p>The route</p>
+
+<p>
+<md>A\to B\to C\to D</md>
+</p>
+
+<p>has cost</p>
+
+<p>
+<md>2+1+3=6.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+A\to B\to C\to D
+}</md>
+</p>
+
+<p>is shorter, with total cost</p>
+
+<p>
+<md>\boxed{
+6.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-maximum-flow-problem">
+<title>Maximum-Flow Problem</title>
+<p>The maximum-flow problem sends as much flow as possible from a source</p>
+
+<p>
+<md>s</md>
+</p>
+
+<p>to a sink</p>
+
+<p>
+<md>t</md>
+</p>
+
+<p>subject to capacity restrictions.</p>
+
+<p>Each arc satisfies</p>
+
+<p>
+<md>\boxed{
+0\leq x_{ij}\leq u_{ij}.
+}</md>
+</p>
+
+<p>At intermediate nodes,</p>
+
+<p>
+<md>\boxed{
+\text{inflow}
+=
+\text{outflow}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-value-of-flow">
+<title>Value of a Flow</title>
+<p>The value of an <m>s</m>-<m>t</m> flow is the net flow leaving <m>s</m>:</p>
+
+<p>
+<md>\boxed{
+v
+=
+\sum_j
+x_{sj}
+-
+\sum_j
+x_{js}.
+}</md>
+</p>
+
+<p>Equivalently, by conservation, it equals the net flow entering <m>t</m>.</p>
+
+<p>The objective is</p>
+
+<p>
+<md>\boxed{
+\max v.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-residual-capacity">
+<title>Residual Capacity</title>
+<p>Suppose arc <m>(i,j)</m> has capacity <m>u_{ij}</m> and current flow <m>x_{ij}</m>.</p>
+
+<p>The forward residual capacity is</p>
+
+<p>
+<md>\boxed{
+u_{ij}-x_{ij}.
+}</md>
+</p>
+
+<p>A reverse residual arc allows previously sent flow to be reduced.</p>
+
+<p>Its capacity is</p>
+
+<p>
+<md>\boxed{
+x_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-residual-network">
+<title>Residual Network</title>
+<p>The residual network contains all directions in which the current flow can
+be modified.</p>
+
+<p>It contains:</p>
+
+<p>
+<md>\boxed{
+\text{forward residual arcs}
+}</md>
+</p>
+
+<p>for unused capacity,</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{reverse residual arcs}
+}</md>
+</p>
+
+<p>for canceling existing flow.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-augmenting-paths">
+<title>Augmenting Paths</title>
+<p>An augmenting path is an <m>s</m>-to-<m>t</m> path in the residual network with
+positive residual capacity on every arc.</p>
+
+<p>The amount of additional flow that can be sent is</p>
+
+<p>
+<md>\boxed{
+\Delta
+=
+\min_{a\in P}
+u_a^{\mathrm{res}}.
+}</md>
+</p>
+
+<p>This is the bottleneck residual capacity.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-ford-fulkerson">
+<title>Ford--Fulkerson Method</title>
+<p>Ford--Fulkerson repeatedly:</p>
+
+<p>
+<ol>
+<li>
+<p>finds an augmenting path;</p>
+</li>
+<li>
+<p>computes its bottleneck residual capacity;</p>
+</li>
+<li>
+<p>augments the flow;</p>
+</li>
+<li>
+<p>updates the residual network;</p>
+</li>
+<li>
+<p>stops when no augmenting path exists.</p>
+</li>
+</ol>
+</p>
+
+<p>For integral capacities, the method can be implemented so that all flows
+remain integral.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-edmonds-karp">
+<title>Edmonds--Karp Algorithm</title>
+<p>Edmonds--Karp is a specific implementation of Ford--Fulkerson.</p>
+
+<p>It chooses an augmenting path with the fewest arcs by using breadth-first
+search in the residual network.</p>
+
+<p>This produces a polynomial-time algorithm.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-cuts">
+<title>Cuts</title>
+<p>An <m>s</m>-<m>t</m> cut partitions the nodes into</p>
+
+<p>
+<md>S</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>T=V\setminus S,</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>s\in S,
+\qquad
+t\in T.</md>
+</p>
+
+<p>The capacity of the cut is</p>
+
+<p>
+<md>\boxed{
+u(S,T)
+=
+\sum_{\substack{i\in S\\j\in T}}
+u_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-flow-cut-bound">
+<title>Flow Is Bounded by Every Cut</title>
+<p>Any <m>s</m>-to-<m>t</m> flow must cross every <m>s</m>-<m>t</m> cut.</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+v
+\leq
+u(S,T)
+}</md>
+</p>
+
+<p>for every <m>s</m>-<m>t</m> cut.</p>
+
+<p>Thus every cut provides an upper bound on maximum flow.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-max-flow-min-cut">
+<title>Max-Flow Min-Cut Theorem</title>
+<p>\begin{theorem}[Max-Flow Min-Cut Theorem]
+The maximum value of an <m>s</m>-<m>t</m> flow equals the minimum capacity of an
+<m>s</m>-<m>t</m> cut:</p>
+
+<p>
+<md>\boxed{
+\max
+\{
+\text{flow value}
+\}
+=
+\min
+\{
+\text{cut capacity}
+\}.
+}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>This is one of the fundamental duality results in network optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-worked-flow-cut">
+<title>Worked Example: Flow and Cut</title>
+<example>
+<title>Certifying Maximum Flow</title>
+<p>Suppose a feasible <m>s</m>-<m>t</m> flow has value</p>
+
+<p>
+<md>12.</md>
+</p>
+
+<p>Suppose an <m>s</m>-<m>t</m> cut is found with capacity</p>
+
+<p>
+<md>12.</md>
+</p>
+
+<p>Every feasible flow satisfies</p>
+
+<p>
+<md>v\leq12.</md>
+</p>
+
+<p>But a flow of value <m>12</m> already exists.</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+v^*=12.
+}</md>
+</p>
+
+<p>The flow and cut together certify optimality.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-minimum-cost-flow">
+<title>Minimum-Cost Flow</title>
+<p>The minimum-cost flow problem combines:</p>
+
+<p>
+<md>\boxed{
+\text{flow conservation},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{capacities},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{arc costs}.
+}</md>
+</p>
+
+<p>The model is</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min
+\quad&amp;
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}
+\\
+\text{subject to}
+\quad&amp;
+\sum_jx_{ij}
+-
+\sum_jx_{ji}
+=
+b_i,
+\\
+&amp;
+0\leq x_{ij}\leq u_{ij}.
+\end{aligned}
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-min-cost-flow-special-cases">
+<title>Special Cases of Minimum-Cost Flow</title>
+<p>Many classical optimization problems are special cases of minimum-cost
+flow:</p>
+
+<p>
+<md>\boxed{
+\text{shortest path},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{transportation},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{assignment},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{transshipment}.
+}</md>
+</p>
+
+<p>This makes minimum-cost flow one of the most general fundamental network
+models.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-transportation">
+<title>Transportation Problem</title>
+<p>Suppose supply node <m>i</m> has amount</p>
+
+<p>
+<md>s_i,</md>
+</p>
+
+<p>and demand node <m>j</m> requires amount</p>
+
+<p>
+<md>d_j.</md>
+</p>
+
+<p>Let</p>
+
+<p>
+<md>x_{ij}</md>
+</p>
+
+<p>be quantity shipped.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_i
+\sum_j
+c_{ij}x_{ij}
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+\sum_jx_{ij}=s_i,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\sum_ix_{ij}=d_j.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-balanced-transportation">
+<title>Balanced Transportation</title>
+<p>A transportation problem is balanced when</p>
+
+<p>
+<md>\boxed{
+\sum_i
+s_i
+=
+\sum_j
+d_j.
+}</md>
+</p>
+
+<p>If total supply differs from total demand, dummy supply or demand nodes
+may sometimes be introduced when appropriate to the application.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-transshipment">
+<title>Transshipment</title>
+<p>A transshipment problem allows flow to pass through intermediate nodes.</p>
+
+<p>Such a node typically has</p>
+
+<p>
+<md>\boxed{
+b_i=0.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\sum_jx_{ji}
+=
+\sum_jx_{ij}.
+}</md>
+</p>
+
+<p>Transportation is a special case with no intermediate transfer nodes.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-assignment-network-flow">
+<title>Assignment as Network Flow</title>
+<p>Construct a source connected to each worker.</p>
+
+<p>Connect each worker to each feasible task.</p>
+
+<p>Connect each task to a sink.</p>
+
+<p>Give each arc unit capacity.</p>
+
+<p>Sending one unit of flow through</p>
+
+<p>
+<md>\boxed{
+s
+\to
+\text{worker}
+\to
+\text{task}
+\to
+t
+}</md>
+</p>
+
+<p>represents an assignment.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-bipartite-matching-flow">
+<title>Bipartite Matching as Maximum Flow</title>
+<p>For bipartite graph</p>
+
+<p>
+<md>G=(U\cup W,E),</md>
+</p>
+
+<p>construct:</p>
+
+<p>
+<md>\boxed{
+s\to U,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+U\to W,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+W\to t,
+}</md>
+</p>
+
+<p>with capacity <m>1</m> on each arc.</p>
+
+<p>Then a maximum integral flow corresponds to a maximum matching.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-flow-integrality">
+<title>Integrality of Network Flows</title>
+<p>If network capacities and supplies are integral, many standard network
+flow problems possess an optimal solution with integral arc flows.</p>
+
+<p>Thus continuous linear programming can solve important discrete network
+problems.</p>
+
+<p>This is a major structural advantage of network models.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-total-unimodularity">
+<title>Network Matrices and Total Unimodularity</title>
+<p>Node-arc incidence matrices are totally unimodular.</p>
+
+<p>Therefore, under appropriate integral right-hand sides and bounds, extreme
+points of the network-flow polyhedron are integral.</p>
+
+<p>This connects network optimization directly with the integrality theory of
+Sections <xref ref="sec-linear-programming" /> and
+<xref ref="sec-integer-programming" />.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-circulation">
+<title>Circulation</title>
+<p>A circulation is a flow with zero net supply at every node:</p>
+
+<p>
+<md>\boxed{
+b_i=0
+\qquad
+\text{for all }i.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\sum_jx_{ij}
+=
+\sum_jx_{ji}.
+}</md>
+</p>
+
+<p>Circulation problems are useful for studying feasibility, lower bounds,
+and minimum-cost cycles.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-flow-lower-bounds">
+<title>Lower Bounds on Flows</title>
+<p>Suppose an arc must carry at least</p>
+
+<p>
+<md>\ell_{ij}</md>
+</p>
+
+<p>units and at most</p>
+
+<p>
+<md>u_{ij}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\ell_{ij}
+\leq
+x_{ij}
+\leq
+u_{ij}.
+}</md>
+</p>
+
+<p>Lower bounds can be removed by substituting</p>
+
+<p>
+<md>\boxed{
+x_{ij}
+=
+\ell_{ij}
++
+y_{ij},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>y_{ij}\geq0.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-lower-bound-transformation">
+<title>Effect of Lower-Bound Transformation</title>
+<p>Substituting</p>
+
+<p>
+<md>x_{ij}=\ell_{ij}+y_{ij}</md>
+</p>
+
+<p>changes the node balances.</p>
+
+<p>The fixed lower-bound flow contributes predetermined inflow and outflow.</p>
+
+<p>The residual variable satisfies</p>
+
+<p>
+<md>\boxed{
+0\leq y_{ij}\leq u_{ij}-\ell_{ij}.
+}</md>
+</p>
+
+<p>This reduces the model to an ordinary capacity-bounded flow problem with
+adjusted supplies.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-minimum-cost-circulation">
+<title>Minimum-Cost Circulation</title>
+<p>A minimum-cost circulation solves</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_{(i,j)\in A}
+c_{ij}x_{ij}
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+B\mathbf{x}=0,
+}</md>
+</p>
+
+<p>and capacity restrictions.</p>
+
+<p>Many minimum-cost flow problems can be transformed into circulation
+problems by adding an artificial arc or supernodes.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-residual-costs">
+<title>Residual Costs</title>
+<p>In a minimum-cost flow residual network, a forward residual arc retains
+cost</p>
+
+<p>
+<md>\boxed{
+c_{ij},
+}</md>
+</p>
+
+<p>while a reverse residual arc has cost</p>
+
+<p>
+<md>\boxed{
+-c_{ij}.
+}</md>
+</p>
+
+<p>The reverse arc represents undoing one unit of existing flow and reversing
+its cost contribution.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-negative-cycle-optimality">
+<title>Negative-Cycle Optimality</title>
+<p>For a feasible minimum-cost circulation, if the residual network contains
+a negative-cost directed cycle, sending additional circulation around that
+cycle reduces total cost.</p>
+
+<p>Therefore an optimal feasible circulation has no augmentable negative-cost
+cycle in its residual network.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-cycle-canceling">
+<title>Cycle-Canceling Method</title>
+<p>The cycle-canceling method repeatedly:</p>
+
+<p>
+<ol>
+<li>
+<p>identifies a negative-cost cycle in the residual network;</p>
+</li>
+<li>
+<p>sends as much flow as possible around it;</p>
+</li>
+<li>
+<p>updates the residual network;</p>
+</li>
+<li>
+<p>stops when no negative cycle remains.</p>
+</li>
+</ol>
+</p>
+
+<p>The final feasible circulation is optimal under the standard
+minimum-cost-flow framework.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-successive-shortest-path">
+<title>Successive Shortest-Path Method</title>
+<p>Another minimum-cost-flow approach repeatedly sends flow from a supply node
+to a demand node along a minimum-cost residual path.</p>
+
+<p>After augmentation:</p>
+
+<p>
+<md>\boxed{
+\text{residual capacities are updated},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{remaining supplies and demands are reduced}.
+}</md>
+</p>
+
+<p>The process continues until all required flow is routed.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-node-potentials">
+<title>Node Potentials</title>
+<p>Associate a potential</p>
+
+<p>
+<md>\pi_i</md>
+</p>
+
+<p>with each node.</p>
+
+<p>For arc <m>(i,j)</m>, define a reduced cost using the convention</p>
+
+<p>
+<md>\boxed{
+\bar{c}_{ij}
+=
+c_{ij}
++
+\pi_i
+-
+\pi_j.
+}</md>
+</p>
+
+<p>These potentials are closely related to dual variables for flow
+conservation constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-reduced-cost-optimality">
+<title>Reduced-Cost Optimality</title>
+<p>Suitable node potentials can transform residual arc costs while preserving
+path comparisons.</p>
+
+<p>For a minimum-cost flow optimum, the residual network admits potentials
+such that all usable residual reduced costs satisfy</p>
+
+<p>
+<md>\boxed{
+\bar{c}_{ij}\geq0.
+}</md>
+</p>
+
+<p>This is a network version of reduced-cost optimality in linear
+programming.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-shortest-path-potentials">
+<title>Shortest Paths and Potentials</title>
+<p>If node potentials equal shortest-path distance labels from a source, then
+triangle inequalities give</p>
+
+<p>
+<md>\boxed{
+d(j)
+\leq
+d(i)+c_{ij}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+c_{ij}
++
+d(i)
+-
+d(j)
+\geq0.
+}</md>
+</p>
+
+<p>Thus shortest-path distances naturally produce nonnegative reduced arc
+costs.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-simplex">
+<title>Network Simplex Method</title>
+<p>The network simplex method specializes the simplex algorithm to
+minimum-cost flow.</p>
+
+<p>A basis corresponds to a spanning-tree-like network structure.</p>
+
+<p>Pivots modify the tree by:</p>
+
+<p>
+<md>\boxed{
+\text{adding one arc},
+}</md>
+</p>
+
+<p>which creates a cycle, and then</p>
+
+<p>
+<md>\boxed{
+\text{removing another arc}.
+}</md>
+</p>
+
+<p>The specialized structure makes network simplex highly efficient in many
+applications.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-minimum-spanning-tree-network">
+<title>Minimum Spanning Tree as Network Design</title>
+<p>A minimum spanning tree chooses edges connecting all nodes at minimum total
+cost.</p>
+
+<p>The problem is</p>
+
+<p>
+<md>\boxed{
+\min_{T}
+\sum_{e\in T}
+c_e
+}</md>
+</p>
+
+<p>over all spanning trees <m>T</m>.</p>
+
+<p>Unlike ordinary flow models, the primary decision is which connections
+exist.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-flow-versus-network-design">
+<title>Flow Versus Network Design</title>
+<p>In a flow problem, the network is usually fixed and the decision is:</p>
+
+<p>
+<md>\boxed{
+\text{how much to send}.
+}</md>
+</p>
+
+<p>In a network-design problem, the decision includes:</p>
+
+<p>
+<md>\boxed{
+\text{which arcs or facilities to build}.
+}</md>
+</p>
+
+<p>Network design often requires binary variables and becomes a
+mixed-integer optimization problem.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-fixed-charge-network-design">
+<title>Fixed-Charge Network Design</title>
+<p>Suppose arc <m>(i,j)</m> costs</p>
+
+<p>
+<md>F_{ij}</md>
+</p>
+
+<p>to activate and</p>
+
+<p>
+<md>c_{ij}</md>
+</p>
+
+<p>per unit of flow.</p>
+
+<p>Define</p>
+
+<p>
+<md>y_{ij}\in\{0,1\}</md>
+</p>
+
+<p>for arc activation.</p>
+
+<p>The cost is</p>
+
+<p>
+<md>\boxed{
+F_{ij}y_{ij}
++
+c_{ij}x_{ij}.
+}</md>
+</p>
+
+<p>Link flow to activation using</p>
+
+<p>
+<md>\boxed{
+0\leq x_{ij}\leq u_{ij}y_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-worked-arc-activation">
+<title>Worked Example: Arc Activation</title>
+<example>
+<title>Building a Shipping Route</title>
+<p>Suppose route <m>(i,j)</m> has:</p>
+
+<p>
+<md>\text{fixed opening cost}=100,</md>
+</p>
+
+<p>
+<md>\text{shipping cost}=4</md>
+</p>
+
+<p>per unit, and capacity</p>
+
+<p>
+<md>30.</md>
+</p>
+
+<p>Let</p>
+
+<p>
+<md>y_{ij}\in\{0,1\}.</md>
+</p>
+
+<p>Then use</p>
+
+<p>
+<md>0\leq x_{ij}\leq30y_{ij},</md>
+</p>
+
+<p>with objective contribution</p>
+
+<p>
+<md>100y_{ij}+4x_{ij}.</md>
+</p>
+
+<p>Thus,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+y_{ij}=0
+\Rightarrow
+x_{ij}=0.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-multicommodity-flow">
+<title>Multicommodity Flow</title>
+<p>Suppose several commodities share the same network.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_{ij}^{k}</md>
+</p>
+
+<p>be flow of commodity <m>k</m> on arc <m>(i,j)</m>.</p>
+
+<p>Each commodity has its own conservation equations.</p>
+
+<p>Shared arc capacities satisfy</p>
+
+<p>
+<md>\boxed{
+\sum_k
+x_{ij}^{k}
+\leq
+u_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-why-multicommodity-harder">
+<title>Why Multicommodity Flow Is Harder</title>
+<p>Single-commodity network flows often have powerful integrality structure.</p>
+
+<p>Multiple commodities share capacities and couple otherwise separate flow
+systems.</p>
+
+<p>This can destroy simple network-matrix structure and produce substantially
+harder models, particularly when flows must be integral.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-unsplittable-flow">
+<title>Unsplittable Flow</title>
+<p>In some applications, a commodity must use one path rather than splitting
+across several paths.</p>
+
+<p>Then path or binary arc decisions are required.</p>
+
+<p>For commodity <m>k</m>,</p>
+
+<p>
+<md>\boxed{
+x_{ij}^{k}\in\{0,1\}
+}</md>
+</p>
+
+<p>may indicate whether its path uses arc <m>(i,j)</m>.</p>
+
+<p>Unsplittable flow is generally a discrete network optimization problem.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-time-expanded-networks">
+<title>Time-Expanded Networks</title>
+<p>A dynamic problem can be converted into a static network by copying nodes
+across time periods.</p>
+
+<p>A state may be represented as</p>
+
+<p>
+<md>\boxed{
+(i,t),
+}</md>
+</p>
+
+<p>meaning location <m>i</m> at time <m>t</m>.</p>
+
+<p>Arcs connect states across time.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-holdover-arcs">
+<title>Holdover Arcs</title>
+<p>A holdover arc represents remaining at a node from one period to the next:</p>
+
+<p>
+<md>\boxed{
+(i,t)
+\to
+(i,t+1).
+}</md>
+</p>
+
+<p>Its capacity may represent storage or waiting capacity.</p>
+
+<p>Its cost may represent inventory holding or delay.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-time-expanded-movement-arcs">
+<title>Movement Arcs in Time-Expanded Networks</title>
+<p>Suppose travel from node <m>i</m> to node <m>j</m> requires one period.</p>
+
+<p>Then a movement arc is</p>
+
+<p>
+<md>\boxed{
+(i,t)
+\to
+(j,t+1).
+}</md>
+</p>
+
+<p>Longer travel times connect nodes separated by multiple time layers.</p>
+
+<p>This technique converts scheduling and dynamic routing into network-flow
+models.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-dynamic-network-flow">
+<title>Dynamic Network Flow</title>
+<p>Dynamic flow problems involve movement through a network over time.</p>
+
+<p>Important considerations include:</p>
+
+<p>
+<md>\boxed{
+\text{arc travel times},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{time-dependent capacities},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{time-dependent costs}.
+}</md>
+</p>
+
+<p>Time-expanded networks provide one standard finite-horizon formulation.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-interdiction">
+<title>Network Reliability and Interdiction Preview</title>
+<p>Network interdiction asks how disrupting selected arcs or nodes changes an
+optimal network operation.</p>
+
+<p>An interdictor may seek to:</p>
+
+<p>
+<md>\boxed{
+\text{increase shortest-path distance},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{decrease maximum flow}.
+}</md>
+</p>
+
+<p>Such models often have a bilevel structure.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-bilevel-network-interdiction">
+<title>Bilevel Network Interdiction</title>
+<p>A schematic interdiction model is</p>
+
+<p>
+<md>\boxed{
+\max_{y}
+\left[
+\min_{x}
+\text{network performance under }y
+\right].
+}</md>
+</p>
+
+<p>The outer decision selects disruptions.</p>
+
+<p>The inner problem represents optimal network response.</p>
+
+<p>Bilevel optimization can be significantly more difficult than ordinary
+network flow.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-cut-sets-reliability">
+<title>Cut Sets and Reliability</title>
+<p>A cut set is a collection of arcs whose removal disconnects specified
+parts of a network.</p>
+
+<p>Small-capacity or vulnerable cuts may indicate structural weaknesses.</p>
+
+<p>This connects optimization with network reliability and resilience.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-max-flow-matching-integrality">
+<title>Maximum Flow and Bipartite Matching</title>
+<p>If all capacities are integer, Ford--Fulkerson augmentation amounts can be
+chosen integral.</p>
+
+<p>Thus an integral maximum flow exists.</p>
+
+<p>In the bipartite matching construction, capacities are all <m>1</m>.</p>
+
+<p>Therefore each selected flow arc corresponds exactly to a matching edge.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-shortest-path-duality">
+<title>Duality in Shortest Paths</title>
+<p>The shortest-path problem has a dual interpretation using node potentials.</p>
+
+<p>One potential formulation seeks values <m>\pi_i</m> satisfying</p>
+
+<p>
+<md>\boxed{
+\pi_j-\pi_i
+\leq
+c_{ij}
+}</md>
+</p>
+
+<p>for every arc.</p>
+
+<p>The difference</p>
+
+<p>
+<md>\pi_t-\pi_s</md>
+</p>
+
+<p>provides a lower bound on any <m>s</m>-to-<m>t</m> path cost.</p>
+
+<p>At optimality, this lower bound equals the shortest-path cost under the
+usual assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-max-flow-duality">
+<title>Duality in Maximum Flow</title>
+<p>The minimum-cut problem acts as the dual counterpart of maximum flow.</p>
+
+<p>A feasible cut provides an upper bound on any flow.</p>
+
+<p>A feasible flow provides a lower bound on the maximum-flow value.</p>
+
+<p>When they have equal values,</p>
+
+<p>
+<md>\boxed{
+\text{flow value}
+=
+\text{cut capacity},
+}</md>
+</p>
+
+<p>optimality is certified.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-min-cost-flow-duality">
+<title>Duality in Minimum-Cost Flow</title>
+<p>Dual variables associated with node balance equations can be interpreted
+as node potentials.</p>
+
+<p>These potentials modify arc costs through reduced costs:</p>
+
+<p>
+<md>\boxed{
+\bar c_{ij}
+=
+c_{ij}
++
+\pi_i
+-
+\pi_j.
+}</md>
+</p>
+
+<p>This is the network analogue of reduced-cost analysis in linear
+programming.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-cost-sensitivity">
+<title>Sensitivity to Arc Costs</title>
+<p>Changing</p>
+
+<p>
+<md>c_{ij}</md>
+</p>
+
+<p>can alter which path or flow pattern is optimal.</p>
+
+<p>If a nonused arc becomes sufficiently cheap, it may enter the optimal
+solution.</p>
+
+<p>Reduced costs help quantify how much an arc cost must change before the
+current basis loses optimality.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-capacity-sensitivity">
+<title>Sensitivity to Capacity</title>
+<p>Increasing capacity</p>
+
+<p>
+<md>u_{ij}</md>
+</p>
+
+<p>has value only when the capacity is restrictive.</p>
+
+<p>For a maximum-flow problem, increasing an arc outside every relevant
+minimum cut may have no effect.</p>
+
+<p>Increasing capacity on a bottleneck cut can increase the maximum possible
+flow.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-bottlenecks">
+<title>Bottlenecks</title>
+<p>A bottleneck is a network component limiting overall system performance.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{minimum-cut arcs},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{fully utilized transportation links},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{capacity-constrained facilities}.
+}</md>
+</p>
+
+<p>Dual and sensitivity information can help identify bottlenecks.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-decomposition">
+<title>Network Decomposition</title>
+<p>Large networks may contain exploitable structure.</p>
+
+<p>Possible techniques include:</p>
+
+<p>
+<md>\boxed{
+\text{decomposition by commodity},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{decomposition by geographic region},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{column generation using paths},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{Lagrangian relaxation of shared capacities}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-arc-versus-path-formulations">
+<title>Arc-Based Versus Path-Based Formulations</title>
+<p>An arc-based model uses variables</p>
+
+<p>
+<md>\boxed{
+x_{ij}.
+}</md>
+</p>
+
+<p>A path-based model uses variables</p>
+
+<p>
+<md>\boxed{
+x_p
+}</md>
+</p>
+
+<p>for complete paths <m>p</m>.</p>
+
+<p>Path formulations can contain enormous numbers of variables but may have
+strong structural advantages.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-path-based-multicommodity">
+<title>Path-Based Multicommodity Flow</title>
+<p>Let</p>
+
+<p>
+<md>\mathcal{P}_k</md>
+</p>
+
+<p>be possible paths for commodity <m>k</m>.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_p^k</md>
+</p>
+
+<p>be flow assigned to path <m>p</m>.</p>
+
+<p>Demand satisfaction becomes</p>
+
+<p>
+<md>\boxed{
+\sum_{p\in\mathcal{P}_k}
+x_p^k
+=
+d_k.
+}</md>
+</p>
+
+<p>Arc capacity becomes</p>
+
+<p>
+<md>\boxed{
+\sum_k
+\sum_{p\ni(i,j)}
+x_p^k
+\leq
+u_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-column-generation">
+<title>Column Generation Connection</title>
+<p>A path-based model may have too many path variables to list.</p>
+
+<p>Column generation starts with a small subset of paths.</p>
+
+<p>A pricing problem searches for a new path with favorable reduced cost.</p>
+
+<p>The pricing problem is often itself a shortest-path problem.</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-optimization-workflow">
+<title>Network Optimization Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify nodes and arcs;</p>
+</li>
+<li>
+<p>determine whether the network is directed or undirected;</p>
+</li>
+<li>
+<p>define flow or design variables;</p>
+</li>
+<li>
+<p>assign costs, capacities, supplies, and demands;</p>
+</li>
+<li>
+<p>write flow-conservation equations;</p>
+</li>
+<li>
+<p>identify special structure;</p>
+</li>
+<li>
+<p>determine whether the problem is shortest path, maximum flow,
+          minimum-cost flow, transportation, matching, or network design;</p>
+</li>
+<li>
+<p>use a specialized network algorithm when possible;</p>
+</li>
+<li>
+<p>verify supply-demand balance;</p>
+</li>
+<li>
+<p>inspect capacities and bottlenecks;</p>
+</li>
+<li>
+<p>exploit integrality of standard network formulations;</p>
+</li>
+<li>
+<p>introduce integer variables only when discrete design or routing
+          decisions require them;</p>
+</li>
+<li>
+<p>examine residual networks when using augmenting methods;</p>
+</li>
+<li>
+<p>inspect dual node potentials and reduced costs;</p>
+</li>
+<li>
+<p>perform sensitivity analysis;</p>
+</li>
+<li>
+<p>interpret network structure in the original application.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-choosing-network-method">
+<title>Choosing a Network Method</title>
+<p>For nonnegative shortest-path costs, use:</p>
+
+<p>
+<md>\boxed{
+\text{Dijkstra's algorithm}.
+}</md>
+</p>
+
+<p>For shortest paths with negative edges but no relevant negative cycles,
+consider:</p>
+
+<p>
+<md>\boxed{
+\text{Bellman--Ford}.
+}</md>
+</p>
+
+<p>For maximum flow, use:</p>
+
+<p>
+<md>\boxed{
+\text{augmenting-path or modern max-flow algorithms}.
+}</md>
+</p>
+
+<p>For minimum-cost flow, consider:</p>
+
+<p>
+<md>\boxed{
+\text{successive shortest path},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{cost-scaling methods},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{network simplex}.
+}</md>
+</p>
+
+<p>For discrete network design, use:</p>
+
+<p>
+<md>\boxed{
+\text{mixed-integer optimization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-optimization-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-using-the-wrong-flow-conservation-sign-convention">
+<title>Using the Wrong Flow-Conservation Sign Convention</title>
+<p>If the model uses</p>
+
+<p>
+<md>\text{outflow}-\text{inflow}=b_i,</md>
+</p>
+
+<p>then positive <m>b_i</m> means supply.</p>
+
+<p>Changing conventions midway creates incorrect balances.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-network-balance">
+<title>Ignoring Network Balance</title>
+<p>For a closed minimum-cost flow model,</p>
+
+<p>
+<md>\boxed{
+\sum_i b_i=0
+}</md>
+</p>
+
+<p>is required unless external flow or special modeling devices are included.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-applying-dijkstra-s-algorithm-to-negative-edge-costs">
+<title>Applying Dijkstra's Algorithm to Negative Edge Costs</title>
+<p>Dijkstra's optimality logic relies on nonnegative arc lengths.</p>
+
+<p>Negative costs require another algorithm.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-negative-edges-with-negative-cycles">
+<title>Confusing Negative Edges with Negative Cycles</title>
+<p>A graph can contain negative edges and still have well-defined shortest
+paths.</p>
+
+<p>The fundamental obstruction is an exploitable reachable negative cycle.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-reverse-residual-arcs">
+<title>Ignoring Reverse Residual Arcs</title>
+<p>Residual reverse arcs are essential because an earlier flow decision may
+need to be undone.</p>
+
+<p>Without them, augmenting-path methods can become trapped in nonoptimal
+flows.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-original-capacity-instead-of-residual-capacity">
+<title>Using Original Capacity Instead of Residual Capacity</title>
+<p>When augmenting flow, the allowable amount is determined by</p>
+
+<p>
+<md>\boxed{
+\text{residual capacity},
+}</md>
+</p>
+
+<p>not the original capacity alone.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-any-cut-certifies-maximum-flow">
+<title>Assuming Any Cut Certifies Maximum Flow</title>
+<p>A cut gives an upper bound.</p>
+
+<p>Only when its capacity equals the value of a feasible flow does it certify
+optimality.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-flow-integrality-structure">
+<title>Ignoring Flow Integrality Structure</title>
+<p>Standard single-commodity network problems with integral data often have
+integral optimal solutions without explicit integer variables.</p>
+
+<p>Adding unnecessary integrality constraints can make the model harder.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-multicommodity-flow-has-the-same-integrality-properties">
+<title>Assuming Multicommodity Flow Has the Same Integrality Properties</title>
+<p>Shared capacities couple commodities.</p>
+
+<p>The strong integrality properties of ordinary single-commodity network
+flow do not automatically carry over.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-flow-with-network-design">
+<title>Confusing Flow with Network Design</title>
+<p>Flow variables determine how much is sent.</p>
+
+<p>Binary design variables determine which infrastructure exists.</p>
+
+<p>These are different decision types.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-fixed-costs">
+<title>Ignoring Fixed Costs</title>
+<p>If using an arc requires a fixed setup cost, a purely linear per-unit flow
+cost does not represent the true problem.</p>
+
+<p>Binary activation variables may be needed.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-time-in-dynamic-networks">
+<title>Forgetting Time in Dynamic Networks</title>
+<p>A static flow can incorrectly allow simultaneous use of resources that are
+available at different times.</p>
+
+<p>Time-expanded networks preserve temporal feasibility.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-shortest-path-and-minimum-spanning-tree">
+<title>Confusing Shortest Path and Minimum Spanning Tree</title>
+<p>A shortest path connects specified endpoints.</p>
+
+<p>A minimum spanning tree connects all vertices.</p>
+
+<p>They solve different optimization problems.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-optimization-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Transportation.</em>
+Road, airline, rail, and shipping systems use shortest paths, flow models,
+and network design.</p>
+
+<p>\medskip</p>
+
+<p><em>Supply Chains.</em>
+Goods move through factories, warehouses, distribution centers, and
+customers under capacity and cost restrictions.</p>
+
+<p>\medskip</p>
+
+<p><em>Telecommunications.</em>
+Traffic is routed through communication links while respecting bandwidth
+capacities.</p>
+
+<p>\medskip</p>
+
+<p><em>Energy Systems.</em>
+Electricity, natural gas, and fuel distribution systems have important
+network structures.</p>
+
+<p>\medskip</p>
+
+<p><em>Water Systems.</em>
+Water distribution and pipeline planning involve capacities, flows, and
+network design.</p>
+
+<p>\medskip</p>
+
+<p><em>Scheduling.</em>
+Time-expanded networks can represent jobs, resources, and time-dependent
+decisions.</p>
+
+<p>\medskip</p>
+
+<p><em>Assignment.</em>
+Workers, machines, vehicles, and tasks can be matched through bipartite
+network models.</p>
+
+<p>\medskip</p>
+
+<p><em>Emergency Logistics.</em>
+Maximum-flow and shortest-path models can support evacuation, relief
+distribution, and infrastructure resilience planning.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-optimization-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define a directed network.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a flow variable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define arc capacity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the flow-conservation equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a residual network.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an augmenting path.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an <m>s</m>-<m>t</m> cut.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the max-flow min-cut theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a circulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a multicommodity flow problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>At a transshipment node with inflow <m>8</m>, determine the required outflow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the node-balance constraint for a supply node with supply <m>12</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the node-balance constraint for a demand node requiring <m>7</m> units.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose an arc has capacity <m>15</m> and current flow <m>9</m>. Find its forward
+residual capacity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the same arc, determine the reverse residual capacity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a unit-flow formulation of an <m>s</m>-to-<m>t</m> shortest-path problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain when Dijkstra's algorithm is applicable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain what a negative cycle means for shortest paths.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the capacity of a given <m>s</m>-<m>t</m> cut.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply Dijkstra's algorithm to a small weighted graph.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply Bellman--Ford to a graph containing one negative edge but no
+negative cycle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Detect a negative cycle using Bellman--Ford relaxation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a maximum-flow model for a four-node network.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one Ford--Fulkerson augmentation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the residual network after the augmentation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find an <m>s</m>-<m>t</m> cut and compute its capacity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use a matching flow and cut to certify maximum-flow optimality.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a minimum-cost flow problem with two supply nodes and two demand
+nodes.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a transportation problem as a network flow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a transshipment problem with one intermediate warehouse.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct an assignment problem as a bipartite network.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show how maximum bipartite matching can be converted into maximum flow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Transform an arc with lower bound</p>
+
+<p>
+<md>\ell_{ij}=4</md>
+</p>
+
+<p>and upper bound</p>
+
+<p>
+<md>u_{ij}=10</md>
+</p>
+
+<p>using a residual variable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how the lower-bound transformation changes node balances.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a fixed-charge network-design problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a two-commodity flow problem with a shared capacity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why multicommodity flow is more difficult than single-commodity
+flow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a time-expanded network for three locations and three time
+periods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Add holdover arcs to the previous network.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a node-potential reduced-cost formula.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use shortest-path distances to show that reduced arc costs are
+nonnegative.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a negative residual cycle implies a minimum-cost flow is not
+optimal.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between an arc-based and path-based formulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a path-based flow formulation for two possible routes.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why shortest path can appear as a pricing problem in column
+generation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Interpret a saturated arc as a possible network bottleneck.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why increasing capacity on a noncritical arc may not improve
+maximum flow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the max-flow min-cut theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Ford--Fulkerson termination for integral capacities.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the complexity of Edmonds--Karp.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Dinic's maximum-flow algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study push--relabel maximum-flow algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the LP dual of the shortest-path formulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the LP dual relationship between maximum flow and minimum cut.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive dual conditions for minimum-cost flow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the integrality theorem for network flows.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove total unimodularity of a directed node-arc incidence matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study minimum-cost circulation algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove negative-cycle optimality for minimum-cost circulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study successive shortest-path algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study cost-scaling algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the network simplex method.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study capacitated transshipment models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate fixed-charge network flow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study multicommodity flow formulations and relaxations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study unsplittable flow problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study time-expanded network formulations for scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate maximum dynamic flow.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study network interdiction as a bilevel optimization problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate path-based column generation for multicommodity flow.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-optimization-summary">
+<title>Conceptual Summary</title>
+<p>Network optimization represents decisions on</p>
+
+<p>
+<md>\boxed{
+G=(V,A).
+}</md>
+</p>
+
+<p>A general flow balance is</p>
+
+<p>
+<md>\boxed{
+\sum_jx_{ij}
+-
+\sum_jx_{ji}
+=
+b_i.
+}</md>
+</p>
+
+<p>Capacitated arcs satisfy</p>
+
+<p>
+<md>\boxed{
+0\leq x_{ij}\leq u_{ij}.
+}</md>
+</p>
+
+<p>Shortest path solves</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_{(i,j)}
+c_{ij}x_{ij}
+}</md>
+</p>
+
+<p>for one unit of source-to-sink flow.</p>
+
+<p>Maximum flow seeks</p>
+
+<p>
+<md>\boxed{
+\max v,
+}</md>
+</p>
+
+<p>and the max-flow min-cut theorem gives</p>
+
+<p>
+<md>\boxed{
+\max
+\{
+\text{flow}
+\}
+=
+\min
+\{
+\text{cut capacity}
+\}.
+}</md>
+</p>
+
+<p>Minimum-cost flow solves</p>
+
+<p>
+<md>\boxed{
+\min
+\sum_{(i,j)}
+c_{ij}x_{ij}
+}</md>
+</p>
+
+<p>subject to flow conservation and capacity constraints.</p>
+
+<p>Important special cases include</p>
+
+<p>
+<md>\boxed{
+\text{shortest path}
++
+\text{transportation}
++
+\text{assignment}
++
+\text{transshipment}.
+}</md>
+</p>
+
+<p>Standard network matrices often have powerful integrality properties.</p>
+
+<p>Network optimization therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{graph theory}
++
+\text{linear programming}
++
+\text{combinatorial optimization}
++
+\text{algorithms}
++
+\text{operations research}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-10-network-optimization-subsec-network-optimization-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Network Optimization specializes the linear, integer, and combinatorial
+optimization ideas of Sections <xref ref="sec-linear-programming" />,
+<xref ref="sec-integer-programming" />, and
+<xref ref="sec-combinatorial-optimization" /> to graph-structured models. Shortest
+paths, maximum flows, minimum cuts, minimum-cost flows, transportation,
+assignment, and transshipment problems benefit from strong network
+structure and integrality properties. More complicated models introduce
+fixed-charge design, multiple commodities, time expansion, and network
+interdiction. The next section, Queueing Theory, shifts from deterministic
+network movement to stochastic service systems and develops arrival
+processes, service distributions, queue disciplines, utilization,
+Little's Law, and classical queueing models.</p>
+</remark>
+</subsection>
+
 </section>

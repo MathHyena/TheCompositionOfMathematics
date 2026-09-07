@@ -1,9 +1,3753 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-11-optimization-operations-research-03-nonlinear-programming">
-  <title>Nonlinear Programming</title>
+<section xml:id="sec-nonlinear-programming">
+<title>Nonlinear Programming</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Optimization fundamentals, gradients, Hessian matrices, multivariable
+calculus, linear algebra, constrained optimization, Lagrange multipliers,
+Karush--Kuhn--Tucker conditions, and basic numerical optimization.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define a nonlinear programming problem;</p>
+</li>
+<li>
+<p>distinguish linear and nonlinear optimization models;</p>
+</li>
+<li>
+<p>identify smooth and nonsmooth nonlinear programs;</p>
+</li>
+<li>
+<p>formulate general constrained nonlinear optimization problems;</p>
+</li>
+<li>
+<p>distinguish local and global nonlinear optimization;</p>
+</li>
+<li>
+<p>understand feasible directions and tangent spaces;</p>
+</li>
+<li>
+<p>recognize active constraints;</p>
+</li>
+<li>
+<p>formulate the Lagrangian;</p>
+</li>
+<li>
+<p>derive first-order equality-constrained optimality conditions;</p>
+</li>
+<li>
+<p>understand constraint qualifications;</p>
+</li>
+<li>
+<p>state the KKT conditions for nonlinear programs;</p>
+</li>
+<li>
+<p>interpret complementary slackness;</p>
+</li>
+<li>
+<p>identify LICQ conceptually;</p>
+</li>
+<li>
+<p>identify MFCQ conceptually;</p>
+</li>
+<li>
+<p>understand second-order necessary conditions;</p>
+</li>
+<li>
+<p>understand second-order sufficient conditions;</p>
+</li>
+<li>
+<p>recognize the Hessian of the Lagrangian;</p>
+</li>
+<li>
+<p>understand reduced Hessian ideas conceptually;</p>
+</li>
+<li>
+<p>recognize saddle-point structure in KKT systems;</p>
+</li>
+<li>
+<p>solve simple nonlinear equality-constrained problems;</p>
+</li>
+<li>
+<p>solve simple nonlinear inequality-constrained problems;</p>
+</li>
+<li>
+<p>understand penalty methods;</p>
+</li>
+<li>
+<p>distinguish quadratic and exact penalties conceptually;</p>
+</li>
+<li>
+<p>understand barrier methods;</p>
+</li>
+<li>
+<p>understand logarithmic barriers;</p>
+</li>
+<li>
+<p>understand augmented Lagrangian methods;</p>
+</li>
+<li>
+<p>understand sequential quadratic programming;</p>
+</li>
+<li>
+<p>understand nonlinear interior-point methods conceptually;</p>
+</li>
+<li>
+<p>recognize trust-region methods for constrained optimization;</p>
+</li>
+<li>
+<p>understand line-search globalization;</p>
+</li>
+<li>
+<p>understand merit functions;</p>
+</li>
+<li>
+<p>recognize feasibility restoration;</p>
+</li>
+<li>
+<p>understand Newton systems for KKT equations;</p>
+</li>
+<li>
+<p>recognize sparse nonlinear programming structure;</p>
+</li>
+<li>
+<p>understand scaling and conditioning;</p>
+</li>
+<li>
+<p>distinguish local solvers from global nonlinear optimization;</p>
+</li>
+<li>
+<p>recognize nonconvexity and multiple local optima;</p>
+</li>
+<li>
+<p>understand multistart strategies conceptually;</p>
+</li>
+<li>
+<p>connect nonlinear programming with engineering design,
+          estimation, economics, machine learning, and optimal control.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-what-is-nonlinear-programming">
+<title>What Is Nonlinear Programming?</title>
+<p>A nonlinear programming problem, abbreviated NLP, is an optimization
+problem in which the objective function, one or more constraints, or both
+are nonlinear.</p>
+
+<p>A general form is</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{\mathbf{x}\in\mathbb{R}^n}
+\quad&amp;
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&amp;
+g_i(\mathbf{x})\leq0,
+\qquad
+i=1,\ldots,m,
+\\
+&amp;
+h_j(\mathbf{x})=0,
+\qquad
+j=1,\ldots,p.
+\end{aligned}
+}</md>
+</p>
+
+<p>The functions <m>f</m>, <m>g_i</m>, and <m>h_j</m> may be nonlinear.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-linear-versus-nonlinear-programming">
+<title>Linear Versus Nonlinear Programming</title>
+<p>A linear program requires:</p>
+
+<p>
+<md>\boxed{
+\text{linear objective}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{linear constraints}.
+}</md>
+</p>
+
+<p>A nonlinear program may contain terms such as</p>
+
+<p>
+<md>x_1^2,</md>
+</p>
+
+<p>
+<md>x_1x_2,</md>
+</p>
+
+<p>
+<md>e^{x_1},</md>
+</p>
+
+<p>
+<md>\log x_2,</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\sin x_1.</md>
+</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\min_{x,y}
+x^2+y^2
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+xy\geq1
+}</md>
+</p>
+
+<p>is nonlinear because the constraint contains the product <m>xy</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-smooth-nonlinear-programs">
+<title>Smooth Nonlinear Programs</title>
+<p>A smooth nonlinear program has sufficiently differentiable objective and
+constraint functions.</p>
+
+<p>Typical algorithms rely on:</p>
+
+<p>
+<md>\boxed{
+\nabla f,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\nabla g_i,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\nabla h_j,
+}</md>
+</p>
+
+<p>and sometimes</p>
+
+<p>
+<md>\boxed{
+\nabla^2 f.
+}</md>
+</p>
+
+<p>Smoothness enables Taylor expansion and local optimality analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonsmooth-nonlinear-programs">
+<title>Nonsmooth Nonlinear Programs</title>
+<p>A nonlinear optimization problem can also be nonsmooth.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\min_x
+|x|
+}</md>
+</p>
+
+<p>has no ordinary derivative at</p>
+
+<p>
+<md>x=0.</md>
+</p>
+
+<p>Similarly,</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}}
+f(\mathbf{x})
++
+\lambda
+\|\mathbf{x}\|_1
+}</md>
+</p>
+
+<p>is nonsmooth at points where components vanish.</p>
+
+<p>Nonsmooth optimization requires generalized derivative concepts and
+specialized methods.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-local-global-solutions">
+<title>Local and Global Solutions</title>
+<p>A feasible point <m>\mathbf{x}^*</m> is a local minimizer if there exists a
+neighborhood in which</p>
+
+<p>
+<md>\boxed{
+f(\mathbf{x}^*)
+\leq
+f(\mathbf{x})
+}</md>
+</p>
+
+<p>for all nearby feasible <m>\mathbf{x}</m>.</p>
+
+<p>A global minimizer satisfies</p>
+
+<p>
+<md>\boxed{
+f(\mathbf{x}^*)
+\leq
+f(\mathbf{x})
+}</md>
+</p>
+
+<p>for every feasible point.</p>
+
+<p>For nonlinear and especially nonconvex problems,</p>
+
+<p>
+<md>\boxed{
+\text{local minimum}
+\not\Rightarrow
+\text{global minimum}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-nonconvexity">
+<title>Nonconvexity</title>
+<p>A nonlinear problem is nonconvex if the objective or feasible region fails
+to have the required convex structure.</p>
+
+<p>Nonconvexity can produce:</p>
+
+<p>
+<md>\boxed{
+\text{multiple local minima},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{local maxima},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{saddle points},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{disconnected feasible regions}.
+}</md>
+</p>
+
+<p>This makes global optimization difficult.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-multiple-local-minima">
+<title>Example of Multiple Local Minima</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+f(x)
+=
+(x^2-1)^2.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>f'(x)
+=
+4x(x^2-1).</md>
+</p>
+
+<p>Stationary points are</p>
+
+<p>
+<md>x=-1,
+\qquad
+x=0,
+\qquad
+x=1.</md>
+</p>
+
+<p>The points</p>
+
+<p>
+<md>\boxed{
+x=\pm1
+}</md>
+</p>
+
+<p>are global minima, while</p>
+
+<p>
+<md>\boxed{
+x=0
+}</md>
+</p>
+
+<p>is a local maximum.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-feasible-directions">
+<title>Feasible Directions</title>
+<p>Let <m>\mathbf{x}</m> be feasible.</p>
+
+<p>A direction <m>\mathbf{d}</m> is a feasible direction if sufficiently small
+movement in that direction remains feasible:</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}
++
+\alpha\mathbf{d}
+\in
+\mathcal{F}
+}</md>
+</p>
+
+<p>for sufficiently small positive <m>\alpha</m>.</p>
+
+<p>At boundary points, not every direction is feasible.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-tangent-directions">
+<title>Tangent Directions for Equality Constraints</title>
+<p>Suppose</p>
+
+<p>
+<md>h_j(\mathbf{x})=0.</md>
+</p>
+
+<p>A tangent direction <m>\mathbf{d}</m> at <m>\mathbf{x}^*</m> satisfies</p>
+
+<p>
+<md>\boxed{
+\nabla h_j(\mathbf{x}^*)^T
+\mathbf{d}
+=
+0
+}</md>
+</p>
+
+<p>for all equality constraints.</p>
+
+<p>Thus feasible first-order motion lies in the tangent space.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-active-constraints">
+<title>Active Inequality Constraints</title>
+<p>For</p>
+
+<p>
+<md>g_i(\mathbf{x})\leq0,</md>
+</p>
+
+<p>constraint <m>i</m> is active at <m>\mathbf{x}^*</m> if</p>
+
+<p>
+<md>\boxed{
+g_i(\mathbf{x}^*)=0.
+}</md>
+</p>
+
+<p>It is inactive if</p>
+
+<p>
+<md>\boxed{
+g_i(\mathbf{x}^*)&lt;0.
+}</md>
+</p>
+
+<p>Only active inequalities contribute to the local boundary geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-equality-constrained">
+<title>Equality-Constrained Nonlinear Optimization</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&amp;
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&amp;
+h_j(\mathbf{x})=0,
+\qquad
+j=1,\ldots,p.
+\end{aligned}
+}</md>
+</p>
+
+<p>The Lagrangian is</p>
+
+<p>
+<md>\boxed{
+\mathcal{L}
+(
+\mathbf{x},
+\boldsymbol{\lambda}
+)
+=
+f(\mathbf{x})
++
+\sum_{j=1}^{p}
+\lambda_j
+h_j(\mathbf{x}).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-first-order-equality">
+<title>First-Order Equality Conditions</title>
+<p>Under appropriate regularity conditions, a local constrained optimum
+satisfies</p>
+
+<p>
+<md>\boxed{
+\nabla_{\mathbf{x}}
+\mathcal{L}
+(
+\mathbf{x}^*,
+\boldsymbol{\lambda}^*
+)
+=
+0,
+}</md>
+</p>
+
+<p>together with</p>
+
+<p>
+<md>\boxed{
+h_j(\mathbf{x}^*)=0.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\nabla f(\mathbf{x}^*)
++
+\sum_{j=1}^{p}
+\lambda_j^*
+\nabla h_j(\mathbf{x}^*)
+=
+0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-worked-nlp-equality">
+<title>Worked Example: Nonlinear Equality Constraint</title>
+<example>
+<title>Minimum on a Circle</title>
+<p>Minimize</p>
+
+<p>
+<md>f(x,y)=x+y</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>x^2+y^2=1.</md>
+</p>
+
+<p>The Lagrangian is</p>
+
+<p>
+<md>\mathcal{L}
+=
+x+y
++
+\lambda
+(
+x^2+y^2-1
+).</md>
+</p>
+
+<p>Stationarity gives</p>
+
+<p>
+<md>1+2\lambda x=0,</md>
+</p>
+
+<p>
+<md>1+2\lambda y=0.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>x=y.</md>
+</p>
+
+<p>Using the constraint,</p>
+
+<p>
+<md>2x^2=1.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>x=y=\pm\frac1{\sqrt2}.</md>
+</p>
+
+<p>Evaluate the objective:</p>
+
+<p>
+<md>f
+\left(
+\frac1{\sqrt2},
+\frac1{\sqrt2}
+\right)
+=
+\sqrt2,</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>f
+\left(
+-\frac1{\sqrt2},
+-\frac1{\sqrt2}
+\right)
+=
+-\sqrt2.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+(x^*,y^*)
+=
+\left(
+-\frac1{\sqrt2},
+-\frac1{\sqrt2}
+\right),
+}</md>
+</p>
+
+<p>with minimum value</p>
+
+<p>
+<md>\boxed{
+f^*=-\sqrt2.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-constraint-qualifications">
+<title>Constraint Qualifications</title>
+<p>Constraint qualifications are regularity conditions ensuring that local
+constraint geometry is represented correctly by the gradients.</p>
+
+<p>They are needed because multiplier conditions can fail at degenerate
+points.</p>
+
+<p>Important examples include:</p>
+
+<p>
+<md>\boxed{
+\text{LICQ},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{MFCQ},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{Slater's condition}
+}</md>
+</p>
+
+<p>for convex problems.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-licq">
+<title>Linear Independence Constraint Qualification</title>
+<p>LICQ stands for Linear Independence Constraint Qualification.</p>
+
+<p>At <m>\mathbf{x}^*</m>, LICQ requires the gradients of:</p>
+
+<p>
+<md>\boxed{
+\text{all equality constraints}
+}</md>
+</p>
+
+<p>together with</p>
+
+<p>
+<md>\boxed{
+\text{all active inequality constraints}
+}</md>
+</p>
+
+<p>to be linearly independent.</p>
+
+<p>Under LICQ, KKT multipliers are locally well behaved and are unique under
+appropriate conditions.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-mfcq">
+<title>Mangasarian--Fromovitz Constraint Qualification</title>
+<p>MFCQ is weaker than LICQ.</p>
+
+<p>Conceptually, it requires:</p>
+
+<p>
+<ul>
+<li>
+<p>equality gradients to be linearly independent; and</p>
+</li>
+<li>
+<p>existence of a direction tangent to the equality constraints
+          that strictly decreases all active inequality constraints.</p>
+</li>
+</ul>
+</p>
+
+<p>MFCQ ensures the feasible set has an appropriate local direction structure.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-cq-failure">
+<title>Failure of Constraint Qualification</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\min_x x
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+x^2=0.
+}</md>
+</p>
+
+<p>The only feasible point is</p>
+
+<p>
+<md>x=0,</md>
+</p>
+
+<p>so it is trivially optimal.</p>
+
+<p>However,</p>
+
+<p>
+<md>\nabla h(0)=0.</md>
+</p>
+
+<p>The ordinary Lagrange condition would require</p>
+
+<p>
+<md>1+\lambda(0)=0,</md>
+</p>
+
+<p>which is impossible.</p>
+
+<p>The issue is failure of constraint regularity.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-kkt">
+<title>General Nonlinear KKT Conditions</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&amp;
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&amp;
+g_i(\mathbf{x})\leq0,
+\qquad i=1,\ldots,m,
+\\
+&amp;
+h_j(\mathbf{x})=0,
+\qquad j=1,\ldots,p.
+\end{aligned}
+}</md>
+</p>
+
+<p>Define</p>
+
+<p>
+<md>\boxed{
+\mathcal{L}
+=
+f
++
+\sum_{i=1}^{m}
+\mu_i g_i
++
+\sum_{j=1}^{p}
+\lambda_j h_j.
+}</md>
+</p>
+
+<p>At a regular local minimizer, the KKT conditions hold.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-kkt-stationarity">
+<title>KKT Stationarity</title>
+<p>Stationarity requires</p>
+
+<p>
+<md>\boxed{
+\nabla f(\mathbf{x}^*)
++
+\sum_{i=1}^{m}
+\mu_i^*
+\nabla g_i(\mathbf{x}^*)
++
+\sum_{j=1}^{p}
+\lambda_j^*
+\nabla h_j(\mathbf{x}^*)
+=
+0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-kkt-primal-feasibility">
+<title>KKT Primal Feasibility</title>
+<p>The candidate must satisfy</p>
+
+<p>
+<md>\boxed{
+g_i(\mathbf{x}^*)\leq0,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+h_j(\mathbf{x}^*)=0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-kkt-dual-feasibility">
+<title>KKT Dual Feasibility</title>
+<p>For the convention</p>
+
+<p>
+<md>g_i(\mathbf{x})\leq0,</md>
+</p>
+
+<p>the multipliers satisfy</p>
+
+<p>
+<md>\boxed{
+\mu_i^*\geq0.
+}</md>
+</p>
+
+<p>Equality multipliers remain unrestricted in sign.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-kkt-complementary-slackness">
+<title>KKT Complementary Slackness</title>
+<p>For every inequality,</p>
+
+<p>
+<md>\boxed{
+\mu_i^*
+g_i(\mathbf{x}^*)
+=
+0.
+}</md>
+</p>
+
+<p>Hence,</p>
+
+<p>
+<md>g_i(\mathbf{x}^*)&lt;0
+\Rightarrow
+\mu_i^*=0.</md>
+</p>
+
+<p>Only active constraints can have positive multipliers.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-worked-nlp-inequality">
+<title>Worked Example: Nonlinear Inequality Constraint</title>
+<example>
+<title>KKT with an Active Constraint</title>
+<p>Minimize</p>
+
+<p>
+<md>f(x,y)=x^2+y^2</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>x+y\geq2.</md>
+</p>
+
+<p>Rewrite the inequality as</p>
+
+<p>
+<md>g(x,y)
+=
+2-x-y
+\leq0.</md>
+</p>
+
+<p>The Lagrangian is</p>
+
+<p>
+<md>\mathcal{L}
+=
+x^2+y^2
++
+\mu(2-x-y).</md>
+</p>
+
+<p>Stationarity gives</p>
+
+<p>
+<md>2x-\mu=0,</md>
+</p>
+
+<p>
+<md>2y-\mu=0.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>x=y.</md>
+</p>
+
+<p>The unconstrained minimizer <m>(0,0)</m> is infeasible, so the constraint is
+active:</p>
+
+<p>
+<md>x+y=2.</md>
+</p>
+
+<p>Hence,</p>
+
+<p>
+<md>x=y=1.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\mu=2.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+(x^*,y^*)=(1,1),
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+\mu^*=2.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-kkt-necessary-sufficient">
+<title>Necessary Versus Sufficient KKT Conditions</title>
+<p>For general nonlinear problems, KKT conditions are usually necessary
+under a suitable constraint qualification.</p>
+
+<p>They are not generally sufficient.</p>
+
+<p>A KKT point may correspond to:</p>
+
+<p>
+<md>\boxed{
+\text{local minimum},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{local maximum},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{saddle-type behavior}.
+}</md>
+</p>
+
+<p>Convexity changes this situation substantially.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-hessian-of-lagrangian">
+<title>Hessian of the Lagrangian</title>
+<p>The Hessian with respect to the decision variables is</p>
+
+<p>
+<md>\boxed{
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+=
+\nabla^2f
++
+\sum_i
+\mu_i
+\nabla^2g_i
++
+\sum_j
+\lambda_j
+\nabla^2h_j.
+}</md>
+</p>
+
+<p>Second-order constrained optimality depends on this matrix restricted to
+appropriate feasible directions.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-second-order-necessary">
+<title>Second-Order Necessary Condition</title>
+<p>At a sufficiently regular local minimizer satisfying KKT conditions, the
+Hessian of the Lagrangian must be nonnegative along appropriate critical
+directions.</p>
+
+<p>In a pure equality-constrained problem, if <m>\mathbf{d}</m> satisfies</p>
+
+<p>
+<md>\boxed{
+\nabla h_j(\mathbf{x}^*)^T\mathbf{d}=0
+}</md>
+</p>
+
+<p>for every constraint, then a second-order necessary condition is</p>
+
+<p>
+<md>\boxed{
+\mathbf{d}^T
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+(\mathbf{x}^*,\boldsymbol{\lambda}^*)
+\mathbf{d}
+\geq0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-second-order-sufficient">
+<title>Second-Order Sufficient Condition</title>
+<p>If the KKT conditions hold and</p>
+
+<p>
+<md>\boxed{
+\mathbf{d}^T
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+\mathbf{d}
+&gt;0
+}</md>
+</p>
+
+<p>for every nonzero feasible critical direction <m>\mathbf{d}</m>, then under
+appropriate regularity conditions the point is a strict local minimizer.</p>
+
+<p>Thus curvature is checked only along directions permitted by the
+constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-reduced-hessian">
+<title>Reduced Hessian</title>
+<p>Suppose the columns of <m>Z</m> form a basis for the tangent space:</p>
+
+<p>
+<md>\boxed{
+\nabla h(\mathbf{x}^*)^TZ=0.
+}</md>
+</p>
+
+<p>The reduced Hessian is</p>
+
+<p>
+<md>\boxed{
+Z^T
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+Z.
+}</md>
+</p>
+
+<p>Positive definiteness of the reduced Hessian gives a convenient
+second-order test for equality-constrained minima.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-equality-kkt-newton-system">
+<title>Newton System for Equality-Constrained Optimization</title>
+<p>For equality constraints,</p>
+
+<p>
+<md>h(\mathbf{x})=0,</md>
+</p>
+
+<p>the KKT equations are</p>
+
+<p>
+<md>\boxed{
+\nabla f(\mathbf{x})
++
+J_h(\mathbf{x})^T\boldsymbol{\lambda}
+=
+0,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+h(\mathbf{x})=0.
+}</md>
+</p>
+
+<p>Newton's method applied to these equations gives a linear system of the
+form</p>
+
+<p>
+<md>\boxed{
+\begin{pmatrix}
+H &amp; J_h^T\\
+J_h &amp; 0
+\end{pmatrix}
+\begin{pmatrix}
+\mathbf{p}\\
+\Delta\boldsymbol{\lambda}
+\end{pmatrix}
+=
+-
+\begin{pmatrix}
+\nabla_{\mathbf{x}}\mathcal{L}\\
+h
+\end{pmatrix},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+H
+=
+\nabla_{\mathbf{x}\mathbf{x}}^2\mathcal{L}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-saddle-point-system">
+<title>Saddle-Point Linear Systems</title>
+<p>The KKT matrix</p>
+
+<p>
+<md>\boxed{
+\begin{pmatrix}
+H&amp;A^T\\
+A&amp;0
+\end{pmatrix}
+}</md>
+</p>
+
+<p>is called a saddle-point matrix.</p>
+
+<p>Such matrices arise throughout:</p>
+
+<p>
+<md>\boxed{
+\text{constrained optimization},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{fluid mechanics},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{finite-element methods},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{optimal control}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-penalty-methods">
+<title>Penalty Methods</title>
+<p>Penalty methods transform constrained optimization into a sequence of
+unconstrained or simpler problems.</p>
+
+<p>For equality constraints</p>
+
+<p>
+<md>h(\mathbf{x})=0,</md>
+</p>
+
+<p>a quadratic penalty objective is</p>
+
+<p>
+<md>\boxed{
+P_\rho(\mathbf{x})
+=
+f(\mathbf{x})
++
+\frac{\rho}{2}
+\|
+h(\mathbf{x})
+\|^2.
+}</md>
+</p>
+
+<p>As <m>\rho</m> increases, constraint violation becomes increasingly
+expensive.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-quadratic-penalty">
+<title>Quadratic Penalty Method</title>
+<p>A sequence of problems is solved:</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}}
+P_{\rho_k}(\mathbf{x}),
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+\rho_k\to\infty.
+}</md>
+</p>
+
+<p>Under suitable conditions, minimizers approach feasible solutions of the
+original constrained problem.</p>
+
+<p>However, very large penalty parameters can create severe ill-conditioning.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-worked-quadratic-penalty">
+<title>Worked Example: Quadratic Penalty</title>
+<example>
+<title>Penalizing an Equality Constraint</title>
+<p>Consider</p>
+
+<p>
+<md>\min_x
+(x-2)^2</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>x=1.</md>
+</p>
+
+<p>The constrained optimum is clearly</p>
+
+<p>
+<md>x^*=1.</md>
+</p>
+
+<p>The quadratic penalty objective is</p>
+
+<p>
+<md>P_\rho(x)
+=
+(x-2)^2
++
+\frac{\rho}{2}
+(x-1)^2.</md>
+</p>
+
+<p>Differentiate:</p>
+
+<p>
+<md>P_\rho'(x)
+=
+2(x-2)
++
+\rho(x-1).</md>
+</p>
+
+<p>Set equal to zero:</p>
+
+<p>
+<md>(2+\rho)x
+=
+4+\rho.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+x_\rho
+=
+\frac{
+\rho+4
+}{
+\rho+2
+}.
+}</md>
+</p>
+
+<p>As</p>
+
+<p>
+<md>\rho\to\infty,</md>
+</p>
+
+<p>
+<md>\begin{answerbox}
+\[
+\boxed{
+x_\rho\to1.
+}</md>
+</p>
+
+<p>\end{answerbox}</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-exact-penalty-functions">
+<title>Exact Penalty Functions</title>
+<p>An exact penalty can recover a constrained solution using a finite
+penalty parameter.</p>
+
+<p>A common form for equality constraints is</p>
+
+<p>
+<md>\boxed{
+P_\rho(\mathbf{x})
+=
+f(\mathbf{x})
++
+\rho
+\sum_j
+|h_j(\mathbf{x})|.
+}</md>
+</p>
+
+<p>Unlike quadratic penalties, exact penalties are generally nonsmooth.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-barrier-methods">
+<title>Barrier Methods</title>
+<p>Barrier methods enforce inequality feasibility from the interior.</p>
+
+<p>For</p>
+
+<p>
+<md>g_i(\mathbf{x})&lt;0,</md>
+</p>
+
+<p>a logarithmic barrier problem is</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}}
+f(\mathbf{x})
+-
+\mu
+\sum_{i=1}^{m}
+\log
+[
+-g_i(\mathbf{x})
+].
+}</md>
+</p>
+
+<p>The parameter</p>
+
+<p>
+<md>\mu&gt;0</md>
+</p>
+
+<p>controls the barrier strength.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-barrier-behavior">
+<title>Barrier Behavior</title>
+<p>As a feasible point approaches the boundary,</p>
+
+<p>
+<md>g_i(\mathbf{x})\to0^-,</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>-\log[-g_i(\mathbf{x})]
+\to\infty.</md>
+</p>
+
+<p>Therefore the barrier prevents iterates from crossing the inequality
+boundary.</p>
+
+<p>As</p>
+
+<p>
+<md>\mu\to0,</md>
+</p>
+
+<p>the barrier problem approaches the original constrained problem.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-central-path">
+<title>Central Path in Nonlinear Optimization</title>
+<p>The solutions of the barrier problems for varying <m>\mu</m> form a central
+path under appropriate conditions.</p>
+
+<p>This path satisfies perturbed KKT conditions.</p>
+
+<p>As</p>
+
+<p>
+<md>\boxed{
+\mu\to0,
+}</md>
+</p>
+
+<p>the solution approaches a constrained optimum.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-augmented-lagrangian">
+<title>Augmented Lagrangian Method</title>
+<p>For equality constraints,</p>
+
+<p>
+<md>h(\mathbf{x})=0,</md>
+</p>
+
+<p>the augmented Lagrangian is</p>
+
+<p>
+<md>\boxed{
+\mathcal{L}_\rho
+(
+\mathbf{x},
+\boldsymbol{\lambda}
+)
+=
+f(\mathbf{x})
++
+\boldsymbol{\lambda}^T
+h(\mathbf{x})
++
+\frac{\rho}{2}
+\|
+h(\mathbf{x})
+\|^2.
+}</md>
+</p>
+
+<p>It combines multiplier information with a quadratic penalty.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-why-augmented-lagrangian">
+<title>Why Augmented Lagrangians Help</title>
+<p>Pure quadratic penalty methods often require</p>
+
+<p>
+<md>\rho\to\infty.</md>
+</p>
+
+<p>Augmented Lagrangian methods update both:</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\lambda}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\rho.
+}</md>
+</p>
+
+<p>This can achieve accurate feasibility without requiring extremely large
+penalty parameters.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-augmented-lagrangian-multiplier-update">
+<title>Multiplier Update</title>
+<p>A basic equality-constrained multiplier update has form</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\lambda}_{k+1}
+=
+\boldsymbol{\lambda}_k
++
+\rho_k
+h(\mathbf{x}_{k+1}).
+}</md>
+</p>
+
+<p>The multiplier accumulates information about persistent constraint
+violation.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-sequential-quadratic-programming">
+<title>Sequential Quadratic Programming</title>
+<p>Sequential quadratic programming, abbreviated SQP, solves a sequence of
+quadratic approximations to the nonlinear problem.</p>
+
+<p>At iteration <m>k</m>, the objective is approximated quadratically and the
+constraints are linearized.</p>
+
+<p>This produces a quadratic programming subproblem.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-sqp-subproblem">
+<title>SQP Subproblem</title>
+<p>For equality constraints, a typical SQP step solves</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{\mathbf{p}}
+\quad&amp;
+\nabla f(\mathbf{x}_k)^T\mathbf{p}
++
+\frac12
+\mathbf{p}^TB_k\mathbf{p}
+\\
+\text{subject to}
+\quad&amp;
+h(\mathbf{x}_k)
++
+J_h(\mathbf{x}_k)\mathbf{p}
+=
+0.
+\end{aligned}
+}</md>
+</p>
+
+<p>Here <m>B_k</m> approximates the Hessian of the Lagrangian.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-sqp-inequality">
+<title>SQP with Inequality Constraints</title>
+<p>For nonlinear inequalities,</p>
+
+<p>
+<md>g_i(\mathbf{x})\leq0,</md>
+</p>
+
+<p>the SQP subproblem uses linearized constraints:</p>
+
+<p>
+<md>\boxed{
+g_i(\mathbf{x}_k)
++
+\nabla g_i(\mathbf{x}_k)^T\mathbf{p}
+\leq0.
+}</md>
+</p>
+
+<p>Thus each nonlinear iteration solves a quadratic program with locally
+linearized constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-why-sqp">
+<title>Why SQP Is Powerful</title>
+<p>Near a regular solution, SQP closely resembles Newton's method applied to
+the KKT equations.</p>
+
+<p>With accurate Hessian information and suitable assumptions, SQP can have
+very fast local convergence.</p>
+
+<p>It is one of the standard methods for smooth constrained nonlinear
+optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-quasi-newton-sqp">
+<title>Quasi-Newton SQP</title>
+<p>Computing</p>
+
+<p>
+<md>\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}</md>
+</p>
+
+<p>exactly can be expensive.</p>
+
+<p>Instead, <m>B_k</m> may be updated using quasi-Newton formulas such as BFGS.</p>
+
+<p>This reduces derivative cost while retaining curvature information.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-line-search">
+<title>Line Search in Constrained Optimization</title>
+<p>After computing a search direction <m>\mathbf{p}_k</m>, a line-search method
+chooses</p>
+
+<p>
+<md>\alpha_k&gt;0</md>
+</p>
+
+<p>and updates</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}_{k+1}
+=
+\mathbf{x}_k
++
+\alpha_k\mathbf{p}_k.
+}</md>
+</p>
+
+<p>The step should improve some measure of both objective quality and
+constraint satisfaction.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-merit-functions">
+<title>Merit Functions</title>
+<p>A merit function combines objective and constraint violation into one
+scalar quantity.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\Phi_\rho(\mathbf{x})
+=
+f(\mathbf{x})
++
+\rho
+\|
+h(\mathbf{x})
+\|_1.
+}</md>
+</p>
+
+<p>Line search can then require sufficient decrease in <m>\Phi_\rho</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-why-merit-functions">
+<title>Why Merit Functions Are Needed</title>
+<p>A step can reduce the objective while worsening feasibility.</p>
+
+<p>Another step can improve feasibility while increasing the objective.</p>
+
+<p>A merit function gives one scalar quantity for balancing these competing
+goals during globalization.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-filter-methods-preview">
+<title>Filter Methods Preview</title>
+<p>Filter methods avoid combining objective and feasibility into one fixed
+merit function.</p>
+
+<p>Instead, a trial point can be accepted if it sufficiently improves either:</p>
+
+<p>
+<md>\boxed{
+\text{objective value}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{constraint violation}.
+}</md>
+</p>
+
+<p>This creates a two-criterion acceptance strategy.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-trust-region">
+<title>Trust-Region Constrained Methods</title>
+<p>Trust-region methods solve a local constrained model subject to</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{p}\|
+\leq
+\Delta_k.
+}</md>
+</p>
+
+<p>The step is restricted to a region where the local approximation is
+believed to be reliable.</p>
+
+<p>The radius is adjusted based on agreement between model prediction and
+actual improvement.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-feasibility-restoration">
+<title>Feasibility Restoration</title>
+<p>Some nonlinear algorithms temporarily focus primarily on reducing
+constraint violation.</p>
+
+<p>A restoration phase may approximately solve</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}}
+\|
+h(\mathbf{x})
+\|
+}</md>
+</p>
+
+<p>and suitable measures of violated inequalities.</p>
+
+<p>Once feasibility improves, objective optimization resumes.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-interior-point">
+<title>Nonlinear Interior-Point Methods</title>
+<p>Interior-point methods for nonlinear programming solve barrier-modified
+KKT systems.</p>
+
+<p>Introduce slack variables</p>
+
+<p>
+<md>s_i&gt;0</md>
+</p>
+
+<p>so that</p>
+
+<p>
+<md>\boxed{
+g_i(\mathbf{x})+s_i=0.
+}</md>
+</p>
+
+<p>Perturbed complementary slackness takes form</p>
+
+<p>
+<md>\boxed{
+\mu_i s_i
+=
+\tau,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\tau&gt;0</md>
+</p>
+
+<p>is driven toward zero.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-primal-dual-kkt">
+<title>Primal-Dual KKT System</title>
+<p>A primal-dual nonlinear interior-point method seeks approximate
+solutions of</p>
+
+<p>
+<md>\boxed{
+\nabla f
++
+J_g^T\boldsymbol{\mu}
++
+J_h^T\boldsymbol{\lambda}
+=
+0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+g(\mathbf{x})+\mathbf{s}=0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+h(\mathbf{x})=0,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+S\boldsymbol{\mu}
+=
+\tau\mathbf{1}.
+}</md>
+</p>
+
+<p>Here</p>
+
+<p>
+<md>S
+=
+\operatorname{diag}(s_1,\ldots,s_m).</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-primal-dual-newton">
+<title>Newton's Method for the Primal-Dual System</title>
+<p>The nonlinear primal-dual equations are linearized around the current
+iterate.</p>
+
+<p>A Newton system is solved for corrections to:</p>
+
+<p>
+<md>\boxed{
+\mathbf{x},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\lambda},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\boldsymbol{\mu},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\mathbf{s}.
+}</md>
+</p>
+
+<p>Large practical NLP solvers rely heavily on sparse linear algebra for this
+step.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-active-set-methods">
+<title>Active-Set Methods</title>
+<p>An active-set method attempts to identify which inequalities will be
+binding at the solution.</p>
+
+<p>Once an active set is guessed, the problem is treated locally like an
+equality-constrained problem.</p>
+
+<p>The algorithm then adds or removes constraints from the active set as
+needed.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-projected-gradient-preview">
+<title>Projected Gradient Methods Preview</title>
+<p>For a simple feasible set <m>C</m>, projected gradient descent uses</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}_{k+1}
+=
+P_C
+\left[
+\mathbf{x}_k
+-
+\alpha_k
+\nabla f(\mathbf{x}_k)
+\right],
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>P_C</md>
+</p>
+
+<p>denotes projection onto <m>C</m>.</p>
+
+<p>This is especially useful when projection is inexpensive.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-bound-constrained-optimization">
+<title>Bound-Constrained Optimization</title>
+<p>A common nonlinear problem has simple bounds:</p>
+
+<p>
+<md>\boxed{
+\ell_i
+\leq
+x_i
+\leq
+u_i.
+}</md>
+</p>
+
+<p>These constraints arise naturally from:</p>
+
+<p>
+<md>\boxed{
+\text{physical limits},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{probabilities},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{design ranges}.
+}</md>
+</p>
+
+<p>Specialized algorithms exploit this simple structure.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-variable-transformations">
+<title>Variable Transformations for Bounds</title>
+<p>Sometimes constraints are removed through reparameterization.</p>
+
+<p>For a positive variable,</p>
+
+<p>
+<md>x&gt;0,</md>
+</p>
+
+<p>one may write</p>
+
+<p>
+<md>\boxed{
+x=e^z.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>0&lt;x&lt;1,</md>
+</p>
+
+<p>one may use the logistic transformation</p>
+
+<p>
+<md>\boxed{
+x
+=
+\frac{
+1
+}{
+1+e^{-z}
+}.
+}</md>
+</p>
+
+<p>Such transformations trade explicit constraints for nonlinear geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-least-squares">
+<title>Nonlinear Least Squares</title>
+<p>Suppose residuals are</p>
+
+<p>
+<md>r_i(\mathbf{x}),
+\qquad
+i=1,\ldots,m.</md>
+</p>
+
+<p>Nonlinear least squares solves</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}}
+\frac12
+\sum_{i=1}^{m}
+r_i(\mathbf{x})^2.
+}</md>
+</p>
+
+<p>In vector form,</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}}
+\frac12
+\|
+\mathbf{r}(\mathbf{x})
+\|_2^2.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-least-squares-gradient">
+<title>Gradient of Nonlinear Least Squares</title>
+<p>Let</p>
+
+<p>
+<md>J(\mathbf{x})</md>
+</p>
+
+<p>be the Jacobian of the residual vector.</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\nabla f(\mathbf{x})
+=
+J(\mathbf{x})^T
+\mathbf{r}(\mathbf{x}).
+}</md>
+</p>
+
+<p>The Hessian is</p>
+
+<p>
+<md>\boxed{
+\nabla^2f
+=
+J^TJ
++
+\sum_i
+r_i
+\nabla^2r_i.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-gauss-newton-method">
+<title>Gauss--Newton Method</title>
+<p>If residuals are small or nearly linear, the second Hessian term may be
+neglected.</p>
+
+<p>The Gauss--Newton step solves</p>
+
+<p>
+<md>\boxed{
+J^TJ\mathbf{p}
+=
+-
+J^T\mathbf{r}.
+}</md>
+</p>
+
+<p>This is often effective for parameter estimation.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-levenberg-marquardt">
+<title>Levenberg--Marquardt Preview</title>
+<p>Levenberg--Marquardt modifies the Gauss--Newton system:</p>
+
+<p>
+<md>\boxed{
+(
+J^TJ+\lambda I
+)
+\mathbf{p}
+=
+-
+J^T\mathbf{r}.
+}</md>
+</p>
+
+<p>The parameter <m>\lambda&gt;0</m> regularizes the step.</p>
+
+<p>Large <m>\lambda</m> makes the method more gradient-like, while small
+<m>\lambda</m> approaches Gauss--Newton behavior.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-globalization">
+<title>Globalization</title>
+<p>Newton and SQP methods can converge rapidly near a solution but may fail
+when started far away.</p>
+
+<p>Globalization strategies improve robustness.</p>
+
+<p>Common strategies include:</p>
+
+<p>
+<md>\boxed{
+\text{line search},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{trust regions},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{merit functions},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{filters}.
+}</md>
+</p>
+
+<p>Here <em>globalization</em> refers to convergence from a broader set of
+starting points, not proof of a global optimum.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-local-solvers">
+<title>Local Solvers</title>
+<p>Most classical smooth NLP algorithms are local methods.</p>
+
+<p>They attempt to find a nearby KKT point.</p>
+
+<p>The solution can depend strongly on:</p>
+
+<p>
+<md>\boxed{
+\text{initial guess},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{scaling},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{algorithmic parameters}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-multistart">
+<title>Multistart Methods</title>
+<p>A simple strategy for nonconvex problems is to run a local solver from
+many initial points.</p>
+
+<p>If several runs converge to different local minima, compare their
+objective values.</p>
+
+<p>Multistart does not generally prove global optimality, but it can improve
+the chance of locating better solutions.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-global-nonlinear-optimization-preview">
+<title>Global Nonlinear Optimization Preview</title>
+<p>Global optimization seeks a provably best solution over the entire
+feasible set.</p>
+
+<p>Methods can use:</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-bound},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{convex relaxations},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{interval methods},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{spatial decomposition}.
+}</md>
+</p>
+
+<p>Global nonlinear optimization can be substantially harder than local
+optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-scaling">
+<title>Scaling</title>
+<p>Suppose one variable naturally has magnitude</p>
+
+<p>
+<md>10^{-6}</md>
+</p>
+
+<p>and another has magnitude</p>
+
+<p>
+<md>10^6.</md>
+</p>
+
+<p>Then gradients and Hessians can be poorly balanced.</p>
+
+<p>Variable and constraint scaling can improve:</p>
+
+<p>
+<md>\boxed{
+\text{conditioning},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Newton steps},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{termination tests}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-constraint-scaling">
+<title>Constraint Scaling</title>
+<p>Suppose two constraints are</p>
+
+<p>
+<md>g_1(\mathbf{x})\approx10^8,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>g_2(\mathbf{x})\approx10^{-5}.</md>
+</p>
+
+<p>A solver may treat residuals unevenly.</p>
+
+<p>Rescaling constraints so their typical magnitudes are comparable often
+improves numerical behavior.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-sparse-nonlinear-programs">
+<title>Sparse Nonlinear Programs</title>
+<p>Large engineering NLPs often have sparse derivative matrices.</p>
+
+<p>That is, most entries of</p>
+
+<p>
+<md>\boxed{
+J_g,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+J_h,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\nabla^2\mathcal{L}
+}</md>
+</p>
+
+<p>are zero.</p>
+
+<p>Sparse linear algebra can dramatically reduce memory and computational
+cost.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-automatic-differentiation">
+<title>Automatic Differentiation</title>
+<p>Optimization methods often require accurate derivatives.</p>
+
+<p>Automatic differentiation evaluates derivatives through the computational
+graph of the objective and constraints.</p>
+
+<p>It can provide derivatives accurate to floating-point precision without
+symbolic expression growth or finite-difference truncation error.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-finite-difference-derivatives">
+<title>Finite-Difference Derivatives</title>
+<p>When analytical derivatives are unavailable, approximate</p>
+
+<p>
+<md>\boxed{
+\frac{\partial f}{\partial x_i}
+\approx
+\frac{
+f(\mathbf{x}+h\mathbf{e}_i)
+-
+f(\mathbf{x})
+}{
+h
+}.
+}</md>
+</p>
+
+<p>However, choosing <m>h</m> involves a tradeoff between:</p>
+
+<p>
+<md>\boxed{
+\text{truncation error}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{floating-point cancellation}.
+}</md>
+</p>
+
+<p>Poor derivative estimates can seriously degrade nonlinear solvers.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-stopping-criteria">
+<title>Stopping Criteria</title>
+<p>For constrained nonlinear optimization, stopping criteria should examine
+several residuals.</p>
+
+<p>Important measures include:</p>
+
+<p>
+<md>\boxed{
+\|\nabla_{\mathbf{x}}\mathcal{L}\|,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\|h(\mathbf{x})\|,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\max_i
+\{
+g_i(\mathbf{x}),0
+\},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+|\mu_i g_i(\mathbf{x})|.
+}</md>
+</p>
+
+<p>A small change in the objective alone is not enough.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-kkt-residual">
+<title>KKT Residual</title>
+<p>A solver may combine stationarity, feasibility, and complementarity into a
+KKT residual.</p>
+
+<p>Schematically,</p>
+
+<p>
+<md>\boxed{
+R_{\mathrm{KKT}}
+=
+\begin{pmatrix}
+\nabla_{\mathbf{x}}\mathcal{L}
+\\
+h(\mathbf{x})
+\\
+\text{inequality residual}
+\\
+\text{complementarity residual}
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>A small norm</p>
+
+<p>
+<md>\boxed{
+\|R_{\mathrm{KKT}}\|
+}</md>
+</p>
+
+<p>indicates approximate first-order optimality.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-sensitivity-analysis">
+<title>Sensitivity Analysis</title>
+<p>Suppose the optimization problem depends on a parameter <m>p</m>.</p>
+
+<p>The optimal solution</p>
+
+<p>
+<md>\mathbf{x}^*(p)</md>
+</p>
+
+<p>and multipliers</p>
+
+<p>
+<md>\boldsymbol{\lambda}^*(p),
+\qquad
+\boldsymbol{\mu}^*(p)</md>
+</p>
+
+<p>may change as <m>p</m> changes.</p>
+
+<p>Under suitable regularity conditions, differentiating the KKT system can
+provide local sensitivity information.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-shadow-prices">
+<title>Shadow Prices in Nonlinear Programming</title>
+<p>Lagrange multipliers can still have marginal-value interpretations.</p>
+
+<p>If a constraint is parameterized by</p>
+
+<p>
+<md>h(\mathbf{x})=b,</md>
+</p>
+
+<p>then the associated multiplier may describe the local change in optimal
+value caused by changing <m>b</m>.</p>
+
+<p>The exact sign depends on the formulation.</p>
+
+<p>Unlike linear programming, this sensitivity may vary continuously with
+the operating point.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-engineering-design">
+<title>Engineering Design Example</title>
+<p>Suppose a cylindrical container must hold volume <m>V</m>.</p>
+
+<p>Let:</p>
+
+<p>
+<md>r
+=
+\text{radius},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>h
+=
+\text{height}.</md>
+</p>
+
+<p>Volume imposes</p>
+
+<p>
+<md>\boxed{
+\pi r^2h=V.
+}</md>
+</p>
+
+<p>Surface area is</p>
+
+<p>
+<md>\boxed{
+A(r,h)
+=
+2\pi r^2
++
+2\pi rh.
+}</md>
+</p>
+
+<p>The design problem is</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{r,h}
+\quad&amp;
+2\pi r^2+2\pi rh
+\\
+\text{subject to}
+\quad&amp;
+\pi r^2h=V,
+\\
+&amp;
+r,h&gt;0.
+\end{aligned}
+}</md>
+</p>
+
+<p>This is a nonlinear equality-constrained optimization problem.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-worked-optimal-cylinder">
+<title>Worked Example: Optimal Cylinder Proportion</title>
+<example>
+<title>Closed Cylinder with Fixed Volume</title>
+<p>From</p>
+
+<p>
+<md>\pi r^2h=V,</md>
+</p>
+
+<p>solve for</p>
+
+<p>
+<md>h
+=
+\frac{
+V
+}{
+\pi r^2
+}.</md>
+</p>
+
+<p>Substitute into surface area:</p>
+
+<p>
+<md>A(r)
+=
+2\pi r^2
++
+2\pi r
+\left(
+\frac{
+V
+}{
+\pi r^2
+}
+\right).</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>A(r)
+=
+2\pi r^2
++
+\frac{
+2V
+}{
+r
+}.</md>
+</p>
+
+<p>Differentiate:</p>
+
+<p>
+<md>A'(r)
+=
+4\pi r
+-
+\frac{
+2V
+}{
+r^2
+}.</md>
+</p>
+
+<p>Set equal to zero:</p>
+
+<p>
+<md>4\pi r^3
+=
+2V.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>r^3
+=
+\frac{
+V
+}{
+2\pi
+}.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>h
+=
+\frac{
+V
+}{
+\pi r^2
+},</md>
+</p>
+
+<p>using</p>
+
+<p>
+<md>V=2\pi r^3</md>
+</p>
+
+<p>gives</p>
+
+<p>
+<md>h=2r.</md>
+</p>
+
+<p>Hence,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+h=2r.
+}</md>
+</p>
+
+<p>The optimal cylinder height equals its diameter.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-parameter-estimation">
+<title>Parameter Estimation</title>
+<p>Suppose a nonlinear model predicts</p>
+
+<p>
+<md>y_i
+\approx
+m(t_i,\boldsymbol{\theta}).</md>
+</p>
+
+<p>Parameter estimation can be formulated as</p>
+
+<p>
+<md>\boxed{
+\min_{\boldsymbol{\theta}}
+\sum_{i=1}^{n}
+\left[
+y_i
+-
+m(t_i,\boldsymbol{\theta})
+\right]^2.
+}</md>
+</p>
+
+<p>This is nonlinear least squares when <m>m</m> depends nonlinearly on the
+parameters.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-maximum-likelihood">
+<title>Maximum Likelihood as Nonlinear Optimization</title>
+<p>For likelihood</p>
+
+<p>
+<md>L(\boldsymbol{\theta}),</md>
+</p>
+
+<p>maximum likelihood solves</p>
+
+<p>
+<md>\boxed{
+\max_{\boldsymbol{\theta}}
+L(\boldsymbol{\theta}).
+}</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+\min_{\boldsymbol{\theta}}
+-
+\log
+L(\boldsymbol{\theta}).
+}</md>
+</p>
+
+<p>Constraints may arise from parameter domains such as:</p>
+
+<p>
+<md>\boxed{
+\sigma&gt;0,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+p\in[0,1].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-economic-optimization">
+<title>Economic Optimization</title>
+<p>Consumer and producer models often involve nonlinear utility, production,
+or cost functions.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\max_{x,y}
+x^\alpha y^{1-\alpha}
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+p_xx+p_yy\leq I.
+}</md>
+</p>
+
+<p>This is a nonlinear optimization problem with a linear budget constraint.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nlp-workflow">
+<title>Nonlinear Programming Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>define the decision variables;</p>
+</li>
+<li>
+<p>write the nonlinear objective;</p>
+</li>
+<li>
+<p>state equality and inequality constraints;</p>
+</li>
+<li>
+<p>specify bounds and domains;</p>
+</li>
+<li>
+<p>determine whether the problem is smooth;</p>
+</li>
+<li>
+<p>determine whether the problem is convex;</p>
+</li>
+<li>
+<p>find or construct a feasible starting point;</p>
+</li>
+<li>
+<p>identify active constraints near candidate solutions;</p>
+</li>
+<li>
+<p>derive first-order KKT conditions;</p>
+</li>
+<li>
+<p>check constraint qualifications;</p>
+</li>
+<li>
+<p>examine second-order conditions when possible;</p>
+</li>
+<li>
+<p>select an algorithm appropriate to the problem structure;</p>
+</li>
+<li>
+<p>scale variables and constraints;</p>
+</li>
+<li>
+<p>solve the numerical problem;</p>
+</li>
+<li>
+<p>inspect KKT residuals;</p>
+</li>
+<li>
+<p>test multiple initial points if nonconvexity is present;</p>
+</li>
+<li>
+<p>perform sensitivity analysis;</p>
+</li>
+<li>
+<p>interpret the result in the original application.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-choosing-nlp-method">
+<title>Choosing a Nonlinear Programming Method</title>
+<p>For smooth equality constraints, consider:</p>
+
+<p>
+<md>\boxed{
+\text{Newton or SQP methods}.
+}</md>
+</p>
+
+<p>For many smooth inequalities, consider:</p>
+
+<p>
+<md>\boxed{
+\text{interior-point methods}.
+}</md>
+</p>
+
+<p>For difficult feasibility structure, consider:</p>
+
+<p>
+<md>\boxed{
+\text{augmented Lagrangian methods}.
+}</md>
+</p>
+
+<p>For simple bounds, consider:</p>
+
+<p>
+<md>\boxed{
+\text{projected or bound-constrained methods}.
+}</md>
+</p>
+
+<p>For nonlinear least squares, consider:</p>
+
+<p>
+<md>\boxed{
+\text{Gauss--Newton or Levenberg--Marquardt}.
+}</md>
+</p>
+
+<p>For nonconvex global optimization, specialized global methods may be
+necessary.</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-programming-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-assuming-kkt-conditions-guarantee-a-minimum">
+<title>Assuming KKT Conditions Guarantee a Minimum</title>
+<p>For a nonconvex problem, a KKT point need not be a minimum.</p>
+
+<p>Second-order conditions or global reasoning may be required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-constraint-qualifications">
+<title>Ignoring Constraint Qualifications</title>
+<p>KKT conditions may fail to be necessary when constraint gradients are
+degenerate.</p>
+
+<p>Always examine regularity assumptions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-checking-the-full-hessian-instead-of-feasible-directions">
+<title>Checking the Full Hessian Instead of Feasible Directions</title>
+<p>For constrained optimization, curvature matters along feasible tangent or
+critical directions.</p>
+
+<p>The full Hessian need not be positive definite.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-the-hessian-of-f-instead-of-the-hessian-of-the-lagrangian">
+<title>Using the Hessian of <m>f</m> Instead of the Hessian of the Lagrangian</title>
+<p>Second-order constrained conditions generally use</p>
+
+<p>
+<md>\boxed{
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L},
+}</md>
+</p>
+
+<p>not merely</p>
+
+<p>
+<md>\nabla^2f.</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="id-11-optimization-operations-research-03-nonlinear-programming-subsubsec-forgetting-complementary-slackness">
+<title>Forgetting Complementary Slackness</title>
+<p>For every inequality,</p>
+
+<p>
+<md>\boxed{
+\mu_i g_i(x)=0.
+}</md>
+</p>
+
+<p>An inactive constraint must have zero multiplier.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-the-wrong-multiplier-sign">
+<title>Using the Wrong Multiplier Sign</title>
+<p>For</p>
+
+<p>
+<md>g_i(x)\leq0,</md>
+</p>
+
+<p>the standard minimization KKT convention requires</p>
+
+<p>
+<md>\boxed{
+\mu_i\geq0.
+}</md>
+</p>
+
+<p>Changing the inequality orientation changes the sign convention.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-penalty-methods-enforce-exact-feasibility-at-finite">
+<title>Assuming Penalty Methods Enforce Exact Feasibility at Finite <m>\rho</m></title>
+<p>Quadratic penalties generally require increasing <m>\rho</m> toward large
+values.</p>
+
+<p>At finite penalty, constraint violation is usually nonzero.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-taking-penalty-parameters-too-large-too-quickly">
+<title>Taking Penalty Parameters Too Large Too Quickly</title>
+<p>Very large <m>\rho</m> can create ill-conditioning.</p>
+
+<p>Augmented Lagrangian methods help reduce this problem.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-a-log-barrier-outside-the-strict-interior">
+<title>Using a Log Barrier Outside the Strict Interior</title>
+<p>The logarithmic barrier</p>
+
+<p>
+<md>-\log[-g_i(x)]</md>
+</p>
+
+<p>requires</p>
+
+<p>
+<md>\boxed{
+g_i(x)&lt;0.
+}</md>
+</p>
+
+<p>It is undefined on or outside the boundary.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-globalization-with-global-optimization">
+<title>Confusing Globalization with Global Optimization</title>
+<p>Line search and trust regions improve convergence reliability.</p>
+
+<p>They do not generally guarantee the global optimum of a nonconvex
+problem.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-initial-guess-dependence">
+<title>Ignoring Initial Guess Dependence</title>
+<p>Local nonlinear solvers can converge to different KKT points from
+different starting values.</p>
+
+<p>This is especially important for nonconvex problems.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-11-optimization-operations-research-03-nonlinear-programming-subsubsec-ignoring-scaling">
+<title>Ignoring Scaling</title>
+<p>Poorly scaled variables and constraints can cause bad Newton steps and
+misleading termination tests.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-noisy-finite-differences-without-checking-accuracy">
+<title>Using Noisy Finite Differences Without Checking Accuracy</title>
+<p>Derivative errors can make an otherwise good optimization algorithm fail.</p>
+
+<p>Analytical or automatic derivatives are preferable when available.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-stopping-because-the-objective-barely-changes">
+<title>Stopping Because the Objective Barely Changes</title>
+<p>A flat objective sequence does not prove feasibility or stationarity.</p>
+
+<p>KKT residuals should also be checked.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-programming-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Engineering Design.</em>
+Structures, aircraft, mechanical components, and energy systems are often
+optimized subject to nonlinear physical constraints.</p>
+
+<p>\medskip</p>
+
+<p><em>Parameter Estimation.</em>
+Nonlinear least-squares problems arise when model predictions depend
+nonlinearly on unknown parameters.</p>
+
+<p>\medskip</p>
+
+<p><em>Statistics.</em>
+Maximum-likelihood and penalized estimation frequently require nonlinear
+optimization.</p>
+
+<p>\medskip</p>
+
+<p><em>Machine Learning.</em>
+Training many models requires minimizing large nonlinear and often
+nonconvex loss functions.</p>
+
+<p>\medskip</p>
+
+<p><em>Economics.</em>
+Utility, production, equilibrium, and resource-allocation models often
+contain nonlinear objectives and constraints.</p>
+
+<p>\medskip</p>
+
+<p><em>Finance.</em>
+Risk measures, transaction costs, and nonlinear market constraints can
+produce nonlinear portfolio models.</p>
+
+<p>\medskip</p>
+
+<p><em>Optimal Control.</em>
+Discretized trajectory optimization typically produces large sparse NLPs.</p>
+
+<p>\medskip</p>
+
+<p><em>Scientific Computing.</em>
+Inverse problems, model calibration, and experimental design frequently
+lead to constrained nonlinear optimization.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-programming-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define a nonlinear programming problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of a nonlinear objective with linear constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of a linear objective with nonlinear constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an active inequality constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define LICQ conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the KKT conditions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the Hessian of the Lagrangian.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a quadratic penalty function.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an augmented Lagrangian.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define sequential quadratic programming conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether</p>
+
+<p>
+<md>\min_{x,y}
+x^2+y</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>x+y\leq3</md>
+</p>
+
+<p>is a nonlinear program.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the active constraints at</p>
+
+<p>
+<md>(x,y)=(1,1)</md>
+</p>
+
+<p>for</p>
+
+<p>
+<md>x^2+y^2\leq2,</md>
+</p>
+
+<p>
+<md>x+y\leq3.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the tangent direction condition for</p>
+
+<p>
+<md>x^2+y^2=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the Lagrangian for</p>
+
+<p>
+<md>\min_{x,y}
+x^2+3y^2</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>xy=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the KKT conditions for</p>
+
+<p>
+<md>\min_x
+x^2</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>1-x\leq0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Minimize</p>
+
+<p>
+<md>x^2+y^2</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>xy=1</md>
+</p>
+
+<p>using Lagrange multipliers.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Minimize</p>
+
+<p>
+<md>x+y</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>x^2+y^2=4.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the KKT points of</p>
+
+<p>
+<md>\min_{x,y}
+x^2+y^2</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>x+y\geq4.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify LICQ for the active constraint in the previous problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give a constrained optimization problem where LICQ fails.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why</p>
+
+<p>
+<md>\min_x x</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>x^2=0</md>
+</p>
+
+<p>does not satisfy ordinary Lagrange multiplier stationarity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Hessian of the Lagrangian for</p>
+
+<p>
+<md>f(x,y)=x^2+y^2</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>xy=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine the tangent space to</p>
+
+<p>
+<md>x+y+z=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the reduced Hessian to analyze an equality-constrained quadratic
+problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Newton KKT system for equality-constrained optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a quadratic penalty formulation for</p>
+
+<p>
+<md>h(x)=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that a quadratic penalty solution approaches feasibility as
+<m>\rho\to\infty</m> for a simple one-variable example.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a logarithmic barrier for</p>
+
+<p>
+<md>x^2+y^2&lt;1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write an augmented Lagrangian for two equality constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive a multiplier update for an augmented Lagrangian method.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the SQP subproblem for</p>
+
+<p>
+<md>\min f(x)</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>h(x)=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Linearize the nonlinear inequality</p>
+
+<p>
+<md>x^2+y^2-1\leq0</md>
+</p>
+
+<p>around a given point.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a merit function is useful in constrained line search.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the gradient for nonlinear least squares.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the exact Hessian of a nonlinear least-squares objective.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Gauss--Newton approximation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a nonlinear parameter-estimation problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Formulate a nonlinear engineering-design problem with one equality and
+one inequality constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why multistart can help on a nonconvex NLP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove first-order necessary conditions using tangent cones.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study LICQ, MFCQ, and their relationships.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study second-order necessary conditions for nonlinear programs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study second-order sufficient conditions using critical cones.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive reduced-Hessian conditions for equality-constrained problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study exact penalty theory.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze ill-conditioning in quadratic penalty methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study augmented Lagrangian convergence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive SQP from Newton's method on the KKT equations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study superlinear convergence of SQP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study line-search merit functions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate filter globalization methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study trust-region SQP methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive primal-dual interior-point equations for NLP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study central-path theory for nonlinear programs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate sparse KKT-system factorization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study automatic differentiation for large NLPs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Analyze Gauss--Newton convergence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Levenberg--Marquardt methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate global optimization methods for nonconvex NLPs.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-programming-summary">
+<title>Conceptual Summary</title>
+<p>A nonlinear program has form</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min_{\mathbf{x}}
+\quad&amp;
+f(\mathbf{x})
+\\
+\text{subject to}
+\quad&amp;
+g_i(\mathbf{x})\leq0,
+\\
+&amp;
+h_j(\mathbf{x})=0.
+\end{aligned}
+}</md>
+</p>
+
+<p>Its Lagrangian is</p>
+
+<p>
+<md>\boxed{
+\mathcal{L}
+=
+f
++
+\sum_i
+\mu_i g_i
++
+\sum_j
+\lambda_jh_j.
+}</md>
+</p>
+
+<p>Under suitable regularity, a local minimizer satisfies the KKT
+conditions:</p>
+
+<p>
+<md>\boxed{
+\nabla_{\mathbf{x}}\mathcal{L}=0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+g_i(\mathbf{x})\leq0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+h_j(\mathbf{x})=0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\mu_i\geq0,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\mu_i g_i(\mathbf{x})=0.
+}</md>
+</p>
+
+<p>Second-order conditions use</p>
+
+<p>
+<md>\boxed{
+\nabla_{\mathbf{x}\mathbf{x}}^2
+\mathcal{L}
+}</md>
+</p>
+
+<p>restricted to feasible or critical directions.</p>
+
+<p>Important numerical methods include:</p>
+
+<p>
+<md>\boxed{
+\text{penalty methods},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{augmented Lagrangians},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{SQP},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{interior-point methods}.
+}</md>
+</p>
+
+<p>Nonlinear programming therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{calculus}
++
+\text{constraint geometry}
++
+\text{linear algebra}
++
+\text{numerical methods}
++
+\text{optimization theory}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-03-nonlinear-programming-subsec-nonlinear-programming-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Nonlinear Programming extends the linear and general optimization
+framework of Sections <xref ref="sec-optimization-fundamentals" /> and
+<xref ref="sec-linear-programming" /> to smooth and nonsmooth nonlinear models.
+KKT systems, second-order conditions, penalty methods, augmented
+Lagrangians, SQP, and nonlinear interior-point methods provide the central
+tools for constrained nonlinear problems. The next section, Convex
+Optimization, identifies an especially important subclass of nonlinear
+optimization in which convexity converts local optimality into global
+optimality and allows powerful duality and algorithmic guarantees.</p>
+</remark>
+</subsection>
+
 </section>

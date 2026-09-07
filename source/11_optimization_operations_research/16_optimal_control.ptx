@@ -1,9 +1,4419 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-11-optimization-operations-research-16-optimal-control">
-  <title>Optimal Control</title>
+<section xml:id="sec-optimal-control">
+<title>Optimal Control</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Optimization fundamentals, multivariable calculus, differential equations,
+dynamical systems, linear algebra, calculus of variations, dynamic
+programming, and basic probability for stochastic extensions.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define an optimal-control problem;</p>
+</li>
+<li>
+<p>distinguish states, controls, trajectories, and parameters;</p>
+</li>
+<li>
+<p>formulate continuous-time dynamical constraints;</p>
+</li>
+<li>
+<p>distinguish running and terminal costs;</p>
+</li>
+<li>
+<p>recognize fixed and free terminal conditions;</p>
+</li>
+<li>
+<p>understand admissible controls;</p>
+</li>
+<li>
+<p>distinguish open-loop and feedback control;</p>
+</li>
+<li>
+<p>connect optimal control with calculus of variations;</p>
+</li>
+<li>
+<p>formulate the Hamiltonian;</p>
+</li>
+<li>
+<p>state Pontryagin's Maximum Principle under a consistent sign
+          convention;</p>
+</li>
+<li>
+<p>derive costate equations;</p>
+</li>
+<li>
+<p>interpret transversality conditions;</p>
+</li>
+<li>
+<p>understand pointwise Hamiltonian minimization;</p>
+</li>
+<li>
+<p>identify bang-bang controls;</p>
+</li>
+<li>
+<p>recognize switching functions;</p>
+</li>
+<li>
+<p>understand singular controls conceptually;</p>
+</li>
+<li>
+<p>formulate linear-quadratic optimal-control problems;</p>
+</li>
+<li>
+<p>derive the finite-horizon Riccati differential equation;</p>
+</li>
+<li>
+<p>understand linear-quadratic regulation;</p>
+</li>
+<li>
+<p>recognize infinite-horizon algebraic Riccati equations;</p>
+</li>
+<li>
+<p>formulate discrete-time optimal-control problems;</p>
+</li>
+<li>
+<p>derive Bellman equations;</p>
+</li>
+<li>
+<p>understand value functions;</p>
+</li>
+<li>
+<p>state the Hamilton--Jacobi--Bellman equation;</p>
+</li>
+<li>
+<p>connect the HJB equation with feedback control;</p>
+</li>
+<li>
+<p>distinguish PMP and dynamic-programming approaches;</p>
+</li>
+<li>
+<p>formulate state and control constraints;</p>
+</li>
+<li>
+<p>understand endpoint constraints;</p>
+</li>
+<li>
+<p>recognize minimum-time control;</p>
+</li>
+<li>
+<p>recognize minimum-energy control;</p>
+</li>
+<li>
+<p>understand controllability as a feasibility issue conceptually;</p>
+</li>
+<li>
+<p>understand terminal penalties and tracking objectives;</p>
+</li>
+<li>
+<p>formulate trajectory-tracking problems;</p>
+</li>
+<li>
+<p>recognize model predictive control;</p>
+</li>
+<li>
+<p>distinguish direct and indirect numerical methods;</p>
+</li>
+<li>
+<p>understand control parameterization and direct transcription;</p>
+</li>
+<li>
+<p>recognize shooting methods;</p>
+</li>
+<li>
+<p>understand collocation conceptually;</p>
+</li>
+<li>
+<p>recognize stochastic optimal-control problems;</p>
+</li>
+<li>
+<p>understand stochastic HJB equations conceptually;</p>
+</li>
+<li>
+<p>recognize connections with reinforcement learning;</p>
+</li>
+<li>
+<p>connect optimal control with robotics, aerospace, engineering,
+          economics, energy systems, biological systems, and finance.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-16-optimal-control-subsec-what-is-optimal-control">
+<title>What Is Optimal Control?</title>
+<p>Optimal control studies how a dynamical system should be influenced over
+time in order to optimize a performance criterion.</p>
+
+<p>A typical system is described by</p>
+
+<p>
+<md>\boxed{
+\dot{x}(t)
+=
+f
+(
+x(t),
+u(t),
+t
+),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>x(t)
+=
+\text{state},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>u(t)
+=
+\text{control}.</md>
+</p>
+
+<p>The control is selected to optimize an objective while the state must obey
+the differential equation.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-state">
+<title>State Variables</title>
+<p>The state vector</p>
+
+<p>
+<md>\boxed{
+x(t)
+\in
+\mathbb{R}^n
+}</md>
+</p>
+
+<p>contains the information needed to describe the system at time <m>t</m>.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{position and velocity},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{inventory levels},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{population sizes},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{temperature},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{capital stock}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-control">
+<title>Control Variables</title>
+<p>The control</p>
+
+<p>
+<md>\boxed{
+u(t)
+\in
+\mathbb{R}^m
+}</md>
+</p>
+
+<p>represents quantities the decision maker can manipulate.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{thrust},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{steering input},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{production rate},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{drug dosage},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{investment rate}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-dynamics">
+<title>State Dynamics</title>
+<p>The state evolves according to</p>
+
+<p>
+<md>\boxed{
+\dot{x}
+=
+f(x,u,t).
+}</md>
+</p>
+
+<p>Given an initial condition</p>
+
+<p>
+<md>\boxed{
+x(t_0)
+=
+x_0,
+}</md>
+</p>
+
+<p>and an admissible control <m>u(t)</m>, the differential equation determines a
+state trajectory.</p>
+
+<p>Thus control decisions cannot choose states independently at each time.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-admissible-controls">
+<title>Admissible Controls</title>
+<p>A control is admissible if it satisfies all required conditions.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+u(t)\in U
+}</md>
+</p>
+
+<p>for almost every <m>t</m>, where <m>U</m> is the control constraint set.</p>
+
+<p>A simple bound is</p>
+
+<p>
+<md>\boxed{
+u_{\min}
+\leq
+u(t)
+\leq
+u_{\max}.
+}</md>
+</p>
+
+<p>Admissibility may also require measurability, integrability, or additional
+regularity.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-bolza-problem">
+<title>The Bolza Problem</title>
+<p>A standard finite-horizon optimal-control problem is</p>
+
+<p>
+<md>\boxed{
+\min_{u(\cdot)}
+J[u]
+=
+\Phi
+(
+x(T),
+T
+)
++
+\int_{t_0}^{T}
+L
+(
+x(t),
+u(t),
+t
+)
+\,dt
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+\dot{x}(t)
+=
+f
+(
+x(t),
+u(t),
+t
+),
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+x(t_0)=x_0.
+}</md>
+</p>
+
+<p>This is called the Bolza form.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-running-cost">
+<title>Running Cost</title>
+<p>The function</p>
+
+<p>
+<md>\boxed{
+L(x,u,t)
+}</md>
+</p>
+
+<p>is the running cost or stage cost.</p>
+
+<p>It accumulates cost continuously over time.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{fuel consumption},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{tracking error},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{energy use},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{operating cost}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-terminal-cost">
+<title>Terminal Cost</title>
+<p>The function</p>
+
+<p>
+<md>\boxed{
+\Phi(x(T),T)
+}</md>
+</p>
+
+<p>is the terminal cost.</p>
+
+<p>It may penalize:</p>
+
+<p>
+<md>\boxed{
+\text{final position error},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{remaining inventory},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{terminal wealth},
+}</md>
+</p>
+
+<p>or other final-state outcomes.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-lagrange-mayer-forms">
+<title>Lagrange and Mayer Forms</title>
+<p>If</p>
+
+<p>
+<md>\Phi=0,</md>
+</p>
+
+<p>the problem is in Lagrange form:</p>
+
+<p>
+<md>\boxed{
+J
+=
+\int_{t_0}^{T}
+L(x,u,t)\,dt.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>L=0,</md>
+</p>
+
+<p>the problem is in Mayer form:</p>
+
+<p>
+<md>\boxed{
+J
+=
+\Phi(x(T),T).
+}</md>
+</p>
+
+<p>Bolza form contains both.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-fixed-free-terminal-state">
+<title>Fixed and Free Terminal State</title>
+<p>A terminal state may be fixed:</p>
+
+<p>
+<md>\boxed{
+x(T)=x_T.
+}</md>
+</p>
+
+<p>Alternatively, <m>x(T)</m> may be free and penalized through</p>
+
+<p>
+<md>\Phi(x(T),T).</md>
+</p>
+
+<p>Different terminal conditions lead to different transversality conditions.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-fixed-free-terminal-time">
+<title>Fixed and Free Terminal Time</title>
+<p>The final time <m>T</m> may also be fixed or optimized.</p>
+
+<p>If <m>T</m> is free, then time itself becomes part of the optimization
+problem.</p>
+
+<p>Minimum-time control is an important example.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-open-loop-control">
+<title>Open-Loop Control</title>
+<p>An open-loop control is specified as a function of time:</p>
+
+<p>
+<md>\boxed{
+u=u(t).
+}</md>
+</p>
+
+<p>Once the control trajectory is determined, it does not explicitly respond
+to deviations in the observed state.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-feedback-control">
+<title>Feedback Control</title>
+<p>A feedback control uses the current state:</p>
+
+<p>
+<md>\boxed{
+u(t)
+=
+\pi
+(
+x(t),
+t
+).
+}</md>
+</p>
+
+<p>The function</p>
+
+<p>
+<md>\pi</md>
+</p>
+
+<p>is called a feedback policy.</p>
+
+<p>Feedback can react to disturbances or modeling errors because the control
+depends on the observed state.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-open-loop-versus-feedback">
+<title>Open Loop Versus Feedback</title>
+<p>Open-loop control specifies:</p>
+
+<p>
+<md>\boxed{
+\text{what to do as a function of time}.
+}</md>
+</p>
+
+<p>Feedback control specifies:</p>
+
+<p>
+<md>\boxed{
+\text{what to do as a function of the current state}.
+}</md>
+</p>
+
+<p>Dynamic programming naturally produces feedback policies.</p>
+
+<p>Pontryagin-based boundary-value methods often produce open-loop optimal
+trajectories.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-simple-optimal-control-problem">
+<title>A Simple Optimal-Control Problem</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+\dot{x}=u,
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>x(0)=x_0.</md>
+</p>
+
+<p>Suppose the objective is</p>
+
+<p>
+<md>\boxed{
+J
+=
+\frac12
+x(T)^2
++
+\frac12
+\int_0^T
+u(t)^2\,dt.
+}</md>
+</p>
+
+<p>The control balances:</p>
+
+<p>
+<md>\boxed{
+\text{terminal state error}
+}</md>
+</p>
+
+<p>against</p>
+
+<p>
+<md>\boxed{
+\text{control effort}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-calculus-variations">
+<title>Optimal Control and Calculus of Variations</title>
+<p>Calculus of variations optimizes functionals such as</p>
+
+<p>
+<md>\boxed{
+J[y]
+=
+\int
+F
+(
+t,
+y,
+\dot y
+)
+\,dt.
+}</md>
+</p>
+
+<p>Optimal control extends this framework by introducing:</p>
+
+<p>
+<md>\boxed{
+\text{state equations}
+}</md>
+</p>
+
+<p>and explicit</p>
+
+<p>
+<md>\boxed{
+\text{control variables}.
+}</md>
+</p>
+
+<p>The state dynamics act as differential constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-hamiltonian">
+<title>Hamiltonian</title>
+<p>For the minimization convention used in this section, define the
+Hamiltonian</p>
+
+<p>
+<md>\boxed{
+H(x,u,\lambda,t)
+=
+L(x,u,t)
++
+\lambda^T
+f(x,u,t),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\lambda(t)
+\in
+\mathbb{R}^n
+}</md>
+</p>
+
+<p>is the costate or adjoint vector.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-costate-variables">
+<title>Costate Variables</title>
+<p>The costate variable acts as a time-dependent multiplier for the state
+equation.</p>
+
+<p>It measures, in a local sensitivity sense, the marginal value of changing
+the state along an optimal trajectory.</p>
+
+<p>Costates are analogous to Lagrange multipliers in finite-dimensional
+optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-pontryagin-principle">
+<title>Pontryagin's Principle: Minimization Convention</title>
+<p>Consider</p>
+
+<p>
+<md>\min
+\left[
+\Phi(x(T))
++
+\int_{t_0}^{T}
+L(x,u,t)\,dt
+\right]</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\dot{x}=f(x,u,t).</md>
+</p>
+
+<p>Under appropriate regularity and optimality assumptions, an optimal
+trajectory satisfies necessary conditions involving</p>
+
+<p>
+<md>H
+=
+L+\lambda^Tf.</md>
+</p>
+
+<p>The principal equations are</p>
+
+<p>
+<md>\boxed{
+\dot{x}
+=
+\frac{\partial H}{\partial\lambda}
+=
+f(x,u,t),
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\dot{\lambda}
+=
+-
+\frac{\partial H}{\partial x},
+}</md>
+</p>
+
+<p>and, for an interior control,</p>
+
+<p>
+<md>\boxed{
+\frac{\partial H}{\partial u}
+=
+0.
+}</md>
+</p>
+
+<p>More generally,</p>
+
+<p>
+<md>\boxed{
+u^*(t)
+\in
+\operatorname*{arg\,min}_{u\in U}
+H
+(
+x^*(t),
+u,
+\lambda^*(t),
+t
+).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-sign-conventions">
+<title>Sign Conventions</title>
+<p>Different texts define the Hamiltonian differently.</p>
+
+<p>This section uses</p>
+
+<p>
+<md>\boxed{
+H
+=
+L+\lambda^Tf
+}</md>
+</p>
+
+<p>for a minimization problem and therefore minimizes <m>H</m> with respect to
+the control.</p>
+
+<p>Another common convention uses</p>
+
+<p>
+<md>H
+=
+-L+\lambda^Tf</md>
+</p>
+
+<p>and maximizes the Hamiltonian.</p>
+
+<p>Both conventions are valid when used consistently.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-hamiltonian-state-equation">
+<title>State Equation From the Hamiltonian</title>
+<p>Because</p>
+
+<p>
+<md>H
+=
+L+\lambda^Tf,</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\frac{\partial H}{\partial\lambda}
+=
+f.</md>
+</p>
+
+<p>Thus the state equation is recovered as</p>
+
+<p>
+<md>\boxed{
+\dot{x}
+=
+H_{\lambda}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-costate-equation">
+<title>Costate Equation</title>
+<p>The costate equation is</p>
+
+<p>
+<md>\boxed{
+\dot{\lambda}
+=
+-
+H_x.
+}</md>
+</p>
+
+<p>In components,</p>
+
+<p>
+<md>\boxed{
+\dot{\lambda}_i
+=
+-
+\frac{\partial H}{\partial x_i}.
+}</md>
+</p>
+
+<p>This differential equation is typically solved backward from a terminal
+condition.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-terminal-transversality">
+<title>Terminal Transversality Condition</title>
+<p>If terminal state <m>x(T)</m> is free and terminal time <m>T</m> is fixed, then</p>
+
+<p>
+<md>\boxed{
+\lambda(T)
+=
+\nabla_x
+\Phi
+(
+x(T)
+).
+}</md>
+</p>
+
+<p>If the terminal state is fixed, this costate terminal condition is replaced
+by the corresponding endpoint restriction and multiplier structure.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-interior-control-condition">
+<title>Interior Control Condition</title>
+<p>If the optimal control lies in the interior of the admissible set and the
+Hamiltonian is differentiable with respect to <m>u</m>, then</p>
+
+<p>
+<md>\boxed{
+H_u
+=
+0.
+}</md>
+</p>
+
+<p>This is analogous to a stationarity condition in ordinary optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-control-constraints">
+<title>Control Constraints</title>
+<p>Suppose</p>
+
+<p>
+<md>\boxed{
+u_{\min}
+\leq
+u(t)
+\leq
+u_{\max}.
+}</md>
+</p>
+
+<p>Then the stationarity equation</p>
+
+<p>
+<md>H_u=0</md>
+</p>
+
+<p>may produce an inadmissible value.</p>
+
+<p>The correct condition is</p>
+
+<p>
+<md>\boxed{
+u^*(t)
+\in
+\operatorname*{arg\,min}_{
+u_{\min}\leq u\leq u_{\max}
+}
+H.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-worked-quadratic-control">
+<title>Worked Example: Quadratic Control Effort</title>
+<example>
+<title>Hamiltonian Stationarity</title>
+<p>Suppose</p>
+
+<p>
+<md>\dot{x}=u,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>J
+=
+\frac12x(T)^2
++
+\frac12
+\int_0^T
+u^2\,dt.</md>
+</p>
+
+<p>The Hamiltonian is</p>
+
+<p>
+<md>H
+=
+\frac12u^2
++
+\lambda u.</md>
+</p>
+
+<p>The stationarity condition is</p>
+
+<p>
+<md>\frac{\partial H}{\partial u}
+=
+u+\lambda
+=
+0.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>Because <m>H</m> does not depend explicitly on <m>x</m>,</p>
+
+<p>
+<md>\dot{\lambda}=0.</md>
+</p>
+
+<p>Therefore the costate is constant.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+u^*
+=
+-\lambda.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-solving-quadratic-control-example">
+<title>Solving the Previous Example</title>
+<p>Since</p>
+
+<p>
+<md>\dot{\lambda}=0,</md>
+</p>
+
+<p>write</p>
+
+<p>
+<md>\lambda(t)=c.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>u^*=-c.</md>
+</p>
+
+<p>The state satisfies</p>
+
+<p>
+<md>\dot{x}=-c,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>x(t)
+=
+x_0-ct.</md>
+</p>
+
+<p>The terminal condition is</p>
+
+<p>
+<md>\lambda(T)
+=
+x(T).</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>c
+=
+x_0-cT.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>c(1+T)
+=
+x_0,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>\boxed{
+c
+=
+\frac{x_0}{1+T}.
+}</md>
+</p>
+
+<p>Hence,</p>
+
+<p>
+<md>\boxed{
+u^*(t)
+=
+-
+\frac{x_0}{1+T}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-state-trajectory-example">
+<title>Optimal State Trajectory</title>
+<p>Substituting the optimal control,</p>
+
+<p>
+<md>\dot{x}
+=
+-
+\frac{x_0}{1+T}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+x^*(t)
+=
+x_0
+-
+\frac{x_0}{1+T}t.
+}</md>
+</p>
+
+<p>At the final time,</p>
+
+<p>
+<md>\boxed{
+x^*(T)
+=
+\frac{x_0}{1+T}.
+}</md>
+</p>
+
+<p>The terminal state is not forced exactly to zero because doing so would
+require additional control effort.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-two-point-boundary-value">
+<title>Two-Point Boundary-Value Problem</title>
+<p>Pontryagin conditions frequently create differential equations with
+boundary conditions at both ends of the time interval:</p>
+
+<p>
+<md>\boxed{
+x(t_0)=x_0,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\lambda(T)
+=
+\nabla\Phi(x(T)).
+}</md>
+</p>
+
+<p>Such systems are called two-point boundary-value problems.</p>
+
+<p>They are generally more difficult than ordinary initial-value problems.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-hamiltonian-conservation">
+<title>Hamiltonian Conservation</title>
+<p>For sufficiently smooth autonomous optimal-control problems, where the
+Hamiltonian has no explicit time dependence,</p>
+
+<p>
+<md>\boxed{
+\frac{\partial H}{\partial t}=0,
+}</md>
+</p>
+
+<p>the Hamiltonian is constant along suitable unconstrained extremals.</p>
+
+<p>This property depends on the precise optimal-control setting and
+regularity assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-free-final-time">
+<title>Free Final Time</title>
+<p>If terminal time <m>T</m> is free, an additional transversality condition
+appears.</p>
+
+<p>For the convention</p>
+
+<p>
+<md>H=L+\lambda^Tf</md>
+</p>
+
+<p>and terminal cost</p>
+
+<p>
+<md>\Phi(x(T),T),</md>
+</p>
+
+<p>a standard condition is</p>
+
+<p>
+<md>\boxed{
+H(T)
++
+\frac{\partial\Phi}{\partial T}
+=
+0,
+}</md>
+</p>
+
+<p>subject to the assumptions of the specific endpoint problem.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-minimum-time-control">
+<title>Minimum-Time Control</title>
+<p>A minimum-time problem seeks</p>
+
+<p>
+<md>\boxed{
+\min T
+}</md>
+</p>
+
+<p>subject to dynamical constraints and a target condition.</p>
+
+<p>It can be written with running cost</p>
+
+<p>
+<md>\boxed{
+L=1,
+}</md>
+</p>
+
+<p>so that</p>
+
+<p>
+<md>\boxed{
+J
+=
+\int_0^T1\,dt
+=
+T.
+}</md>
+</p>
+
+<p>Control bounds are often essential in minimum-time problems.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-bang-bang-control">
+<title>Bang-Bang Control</title>
+<p>Suppose the Hamiltonian is linear in a bounded scalar control:</p>
+
+<p>
+<md>\boxed{
+H
+=
+H_0(x,\lambda,t)
++
+\psi(t)u,
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>u_{\min}
+\leq
+u
+\leq
+u_{\max}.</md>
+</p>
+
+<p>To minimize <m>H</m>,</p>
+
+<p>
+<md>\boxed{
+u^*
+=
+u_{\min}
+}</md>
+</p>
+
+<p>when</p>
+
+<p>
+<md>\psi(t)&gt;0,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+u^*
+=
+u_{\max}
+}</md>
+</p>
+
+<p>when</p>
+
+<p>
+<md>\psi(t)&lt;0.</md>
+</p>
+
+<p>Thus the control switches between its extreme values.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-switching-function">
+<title>Switching Function</title>
+<p>The coefficient</p>
+
+<p>
+<md>\boxed{
+\psi(t)
+=
+\frac{\partial H}{\partial u}
+}</md>
+</p>
+
+<p>for a Hamiltonian affine in <m>u</m> is called a switching function.</p>
+
+<p>Its sign determines which boundary control minimizes the Hamiltonian.</p>
+
+<p>A switching time occurs when the sign changes.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-singular-arcs">
+<title>Singular Arcs</title>
+<p>If</p>
+
+<p>
+<md>\boxed{
+\psi(t)=0
+}</md>
+</p>
+
+<p>over an interval, the first-order Hamiltonian condition does not determine
+the control directly.</p>
+
+<p>Such an interval may be a singular arc.</p>
+
+<p>Higher derivatives of the switching condition and additional optimality
+conditions may be required.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-worked-bang-bang">
+<title>Worked Example: Bang-Bang Decision</title>
+<example>
+<title>Bounded Linear Hamiltonian</title>
+<p>Suppose</p>
+
+<p>
+<md>H
+=
+5
++
+3u,</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>-2
+\leq
+u
+\leq
+2.</md>
+</p>
+
+<p>Because the coefficient of <m>u</m> is positive, minimizing <m>H</m> requires
+the smallest admissible control.</p>
+
+<p>Therefore,</p>
+
+<p>If instead the coefficient were negative, the minimizing control would be
+the upper bound.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+u^*=-2.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-minimum-energy-control">
+<title>Minimum-Energy Control</title>
+<p>A common objective is</p>
+
+<p>
+<md>\boxed{
+J
+=
+\frac12
+\int_0^T
+u(t)^Tu(t)
+\,dt.
+}</md>
+</p>
+
+<p>This minimizes control energy or effort.</p>
+
+<p>Such objectives strongly favor smooth moderate controls rather than
+bang-bang inputs.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-tracking">
+<title>Tracking Problems</title>
+<p>Suppose a desired state trajectory is</p>
+
+<p>
+<md>x_r(t).</md>
+</p>
+
+<p>A quadratic tracking objective is</p>
+
+<p>
+<md>\boxed{
+J
+=
+\frac12
+(
+x(T)-x_r(T)
+)^T
+F
+(
+x(T)-x_r(T)
+)
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\phantom{J={}}
++
+\frac12
+\int_0^T
+\left[
+(
+x-x_r
+)^T
+Q
+(
+x-x_r
+)
++
+u^TRu
+\right]dt.
+}</md>
+</p>
+
+<p>This balances tracking accuracy and control effort.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-linear-quadratic-regulator">
+<title>Linear-Quadratic Regulator</title>
+<p>Consider the linear system</p>
+
+<p>
+<md>\boxed{
+\dot{x}
+=
+Ax+Bu,
+}</md>
+</p>
+
+<p>with quadratic objective</p>
+
+<p>
+<md>\boxed{
+J
+=
+\frac12x(T)^TFx(T)
++
+\frac12
+\int_0^T
+\left(
+x^TQx
++
+u^TRu
+\right)dt.
+}</md>
+</p>
+
+<p>Assume typically</p>
+
+<p>
+<md>\boxed{
+Q\succeq0,
+\qquad
+F\succeq0,
+\qquad
+R\succ0.
+}</md>
+</p>
+
+<p>This is the finite-horizon Linear-Quadratic Regulator, abbreviated LQR.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-lqr-hamiltonian">
+<title>LQR Hamiltonian</title>
+<p>The Hamiltonian is</p>
+
+<p>
+<md>\boxed{
+H
+=
+\frac12x^TQx
++
+\frac12u^TRu
++
+\lambda^T
+(
+Ax+Bu
+).
+}</md>
+</p>
+
+<p>Stationarity with respect to <m>u</m> gives</p>
+
+<p>
+<md>Ru
++
+B^T\lambda
+=
+0.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+u^*
+=
+-
+R^{-1}B^T\lambda.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-lqr-costate">
+<title>LQR Costate Equation</title>
+<p>The costate equation is</p>
+
+<p>
+<md>\dot{\lambda}
+=
+-
+Qx
+-
+A^T\lambda.</md>
+</p>
+
+<p>The terminal condition is</p>
+
+<p>
+<md>\boxed{
+\lambda(T)
+=
+Fx(T).
+}</md>
+</p>
+
+<p>This suggests a relationship of the form</p>
+
+<p>
+<md>\boxed{
+\lambda(t)
+=
+P(t)x(t).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-riccati-differential-equation">
+<title>Riccati Differential Equation</title>
+<p>Substituting</p>
+
+<p>
+<md>\lambda=Px</md>
+</p>
+
+<p>into the LQR conditions yields</p>
+
+<p>
+<md>\boxed{
+-\dot{P}
+=
+A^TP
++
+PA
+-
+PBR^{-1}B^TP
++
+Q,
+}</md>
+</p>
+
+<p>with terminal condition</p>
+
+<p>
+<md>\boxed{
+P(T)=F.
+}</md>
+</p>
+
+<p>This is the continuous-time Riccati differential equation.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-lqr-feedback-law">
+<title>LQR Feedback Law</title>
+<p>The optimal control becomes</p>
+
+<p>
+<md>\boxed{
+u^*(t)
+=
+-
+R^{-1}
+B^T
+P(t)
+x(t).
+}</md>
+</p>
+
+<p>Define</p>
+
+<p>
+<md>\boxed{
+K(t)
+=
+R^{-1}B^TP(t).
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+u^*(t)
+=
+-K(t)x(t).
+}</md>
+</p>
+
+<p>Thus finite-horizon LQR naturally produces linear state feedback.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-lqr-weight-interpretation">
+<title>Interpretation of LQR Weights</title>
+<p>The matrix</p>
+
+<p>
+<md>Q</md>
+</p>
+
+<p>penalizes state deviation.</p>
+
+<p>The matrix</p>
+
+<p>
+<md>R</md>
+</p>
+
+<p>penalizes control effort.</p>
+
+<p>Larger state penalties encourage more aggressive correction.</p>
+
+<p>Larger control penalties discourage large inputs.</p>
+
+<p>Thus LQR explicitly models a performance-effort tradeoff.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-scalar-lqr-example">
+<title>Scalar LQR Example</title>
+<p>Consider</p>
+
+<p>
+<md>\dot{x}
+=
+ax+bu,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>J
+=
+\frac12Fx(T)^2
++
+\frac12
+\int_0^T
+\left(
+qx^2+ru^2
+\right)dt.</md>
+</p>
+
+<p>The Riccati equation becomes</p>
+
+<p>
+<md>\boxed{
+-\dot{P}
+=
+2aP
+-
+\frac{b^2}{r}P^2
++
+q,
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+P(T)=F.
+}</md>
+</p>
+
+<p>The feedback law is</p>
+
+<p>
+<md>\boxed{
+u^*
+=
+-
+\frac{b}{r}
+Px.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-infinite-horizon-lqr">
+<title>Infinite-Horizon LQR</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+J
+=
+\frac12
+\int_0^\infty
+\left(
+x^TQx
++
+u^TRu
+\right)dt.
+}</md>
+</p>
+
+<p>Under appropriate stabilizability and detectability assumptions, the
+steady-state matrix <m>P</m> satisfies the algebraic Riccati equation</p>
+
+<p>
+<md>\boxed{
+A^TP
++
+PA
+-
+PBR^{-1}B^TP
++
+Q
+=
+0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-infinite-horizon-feedback">
+<title>Infinite-Horizon Feedback</title>
+<p>The resulting feedback law is</p>
+
+<p>
+<md>\boxed{
+u^*
+=
+-Kx,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+K
+=
+R^{-1}B^TP.
+}</md>
+</p>
+
+<p>Unlike finite-horizon LQR, <m>K</m> is constant when the system and objective
+are time invariant.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-controllability">
+<title>Controllability</title>
+<p>Before optimizing a control problem, one must determine whether the desired
+state can be reached at all.</p>
+
+<p>For the linear system</p>
+
+<p>
+<md>\dot{x}=Ax+Bu,</md>
+</p>
+
+<p>define the controllability matrix</p>
+
+<p>
+<md>\boxed{
+\mathcal{C}
+=
+\begin{bmatrix}
+B
+&amp;
+AB
+&amp;
+A^2B
+&amp;
+\cdots
+&amp;
+A^{n-1}B
+\end{bmatrix}.
+}</md>
+</p>
+
+<p>The pair <m>(A,B)</m> is controllable if</p>
+
+<p>
+<md>\boxed{
+\operatorname{rank}
+(
+\mathcal{C}
+)
+=
+n.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-feasibility-before-optimality">
+<title>Feasibility Before Optimality</title>
+<p>An optimal-control objective cannot overcome impossible dynamics.</p>
+
+<p>Thus the logical order is:</p>
+
+<p>
+<md>\boxed{
+\text{Can the system reach the required state?}
+}</md>
+</p>
+
+<p>before asking:</p>
+
+<p>
+<md>\boxed{
+\text{What is the best way to reach it?}
+}</md>
+</p>
+
+<p>Controllability is therefore fundamentally a feasibility concept.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-discrete-time-optimal-control">
+<title>Discrete-Time Optimal Control</title>
+<p>A discrete-time system has dynamics</p>
+
+<p>
+<md>\boxed{
+x_{k+1}
+=
+f_k
+(
+x_k,
+u_k
+).
+}</md>
+</p>
+
+<p>A finite-horizon objective may be</p>
+
+<p>
+<md>\boxed{
+J
+=
+\Phi(x_N)
++
+\sum_{k=0}^{N-1}
+L_k
+(
+x_k,
+u_k
+).
+}</md>
+</p>
+
+<p>This form connects directly with dynamic programming.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-bellman-principle">
+<title>Bellman Principle</title>
+<p>Bellman's principle of optimality states that the remaining decisions of an
+optimal policy must themselves be optimal for the state reached after the
+first decision.</p>
+
+<p>This produces recursive optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-discrete-value-function">
+<title>Discrete-Time Value Function</title>
+<p>Define</p>
+
+<p>
+<md>\boxed{
+V_k(x)
+=
+\text{minimum future cost starting from state }x\text{ at stage }k.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+V_N(x)
+=
+\Phi(x).
+}</md>
+</p>
+
+<p>The Bellman recursion is</p>
+
+<p>
+<md>\boxed{
+V_k(x)
+=
+\min_{u\in U_k(x)}
+\left[
+L_k(x,u)
++
+V_{k+1}
+(
+f_k(x,u)
+)
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-feedback-from-bellman">
+<title>Feedback Policy From Bellman Recursion</title>
+<p>The minimizing control is</p>
+
+<p>
+<md>\boxed{
+u_k^*(x)
+\in
+\operatorname*{arg\,min}_{u}
+\left[
+L_k(x,u)
++
+V_{k+1}
+(
+f_k(x,u)
+)
+\right].
+}</md>
+</p>
+
+<p>Thus dynamic programming gives a feedback policy directly:</p>
+
+<p>
+<md>\boxed{
+u_k^*
+=
+\pi_k(x_k).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-continuous-value-function">
+<title>Continuous-Time Value Function</title>
+<p>For continuous time, define</p>
+
+<p>
+<md>\boxed{
+V(x,t)
+=
+\inf_{u(\cdot)}
+\left[
+\Phi(x(T))
++
+\int_t^T
+L
+(
+x(s),
+u(s),
+s
+)
+\,ds
+\right],
+}</md>
+</p>
+
+<p>where the trajectory starts from state <m>x</m> at time <m>t</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-hjb-equation">
+<title>Hamilton--Jacobi--Bellman Equation</title>
+<p>Under appropriate smoothness assumptions, the value function satisfies the
+Hamilton--Jacobi--Bellman equation</p>
+
+<p>
+<md>\boxed{
+-
+V_t(x,t)
+=
+\min_{u\in U}
+\left\{
+L(x,u,t)
++
+\nabla_xV(x,t)^T
+f(x,u,t)
+\right\}.
+}</md>
+</p>
+
+<p>The terminal condition is</p>
+
+<p>
+<md>\boxed{
+V(x,T)
+=
+\Phi(x).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-hjb-optimization-equation">
+<title>HJB as an Optimization Equation</title>
+<p>The expression</p>
+
+<p>
+<md>L
++
+\nabla V^Tf</md>
+</p>
+
+<p>has the same structure as the Hamiltonian</p>
+
+<p>
+<md>H
+=
+L+\lambda^Tf.</md>
+</p>
+
+<p>Indeed, when the value function is sufficiently smooth,</p>
+
+<p>
+<md>\boxed{
+\lambda
+=
+\nabla_xV
+}</md>
+</p>
+
+<p>along an optimal trajectory under standard conditions.</p>
+
+<p>Thus PMP and HJB are closely related.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-feedback-hjb">
+<title>Optimal Feedback From HJB</title>
+<p>If the minimizer is unique,</p>
+
+<p>
+<md>\boxed{
+u^*(x,t)
+=
+\operatorname*{arg\,min}_{u\in U}
+\left\{
+L(x,u,t)
++
+\nabla V(x,t)^Tf(x,u,t)
+\right\}.
+}</md>
+</p>
+
+<p>Therefore HJB produces an optimal control as a function of the state.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-worked-hjb-integrator">
+<title>Worked Example: HJB for an Integrator</title>
+<example>
+<title>Quadratic Control of an Integrator</title>
+<p>Consider</p>
+
+<p>
+<md>\dot{x}=u,</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>J
+=
+\frac12x(T)^2
++
+\frac12
+\int_t^T
+u^2\,ds.</md>
+</p>
+
+<p>The HJB equation is</p>
+
+<p>
+<md>-V_t
+=
+\min_u
+\left\{
+\frac12u^2
++
+V_xu
+\right\}.</md>
+</p>
+
+<p>Differentiate with respect to <m>u</m>:</p>
+
+<p>
+<md>u+V_x=0.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>Substitution gives</p>
+
+<p>
+<md>\boxed{
+-V_t
+=
+-\frac12V_x^2.
+}</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+V_t
+=
+\frac12V_x^2.
+}</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+u^*
+=
+-V_x.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-pmp-versus-hjb">
+<title>PMP Versus HJB</title>
+<p>Pontryagin's principle gives necessary conditions along candidate optimal
+trajectories.</p>
+
+<p>The HJB equation characterizes the optimal value function under suitable
+conditions and produces state-feedback policies.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{PMP}
+\rightarrow
+\text{trajectory-based necessary conditions},
+}</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>\boxed{
+\text{HJB}
+\rightarrow
+\text{value-function dynamic programming}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-curse-dimensionality">
+<title>Curse of Dimensionality</title>
+<p>If the state has dimension <m>n</m>, numerically approximating</p>
+
+<p>
+<md>V(x,t)</md>
+</p>
+
+<p>on a grid can require exponentially many state points.</p>
+
+<p>This is the curse of dimensionality.</p>
+
+<p>It makes classical HJB methods difficult for high-dimensional systems.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-state-constraints">
+<title>State Constraints</title>
+<p>A state may be required to satisfy</p>
+
+<p>
+<md>\boxed{
+g(x(t),t)
+\leq
+0.
+}</md>
+</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{altitude limits},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{temperature limits},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{inventory bounds},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{safety regions}.
+}</md>
+</p>
+
+<p>State constraints introduce additional multiplier and boundary conditions.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-path-constraints">
+<title>Path Constraints</title>
+<p>A general path constraint has form</p>
+
+<p>
+<md>\boxed{
+g
+(
+x(t),
+u(t),
+t
+)
+\leq
+0.
+}</md>
+</p>
+
+<p>Unlike endpoint constraints, it must hold throughout the entire time
+interval.</p>
+
+<p>Examples include actuator limits and safety constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-endpoint-constraints">
+<title>Endpoint Constraints</title>
+<p>An endpoint constraint may have form</p>
+
+<p>
+<md>\boxed{
+\Psi
+(
+x(t_0),
+x(T),
+T
+)
+=
+0.
+}</md>
+</p>
+
+<p>Endpoint multipliers then modify the transversality conditions.</p>
+
+<p>Optimal-control boundary conditions must therefore be derived from the
+specific endpoint structure.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-path-constrained-hamiltonian">
+<title>Path-Constrained Hamiltonian</title>
+<p>For inequality path constraint</p>
+
+<p>
+<md>g(x,u,t)\leq0,</md>
+</p>
+
+<p>one may introduce multiplier</p>
+
+<p>
+<md>\mu(t)\geq0.</md>
+</p>
+
+<p>An augmented Hamiltonian has form</p>
+
+<p>
+<md>\boxed{
+\mathcal{H}
+=
+L
++
+\lambda^Tf
++
+\mu^Tg.
+}</md>
+</p>
+
+<p>Complementarity conditions resemble finite-dimensional KKT conditions.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-path-complementarity">
+<title>Complementarity Along a Trajectory</title>
+<p>For suitable path inequality constraints,</p>
+
+<p>
+<md>\boxed{
+\mu_i(t)\geq0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+g_i(x,u,t)\leq0,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\mu_i(t)
+g_i(x,u,t)
+=
+0.
+}</md>
+</p>
+
+<p>Thus inactive constraints have zero multipliers, while active constraints
+may influence the optimal control.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-terminal-state-penalties">
+<title>Terminal-State Penalties</title>
+<p>Instead of requiring</p>
+
+<p>
+<md>x(T)=x_T</md>
+</p>
+
+<p>exactly, one may penalize terminal error:</p>
+
+<p>
+<md>\boxed{
+\Phi(x(T))
+=
+\frac12
+(
+x(T)-x_T
+)^T
+F
+(
+x(T)-x_T
+).
+}</md>
+</p>
+
+<p>This permits a tradeoff between final accuracy and control effort.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-hard-versus-soft-control">
+<title>Hard Versus Soft Constraints</title>
+<p>A hard constraint must be satisfied:</p>
+
+<p>
+<md>\boxed{
+g(x,u,t)\leq0.
+}</md>
+</p>
+
+<p>A soft constraint can be violated at a penalty.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+J
+=
+J_0
++
+\rho
+\int
+[g(x,u,t)]_+^2dt.
+}</md>
+</p>
+
+<p>Soft constraints can improve numerical feasibility but no longer guarantee
+exact satisfaction.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-discounted-infinite-horizon-control">
+<title>Discounted Infinite-Horizon Control</title>
+<p>In economics and other applications, future costs may be discounted:</p>
+
+<p>
+<md>\boxed{
+J
+=
+\int_0^\infty
+e^{-\rho t}
+L(x(t),u(t))
+\,dt,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\rho&gt;0
+}</md>
+</p>
+
+<p>is a discount rate.</p>
+
+<p>Future costs receive less weight than immediate costs.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-economics">
+<title>Optimal Control in Economics</title>
+<p>An economic state might be capital</p>
+
+<p>
+<md>K(t),</md>
+</p>
+
+<p>with dynamics</p>
+
+<p>
+<md>\boxed{
+\dot{K}
+=
+F(K)
+-
+C
+-
+\delta K,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>C(t)</md>
+</p>
+
+<p>is consumption.</p>
+
+<p>An objective may maximize discounted utility:</p>
+
+<p>
+<md>\boxed{
+\max
+\int_0^\infty
+e^{-\rho t}
+U(C(t))
+\,dt.
+}</md>
+</p>
+
+<p>Optimal-control methods then determine the consumption path.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-current-value-hamiltonian">
+<title>Current-Value Hamiltonian Preview</title>
+<p>For discounted economic problems, one may transform the costate and define
+a current-value Hamiltonian.</p>
+
+<p>This removes the explicit discount factor from some first-order
+conditions.</p>
+
+<p>Care is required because the current-value costate equation differs from
+the ordinary present-value equation.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-biological">
+<title>Optimal Control in Biological Systems</title>
+<p>Optimal control can model interventions in systems such as:</p>
+
+<p>
+<md>\boxed{
+\text{epidemics},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{harvesting},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{drug treatment},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{population management}.
+}</md>
+</p>
+
+<p>The state equations are often nonlinear differential equations.</p>
+
+<p>Controls represent intervention intensity.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-epidemic-control-example">
+<title>Epidemic-Control Example</title>
+<p>Suppose infection level is <m>I(t)</m> and intervention intensity is <m>u(t)</m>.</p>
+
+<p>A schematic objective could be</p>
+
+<p>
+<md>\boxed{
+J
+=
+\int_0^T
+\left[
+aI(t)^2
++
+bu(t)^2
+\right]dt.
+}</md>
+</p>
+
+<p>The first term penalizes infection.</p>
+
+<p>The second penalizes intervention cost.</p>
+
+<p>The state equations constrain how intervention changes epidemic dynamics.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-trajectory-optimization">
+<title>Trajectory Optimization</title>
+<p>Trajectory optimization is optimal control applied to motion planning.</p>
+
+<p>The state may contain</p>
+
+<p>
+<md>\boxed{
+\text{position}
++
+\text{velocity}
++
+\text{orientation}.
+}</md>
+</p>
+
+<p>Controls may include forces, torques, steering, or thrust.</p>
+
+<p>Constraints may enforce:</p>
+
+<p>
+<md>\boxed{
+\text{dynamics},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{obstacle avoidance},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{actuator limits}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-model-predictive-control">
+<title>Model Predictive Control</title>
+<p>Model Predictive Control, abbreviated MPC, repeatedly solves a finite-
+horizon optimal-control problem.</p>
+
+<p>At each update:</p>
+
+<p>
+<ol>
+<li>
+<p>measure or estimate the current state;</p>
+</li>
+<li>
+<p>solve a finite-horizon control problem;</p>
+</li>
+<li>
+<p>apply only the first control action;</p>
+</li>
+<li>
+<p>advance the system;</p>
+</li>
+<li>
+<p>measure the new state;</p>
+</li>
+<li>
+<p>solve again.</p>
+</li>
+</ol>
+</p>
+
+<p>This is also called receding-horizon control.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-why-mpc-feedback">
+<title>Why MPC Uses Feedback</title>
+<p>Although each finite-horizon optimization produces an open-loop sequence,
+MPC repeatedly resolves the problem using the current measured state.</p>
+
+<p>Thus the overall implementation creates feedback.</p>
+
+<p>It can respond to:</p>
+
+<p>
+<md>\boxed{
+\text{disturbances},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{forecast changes},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{model mismatch}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-mpc-objective">
+<title>MPC Objective</title>
+<p>A discrete-time MPC objective may be</p>
+
+<p>
+<md>\boxed{
+\sum_{k=0}^{N-1}
+\left[
+(x_k-x_r)^TQ(x_k-x_r)
++
+u_k^TRu_k
+\right]
++
+(x_N-x_r)^TP(x_N-x_r).
+}</md>
+</p>
+
+<p>Constraints are imposed over the prediction horizon.</p>
+
+<p>Only <m>u_0</m> is implemented before optimization is repeated.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-constrained-mpc">
+<title>Constrained MPC</title>
+<p>MPC is particularly useful because it can handle constraints such as</p>
+
+<p>
+<md>\boxed{
+u_{\min}\leq u_k\leq u_{\max},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+x_{\min}\leq x_k\leq x_{\max}.
+}</md>
+</p>
+
+<p>For linear dynamics and quadratic costs with linear constraints, each MPC
+step may become a quadratic program.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-indirect-optimal-control-methods">
+<title>Indirect Numerical Methods</title>
+<p>Indirect methods first derive necessary optimality conditions.</p>
+
+<p>One then solves:</p>
+
+<p>
+<md>\boxed{
+\text{state equations}
++
+\text{costate equations}
++
+\text{optimality conditions}
++
+\text{boundary conditions}.
+}</md>
+</p>
+
+<p>Examples include shooting and multiple-shooting methods.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-shooting-method">
+<title>Shooting Method</title>
+<p>In a shooting method, unknown initial costate values are guessed.</p>
+
+<p>The state-costate differential equations are integrated.</p>
+
+<p>The resulting terminal error is used to update the initial costate guess.</p>
+
+<p>Thus a boundary-value problem is transformed into a nonlinear root-finding
+problem.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-shooting-sensitivity">
+<title>Sensitivity of Shooting Methods</title>
+<p>Shooting can be extremely sensitive to the initial costate guess.</p>
+
+<p>Small changes in the initial adjoint can lead to large terminal-state
+changes.</p>
+
+<p>This is especially problematic for:</p>
+
+<p>
+<md>\boxed{
+\text{long horizons},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{unstable dynamics},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{strong nonlinearities}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-multiple-shooting">
+<title>Multiple Shooting</title>
+<p>Multiple shooting divides the horizon into several intervals.</p>
+
+<p>Separate initial states or costates are introduced for each interval.</p>
+
+<p>Continuity constraints then connect neighboring segments.</p>
+
+<p>This often improves numerical stability compared with single shooting.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-direct-optimal-control-methods">
+<title>Direct Numerical Methods</title>
+<p>Direct methods discretize the control problem before deriving optimization
+conditions.</p>
+
+<p>The result is a finite-dimensional nonlinear program or quadratic program.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{optimal control problem}
+\rightarrow
+\text{nonlinear programming problem}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-control-parameterization">
+<title>Control Parameterization</title>
+<p>Approximate the control by finitely many parameters.</p>
+
+<p>For piecewise-constant control,</p>
+
+<p>
+<md>\boxed{
+u(t)
+=
+u_k,
+\qquad
+t_k\leq t&lt;t_{k+1}.
+}</md>
+</p>
+
+<p>The decision variables become</p>
+
+<p>
+<md>\boxed{
+u_0,u_1,\ldots,u_{N-1}.
+}</md>
+</p>
+
+<p>The state equations are integrated numerically.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-direct-transcription">
+<title>Direct Transcription</title>
+<p>Direct transcription discretizes both states and controls.</p>
+
+<p>For example, Euler discretization gives</p>
+
+<p>
+<md>\boxed{
+x_{k+1}
+=
+x_k
++
+h
+f(x_k,u_k,t_k).
+}</md>
+</p>
+
+<p>These equations become equality constraints in a finite-dimensional
+optimization problem.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-trapezoidal-transcription">
+<title>Trapezoidal Transcription</title>
+<p>A more accurate approximation is</p>
+
+<p>
+<md>\boxed{
+x_{k+1}
+-
+x_k
+=
+\frac{h}{2}
+\left[
+f(x_k,u_k,t_k)
++
+f(x_{k+1},u_{k+1},t_{k+1})
+\right].
+}</md>
+</p>
+
+<p>This is based on the trapezoidal integration rule.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-collocation">
+<title>Collocation</title>
+<p>Collocation approximates the state trajectory with polynomial functions
+and enforces the differential equation at selected collocation points.</p>
+
+<p>High-order collocation methods can achieve accurate trajectories with
+relatively few mesh intervals.</p>
+
+<p>They are widely used in practical trajectory optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-direct-versus-indirect">
+<title>Direct Versus Indirect Methods</title>
+<p>Indirect methods:</p>
+
+<p>
+<md>\boxed{
+\text{derive optimality equations first}.
+}</md>
+</p>
+
+<p>Direct methods:</p>
+
+<p>
+<md>\boxed{
+\text{discretize first and solve numerically}.
+}</md>
+</p>
+
+<p>Indirect methods can provide high accuracy and analytical insight.</p>
+
+<p>Direct methods are usually easier to apply to complicated constrained
+problems.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-mesh-refinement">
+<title>Mesh Refinement</title>
+<p>A direct solution depends on the discretization mesh.</p>
+
+<p>After solving, one may:</p>
+
+<p>
+<ol>
+<li>
+<p>estimate discretization error;</p>
+</li>
+<li>
+<p>refine intervals with large error;</p>
+</li>
+<li>
+<p>resolve the optimization problem;</p>
+</li>
+<li>
+<p>repeat until accuracy is acceptable.</p>
+</li>
+</ol>
+</p>
+
+<p>This is called mesh refinement.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-control-saturation">
+<title>Control Saturation</title>
+<p>A computed unconstrained control may exceed physical actuator limits.</p>
+
+<p>For example,</p>
+
+<p>
+<md>u^*_{\mathrm{free}}
+=
+-Kx</md>
+</p>
+
+<p>may violate</p>
+
+<p>
+<md>u_{\min}
+\leq
+u
+\leq
+u_{\max}.</md>
+</p>
+
+<p>Simply clipping the control may not preserve global optimality.</p>
+
+<p>The bounds should ideally be included in the optimization problem itself.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-state-estimation-control">
+<title>State Estimation and Control</title>
+<p>Feedback control requires knowledge of the state.</p>
+
+<p>If the entire state is not measured, an estimator may be used.</p>
+
+<p>This leads to the combination of:</p>
+
+<p>
+<md>\boxed{
+\text{state estimation}
++
+\text{optimal control}.
+}</md>
+</p>
+
+<p>For linear Gaussian systems, the Kalman filter and LQR combine into the
+Linear-Quadratic-Gaussian framework under standard assumptions.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-stochastic-optimal-control">
+<title>Stochastic Optimal Control</title>
+<p>Suppose dynamics include random disturbances:</p>
+
+<p>
+<md>\boxed{
+dX_t
+=
+b
+(
+X_t,
+u_t,t
+)
+\,dt
++
+\sigma
+(
+X_t,u_t,t
+)
+\,dW_t,
+}</md>
+</p>
+
+<p>where <m>W_t</m> is Brownian motion.</p>
+
+<p>The objective may be</p>
+
+<p>
+<md>\boxed{
+\min
+\mathbb{E}
+\left[
+\Phi(X_T)
++
+\int_t^T
+L(X_s,u_s,s)\,ds
+\right].
+}</md>
+</p>
+
+<p>This is a stochastic optimal-control problem.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-stochastic-hjb">
+<title>Stochastic HJB Equation</title>
+<p>Under appropriate smoothness assumptions, the value function can satisfy</p>
+
+<p>
+<md>\boxed{
+-
+V_t
+=
+\min_u
+\left\{
+L
++
+\nabla V^T b
++
+\frac12
+\operatorname{tr}
+\left(
+\sigma\sigma^T
+\nabla^2V
+\right)
+\right\}.
+}</md>
+</p>
+
+<p>The second-derivative term arises from the diffusion process.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-deterministic-hjb-special-case">
+<title>Deterministic HJB as a Special Case</title>
+<p>If</p>
+
+<p>
+<md>\boxed{
+\sigma=0,
+}</md>
+</p>
+
+<p>the diffusion term disappears.</p>
+
+<p>Then the stochastic HJB equation reduces to</p>
+
+<p>
+<md>\boxed{
+-
+V_t
+=
+\min_u
+\left\{
+L
++
+\nabla V^Tf
+\right\},
+}</md>
+</p>
+
+<p>which is the deterministic HJB equation.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-lqg-preview">
+<title>Linear-Quadratic-Gaussian Control Preview</title>
+<p>Linear-Quadratic-Gaussian control combines:</p>
+
+<p>
+<md>\boxed{
+\text{linear dynamics},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{quadratic costs},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{Gaussian disturbances and measurement noise}.
+}</md>
+</p>
+
+<p>Under standard assumptions, optimal state estimation and optimal linear
+feedback can be designed separately.</p>
+
+<p>This is known as the separation principle.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-reinforcement-learning">
+<title>Optimal Control and Reinforcement Learning</title>
+<p>Dynamic programming in optimal control and reinforcement learning share
+the Bellman principle.</p>
+
+<p>Optimal control usually begins with a known mathematical model.</p>
+
+<p>Reinforcement learning may instead learn value functions or policies from
+interaction or data.</p>
+
+<p>The mathematical bridge includes:</p>
+
+<p>
+<md>\boxed{
+\text{value functions},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Bellman equations},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{policies}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-policy-iteration-control">
+<title>Policy Iteration Preview</title>
+<p>Policy iteration alternates between:</p>
+
+<p>
+<md>\boxed{
+\text{policy evaluation}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{policy improvement}.
+}</md>
+</p>
+
+<p>Given policy <m>\pi</m>, first evaluate its value.</p>
+
+<p>Then choose controls that improve the Bellman objective.</p>
+
+<p>Repeat until the policy stabilizes.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-value-iteration-control">
+<title>Value Iteration Preview</title>
+<p>Value iteration repeatedly applies a Bellman operator.</p>
+
+<p>For discrete time,</p>
+
+<p>
+<md>\boxed{
+V_{k+1}(x)
+=
+\min_u
+\left[
+L(x,u)
++
+\gamma
+V_k
+(
+f(x,u)
+)
+\right]
+}</md>
+</p>
+
+<p>in a discounted deterministic setting.</p>
+
+<p>The method seeks the fixed point of the Bellman equation.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-optimization-connection">
+<title>Optimal Control and Optimization</title>
+<p>Ordinary optimization selects a finite-dimensional variable:</p>
+
+<p>
+<md>\boxed{
+x\in\mathbb{R}^n.
+}</md>
+</p>
+
+<p>Optimal control selects an entire function:</p>
+
+<p>
+<md>\boxed{
+u(\cdot).
+}</md>
+</p>
+
+<p>Thus optimal control is an infinite-dimensional optimization problem with
+differential constraints.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-dp-connection">
+<title>Optimal Control and Dynamic Programming</title>
+<p>Dynamic programming converts a global trajectory problem into local
+recursive decisions.</p>
+
+<p>The state summarizes all information relevant to future optimization.</p>
+
+<p>The value function summarizes the optimal future cost.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{state}
++
+\text{Bellman principle}
++
+\text{value function}
+}</md>
+</p>
+
+<p>form the central dynamic-programming view of optimal control.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-nlp-connection">
+<title>Optimal Control and Nonlinear Programming</title>
+<p>After direct transcription,</p>
+
+<p>
+<md>\boxed{
+\text{states}
++
+\text{controls}
+}</md>
+</p>
+
+<p>at discretization points become ordinary optimization variables.</p>
+
+<p>Dynamics become equality constraints.</p>
+
+<p>Path constraints become inequalities.</p>
+
+<p>Thus nonlinear-programming algorithms can solve large optimal-control
+problems numerically.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-ode-connection">
+<title>Optimal Control and Differential Equations</title>
+<p>The state dynamics determine what trajectories are physically possible.</p>
+
+<p>Optimal-control algorithms repeatedly solve or approximate differential
+equations.</p>
+
+<p>Therefore numerical ODE accuracy can directly affect optimization
+accuracy.</p>
+
+<p>This creates a strong connection with Chapter 9 and Chapter 11.</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-workflow">
+<title>Optimal Control Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify the state variables;</p>
+</li>
+<li>
+<p>identify the control variables;</p>
+</li>
+<li>
+<p>construct the dynamical equations;</p>
+</li>
+<li>
+<p>specify initial conditions;</p>
+</li>
+<li>
+<p>specify terminal conditions;</p>
+</li>
+<li>
+<p>define running and terminal costs;</p>
+</li>
+<li>
+<p>specify control bounds;</p>
+</li>
+<li>
+<p>specify state and path constraints;</p>
+</li>
+<li>
+<p>determine whether terminal time is fixed or free;</p>
+</li>
+<li>
+<p>check reachability or controllability when appropriate;</p>
+</li>
+<li>
+<p>determine whether analytical optimality conditions are useful;</p>
+</li>
+<li>
+<p>construct the Hamiltonian for an indirect approach;</p>
+</li>
+<li>
+<p>derive state, costate, stationarity, and transversality
+          conditions;</p>
+</li>
+<li>
+<p>alternatively formulate the Bellman or HJB equation;</p>
+</li>
+<li>
+<p>choose direct or indirect numerical methods;</p>
+</li>
+<li>
+<p>solve the resulting boundary-value or nonlinear optimization
+          problem;</p>
+</li>
+<li>
+<p>verify dynamical feasibility;</p>
+</li>
+<li>
+<p>inspect active constraints and switching behavior;</p>
+</li>
+<li>
+<p>test sensitivity to model parameters;</p>
+</li>
+<li>
+<p>simulate the resulting control under perturbed conditions;</p>
+</li>
+<li>
+<p>implement feedback when robustness to disturbances is needed.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-choosing-optimal-control-method">
+<title>Choosing an Optimal-Control Method</title>
+<p>For analytical necessary conditions, consider:</p>
+
+<p>
+<md>\boxed{
+\text{Pontryagin's Maximum Principle}.
+}</md>
+</p>
+
+<p>For small-state feedback problems, consider:</p>
+
+<p>
+<md>\boxed{
+\text{dynamic programming and HJB}.
+}</md>
+</p>
+
+<p>For linear systems with quadratic objectives, use:</p>
+
+<p>
+<md>\boxed{
+\text{LQR}.
+}</md>
+</p>
+
+<p>For constrained real-time control, consider:</p>
+
+<p>
+<md>\boxed{
+\text{MPC}.
+}</md>
+</p>
+
+<p>For complicated nonlinear constrained trajectories, consider:</p>
+
+<p>
+<md>\boxed{
+\text{direct transcription or collocation}.
+}</md>
+</p>
+
+<p>For smooth boundary-value problems with good initial guesses, consider:</p>
+
+<p>
+<md>\boxed{
+\text{shooting methods}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-treating-state-and-control-as-independent-variables">
+<title>Treating State and Control as Independent Variables</title>
+<p>The state must satisfy</p>
+
+<p>
+<md>\boxed{
+\dot{x}=f(x,u,t).
+}</md>
+</p>
+
+<p>One cannot optimize <m>x(t)</m> independently of the dynamics.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-inconsistent-hamiltonian-signs">
+<title>Using Inconsistent Hamiltonian Signs</title>
+<p>If using</p>
+
+<p>
+<md>H=L+\lambda^Tf</md>
+</p>
+
+<p>for minimization, minimize the Hamiltonian with respect to the control.</p>
+
+<p>If using another convention, all costate and extremum conditions must be
+changed consistently.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-the-costate-equation">
+<title>Forgetting the Costate Equation</title>
+<p>The state equation alone does not produce Pontryagin optimality.</p>
+
+<p>The coupled system includes</p>
+
+<p>
+<md>\boxed{
+\dot{\lambda}
+=
+-H_x.
+}</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-terminal-conditions">
+<title>Forgetting Terminal Conditions</title>
+<p>The state usually has an initial condition.</p>
+
+<p>The costate often has a terminal condition.</p>
+
+<p>Without the correct endpoint conditions, the boundary-value problem is
+incomplete.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-h-u-0-with-a-boundary-control">
+<title>Using <m>H_u=0</m> With a Boundary Control</title>
+<p>The condition</p>
+
+<p>
+<md>H_u=0</md>
+</p>
+
+<p>applies to suitable interior controls.</p>
+
+<p>With bounds, the optimum may lie at</p>
+
+<p>
+<md>u_{\min}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>u_{\max}.</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-bang-bang-control-for-every-bounded-problem">
+<title>Assuming Bang-Bang Control for Every Bounded Problem</title>
+<p>Bang-bang behavior commonly arises when the Hamiltonian is affine in the
+control.</p>
+
+<p>Quadratic control penalties typically produce interior controls instead.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-singular-controls">
+<title>Ignoring Singular Controls</title>
+<p>If the switching function vanishes over an interval, ordinary bang-bang
+logic may fail.</p>
+
+<p>Additional analysis is required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-pmp-conditions-with-a-global-optimality-proof">
+<title>Confusing PMP Conditions With a Global Optimality Proof</title>
+<p>Pontryagin conditions are generally necessary conditions.</p>
+
+<p>A trajectory satisfying them need not automatically be the global optimum.</p>
+
+<p>Convexity or additional verification conditions may be needed.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-open-loop-and-feedback-solutions">
+<title>Confusing Open-Loop and Feedback Solutions</title>
+<p>A precomputed function <m>u(t)</m> does not react directly to state errors.</p>
+
+<p>A feedback law</p>
+
+<p>
+<md>u=\pi(x,t)</md>
+</p>
+
+<p>does.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-11-optimization-operations-research-16-optimal-control-subsubsec-ignoring-controllability">
+<title>Ignoring Controllability</title>
+<p>If the target state cannot be reached under the dynamics, no optimization
+algorithm can produce a feasible trajectory satisfying the target exactly.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-units-in-quadratic-costs">
+<title>Ignoring Units in Quadratic Costs</title>
+<p>Terms such as</p>
+
+<p>
+<md>x^TQx</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>u^TRu</md>
+</p>
+
+<p>may use different physical units.</p>
+
+<p>The weights <m>Q</m> and <m>R</m> should be chosen with scaling and physical
+interpretation in mind.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-larger-lqr-weight-always-improves-performance">
+<title>Assuming Larger LQR Weight Always Improves Performance</title>
+<p>Increasing a state penalty can require much larger control effort.</p>
+
+<p>Actuator constraints and model error may make aggressive gains
+undesirable.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-control-saturation">
+<title>Ignoring Control Saturation</title>
+<p>An unconstrained LQR solution may request physically impossible control.</p>
+
+<p>Actuator limits should be included when they materially affect operation.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-hjb-with-an-ordinary-differential-equation">
+<title>Confusing HJB With an Ordinary Differential Equation</title>
+<p>For multidimensional continuous-state problems, HJB is generally a
+nonlinear partial differential equation.</p>
+
+<p>Its numerical solution can be difficult.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-11-optimization-operations-research-16-optimal-control-subsubsec-ignoring-the-curse-of-dimensionality">
+<title>Ignoring the Curse of Dimensionality</title>
+<p>A grid-based dynamic-programming method may become impractical as state
+dimension grows.</p>
+
+<p>Alternative approximations may be required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-too-coarse-a-direct-transcription-mesh">
+<title>Using Too Coarse a Direct-Transcription Mesh</title>
+<p>A discretized trajectory can satisfy the numerical NLP while poorly
+approximating the true continuous dynamics.</p>
+
+<p>Mesh refinement and simulation verification are important.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-a-numerical-solver-s-success-flag-proves-physical-feasibility">
+<title>Assuming a Numerical Solver's Success Flag Proves Physical Feasibility</title>
+<p>The optimized trajectory should be independently checked by integrating
+the original dynamics and evaluating all constraints.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-model-error">
+<title>Ignoring Model Error</title>
+<p>An open-loop optimum for an inaccurate model may perform poorly in the
+physical system.</p>
+
+<p>Feedback, robust control, stochastic control, or repeated reoptimization
+may be needed.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Aerospace.</em>
+Optimal control determines launch, spacecraft, aircraft, descent, and
+minimum-fuel trajectories.</p>
+
+<p>\medskip</p>
+
+<p><em>Robotics.</em>
+Robots optimize motion while respecting nonlinear dynamics, actuator
+limits, contact constraints, and obstacle avoidance.</p>
+
+<p>\medskip</p>
+
+<p><em>Automotive Systems.</em>
+Optimal control is used for trajectory tracking, autonomous driving,
+energy management, and vehicle stability.</p>
+
+<p>\medskip</p>
+
+<p><em>Energy Systems.</em>
+Batteries, generators, storage systems, and grids require time-dependent
+control under physical and economic constraints.</p>
+
+<p>\medskip</p>
+
+<p><em>Economics.</em>
+Consumption, investment, resource extraction, and capital accumulation can
+be formulated as intertemporal control problems.</p>
+
+<p>\medskip</p>
+
+<p><em>Biology and Medicine.</em>
+Intervention schedules can be optimized for epidemics, drug dosing,
+population management, and treatment planning.</p>
+
+<p>\medskip</p>
+
+<p><em>Manufacturing.</em>
+Production rates, temperatures, pressures, and process conditions can be
+optimized dynamically.</p>
+
+<p>\medskip</p>
+
+<p><em>Finance.</em>
+Portfolio and consumption decisions over continuous time lead to
+stochastic optimal-control models.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define a state variable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a control variable.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define running cost.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define terminal cost.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an admissible control.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Distinguish open-loop and feedback control.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the general Bolza optimal-control problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the Hamiltonian using the minimization convention of this section.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the costate equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the HJB equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>\dot{x}=ax+bu,</md>
+</p>
+
+<p>and running cost</p>
+
+<p>
+<md>L=\frac12(qx^2+ru^2),</md>
+</p>
+
+<p>construct the Hamiltonian.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Differentiate the previous Hamiltonian with respect to <m>u</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve the resulting stationarity equation for <m>u</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the costate equation for the same problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For terminal cost</p>
+
+<p>
+<md>\Phi(x(T))
+=
+\frac12Fx(T)^2,</md>
+</p>
+
+<p>determine the costate terminal condition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve the problem</p>
+
+<p>
+<md>\dot{x}=u,
+\qquad
+x(0)=x_0,</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>J
+=
+\frac12x(T)^2
++
+\frac12
+\int_0^Tu^2dt</md>
+</p>
+
+<p>using Pontryagin's conditions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify the optimal state and control obtained in the previous problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the Hamiltonian for a minimum-time problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why bounded minimum-time controls often have bang-bang structure.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Given switching function</p>
+
+<p>
+<md>\psi(t)=2-t</md>
+</p>
+
+<p>and control bounds</p>
+
+<p>
+<md>-1\leq u\leq1,</md>
+</p>
+
+<p>determine the minimizing bang-bang control away from the switching time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the switching time in the previous problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain what a singular arc means.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the Hamiltonian for the finite-horizon LQR problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive</p>
+
+<p>
+<md>u^*
+=
+-R^{-1}B^T\lambda.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the LQR costate equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Assume</p>
+
+<p>
+<md>\lambda=Px</md>
+</p>
+
+<p>and derive the Riccati differential equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the finite-horizon LQR feedback law.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the roles of <m>Q</m> and <m>R</m> in LQR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the algebraic Riccati equation for infinite-horizon continuous-time
+LQR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the controllability matrix for a two-dimensional linear system.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the system is controllable by calculating its rank.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a discrete-time finite-horizon optimal-control problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive its Bellman recursion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how Bellman recursion produces feedback.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the deterministic continuous-time HJB equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>\dot{x}=u,
+\qquad
+L=\frac12u^2,</md>
+</p>
+
+<p>find the HJB minimizing control in terms of <m>V_x</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the relationship between the costate and value-function gradient.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare PMP and HJB approaches.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a bounded state constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a bounded control constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write an augmented Hamiltonian for a path inequality constraint.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the corresponding complementarity conditions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a quadratic trajectory-tracking objective.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct an MPC objective for a discrete-time linear system.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the receding-horizon principle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why MPC produces feedback despite solving an open-loop trajectory
+at each update.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Discretize</p>
+
+<p>
+<md>\dot{x}=f(x,u,t)</md>
+</p>
+
+<p>using forward Euler.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Discretize the same dynamics using the trapezoidal rule.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain direct transcription.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the shooting method.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare direct and indirect numerical methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why mesh refinement may be necessary.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write a stochastic controlled diffusion.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the additional second-order term in the stochastic HJB equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the relationship between optimal control and reinforcement
+learning.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive Pontryagin's necessary conditions using constrained variational
+arguments.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study transversality conditions for free terminal states.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study transversality conditions for free terminal time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study abnormal extremals in Pontryagin's Maximum Principle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study sufficient optimality conditions for convex optimal-control
+problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate bang-bang optimal control for a double integrator.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the switching curve for minimum-time double-integrator control.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study singular optimal controls.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the Legendre--Clebsch condition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive finite-horizon LQR using dynamic programming instead of PMP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the HJB quadratic ansatz produces the Riccati equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study stabilizability and detectability conditions for infinite-horizon
+LQR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study discrete-time LQR and the discrete Riccati equation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the Hamilton--Jacobi--Bellman verification theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study viscosity solutions of HJB equations conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate the curse of dimensionality in numerical dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study state-constrained Pontryagin conditions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study direct collocation methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study pseudospectral optimal-control methods.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate multiple shooting for nonlinear trajectory optimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study sequential quadratic programming for direct transcription.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study constrained linear MPC.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate terminal sets and stability in MPC.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study stochastic HJB equations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Linear-Quadratic-Gaussian control and the separation principle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate risk-sensitive optimal control.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study robust optimal control.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate differential games as a connection between optimal control and
+game theory.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-summary">
+<title>Conceptual Summary</title>
+<p>Optimal control optimizes decisions distributed over time while respecting
+dynamical equations.</p>
+
+<p>A general problem is</p>
+
+<p>
+<md>\boxed{
+\min_{u(\cdot)}
+\left[
+\Phi(x(T),T)
++
+\int_{t_0}^{T}
+L(x,u,t)\,dt
+\right]
+}</md>
+</p>
+
+<p>subject to</p>
+
+<p>
+<md>\boxed{
+\dot{x}=f(x,u,t).
+}</md>
+</p>
+
+<p>Using the minimization convention,</p>
+
+<p>
+<md>\boxed{
+H
+=
+L+\lambda^Tf.
+}</md>
+</p>
+
+<p>Pontryagin's necessary conditions include</p>
+
+<p>
+<md>\boxed{
+\dot{x}
+=
+H_\lambda,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\dot{\lambda}
+=
+-H_x,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+u^*
+\in
+\operatorname*{arg\,min}_{u\in U}H.
+}</md>
+</p>
+
+<p>For an unconstrained interior control,</p>
+
+<p>
+<md>\boxed{
+H_u=0.
+}</md>
+</p>
+
+<p>Dynamic programming introduces the value function and HJB equation:</p>
+
+<p>
+<md>\boxed{
+-V_t
+=
+\min_u
+\left\{
+L
++
+\nabla V^Tf
+\right\}.
+}</md>
+</p>
+
+<p>For linear-quadratic control,</p>
+
+<p>
+<md>\boxed{
+\dot{x}=Ax+Bu
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+J
+=
+\frac12x(T)^TFx(T)
++
+\frac12
+\int
+(
+x^TQx+u^TRu
+)dt,
+}</md>
+</p>
+
+<p>the optimal feedback is</p>
+
+<p>
+<md>\boxed{
+u^*
+=
+-
+R^{-1}B^TPx,
+}</md>
+</p>
+
+<p>where <m>P</m> satisfies a Riccati equation.</p>
+
+<p>Modern optimal control therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{optimization}
++
+\text{differential equations}
++
+\text{dynamic programming}
++
+\text{numerical computation}
++
+\text{feedback}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-16-optimal-control-subsec-optimal-control-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Optimal Control completes Chapter 10 by extending optimization from
+finite-dimensional decision vectors to time-dependent decisions governed
+by dynamical systems. Pontryagin's Maximum Principle generalizes
+Lagrange-multiplier reasoning to differential constraints, while the
+Hamilton--Jacobi--Bellman equation connects Optimal Control directly with
+Dynamic Programming. Linear-quadratic regulation provides one of the most
+important analytically solvable control families, and direct transcription
+connects modern trajectory optimization with nonlinear programming.
+Stochastic Optimal Control extends these ideas using the stochastic
+processes of Chapter 7. The next chapter, Numerical and Computational
+Mathematics, develops the computational methods required to solve many of
+the nonlinear equations, differential equations, optimization problems,
+Monte Carlo models, and large numerical systems encountered throughout
+advanced mathematics.</p>
+</remark>
+</subsection>
+
 </section>

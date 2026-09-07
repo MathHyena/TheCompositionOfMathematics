@@ -1,9 +1,2989 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-02-algebra-11-representation-theory">
-  <title>Representation Theory</title>
+<section xml:id="sec-representation-theory">
+<title>Representation Theory</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Linear algebra from <xref ref="sec-linear-algebra" />, group theory from
+<xref ref="sec-group-theory" />, module theory from <xref ref="sec-module-theory" />, and
+noncommutative algebra from <xref ref="sec-noncommutative-algebra" />.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain the purpose of representing abstract algebraic objects by linear transformations;</p>
+</li>
+<li>
+<p>define a group representation and its degree;</p>
+</li>
+<li>
+<p>distinguish faithful, trivial, permutation, regular, and irreducible representations;</p>
+</li>
+<li>
+<p>convert between linear transformations and matrix representations;</p>
+</li>
+<li>
+<p>determine invariant subspaces and subrepresentations;</p>
+</li>
+<li>
+<p>define reducible and irreducible representations;</p>
+</li>
+<li>
+<p>construct direct sums of representations;</p>
+</li>
+<li>
+<p>define equivalent representations and intertwining maps;</p>
+</li>
+<li>
+<p>explain representations as modules over group algebras;</p>
+</li>
+<li>
+<p>state and apply Maschke's theorem;</p>
+</li>
+<li>
+<p>define characters and compute basic character values;</p>
+</li>
+<li>
+<p>use character inner products to test irreducibility and equivalence;</p>
+</li>
+<li>
+<p>understand the basic structure of character tables;</p>
+</li>
+<li>
+<p>recognize the regular representation and its decomposition;</p>
+</li>
+<li>
+<p>define tensor-product, dual, and quotient representations;</p>
+</li>
+<li>
+<p>explain Schur's lemma and its structural significance;</p>
+</li>
+<li>
+<p>connect representation theory with symmetry, geometry, physics, and later Lie theory.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-11-representation-theory-subsec-why-representation-theory">
+<title>Why Representation Theory?</title>
+<p>Abstract algebra studies structures such as groups, rings, and algebras.
+These objects may be difficult to visualize or calculate with directly.</p>
+
+<p>Representation theory replaces abstract elements by linear transformations.</p>
+
+<p>The central idea is</p>
+
+<p>\begin{tikzpicture}[
+    node distance=15mm,
+    box/.style={draw,rounded corners,align=center,inner sep=6pt},
+    &gt;=stealth
+]
+\node[box] (abstract) {Abstract\\algebraic object};
+\node[box,right=of abstract] (linear) {Linear\\transformations};
+\node[box,right=of linear] (matrix) {Matrices};
+\node[box,below=of linear] (tools) {Linear algebra\\tools};</p>
+
+<p>\draw[-&gt;,thick] (abstract)--node[above]{represent}(linear);
+\draw[-&gt;,thick] (linear)--node[above]{choose a basis}(matrix);
+\draw[-&gt;,thick] (matrix)--(tools);
+\draw[-&gt;,thick] (linear)--(tools);
+\end{tikzpicture}</p>
+
+<p>Instead of studying an abstract group element <m>g</m>, one studies a matrix</p>
+
+<p>
+<md>\rho(g).</md>
+</p>
+
+<p>This allows algebraic structure to be investigated using eigenvalues,
+eigenvectors, determinants, traces, invariant subspaces, and other tools from
+linear algebra.</p>
+
+<p>\begin{conceptbox}
+Representation theory translates abstract algebra into linear algebra.</p>
+
+<p>The abstract multiplication law is preserved, but its elements become
+concrete linear transformations or matrices.
+\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-group-representations">
+<title>Group Representations</title>
+<p>Let <m>G</m> be a group and <m>V</m> a vector space over a field <m>F</m>.</p>
+
+<definition>
+<title>Group Representation</title>
+<statement>
+<p>A <em>representation</em> of <m>G</m> on <m>V</m> is a group homomorphism</p>
+
+<p>
+<md>\rho:G\to GL(V).</md>
+</p>
+</statement>
+</definition>
+
+<p>The Greek letter</p>
+
+<p>
+<md>\rho</md>
+</p>
+
+<p>is rho, pronounced <q>row.</q></p>
+
+<p>The notation</p>
+
+<p>
+<md>GL(V)</md>
+</p>
+
+<p>denotes the group of invertible linear transformations from <m>V</m> to itself
+and is read <q>general linear group of @@PROTECTED1@@.</q></p>
+
+<p>Thus</p>
+
+<p>
+<md>\rho:G\to GL(V)</md>
+</p>
+
+<p>is read:</p>
+
+<p><q>rho is a representation of @@PROTECTED0@@ on @@PROTECTED1@@,</q></p>
+
+<p>or more literally,</p>
+
+<p><q>rho maps @@PROTECTED0@@ into the general linear group of @@PROTECTED1@@.</q></p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-homomorphism-condition">
+<title>The Homomorphism Condition</title>
+<p>Because <m>\rho</m> is a group homomorphism,</p>
+
+<p>
+<md>\rho(gh)=\rho(g)\rho(h)</md>
+</p>
+
+<p>for all <m>g,h\in G</m>.</p>
+
+<p>Also,</p>
+
+<p>
+<md>\rho(e)=I_V</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\rho(g^{-1})=\rho(g)^{-1}.</md>
+</p>
+
+<p>Therefore the representation preserves the multiplication structure of the
+group.</p>
+
+<p>\begin{importantbox}
+A representation does not assign arbitrary matrices to group elements.</p>
+
+<p>The matrices must preserve the group law:</p>
+
+<p>
+<md>\rho(gh)=\rho(g)\rho(h).</md>
+</p>
+
+<p>\end{importantbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representations-as-actions">
+<title>Representations as Group Actions</title>
+<p>A representation determines an action of <m>G</m> on <m>V</m>:</p>
+
+<p>
+<md>g\cdot v=\rho(g)v.</md>
+</p>
+
+<p>Thus every group element acts as an invertible linear transformation.</p>
+
+<p>The compatibility condition</p>
+
+<p>
+<md>(gh)\cdot v=g\cdot(h\cdot v)</md>
+</p>
+
+<p>follows from</p>
+
+<p>
+<md>\rho(gh)=\rho(g)\rho(h).</md>
+</p>
+
+<p>Hence a representation is precisely a group action on a vector space in
+which every group element acts linearly.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-finite-dimensional-representations">
+<title>Finite-Dimensional Representations</title>
+<p>If</p>
+
+<p>
+<md>\dim_F(V)=n,</md>
+</p>
+
+<p>then choosing a basis identifies</p>
+
+<p>
+<md>GL(V)\cong GL_n(F).</md>
+</p>
+
+<p>The representation may therefore be written</p>
+
+<p>
+<md>\rho:G\to GL_n(F).</md>
+</p>
+
+<p>Each group element <m>g</m> is represented by an invertible <m>n\times n</m>
+matrix.</p>
+
+<definition>
+<title>Degree of a Representation</title>
+<statement>
+<p>If <m>V</m> is finite-dimensional, the <em>degree</em> or <em>dimension</em> of the
+representation is</p>
+
+<p>
+<md>\dim_F(V).</md>
+</p>
+</statement>
+</definition>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-matrix-representations">
+<title>Matrix Representations</title>
+<p>Suppose</p>
+
+<p>
+<md>\mathcal B=(v_1,\ldots,v_n)</md>
+</p>
+
+<p>is a basis of <m>V</m>.</p>
+
+<p>For each <m>g\in G</m>, the linear transformation <m>\rho(g)</m> has a matrix</p>
+
+<p>
+<md>[\rho(g)]_{\mathcal B}.</md>
+</p>
+
+<p>Thus the representation becomes a matrix-valued function</p>
+
+<p>
+<md>g\longmapsto[\rho(g)]_{\mathcal B}.</md>
+</p>
+
+<p>The matrices satisfy</p>
+
+<p>
+<md>[\rho(gh)]_{\mathcal B}=[\rho(g)]_{\mathcal B}[\rho(h)]_{\mathcal B}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-trivial-representation">
+<title>The Trivial Representation</title>
+<p>The simplest representation sends every group element to the identity.</p>
+
+<definition>
+<title>Trivial Representation</title>
+<statement>
+<p>The <em>trivial representation</em> of <m>G</m> on <m>V</m> is defined by</p>
+
+<p>
+<md>\rho(g)=I_V</md>
+</p>
+
+<p>for every <m>g\in G</m>.</p>
+</statement>
+</definition>
+
+<p>For a one-dimensional vector space,</p>
+
+<p>
+<md>\rho(g)=(1).</md>
+</p>
+
+<p>Every element of the group therefore acts trivially.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-one-dimensional-representations">
+<title>One-Dimensional Representations</title>
+<p>If</p>
+
+<p>
+<md>\dim_F(V)=1,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>GL(V)\cong F^\times.</md>
+</p>
+
+<p>Therefore a one-dimensional representation is essentially a homomorphism</p>
+
+<p>
+<md>\rho:G\to F^\times.</md>
+</p>
+
+<p>When <m>F=\C</m>, these representations are particularly important in character
+theory.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-cyclic-group-representation">
+<title>A Representation of a Cyclic Group</title>
+<p>Let</p>
+
+<p>
+<md>C_n=\langle g\rangle</md>
+</p>
+
+<p>be a cyclic group of order <m>n</m>.</p>
+
+<p>Over <m>\C</m>, choose</p>
+
+<p>
+<md>\omega=e^{2\pi i/n}.</md>
+</p>
+
+<p>The Greek letter</p>
+
+<p>
+<md>\omega</md>
+</p>
+
+<p>is omega, pronounced <q>oh-MAY-guh</q> or <q>oh-MEG-uh.</q></p>
+
+<p>The number <m>\omega</m> is an <m>n</m>th root of unity:</p>
+
+<p>
+<md>\omega^n=1.</md>
+</p>
+
+<p>For each integer <m>k</m>, define</p>
+
+<p>
+<md>\rho_k(g)=\omega^k.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\rho_k(g^m)=\omega^{km}.</md>
+</p>
+
+<p>These give one-dimensional complex representations of <m>C_n</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-cyclic-geometric-representation">
+<title>Geometric Representation of <m>C_n</m></title>
+<p>The cyclic group <m>C_n</m> can also act on <m>\R^2</m> by rotations.</p>
+
+<p>Let</p>
+
+<p>
+<md>\theta=\frac{2\pi}{n}.</md>
+</p>
+
+<p>A generator can be represented by</p>
+
+<p>
+<md>R_\theta=
+\begin{pmatrix}
+\cos\theta&amp;-\sin\theta\\
+\sin\theta&amp;\cos\theta
+\end{pmatrix}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>R_\theta^n=I.</md>
+</p>
+
+<p>\begin{tikzpicture}[scale=1.05,&gt;=stealth]
+\draw[-&gt;] (-2.2,0)--(2.2,0);
+\draw[-&gt;] (0,-2.2)--(0,2.2);</p>
+
+<p>\draw[thick,-&gt;] (0,0)--(1.6,0) node[right]{<m>v</m>};
+\draw[thick,-&gt;] (0,0)--({1.6*cos(55)},{1.6*sin(55)})
+node[above right]{<m>\rho(g)v</m>};</p>
+
+<p>\draw[-&gt;] (0.75,0) arc[start angle=0,end angle=55,radius=0.75];
+\node at (0.9,0.4) {<m>\theta</m>};
+\end{tikzpicture}</p>
+
+<p>Thus abstract cyclic multiplication becomes repeated geometric rotation.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-permutation-representations">
+<title>Permutation Representations</title>
+<p>Suppose <m>G</m> acts on a finite set</p>
+
+<p>
+<md>X=\{x_1,\ldots,x_n\}.</md>
+</p>
+
+<p>Let <m>V</m> have basis</p>
+
+<p>
+<md>e_1,\ldots,e_n.</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>g\cdot x_i=x_j,</md>
+</p>
+
+<p>define</p>
+
+<p>
+<md>\rho(g)e_i=e_j.</md>
+</p>
+
+<p>The resulting matrices are permutation matrices.</p>
+
+<definition>
+<title>Permutation Representation</title>
+<statement>
+<p>A representation obtained by allowing a group to permute a basis is called a
+<em>permutation representation</em>.</p>
+</statement>
+</definition>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-permutation-matrix-example">
+<title>Permutation Matrix Example</title>
+<p>Consider the permutation</p>
+
+<p>
+<md>\sigma=(123).</md>
+</p>
+
+<p>The Greek letter</p>
+
+<p>
+<md>\sigma</md>
+</p>
+
+<p>is sigma, pronounced <q>SIG-muh.</q></p>
+
+<p>Using the standard basis of <m>F^3</m>,</p>
+
+<p>
+<md>e_1\mapsto e_2,\qquad e_2\mapsto e_3,\qquad e_3\mapsto e_1.</md>
+</p>
+
+<p>Its permutation matrix is</p>
+
+<p>
+<md>P_\sigma=
+\begin{pmatrix}
+0&amp;0&amp;1\\
+1&amp;0&amp;0\\
+0&amp;1&amp;0
+\end{pmatrix}.</md>
+</p>
+
+<p>Since <m>\sigma^3=e</m>,</p>
+
+<p>
+<md>P_\sigma^3=I_3.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-regular-representation">
+<title>The Regular Representation</title>
+<p>Every finite group naturally acts on a vector space whose basis is indexed
+by the elements of the group.</p>
+
+<p>Let</p>
+
+<p>
+<md>G=\{g_1,\ldots,g_n\}.</md>
+</p>
+
+<p>Construct a vector space <m>V</m> with basis</p>
+
+<p>
+<md>e_{g_1},\ldots,e_{g_n}.</md>
+</p>
+
+<p>Define</p>
+
+<p>
+<md>\rho(h)e_g=e_{hg}.</md>
+</p>
+
+<definition>
+<title>Regular Representation</title>
+<statement>
+<p>The representation obtained from the action of <m>G</m> on itself by left
+multiplication is called the <em>left regular representation</em>.</p>
+</statement>
+</definition>
+
+<p>Its degree is</p>
+
+<p>
+<md>|G|.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-faithful-representations">
+<title>Faithful Representations</title>
+<p>A representation may send distinct group elements to the same
+transformation.</p>
+
+<p>The kernel is</p>
+
+<p>
+<md>\Ker(\rho)=\{g\in G:\rho(g)=I_V\}.</md>
+</p>
+
+<definition>
+<title>Faithful Representation</title>
+<statement>
+<p>A representation <m>\rho:G\to GL(V)</m> is <em>faithful</em> if</p>
+
+<p>
+<md>\Ker(\rho)=\{e\}.</md>
+</p>
+</statement>
+</definition>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\rho(g)=\rho(h)\implies g=h.</md>
+</p>
+
+<p>A faithful representation preserves enough information to identify every
+group element uniquely.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representations-concrete">
+<title>Representations Make Groups Concrete</title>
+<p>If <m>\rho</m> is faithful, then</p>
+
+<p>
+<md>G\cong\rho(G)\subseteq GL(V).</md>
+</p>
+
+<p>Thus <m>G</m> can be realized as a group of matrices or linear transformations.</p>
+
+<p>This is one reason matrix groups are so central throughout algebra.</p>
+
+<p>\begin{tikzcd}
+G \arrow[r,"\rho",hook] \arrow[dr,"\cong"'] &amp;
+GL(V)\\
+&amp; \rho(G)\arrow[u,hook']
+\end{tikzcd}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-invariant-subspaces-representations">
+<title>Invariant Subspaces</title>
+<p>A subspace may be preserved by every group action.</p>
+
+<definition>
+<title>Invariant Subspace</title>
+<statement>
+<p>Let <m>(V,\rho)</m> be a representation of <m>G</m>. A subspace <m>W\subseteq V</m>
+is <em>@@PROTECTED3@@-invariant</em> if</p>
+
+<p>
+<md>\rho(g)W\subseteq W</md>
+</p>
+
+<p>for every <m>g\in G</m>.</p>
+</statement>
+</definition>
+
+<p>Since each <m>\rho(g)</m> is invertible, this condition actually gives</p>
+
+<p>
+<md>\rho(g)W=W.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-subrepresentations">
+<title>Subrepresentations</title>
+<p>If <m>W\subseteq V</m> is invariant, each transformation <m>\rho(g)</m> restricts
+to <m>W</m>.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\rho|_W:G\to GL(W)</md>
+</p>
+
+<p>defines another representation.</p>
+
+<definition>
+<title>Subrepresentation</title>
+<statement>
+<p>A representation on a <m>G</m>-invariant subspace <m>W\subseteq V</m> is called a
+<em>subrepresentation</em>.</p>
+</statement>
+</definition>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-irreducible-representations">
+<title>Reducible and Irreducible Representations</title>
+<definition>
+<title>Irreducible Representation</title>
+<statement>
+<p>A nonzero representation <m>V</m> is <em>irreducible</em> if its only invariant
+subspaces are</p>
+
+<p>
+<md>\{0\}\qquad\text{and}\qquad V.</md>
+</p>
+</statement>
+</definition>
+
+<p>A representation that is not irreducible is called <em>reducible</em>.</p>
+
+<p>Irreducible representations are often called <em>irreps</em>.</p>
+
+<p>\begin{conceptbox}
+Irreducible representations are the basic building blocks of representation
+theory.</p>
+
+<p>They play a role similar to simple modules in module theory.
+\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-reducible-permutation-representation">
+<title>A Reducible Permutation Representation</title>
+<p>Consider a permutation representation on <m>F^n</m>.</p>
+
+<p>The vector</p>
+
+<p>
+<md>\mathbf{1}=(1,1,\ldots,1)</md>
+</p>
+
+<p>is fixed by every permutation matrix.</p>
+
+<p>Therefore</p>
+
+<p>
+<md>W=\Span\{\mathbf{1}\}</md>
+</p>
+
+<p>is invariant.</p>
+
+<p>Hence the permutation representation is reducible whenever <m>n&gt;1</m>.</p>
+
+<p>Geometrically,</p>
+
+<p>\begin{tikzpicture}[
+    node distance=12mm,
+    box/.style={draw,rounded corners,align=center,inner sep=5pt},
+    &gt;=stealth
+]
+\node[box] (V) {<m>F^n</m>};
+\node[box,below=of V] (W) {<m>\Span\{(1,\ldots,1)\}</m>};
+\node[below=6mm of W] {fixed by every permutation};</p>
+
+<p>\draw[-&gt;,thick] (V)--node[right]{contains}(W);
+\end{tikzpicture}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-direct-sum-representations">
+<title>Direct Sums of Representations</title>
+<p>Suppose</p>
+
+<p>
+<md>\rho_1:G\to GL(V_1),\qquad \rho_2:G\to GL(V_2).</md>
+</p>
+
+<p>Define a representation on</p>
+
+<p>
+<md>V_1\oplus V_2</md>
+</p>
+
+<p>by</p>
+
+<p>
+<md>(\rho_1\oplus\rho_2)(g)(v_1,v_2)
+=(\rho_1(g)v_1,\rho_2(g)v_2).</md>
+</p>
+
+<p>In matrix form,</p>
+
+<p>
+<md>(\rho_1\oplus\rho_2)(g)=
+\begin{pmatrix}
+\rho_1(g)&amp;0\\
+0&amp;\rho_2(g)
+\end{pmatrix}.</md>
+</p>
+
+<p>The symbol</p>
+
+<p>
+<md>\oplus</md>
+</p>
+
+<p>denotes a direct sum and is read <q>direct sum.</q></p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-completely-reducible">
+<title>Completely Reducible Representations</title>
+<definition>
+<title>Completely Reducible Representation</title>
+<statement>
+<p>A representation is <em>completely reducible</em> if it can be written as a
+direct sum of irreducible representations.</p>
+</statement>
+</definition>
+
+<p>Thus</p>
+
+<p>
+<md>V\cong V_1\oplus\cdots\oplus V_k,</md>
+</p>
+
+<p>where each <m>V_i</m> is irreducible.</p>
+
+<p>The central question becomes:</p>
+
+<p>\begin{quote}
+When can a representation be decomposed completely into irreducible pieces?
+\end{quote}</p>
+
+<p>For finite groups over suitable fields, Maschke's theorem answers this
+question.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-maschkes-theorem">
+<title>Maschke's Theorem</title>
+<p>\begin{theorem}[Maschke's Theorem]
+Let <m>G</m> be a finite group and <m>F</m> a field such that</p>
+
+<p>
+<md>\operatorname{char}(F)\nmid |G|.</md>
+</p>
+
+<p>Then every finite-dimensional representation of <m>G</m> over <m>F</m> is
+completely reducible.
+\end{theorem}</p>
+
+<p>Equivalently, the group algebra</p>
+
+<p>
+<md>F[G]</md>
+</p>
+
+<p>is semisimple.</p>
+
+<p>The symbol</p>
+
+<p>
+<md>\nmid</md>
+</p>
+
+<p>is read <q>does not divide.</q></p>
+
+<p>Thus the condition is read:</p>
+
+<p><q>the characteristic of @@PROTECTED0@@ does not divide the order of @@PROTECTED1@@.</q></p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-maschke-averaging">
+<title>The Averaging Idea</title>
+<p>The key idea behind Maschke's theorem is averaging over the group.</p>
+
+<p>Suppose <m>W\subseteq V</m> is invariant and</p>
+
+<p>
+<md>P:V\to W</md>
+</p>
+
+<p>is any linear projection.</p>
+
+<p>It may not respect the group action.</p>
+
+<p>Define an averaged map</p>
+
+<p>
+<md>P_G=\frac{1}{|G|}\sum_{g\in G}\rho(g)P\rho(g)^{-1}.</md>
+</p>
+
+<p>Because</p>
+
+<p>
+<md>\operatorname{char}(F)\nmid|G|,</md>
+</p>
+
+<p>the scalar</p>
+
+<p>
+<md>\frac{1}{|G|}</md>
+</p>
+
+<p>exists in <m>F</m>.</p>
+
+<p>The averaged projection commutes with the group action and yields an
+invariant complement to <m>W</m>.</p>
+
+<p>\begin{conceptbox}
+Averaging converts an arbitrary linear construction into a
+<m>G</m>-equivariant one.</p>
+
+<p>This technique appears repeatedly throughout representation theory.
+\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-homomorphisms">
+<title>Representation Homomorphisms</title>
+<p>Suppose <m>V</m> and <m>W</m> are representations of <m>G</m>.</p>
+
+<p>A linear map</p>
+
+<p>
+<md>T:V\to W</md>
+</p>
+
+<p>is compatible with the representations when</p>
+
+<p>
+<md>T(\rho_V(g)v)=\rho_W(g)T(v).</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>T\rho_V(g)=\rho_W(g)T</md>
+</p>
+
+<p>for every <m>g\in G</m>.</p>
+
+<definition>
+<title>Intertwining Map</title>
+<statement>
+<p>A linear map satisfying</p>
+
+<p>
+<md>T\rho_V(g)=\rho_W(g)T</md>
+</p>
+
+<p>for every <m>g\in G</m> is called an <em>intertwining map</em>,
+<em>intertwiner</em>, or <em>@@PROTECTED1@@-homomorphism</em>.</p>
+</statement>
+</definition>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-intertwining-diagram">
+<title>Intertwining Diagram</title>
+<p>The intertwining condition means the following diagram commutes:</p>
+
+<p>\begin{tikzcd}[column sep=large,row sep=large]
+V \arrow[r,"\rho_V(g)"] \arrow[d,"T"'] &amp;
+V \arrow[d,"T"]\\
+W \arrow[r,"\rho_W(g)"'] &amp;
+W
+\end{tikzcd}</p>
+
+<p>Following either path gives the same result.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-equivalent-representations">
+<title>Equivalent Representations</title>
+<definition>
+<title>Equivalent Representations</title>
+<statement>
+<p>Two representations</p>
+
+<p>
+<md>\rho_V:G\to GL(V),\qquad \rho_W:G\to GL(W)</md>
+</p>
+
+<p>are <em>equivalent</em> or <em>isomorphic</em> if there exists an invertible
+intertwining map</p>
+
+<p>
+<md>T:V\to W.</md>
+</p>
+</statement>
+</definition>
+
+<p>Then</p>
+
+<p>
+<md>T\rho_V(g)=\rho_W(g)T.</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\rho_W(g)=T\rho_V(g)T^{-1}.</md>
+</p>
+
+<p>Thus equivalent matrix representations differ only by a change of basis.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-worked-equivalent-representations">
+<title>Worked Example: Equivalent Matrix Representations</title>
+<example>
+<title>Changing the Basis of a Representation</title>
+<p>Suppose</p>
+
+<p>
+<md>A=\begin{pmatrix}1&amp;0\\0&amp;-1\end{pmatrix},\qquad
+P=\begin{pmatrix}1&amp;1\\1&amp;-1\end{pmatrix}.</md>
+</p>
+
+<p>The same transformation in a different basis is represented by</p>
+
+<p>
+<md>B=P^{-1}AP.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{B=\begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-schurs-lemma">
+<title>Schur's Lemma</title>
+<p>Schur's lemma is one of the foundational results of representation theory.</p>
+
+<p>\begin{theorem}[Schur's Lemma]
+Let <m>V</m> and <m>W</m> be irreducible representations of <m>G</m>, and let</p>
+
+<p>
+<md>T:V\to W</md>
+</p>
+
+<p>be an intertwining map. Then either</p>
+
+<p>
+<md>T=0</md>
+</p>
+
+<p>or <m>T</m> is an isomorphism.
+\end{theorem}</p>
+
+<p>\begin{proof}
+Because <m>T</m> intertwines the group action,</p>
+
+<p>
+<md>\Ker(T)</md>
+</p>
+
+<p>is an invariant subspace of <m>V</m>, while</p>
+
+<p>
+<md>\Image(T)</md>
+</p>
+
+<p>is an invariant subspace of <m>W</m>.</p>
+
+<p>Since <m>V</m> is irreducible,</p>
+
+<p>
+<md>\Ker(T)=0\qquad\text{or}\qquad\Ker(T)=V.</md>
+</p>
+
+<p>Since <m>W</m> is irreducible,</p>
+
+<p>
+<md>\Image(T)=0\qquad\text{or}\qquad\Image(T)=W.</md>
+</p>
+
+<p>If <m>T\neq0</m>, then <m>\Ker(T)\neq V</m> and <m>\Image(T)\neq0</m>. Therefore,</p>
+
+<p>
+<md>\Ker(T)=0,\qquad\Image(T)=W.</md>
+</p>
+
+<p>Hence <m>T</m> is an isomorphism.
+\end{proof}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-schur-complex">
+<title>Schur's Lemma over the Complex Numbers</title>
+<p>A stronger statement holds for finite-dimensional complex irreducible
+representations.</p>
+
+<p>\begin{theorem}
+Let <m>V</m> be a finite-dimensional irreducible representation over <m>\C</m>.
+If</p>
+
+<p>
+<md>T:V\to V</md>
+</p>
+
+<p>intertwines the representation with itself, then</p>
+
+<p>
+<md>T=\lambda I_V</md>
+</p>
+
+<p>for some <m>\lambda\in\C</m>.
+\end{theorem}</p>
+
+<p>Thus every operator commuting with an irreducible complex representation is
+a scalar operator.</p>
+
+<p>This is closely related to the idea of the center developed in
+noncommutative algebra.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representations-group-algebras">
+<title>Representations and Group Algebras</title>
+<p>Let</p>
+
+<p>
+<md>\rho:G\to GL(V)</md>
+</p>
+
+<p>be a representation over <m>F</m>.</p>
+
+<p>The action extends linearly from <m>G</m> to the group algebra</p>
+
+<p>
+<md>F[G].</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>a=\sum_{g\in G}a_gg,</md>
+</p>
+
+<p>define</p>
+
+<p>
+<md>a\cdot v=\sum_{g\in G}a_g\rho(g)v.</md>
+</p>
+
+<p>Therefore <m>V</m> becomes an <m>F[G]</m>-module.</p>
+
+<p>Conversely, every <m>F[G]</m>-module determines a representation of <m>G</m>.</p>
+
+<p>Hence</p>
+
+<p>
+<md>\boxed{\text{representations of }G\text{ over }F
+\longleftrightarrow
+F[G]\text{-modules}.}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-module-translation">
+<title>Structural Translation</title>
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+
+<p>This translation allows results from module theory and noncommutative algebra
+to be used directly in representation theory.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-characters">
+<title>Characters</title>
+<p>Matrices contain more information than is always necessary.</p>
+
+<p>A remarkably effective summary is obtained by taking traces.</p>
+
+<definition>
+<title>Character</title>
+<statement>
+<p>Let</p>
+
+<p>
+<md>\rho:G\to GL(V)</md>
+</p>
+
+<p>be a finite-dimensional representation. Its <em>character</em> is the function</p>
+
+<p>
+<md>\chi_\rho:G\to F</md>
+</p>
+
+<p>defined by</p>
+
+<p>
+<md>\chi_\rho(g)=\tr(\rho(g)).</md>
+</p>
+</statement>
+</definition>
+
+<p>The Greek letter</p>
+
+<p>
+<md>\chi</md>
+</p>
+
+<p>is chi, commonly pronounced <q>kai</q> in mathematical English.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\chi_\rho(g)</md>
+</p>
+
+<p>is read <q>chi sub rho of @@PROTECTED0@@.</q></p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-why-character-trace">
+<title>Why the Trace?</title>
+<p>Equivalent representations satisfy</p>
+
+<p>
+<md>\rho_W(g)=T\rho_V(g)T^{-1}.</md>
+</p>
+
+<p>Trace is invariant under similarity:</p>
+
+<p>
+<md>\tr(TAT^{-1})=\tr(A).</md>
+</p>
+
+<p>Therefore equivalent representations have the same character.</p>
+
+<p>This means the character ignores the arbitrary choice of basis while
+retaining important structural information.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-characters-conjugacy">
+<title>Characters Are Constant on Conjugacy Classes</title>
+<p>Suppose</p>
+
+<p>
+<md>h=xgx^{-1}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\rho(h)=\rho(x)\rho(g)\rho(x)^{-1}.</md>
+</p>
+
+<p>Therefore <m>\rho(h)</m> and <m>\rho(g)</m> are similar matrices.</p>
+
+<p>Hence</p>
+
+<p>
+<md>\chi_\rho(h)=\chi_\rho(g).</md>
+</p>
+
+<p>\begin{theorem}
+Characters are constant on conjugacy classes.
+\end{theorem}</p>
+
+<p>Functions constant on conjugacy classes are called <em>class functions</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-identity">
+<title>Character of the Identity</title>
+<p>Since</p>
+
+<p>
+<md>\rho(e)=I_V,</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\chi_\rho(e)=\tr(I_V)=\dim(V).</md>
+</p>
+
+<p>Thus the degree of a representation can be read directly from its character:</p>
+
+<p>
+<md>\boxed{\chi_\rho(e)=\dim(V).}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-direct-sum">
+<title>Character of a Direct Sum</title>
+<p>If</p>
+
+<p>
+<md>V=V_1\oplus V_2,</md>
+</p>
+
+<p>then the representation matrices are block diagonal:</p>
+
+<p>
+<md>\rho(g)=
+\begin{pmatrix}
+\rho_1(g)&amp;0\\
+0&amp;\rho_2(g)
+\end{pmatrix}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\chi_{\rho_1\oplus\rho_2}(g)
+=\chi_{\rho_1}(g)+\chi_{\rho_2}(g).</md>
+</p>
+
+<p>So</p>
+
+<p>
+<md>\boxed{\chi_{\rho_1\oplus\rho_2}=\chi_{\rho_1}+\chi_{\rho_2}.}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-worked-character-rotation">
+<title>Worked Example: Character of a Rotation</title>
+<example>
+<title>Character of a Plane Rotation</title>
+<p>Let</p>
+
+<p>
+<md>R_\theta=
+\begin{pmatrix}
+\cos\theta&amp;-\sin\theta\\
+\sin\theta&amp;\cos\theta
+\end{pmatrix}.</md>
+</p>
+
+<p>Find its character value.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\chi(g)=2\cos\theta}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-inner-product">
+<title>Character Inner Product</title>
+<p>For complex-valued class functions <m>\chi</m> and <m>\psi</m> on a finite group
+<m>G</m>, define</p>
+
+<definition>
+<title>Character Inner Product</title>
+<statement>
+<p>The <em>character inner product</em> is</p>
+
+<p>
+<md>\inner{\chi,\psi}
+=\frac{1}{|G|}\sum_{g\in G}\chi(g)\overline{\psi(g)}.</md>
+</p>
+</statement>
+</definition>
+
+<p>The bar</p>
+
+<p>
+<md>\overline{\psi(g)}</md>
+</p>
+
+<p>denotes complex conjugation and is read <q>psi of @@PROTECTED0@@ conjugate.</q></p>
+
+<p>Because characters are constant on conjugacy classes, the sum can also be
+computed class by class.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-orthogonality">
+<title>Orthogonality of Irreducible Characters</title>
+<p>For finite groups over <m>\C</m>, irreducible characters satisfy a remarkable
+orthogonality relation.</p>
+
+<p>\begin{theorem}[Character Orthogonality]
+If <m>\chi</m> and <m>\psi</m> are irreducible complex characters of a finite
+group <m>G</m>, then</p>
+
+<p>
+<md>\inner{\chi,\psi}=
+\begin{cases}
+1,&amp;\chi=\psi,\\
+0,&amp;\chi\neq\psi.
+\end{cases}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>Thus irreducible characters behave like orthonormal vectors.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-irreducibility-test">
+<title>Irreducibility Test</title>
+<p>A complex character <m>\chi</m> is irreducible exactly when</p>
+
+<p>
+<md>\inner{\chi,\chi}=1.</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\inner{\chi,\chi}&gt;1,</md>
+</p>
+
+<p>the representation is reducible.</p>
+
+<p>This provides a powerful numerical test for irreducibility.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-multiplicity">
+<title>Multiplicity Formula</title>
+<p>Suppose a representation decomposes as</p>
+
+<p>
+<md>V\cong m_1V_1\oplus\cdots\oplus m_rV_r,</md>
+</p>
+
+<p>where the <m>V_i</m> are pairwise nonisomorphic irreducible representations.</p>
+
+<p>Then</p>
+
+<p>
+<md>\chi_V=m_1\chi_1+\cdots+m_r\chi_r.</md>
+</p>
+
+<p>The multiplicity of <m>V_i</m> is</p>
+
+<p>
+<md>\boxed{m_i=\inner{\chi_V,\chi_i}.}</md>
+</p>
+
+<p>Thus character theory can recover the irreducible decomposition without
+explicitly finding invariant subspaces.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-tables">
+<title>Conjugacy Classes and Character Tables</title>
+<p>Since characters are constant on conjugacy classes, one records only one
+value per class.</p>
+
+<p>A <em>character table</em> places irreducible characters in rows and conjugacy
+classes in columns.</p>
+
+<p>Schematically,</p>
+
+<p>\begin{tabular}{c|cccc}
+ &amp; <m>C_1</m> &amp; <m>C_2</m> &amp; <m>\cdots</m> &amp; <m>C_k</m>\\
+\hline
+<m>\chi_1</m> &amp; <m>\chi_1(C_1)</m> &amp; <m>\chi_1(C_2)</m> &amp; <m>\cdots</m> &amp; <m>\chi_1(C_k)</m>\\
+<m>\chi_2</m> &amp; <m>\chi_2(C_1)</m> &amp; <m>\chi_2(C_2)</m> &amp; <m>\cdots</m> &amp; <m>\chi_2(C_k)</m>\\
+<m>\vdots</m> &amp; <m>\vdots</m> &amp; <m>\vdots</m> &amp; <m>\ddots</m> &amp; <m>\vdots</m>\\
+<m>\chi_k</m> &amp; <m>\chi_k(C_1)</m> &amp; <m>\chi_k(C_2)</m> &amp; <m>\cdots</m> &amp; <m>\chi_k(C_k)</m>
+\end{tabular}</p>
+
+<p>For a finite group over <m>\C</m>, the number of irreducible representations up
+to equivalence equals the number of conjugacy classes.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-table-c3">
+<title>The Character Table of <m>C_3</m></title>
+<p>Let</p>
+
+<p>
+<md>C_3=\{e,g,g^2\}.</md>
+</p>
+
+<p>Since <m>C_3</m> is abelian, every element forms its own conjugacy class.</p>
+
+<p>Let</p>
+
+<p>
+<md>\omega=e^{2\pi i/3}.</md>
+</p>
+
+<p>The irreducible complex characters are</p>
+
+<p>\begin{tabular}{c|ccc}
+\toprule
+ &amp; <m>e</m> &amp; <m>g</m> &amp; <m>g^2</m>\\
+\midrule
+<m>\chi_0</m> &amp; <m>1</m> &amp; <m>1</m> &amp; <m>1</m>\\
+<m>\chi_1</m> &amp; <m>1</m> &amp; <m>\omega</m> &amp; <m>\omega^2</m>\\
+<m>\chi_2</m> &amp; <m>1</m> &amp; <m>\omega^2</m> &amp; <m>\omega</m>\\
+\bottomrule
+\end{tabular}</p>
+
+<p>Because <m>C_3</m> is finite abelian, all of its irreducible complex
+representations are one-dimensional.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-finite-abelian-representations">
+<title>Representations of Finite Abelian Groups</title>
+<p>More generally:</p>
+
+<p>\begin{theorem}
+Every irreducible complex representation of a finite abelian group is
+one-dimensional.
+\end{theorem}</p>
+
+<p>One way to understand this is through Schur's lemma.</p>
+
+<p>If <m>G</m> is abelian, then for every <m>g,h\in G</m>,</p>
+
+<p>
+<md>\rho(g)\rho(h)=\rho(h)\rho(g).</md>
+</p>
+
+<p>Thus each <m>\rho(g)</m> intertwines the representation with itself.</p>
+
+<p>For an irreducible complex representation, Schur's lemma gives</p>
+
+<p>
+<md>\rho(g)=\lambda_gI.</md>
+</p>
+
+<p>If the representation had dimension greater than one, every subspace would
+then be invariant, contradicting irreducibility.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-sum-squares-dimensions">
+<title>The Sum of Squares Formula</title>
+<p>Let</p>
+
+<p>
+<md>V_1,\ldots,V_r</md>
+</p>
+
+<p>be the irreducible complex representations of a finite group <m>G</m>, with</p>
+
+<p>
+<md>d_i=\dim(V_i).</md>
+</p>
+
+<p>Then</p>
+
+<p>\begin{theorem}</p>
+
+<p>
+<md>\boxed{\sum_{i=1}^{r}d_i^2=|G|.}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>This places a strong restriction on the possible dimensions of irreducible
+representations.</p>
+
+<p>For an abelian group, every <m>d_i=1</m>, so the number of irreducible
+representations equals</p>
+
+<p>
+<md>|G|.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-regular-representation-decomposition">
+<title>The Regular Representation Decomposition</title>
+<p>The regular representation contains every irreducible representation.</p>
+
+<p>Over <m>\C</m>,</p>
+
+<p>
+<md>\C[G]\cong\bigoplus_{i=1}^{r}d_iV_i,</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>d_i=\dim(V_i).</md>
+</p>
+
+<p>Thus each irreducible representation occurs with multiplicity equal to its
+dimension.</p>
+
+<p>Taking dimensions gives</p>
+
+<p>
+<md>|G|=\sum_{i=1}^{r}d_i^2.</md>
+</p>
+
+<p>This explains the sum of squares formula structurally.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-regular-character">
+<title>Character of the Regular Representation</title>
+<p>Let <m>\chi_{\mathrm{reg}}</m> denote the character of the regular
+representation.</p>
+
+<p>At the identity,</p>
+
+<p>
+<md>\chi_{\mathrm{reg}}(e)=|G|.</md>
+</p>
+
+<p>If <m>g\neq e</m>, left multiplication by <m>g</m> permutes the basis without
+fixing any basis vector, so the corresponding permutation matrix has trace
+zero.</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\chi_{\mathrm{reg}}(g)=
+\begin{cases}
+|G|,&amp;g=e,\\
+0,&amp;g\neq e.
+\end{cases}}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-worked-irrep-dimensions">
+<title>Worked Example: Possible Irreducible Dimensions</title>
+<example>
+<title>Using the Sum of Squares Formula</title>
+<p>Suppose a finite group <m>G</m> has order <m>6</m> and has three irreducible
+complex representations. Two are one-dimensional. Determine the dimension
+of the third.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{d=2}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-s3-representations">
+<title>The Symmetric Group <m>S_3</m></title>
+<p>The symmetric group</p>
+
+<p>
+<md>S_3</md>
+</p>
+
+<p>is the smallest nonabelian symmetric group.</p>
+
+<p>It has order</p>
+
+<p>
+<md>|S_3|=6.</md>
+</p>
+
+<p>Its conjugacy classes are represented by:</p>
+
+<p>
+<ul>
+<li>
+<p>the identity <m>e</m>;</p>
+</li>
+<li>
+<p>a transposition such as <m>(12)</m>;</p>
+</li>
+<li>
+<p>a <m>3</m>-cycle such as <m>(123)</m>.</p>
+</li>
+</ul>
+</p>
+
+<p>Therefore <m>S_3</m> has three irreducible complex representations.</p>
+
+<p>Their dimensions must satisfy</p>
+
+<p>
+<md>d_1^2+d_2^2+d_3^2=6.</md>
+</p>
+
+<p>The dimensions are</p>
+
+<p>
+<md>1,\qquad1,\qquad2.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-s3-trivial-sign">
+<title>The Trivial and Sign Representations of <m>S_3</m></title>
+<p>The trivial representation has character</p>
+
+<p>
+<md>\chi_{\mathrm{triv}}(g)=1</md>
+</p>
+
+<p>for every <m>g\in S_3</m>.</p>
+
+<p>The sign representation is</p>
+
+<p>
+<md>\operatorname{sgn}:S_3\to\{1,-1\}.</md>
+</p>
+
+<p>Even permutations map to <m>1</m>, while odd permutations map to <m>-1</m>.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\chi_{\mathrm{sgn}}(e)=1,</md>
+</p>
+
+<p>
+<md>\chi_{\mathrm{sgn}}((12))=-1,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\chi_{\mathrm{sgn}}((123))=1.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-s3-standard-representation">
+<title>The Standard Representation of <m>S_3</m></title>
+<p>Let <m>S_3</m> act on <m>\R^3</m> by permuting coordinates.</p>
+
+<p>The line</p>
+
+<p>
+<md>L=\Span\{(1,1,1)\}</md>
+</p>
+
+<p>is invariant and carries the trivial representation.</p>
+
+<p>The plane</p>
+
+<p>
+<md>W=\{(x_1,x_2,x_3)\in\R^3:x_1+x_2+x_3=0\}</md>
+</p>
+
+<p>is also invariant.</p>
+
+<p>Since</p>
+
+<p>
+<md>\dim(W)=2,</md>
+</p>
+
+<p>the action on <m>W</m> gives the standard two-dimensional representation of
+<m>S_3</m>.</p>
+
+<p>Geometrically,</p>
+
+<p>\begin{tikzpicture}[scale=0.95,&gt;=stealth]
+\draw[fill=gray!8] (-2.4,-0.8)--(1.8,-1.5)--(2.5,0.7)--(-1.6,1.4)--cycle;
+\node at (1.65,1.1) {<m>W</m>};</p>
+
+<p>\draw[-&gt;,thick] (-1.7,-1.7)--(1.8,1.8);
+\node[right] at (1.8,1.8) {<m>L=\Span\{(1,1,1)\}</m>};</p>
+
+<p>\node at (0,-2.1) {<m>\R^3=L\oplus W</m>};
+\end{tikzpicture}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-s3-character-table">
+<title>Character Table of <m>S_3</m></title>
+<p>The irreducible character table is</p>
+
+<p>\begin{tabular}{c|ccc}
+\toprule
+ &amp; <m>e</m> &amp; <m>(12)</m> &amp; <m>(123)</m>\\
+\midrule
+Class size &amp; <m>1</m> &amp; <m>3</m> &amp; <m>2</m>\\
+\midrule
+<m>\chi_{\mathrm{triv}}</m> &amp; <m>1</m> &amp; <m>1</m> &amp; <m>1</m>\\
+<m>\chi_{\mathrm{sgn}}</m> &amp; <m>1</m> &amp; <m>-1</m> &amp; <m>1</m>\\
+<m>\chi_{\mathrm{std}}</m> &amp; <m>2</m> &amp; <m>0</m> &amp; <m>-1</m>\\
+\bottomrule
+\end{tabular}</p>
+
+<p>The first column confirms the dimensions:</p>
+
+<p>
+<md>1,\qquad1,\qquad2.</md>
+</p>
+
+<p>Their squared dimensions satisfy</p>
+
+<p>
+<md>1^2+1^2+2^2=6=|S_3|.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-worked-standard-character">
+<title>Worked Example: Testing the Standard Character</title>
+<example>
+<title>Testing Irreducibility with Characters</title>
+<p>For <m>S_3</m>, let</p>
+
+<p>
+<md>\chi=(2,0,-1)</md>
+</p>
+
+<p>on conjugacy classes of sizes</p>
+
+<p>
+<md>1,\qquad3,\qquad2.</md>
+</p>
+
+<p>Compute <m>\inner{\chi,\chi}</m>.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\inner{\chi,\chi}=1,\qquad\chi\text{ is irreducible}.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-tensor-product-representations">
+<title>Tensor Products of Representations</title>
+<p>Suppose <m>V</m> and <m>W</m> are representations of <m>G</m>.</p>
+
+<p>Their tensor product</p>
+
+<p>
+<md>V\otimes W</md>
+</p>
+
+<p>becomes a representation by defining</p>
+
+<p>
+<md>g\cdot(v\otimes w)=(g\cdot v)\otimes(g\cdot w).</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>(\rho_V\otimes\rho_W)(g)
+=\rho_V(g)\otimes\rho_W(g).</md>
+</p>
+
+<p>The symbol</p>
+
+<p>
+<md>\otimes</md>
+</p>
+
+<p>is the tensor-product symbol and is read <q>tensor.</q></p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-tensor-product">
+<title>Character of a Tensor Product</title>
+<p>A fundamental trace identity gives</p>
+
+<p>
+<md>\tr(A\otimes B)=\tr(A)\tr(B).</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{\chi_{V\otimes W}(g)=\chi_V(g)\chi_W(g).}</md>
+</p>
+
+<p>Thus direct sums correspond to addition of characters, while tensor products
+correspond to multiplication:</p>
+
+<p>
+<md>\chi_{V\oplus W}=\chi_V+\chi_W,</md>
+</p>
+
+<p>
+<md>\chi_{V\otimes W}=\chi_V\chi_W.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-dual-representations">
+<title>Dual Representations</title>
+<p>Let</p>
+
+<p>
+<md>V^*=\Hom_F(V,F)</md>
+</p>
+
+<p>be the dual vector space.</p>
+
+<p>The dual representation is defined by</p>
+
+<p>
+<md>(g\cdot\varphi)(v)=\varphi(g^{-1}\cdot v).</md>
+</p>
+
+<p>Here <m>\varphi\in V^*</m>.</p>
+
+<p>In matrix form,</p>
+
+<p>
+<md>\rho_{V^*}(g)=\rho_V(g^{-1})^{\mathsf T}.</md>
+</p>
+
+<p>The superscript</p>
+
+<p>
+<md>\mathsf T</md>
+</p>
+
+<p>denotes transpose and is read <q>transpose.</q></p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-character-dual">
+<title>Character of the Dual</title>
+<p>For a finite-dimensional complex representation,</p>
+
+<p>
+<md>\chi_{V^*}(g)=\chi_V(g^{-1}).</md>
+</p>
+
+<p>For unitary representations of finite groups,</p>
+
+<p>
+<md>\chi_V(g^{-1})=\overline{\chi_V(g)}.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\chi_{V^*}(g)=\overline{\chi_V(g)}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-quotient-representations">
+<title>Quotient Representations</title>
+<p>Suppose <m>W\subseteq V</m> is an invariant subspace.</p>
+
+<p>Then the quotient vector space</p>
+
+<p>
+<md>V/W</md>
+</p>
+
+<p>inherits a representation:</p>
+
+<p>
+<md>g\cdot(v+W)=g\cdot v+W.</md>
+</p>
+
+<p>This is well defined precisely because <m>W</m> is invariant.</p>
+
+<p>Thus invariant subspaces produce both:</p>
+
+<p>
+<md>W</md>
+</p>
+
+<p>as a subrepresentation and</p>
+
+<p>
+<md>V/W</md>
+</p>
+
+<p>as a quotient representation.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-exact-sequences-representations">
+<title>Exact Sequences of Representations</title>
+<p>A subrepresentation <m>W\subseteq V</m> gives a short exact sequence</p>
+
+<p>
+<md>0\longrightarrow W\longrightarrow V\longrightarrow V/W\longrightarrow0.</md>
+</p>
+
+<p>This notation will become central in homological algebra.</p>
+
+<p>When the sequence splits,</p>
+
+<p>
+<md>V\cong W\oplus V/W.</md>
+</p>
+
+<p>Maschke's theorem implies that such sequences split for finite-dimensional
+representations of finite groups when the characteristic of the field does
+not divide the group order.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-unitary-representations">
+<title>Unitary Representations</title>
+<p>A complex representation is <em>unitary</em> if each group element acts by a
+unitary transformation.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\rho(g)^*\rho(g)=I.</md>
+</p>
+
+<p>The symbol</p>
+
+<p>
+<md>A^*</md>
+</p>
+
+<p>denotes the conjugate transpose of <m>A</m> and is read <q>@@PROTECTED1@@ star.</q></p>
+
+<p>For finite groups over <m>\C</m>, every finite-dimensional representation is
+equivalent to a unitary representation.</p>
+
+<p>Again, averaging provides the key idea: average an inner product over the
+group to produce a <m>G</m>-invariant inner product.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-averaging-inner-product">
+<title>Averaging an Inner Product</title>
+<p>Begin with any Hermitian inner product</p>
+
+<p>
+<md>\inner{v,w}_0.</md>
+</p>
+
+<p>Define</p>
+
+<p>
+<md>\inner{v,w}_G
+=\frac{1}{|G|}\sum_{g\in G}
+\inner{\rho(g)v,\rho(g)w}_0.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\inner{\rho(h)v,\rho(h)w}_G=\inner{v,w}_G</md>
+</p>
+
+<p>for every <m>h\in G</m>.</p>
+
+<p>Thus the representation becomes unitary relative to this averaged inner
+product.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-restriction-representations">
+<title>Restriction of Representations</title>
+<p>Let</p>
+
+<p>
+<md>H\leq G.</md>
+</p>
+
+<p>A representation</p>
+
+<p>
+<md>\rho:G\to GL(V)</md>
+</p>
+
+<p>can be restricted to <m>H</m>:</p>
+
+<p>
+<md>\rho|_H:H\to GL(V).</md>
+</p>
+
+<p>This is called the <em>restriction</em> of the representation from <m>G</m> to
+<m>H</m>.</p>
+
+<p>One often writes</p>
+
+<p>
+<md>\operatorname{Res}^G_H V.</md>
+</p>
+
+<p>The notation is read <q>the restriction from @@PROTECTED0@@ to @@PROTECTED1@@ of @@PROTECTED2@@.</q></p>
+
+<p>An irreducible representation of <m>G</m> may become reducible when restricted
+to a subgroup.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-induced-representations">
+<title>Induced Representations: A Preview</title>
+<p>There is also a construction moving in the opposite direction.</p>
+
+<p>Starting with a representation <m>W</m> of a subgroup</p>
+
+<p>
+<md>H\leq G,</md>
+</p>
+
+<p>one can construct a representation of <m>G</m> called the <em>induced
+representation</em>.</p>
+
+<p>It is denoted</p>
+
+<p>
+<md>\operatorname{Ind}_H^G W.</md>
+</p>
+
+<p>This is read <q>the representation induced from @@PROTECTED0@@ to @@PROTECTED1@@ by @@PROTECTED2@@.</q></p>
+
+<p>Restriction moves representations downward to subgroups; induction moves
+them upward to larger groups.</p>
+
+<p>\begin{tikzcd}[column sep=large]
+G\text{-representations}
+\arrow[r,shift left=1.2ex,"\operatorname{Res}^G_H"]
+&amp;
+H\text{-representations}
+\arrow[l,shift left=1.2ex,"\operatorname{Ind}_H^G"]
+\end{tikzcd}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-frobenius-reciprocity-preview">
+<title>Frobenius Reciprocity: A Preview</title>
+<p>Induction and restriction are related by Frobenius reciprocity.</p>
+
+<p>In one common form,</p>
+
+<p>
+<md>\Hom_G(\operatorname{Ind}_H^G W,V)
+\cong
+\Hom_H(W,\operatorname{Res}_H^G V).</md>
+</p>
+
+<p>This theorem expresses a deep compatibility between representations of a
+group and representations of its subgroups.</p>
+
+<p>A full treatment requires a more detailed development of induced modules and
+is deferred to advanced representation theory.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representations-of-algebras">
+<title>Representations of Algebras</title>
+<p>Representation theory is not limited to groups.</p>
+
+<p>Let <m>A</m> be an <m>F</m>-algebra.</p>
+
+<p>A representation of <m>A</m> on <m>V</m> is an algebra homomorphism</p>
+
+<p>
+<md>\rho:A\to\End_F(V).</md>
+</p>
+
+<p>Thus elements of <m>A</m> act as linear operators.</p>
+
+<p>Equivalently, <m>V</m> becomes an <m>A</m>-module.</p>
+
+<p>This perspective includes representations of:</p>
+
+<p>
+<ul>
+<li>
+<p>group algebras;</p>
+</li>
+<li>
+<p>associative algebras;</p>
+</li>
+<li>
+<p>Lie algebras;</p>
+</li>
+<li>
+<p>operator algebras;</p>
+</li>
+<li>
+<p>quiver algebras.</p>
+</li>
+</ul>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-lie-preview">
+<title>Representations of Lie Groups and Lie Algebras</title>
+<p>Representation theory becomes especially important for Lie groups and Lie
+algebras.</p>
+
+<p>A Lie group representation typically has the form</p>
+
+<p>
+<md>\rho:G\to GL(V),</md>
+</p>
+
+<p>with additional smoothness conditions.</p>
+
+<p>A Lie algebra representation has the form</p>
+
+<p>
+<md>\rho:\mathfrak g\to\mathfrak{gl}(V),</md>
+</p>
+
+<p>where the fraktur symbol</p>
+
+<p>
+<md>\mathfrak g</md>
+</p>
+
+<p>is read <q>fraktur @@PROTECTED0@@</q> and commonly denotes a Lie algebra.</p>
+
+<p>The notation</p>
+
+<p>
+<md>\mathfrak{gl}(V)</md>
+</p>
+
+<p>denotes the Lie algebra of linear endomorphisms of <m>V</m>.</p>
+
+<p>These structures are developed canonically in
+<xref ref="sec-lie-groups-lie-algebras" />.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-symmetry-through-representations">
+<title>Symmetry Through Representations</title>
+<p>Representation theory is fundamentally a mathematical theory of symmetry.</p>
+
+<p>A symmetry group may be abstract, but a representation describes how those
+symmetries act on an actual mathematical space.</p>
+
+<p>\begin{tikzpicture}[
+    node distance=12mm and 18mm,
+    box/.style={draw,rounded corners,align=center,inner sep=5pt},
+    &gt;=stealth
+]
+\node[box] (sym) {Abstract symmetry\\group <m>G</m>};
+\node[box,below left=of sym] (geo) {Geometric\\space};
+\node[box,below=of sym] (vec) {Vector\\space};
+\node[box,below right=of sym] (func) {Function\\space};</p>
+
+<p>\node[box,below=24mm of sym] (rep) {Representation theory};</p>
+
+<p>\draw[-&gt;,thick] (sym)--(geo);
+\draw[-&gt;,thick] (sym)--(vec);
+\draw[-&gt;,thick] (sym)--(func);
+\draw[-&gt;,thick] (geo)--(rep);
+\draw[-&gt;,thick] (vec)--(rep);
+\draw[-&gt;,thick] (func)--(rep);
+\end{tikzpicture}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-geometry">
+<title>Representation Theory and Geometry</title>
+<p>Geometric objects often possess symmetry groups.</p>
+
+<p>Representations describe how those symmetries act on:</p>
+
+<p>
+<ul>
+<li>
+<p>tangent spaces;</p>
+</li>
+<li>
+<p>coordinate spaces;</p>
+</li>
+<li>
+<p>polynomial spaces;</p>
+</li>
+<li>
+<p>differential forms;</p>
+</li>
+<li>
+<p>spaces of functions.</p>
+</li>
+</ul>
+</p>
+
+<p>For example, rotations of a polygon act naturally on the plane, producing a
+two-dimensional representation of a dihedral group.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-differential-equations">
+<title>Representation Theory and Differential Equations</title>
+<p>Symmetries of differential equations can act on their spaces of solutions.</p>
+
+<p>Representation theory can then decompose a complicated solution space into
+simpler invariant pieces.</p>
+
+<p>This philosophy appears in:</p>
+
+<p>
+<ul>
+<li>
+<p>Fourier analysis;</p>
+</li>
+<li>
+<p>spherical harmonics;</p>
+</li>
+<li>
+<p>partial differential equations;</p>
+</li>
+<li>
+<p>spectral theory;</p>
+</li>
+<li>
+<p>mathematical physics.</p>
+</li>
+</ul>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-quantum">
+<title>Representation Theory and Quantum Mechanics</title>
+<p>Quantum mechanics makes extensive use of representations of symmetry groups.</p>
+
+<p>Physical states form vector spaces, while symmetries act through linear or
+unitary transformations.</p>
+
+<p>Angular momentum, spin, rotational symmetry, and particle classifications
+are deeply connected to representations of groups and Lie algebras.</p>
+
+<p>The mathematical principle is:</p>
+
+<p>
+<md>\text{symmetry}\longrightarrow\text{linear operators}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-fourier">
+<title>Representation Theory and Fourier Analysis</title>
+<p>Classical Fourier analysis can be interpreted using representations of
+abelian groups.</p>
+
+<p>For a finite cyclic group, irreducible characters are roots of unity.</p>
+
+<p>For continuous abelian groups, analogous characters lead to exponential
+functions such as</p>
+
+<p>
+<md>e^{2\pi i\xi x}.</md>
+</p>
+
+<p>Thus Fourier decomposition can be viewed as decomposition into irreducible
+representations of an abelian symmetry group.</p>
+
+<p>This connection is developed further in the analysis branch.</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-structural-hierarchy">
+<title>A Structural Hierarchy</title>
+<p>Representation theory can be organized around decomposition:</p>
+
+<p>\begin{tikzpicture}[
+    node distance=10mm and 13mm,
+    box/.style={draw,rounded corners,align=center,inner sep=5pt,font=\small},
+    &gt;=stealth
+]
+\node[box] (rep) {Representation <m>V</m>};
+\node[box,below=of rep] (inv) {Invariant subspaces};
+\node[box,below left=of inv] (red) {Reducible};
+\node[box,below right=of inv] (irr) {Irreducible};
+\node[box,below=of red] (direct) {Direct-sum\\decomposition};
+\node[box,below=of direct] (chars) {Characters};
+\node[box,below=of irr] (blocks) {Basic building\\blocks};</p>
+
+<p>\draw[-&gt;] (rep)--(inv);
+\draw[-&gt;] (inv)--(red);
+\draw[-&gt;] (inv)--(irr);
+\draw[-&gt;] (red)--(direct);
+\draw[-&gt;] (direct)--(chars);
+\draw[-&gt;] (irr)--(blocks);
+\draw[-&gt;] (chars)--(blocks);
+\end{tikzpicture}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-worked-c4-representation">
+<title>Worked Example: A Representation of <m>C_4</m></title>
+<example>
+<title>Representing <m>C_4</m> by Rotations</title>
+<p>Let</p>
+
+<p>
+<md>C_4=\langle g:g^4=e\rangle.</md>
+</p>
+
+<p>Represent <m>g</m> as rotation through <m>90^\circ</m>.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\rho(g)=\begin{pmatrix}0&amp;-1\\1&amp;0\end{pmatrix},\qquad
+\rho(g)^4=I_2.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-worked-faithful-representation">
+<title>Worked Example: Kernel and Faithfulness</title>
+<example>
+<title>Testing Faithfulness</title>
+<p>Let</p>
+
+<p>
+<md>C_4=\langle g\rangle</md>
+</p>
+
+<p>and define a one-dimensional complex representation by</p>
+
+<p>
+<md>\rho(g)=i.</md>
+</p>
+
+<p>Determine whether <m>\rho</m> is faithful.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\rho\text{ is faithful}.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-worked-character-decomposition">
+<title>Worked Example: Character Decomposition</title>
+<example>
+<title>Finding Multiplicity from a Character</title>
+<p>Suppose <m>\chi</m> is a character of a finite group and <m>\psi</m> is an
+irreducible character. Assume</p>
+
+<p>
+<md>\inner{\chi,\psi}=3.</md>
+</p>
+
+<p>Determine the multiplicity of the irreducible representation corresponding
+to <m>\psi</m>.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\psi\text{ occurs with multiplicity }3.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-assigning-matrices-without-checking-the-group-law">
+<title>Assigning Matrices Without Checking the Group Law</title>
+<p>A collection of matrices does not define a representation unless</p>
+
+<p>
+<md>\rho(gh)=\rho(g)\rho(h).</md>
+</p>
+
+<p>For a group given by generators and relations, the matrices must satisfy the
+same relations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-a-representation-with-its-matrix-form">
+<title>Confusing a Representation with Its Matrix Form</title>
+<p>A representation acts on a vector space.</p>
+
+<p>Matrices appear only after choosing a basis.</p>
+
+<p>Different matrices may therefore describe equivalent representations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-faithful-with-irreducible">
+<title>Confusing Faithful with Irreducible</title>
+<p>Faithfulness concerns the kernel:</p>
+
+<p>
+<md>\Ker(\rho)=\{e\}.</md>
+</p>
+
+<p>Irreducibility concerns invariant subspaces.</p>
+
+<p>Neither condition implies the other in general.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-checking-invariance-under-only-one-element">
+<title>Checking Invariance Under Only One Element</title>
+<p>A subspace <m>W</m> is <m>G</m>-invariant only if</p>
+
+<p>
+<md>\rho(g)W\subseteq W</md>
+</p>
+
+<p>for every <m>g\in G</m>.</p>
+
+<p>If the group is generated by a set <m>S</m>, however, it is enough to check the
+generators.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-reducible-means-already-decomposed">
+<title>Assuming Reducible Means Already Decomposed</title>
+<p>A reducible representation contains a nontrivial invariant subspace.</p>
+
+<p>That alone does not automatically give a direct-sum decomposition over every
+field and in every characteristic.</p>
+
+<p>Maschke's theorem provides such decompositions under specific hypotheses.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-the-characteristic">
+<title>Ignoring the Characteristic</title>
+<p>For a finite group <m>G</m>, Maschke's theorem requires</p>
+
+<p>
+<md>\operatorname{char}(F)\nmid|G|.</md>
+</p>
+
+<p>If the characteristic divides the group order, representations may fail to
+be completely reducible.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-characters-with-representations">
+<title>Confusing Characters with Representations</title>
+<p>A character is a function obtained from a representation:</p>
+
+<p>
+<md>\chi_\rho(g)=\tr(\rho(g)).</md>
+</p>
+
+<p>It summarizes important information but is not itself the original matrix
+representation.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-conjugacy-classes">
+<title>Forgetting Conjugacy Classes</title>
+<p>Characters are constant on conjugacy classes.</p>
+
+<p>A character table therefore has columns indexed by conjugacy classes, not
+necessarily by individual elements.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forgetting-class-sizes-in-inner-products">
+<title>Forgetting Class Sizes in Inner Products</title>
+<p>When computing a character inner product class by class, each character
+value must be multiplied by the size of its conjugacy class.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}
+<em>Group Theory.</em>
+Representations turn abstract groups into matrix groups and reveal structural
+information through linear algebra.</p>
+
+<p>\medskip</p>
+
+<p><em>Noncommutative Algebra.</em>
+Representations of groups correspond to modules over group algebras, linking
+representation theory directly with module and ring theory.</p>
+
+<p>\medskip</p>
+
+<p><em>Geometry.</em>
+Symmetry groups act on geometric spaces, tangent spaces, coordinate spaces,
+and spaces of functions.</p>
+
+<p>\medskip</p>
+
+<p><em>Number Theory.</em>
+Representations of finite groups, Galois groups, and arithmetic groups play
+major roles in modern number theory.</p>
+
+<p>\medskip</p>
+
+<p><em>Fourier Analysis.</em>
+Characters of abelian groups generalize the exponential functions underlying
+Fourier series and Fourier transforms.</p>
+
+<p>\medskip</p>
+
+<p><em>Differential Equations.</em>
+Symmetry representations can decompose solution spaces into simpler
+invariant components.</p>
+
+<p>\medskip</p>
+
+<p><em>Quantum Mechanics.</em>
+Physical symmetries are represented by linear or unitary operators on state
+spaces.</p>
+
+<p>\medskip</p>
+
+<p><em>Particle Physics.</em>
+Representations of Lie groups and Lie algebras classify many symmetry types
+and particle states.</p>
+
+<p>\medskip</p>
+
+<p><em>Chemistry.</em>
+Molecular symmetry and spectroscopy use representations and character tables
+to classify vibrational and orbital behavior.
+\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>State the definition of a representation</p>
+
+<p>
+<md>\rho:G\to GL(V).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that every representation satisfies</p>
+
+<p>
+<md>\rho(e)=I_V.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>\rho(g^{-1})=\rho(g)^{-1}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the trivial representation of a group <m>G</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is the degree of a representation on <m>F^5</m>?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Let</p>
+
+<p>
+<md>C_3=\langle g\rangle.</md>
+</p>
+
+<p>Show that</p>
+
+<p>
+<md>\rho(g)=e^{2\pi i/3}</md>
+</p>
+
+<p>defines a one-dimensional complex representation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Let</p>
+
+<p>
+<md>C_4=\langle g\rangle.</md>
+</p>
+
+<p>Determine whether</p>
+
+<p>
+<md>\rho(g)=
+\begin{pmatrix}
+0&amp;-1\\
+1&amp;0
+\end{pmatrix}</md>
+</p>
+
+<p>defines a representation of <m>C_4</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the kernel of a representation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a faithful representation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that a representation is faithful if and only if it is injective.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the left regular representation is faithful.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a <m>G</m>-invariant subspace.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>\Span\{(1,1,\ldots,1)\}</md>
+</p>
+
+<p>is invariant under every permutation representation on <m>F^n</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Distinguish reducible and irreducible representations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that every one-dimensional nonzero representation is irreducible.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the direct sum</p>
+
+<p>
+<md>V\oplus W</md>
+</p>
+
+<p>of two representations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify that</p>
+
+<p>
+<md>\rho_1\oplus\rho_2</md>
+</p>
+
+<p>satisfies the representation homomorphism condition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State Maschke's theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why the condition</p>
+
+<p>
+<md>\operatorname{char}(F)\nmid|G|</md>
+</p>
+
+<p>is necessary for the averaging argument in Maschke's theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Let <m>G</m> be a finite group acting on a complex vector space. Explain how
+averaging can produce a <m>G</m>-invariant inner product.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an intertwining map.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the kernel of an intertwining map is invariant.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that the image of an intertwining map is invariant.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the previous two exercises to prove Schur's lemma.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define equivalent representations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that a change of basis produces an equivalent matrix representation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the character of a representation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>\chi(e)=\dim(V).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that equivalent representations have the same character.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that characters are constant on conjugacy classes.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the character of</p>
+
+<p>
+<md>A=\begin{pmatrix}2&amp;0\\0&amp;-1\end{pmatrix}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the character of a plane rotation through angle <m>\theta</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that</p>
+
+<p>
+<md>\chi_{V\oplus W}=\chi_V+\chi_W.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that</p>
+
+<p>
+<md>\chi_{V\otimes W}=\chi_V\chi_W.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the inner product of two complex characters of a finite group.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the <m>S_3</m> character</p>
+
+<p>
+<md>\chi=(2,0,-1),</md>
+</p>
+
+<p>verify that</p>
+
+<p>
+<md>\inner{\chi,\chi}=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Using the <m>S_3</m> character table, verify that</p>
+
+<p>
+<md>\inner{\chi_{\mathrm{triv}},\chi_{\mathrm{sgn}}}=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Using the <m>S_3</m> character table, verify that</p>
+
+<p>
+<md>\inner{\chi_{\mathrm{std}},\chi_{\mathrm{triv}}}=0.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the sum of squares formula for irreducible representation dimensions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose a group has order <m>8</m> and four one-dimensional irreducible
+representations. If there is exactly one additional irreducible
+representation, determine its dimension.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose a finite group has irreducible representation dimensions</p>
+
+<p>
+<md>1,1,2,3.</md>
+</p>
+
+<p>Determine the order of the group.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why every irreducible complex representation of a finite abelian
+group is one-dimensional.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine the character of the regular representation of a group of order
+<m>10</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If an irreducible representation has dimension <m>4</m>, how many copies of it
+occur in the regular representation?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the dual representation <m>V^*</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that</p>
+
+<p>
+<md>\rho_{V^*}(g)=\rho_V(g^{-1})^{\mathsf T}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a quotient representation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why invariance of <m>W</m> is necessary for the action on</p>
+
+<p>
+<md>V/W</md>
+</p>
+
+<p>to be well defined.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the restriction</p>
+
+<p>
+<md>\operatorname{Res}_H^G V.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of an irreducible representation that becomes reducible when
+restricted to a subgroup.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is meant by an induced representation?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain conceptually how restriction and induction move in opposite
+directions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show explicitly that representations of <m>G</m> over <m>F</m> correspond to
+<m>F[G]</m>-modules.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the permutation representation of <m>S_3</m> on <m>\R^3</m>, prove that</p>
+
+<p>
+<md>\R^3=\Span\{(1,1,1)\}\oplus
+\{(x,y,z):x+y+z=0\}.</md>
+</p>
+
+<p>Show that both summands are invariant.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Using the character table of <m>S_3</m>, decompose the three-dimensional
+permutation representation into irreducible representations.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-11-representation-theory-subsec-representation-theory-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Representation theory converts abstract algebraic structure into linear
+transformations. Group representations therefore connect group theory with
+linear algebra, while the equivalence between group representations and
+modules over group algebras connects the subject directly with module theory
+and noncommutative algebra. Irreducible representations serve as basic
+building blocks, Maschke's theorem explains when complete decomposition is
+possible, and Schur's lemma describes maps between irreducible pieces.
+Characters compress matrix information into class functions and provide
+powerful tools for testing irreducibility and determining multiplicities.
+Tensor products, duals, restrictions, and induced representations provide
+new ways to construct representations. These ideas prepare for
+<xref ref="sec-lie-groups-lie-algebras" />, while character theory connects naturally
+with Fourier analysis, geometry, number theory, differential equations, and
+mathematical physics.</p>
+</remark>
+</subsection>
+
 </section>

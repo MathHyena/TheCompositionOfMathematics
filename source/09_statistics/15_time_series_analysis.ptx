@@ -1,9 +1,5061 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-09-statistics-15-time-series-analysis">
-  <title>Time Series Analysis</title>
+<section xml:id="sec-time-series-analysis">
+<title>Time Series Analysis</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Probability, random variables, expectation and variance, covariance and
+correlation, regression, statistical estimation, hypothesis testing,
+stochastic processes, linear algebra, and basic differential and
+difference equations.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain what distinguishes time series data from ordinary
+          independent observations;</p>
+</li>
+<li>
+<p>identify trend, seasonality, cycles, and irregular variation;</p>
+</li>
+<li>
+<p>define weak stationarity;</p>
+</li>
+<li>
+<p>define autocovariance and autocorrelation functions;</p>
+</li>
+<li>
+<p>interpret lag;</p>
+</li>
+<li>
+<p>compute sample autocovariances and autocorrelations;</p>
+</li>
+<li>
+<p>understand white-noise processes;</p>
+</li>
+<li>
+<p>understand random walks;</p>
+</li>
+<li>
+<p>distinguish stationary and nonstationary time series;</p>
+</li>
+<li>
+<p>understand differencing;</p>
+</li>
+<li>
+<p>define autoregressive models;</p>
+</li>
+<li>
+<p>define moving-average models;</p>
+</li>
+<li>
+<p>define ARMA and ARIMA models;</p>
+</li>
+<li>
+<p>understand stationarity conditions for autoregressive models;</p>
+</li>
+<li>
+<p>understand invertibility for moving-average models;</p>
+</li>
+<li>
+<p>derive basic mean and variance properties of AR models;</p>
+</li>
+<li>
+<p>understand the Yule--Walker equations;</p>
+</li>
+<li>
+<p>interpret ACF and PACF patterns;</p>
+</li>
+<li>
+<p>understand seasonal ARIMA models conceptually;</p>
+</li>
+<li>
+<p>understand exponential smoothing;</p>
+</li>
+<li>
+<p>understand Holt and Holt--Winters methods conceptually;</p>
+</li>
+<li>
+<p>understand forecasting and forecast uncertainty;</p>
+</li>
+<li>
+<p>distinguish one-step and multi-step forecasts;</p>
+</li>
+<li>
+<p>understand residual diagnostics;</p>
+</li>
+<li>
+<p>recognize unit-root behavior;</p>
+</li>
+<li>
+<p>understand deterministic and stochastic trends;</p>
+</li>
+<li>
+<p>understand transformations such as logarithms;</p>
+</li>
+<li>
+<p>understand intervention and transfer-function ideas
+          conceptually;</p>
+</li>
+<li>
+<p>recognize state-space models;</p>
+</li>
+<li>
+<p>understand the Kalman-filter idea conceptually;</p>
+</li>
+<li>
+<p>distinguish univariate and multivariate time series;</p>
+</li>
+<li>
+<p>recognize vector autoregression;</p>
+</li>
+<li>
+<p>understand cointegration conceptually;</p>
+</li>
+<li>
+<p>recognize frequency-domain analysis;</p>
+</li>
+<li>
+<p>understand spectral density conceptually;</p>
+</li>
+<li>
+<p>connect time series with stochastic processes, forecasting,
+          regression, and dynamical systems.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-what-is-time-series">
+<title>What Is a Time Series?</title>
+<p>A time series is a sequence of observations indexed by time.</p>
+
+<p>A discrete-time series may be written</p>
+
+<p>
+<md>\boxed{
+X_1,
+X_2,
+\ldots,
+X_T.
+}</md>
+</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{daily temperature},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{monthly sales},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{hourly sensor measurements},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{annual economic indicators}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-why-time-order-matters">
+<title>Why Time Order Matters</title>
+<p>In ordinary i.i.d. sampling, rearranging observations does not change
+the probabilistic structure.</p>
+
+<p>In a time series, order is essential.</p>
+
+<p>For example,</p>
+
+<p>
+<md>X_t</md>
+</p>
+
+<p>may depend strongly on</p>
+
+<p>
+<md>X_{t-1}.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\text{time dependence}
+}</md>
+</p>
+
+<p>is a defining feature of time series analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-stochastic-process">
+<title>Time Series as a Stochastic Process</title>
+<p>A time series can be viewed as one observed realization of a stochastic
+process</p>
+
+<p>
+<md>\boxed{
+\{X_t:t\in\mathbb{Z}\}.
+}</md>
+</p>
+
+<p>The index <m>t</m> represents discrete time.</p>
+
+<p>The probabilistic model describes the joint behavior of</p>
+
+<p>
+<md>X_t,
+X_{t-1},
+X_{t-2},
+\ldots</md>
+</p>
+
+<p>across time.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-components">
+<title>Components of a Time Series</title>
+<p>A time series may contain several structural components:</p>
+
+<p>
+<md>\boxed{
+\text{trend},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{seasonality},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{cycles},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{irregular variation}.
+}</md>
+</p>
+
+<p>These components may overlap.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-trend">
+<title>Trend</title>
+<p>A trend is a long-term change in the level of a series.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{steady growth},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{steady decline},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{long-run nonlinear change}.
+}</md>
+</p>
+
+<p>A simple deterministic linear trend is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\beta_0+\beta_1t+\varepsilon_t.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-seasonality">
+<title>Seasonality</title>
+<p>Seasonality is a repeating pattern with a known or approximately fixed
+period.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{daily cycles},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{weekly cycles},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{annual cycles}.
+}</md>
+</p>
+
+<p>A monthly series with yearly seasonality has period</p>
+
+<p>
+<md>\boxed{
+s=12.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-cycles">
+<title>Cyclic Variation</title>
+<p>Cyclic variation involves recurring rises and falls whose periods are not
+necessarily fixed.</p>
+
+<p>Economic business cycles are a common example.</p>
+
+<p>Unlike strict seasonality, cycles may vary in duration and magnitude.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-irregular">
+<title>Irregular Variation</title>
+<p>Irregular variation refers to remaining fluctuations not explained by
+trend, seasonality, or other systematic structure.</p>
+
+<p>A statistical model attempts to make this remaining component behave as
+close as possible to an unpredictable noise process.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-additive-time-series-decomposition">
+<title>Additive Decomposition</title>
+<p>An additive decomposition has the form</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+T_t
++
+S_t
++
+C_t
++
+R_t,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>T_t
+=
+\text{trend},</md>
+</p>
+
+<p>
+<md>S_t
+=
+\text{seasonal component},</md>
+</p>
+
+<p>
+<md>C_t
+=
+\text{cyclic component},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>R_t
+=
+\text{remainder}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-multiplicative-time-series-decomposition">
+<title>Multiplicative Decomposition</title>
+<p>When variation increases with the level of the series, a multiplicative
+form may be more appropriate:</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+T_tS_tC_tR_t.
+}</md>
+</p>
+
+<p>Taking logarithms converts products into sums:</p>
+
+<p>
+<md>\boxed{
+\log X_t
+=
+\log T_t
++
+\log S_t
++
+\log C_t
++
+\log R_t.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-lag">
+<title>Lag</title>
+<p>A lag is a time separation between observations.</p>
+
+<p>For example,</p>
+
+<p>
+<md>X_t</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>X_{t-1}</md>
+</p>
+
+<p>are separated by lag <m>1</m>.</p>
+
+<p>Likewise,</p>
+
+<p>
+<md>X_t</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>X_{t-k}</md>
+</p>
+
+<p>are separated by lag <m>k</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-mean-function">
+<title>Mean Function</title>
+<p>The time-dependent mean is</p>
+
+<p>
+<md>\boxed{
+\mu_t
+=
+\mathbb{E}[X_t].
+}</md>
+</p>
+
+<p>For a stationary process, this mean does not depend on time.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\mu_t=\mu.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-autocovariance-function">
+<title>Autocovariance Function</title>
+<p>For a general time series,</p>
+
+<p>
+<md>\boxed{
+\gamma(s,t)
+=
+\operatorname{Cov}(X_s,X_t).
+}</md>
+</p>
+
+<p>For a weakly stationary process, covariance depends only on the lag</p>
+
+<p>
+<md>h=t-s.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\gamma(h)
+=
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-autocorrelation-function">
+<title>Autocorrelation Function</title>
+<p>The autocorrelation function, abbreviated ACF, is</p>
+
+<p>
+<md>\boxed{
+\rho(h)
+=
+\frac{
+\gamma(h)
+}{
+\gamma(0)
+}.
+}</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>\gamma(0)
+=
+\operatorname{Var}(X_t),</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\boxed{
+\rho(0)=1.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-autocovariance-symmetry">
+<title>Symmetry of Autocovariance</title>
+<p>For a weakly stationary process,</p>
+
+<p>
+<md>\boxed{
+\gamma(-h)
+=
+\gamma(h).
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\rho(-h)
+=
+\rho(h).
+}</md>
+</p>
+
+<p>Only nonnegative lags are usually displayed.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-weak-stationarity">
+<title>Weak Stationarity</title>
+<definition>
+<title>Weak Stationarity</title>
+<statement>
+<p>A process <m>\{X_t\}</m> is weakly stationary if:</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[X_t]
+=
+\mu
+}</md>
+</p>
+
+<p>for all <m>t</m>,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(X_t)
+=
+\gamma(0)
+&lt;
+\infty,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+)
+=
+\gamma(h)
+}</md>
+</p>
+
+<p>depends only on lag <m>h</m>, not on <m>t</m>.</p>
+</statement>
+</definition>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-strict-stationarity">
+<title>Strict Stationarity</title>
+<p>A process is strictly stationary if every finite-dimensional
+distribution is unchanged by shifting time.</p>
+
+<p>For any times</p>
+
+<p>
+<md>t_1,\ldots,t_k</md>
+</p>
+
+<p>and shift <m>h</m>,</p>
+
+<p>
+<md>\boxed{
+(
+X_{t_1},
+\ldots,
+X_{t_k}
+)
+\overset{d}{=}
+(
+X_{t_1+h},
+\ldots,
+X_{t_k+h}
+).
+}</md>
+</p>
+
+<p>Strict stationarity is stronger than weak stationarity unless additional
+conditions are imposed.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-gaussian-stationarity">
+<title>Gaussian Stationarity</title>
+<p>For a Gaussian process, the joint distributions are completely
+determined by means and covariances.</p>
+
+<p>Therefore, for Gaussian processes,</p>
+
+<p>
+<md>\boxed{
+\text{weak stationarity}
+\Longrightarrow
+\text{strict stationarity}.
+}</md>
+</p>
+
+<p>This is a special property of Gaussian processes.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-sample-mean">
+<title>Sample Mean of a Time Series</title>
+<p>For observations</p>
+
+<p>
+<md>X_1,\ldots,X_T,</md>
+</p>
+
+<p>the sample mean is</p>
+
+<p>
+<md>\boxed{
+\overline{X}
+=
+\frac1T
+\sum_{t=1}^{T}
+X_t.
+}</md>
+</p>
+
+<p>Because observations may be dependent, its variance is generally not</p>
+
+<p>
+<md>\sigma^2/T.</md>
+</p>
+
+<p>Autocovariances contribute to its uncertainty.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-variance-time-series-mean">
+<title>Variance of a Time-Series Mean</title>
+<p>For a weakly stationary process,</p>
+
+<p>
+<md>\operatorname{Var}
+(
+\overline{X}
+)
+=
+\frac1{T^2}
+\sum_{t=1}^{T}
+\sum_{s=1}^{T}
+\gamma(t-s).</md>
+</p>
+
+<p>This can be rewritten as</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+\overline{X}
+)
+=
+\frac1T
+\left[
+\gamma(0)
++
+2
+\sum_{h=1}^{T-1}
+\left(
+1-\frac{h}{T}
+\right)
+\gamma(h)
+\right].
+}</md>
+</p>
+
+<p>Positive serial correlation generally increases uncertainty in the sample
+mean.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-sample-autocovariance">
+<title>Sample Autocovariance</title>
+<p>A common sample autocovariance estimator at lag <m>h</m> is</p>
+
+<p>
+<md>\boxed{
+\widehat{\gamma}(h)
+=
+\frac1T
+\sum_{t=h+1}^{T}
+(
+X_t-\overline{X}
+)
+(
+X_{t-h}-\overline{X}
+).
+}</md>
+</p>
+
+<p>Different denominator conventions are used.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-sample-autocorrelation">
+<title>Sample Autocorrelation</title>
+<p>The sample autocorrelation at lag <m>h</m> is</p>
+
+<p>
+<md>\boxed{
+\widehat{\rho}(h)
+=
+\frac{
+\widehat{\gamma}(h)
+}{
+\widehat{\gamma}(0)
+}.
+}</md>
+</p>
+
+<p>Plotting</p>
+
+<p>
+<md>\widehat{\rho}(h)</md>
+</p>
+
+<p>against <m>h</m> produces the sample ACF.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-acf-plot">
+<title>Autocorrelation Plot</title>
+<p>An ACF plot helps identify:</p>
+
+<p>
+<md>\boxed{
+\text{serial dependence},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{seasonality},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{possible ARMA structure}.
+}</md>
+</p>
+
+<p>Large autocorrelations at seasonal lags may indicate repeating seasonal
+behavior.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-white-noise">
+<title>White Noise</title>
+<definition>
+<title>White Noise</title>
+<statement>
+<p>A white-noise process <m>\{\varepsilon_t\}</m> has</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[\varepsilon_t]=0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(\varepsilon_t)=\sigma_\varepsilon^2,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\operatorname{Cov}
+(
+\varepsilon_t,
+\varepsilon_s
+)
+=
+0
+\qquad
+(t\neq s).
+}</md>
+</p>
+</statement>
+</definition>
+
+<p>White noise is uncorrelated across time.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-independent-white-noise">
+<title>Independent White Noise</title>
+<p>If the white-noise variables are also independent, the process is
+stronger than merely uncorrelated white noise.</p>
+
+<p>Gaussian white noise satisfies</p>
+
+<p>
+<md>\boxed{
+\varepsilon_t
+\overset{\text{i.i.d.}}{\sim}
+N
+(
+0,\sigma_\varepsilon^2
+).
+}</md>
+</p>
+
+<p>In Gaussian settings, zero covariance implies independence.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-random-walk">
+<title>Random Walk</title>
+<p>A random walk satisfies</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+X_{t-1}
++
+\varepsilon_t,
+}</md>
+</p>
+
+<p>where <m>\varepsilon_t</m> is white noise.</p>
+
+<p>Iterating,</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+X_0
++
+\sum_{j=1}^{t}
+\varepsilon_j.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-random-walk-mean-variance">
+<title>Random-Walk Mean and Variance</title>
+<p>If</p>
+
+<p>
+<md>X_0</md>
+</p>
+
+<p>is fixed and</p>
+
+<p>
+<md>\mathbb{E}[\varepsilon_t]=0,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[X_t]
+=
+X_0.
+}</md>
+</p>
+
+<p>But</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(X_t)
+=
+t\sigma_\varepsilon^2.
+}</md>
+</p>
+
+<p>The variance grows with time.</p>
+
+<p>Therefore the random walk is not weakly stationary.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-random-walk-drift">
+<title>Random Walk with Drift</title>
+<p>A random walk with drift is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\delta
++
+X_{t-1}
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[X_t]
+=
+X_0+t\delta.
+}</md>
+</p>
+
+<p>Both the mean and variance change with time.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-differencing">
+<title>Differencing</title>
+<p>The first difference is</p>
+
+<p>
+<md>\boxed{
+\Delta X_t
+=
+X_t-X_{t-1}.
+}</md>
+</p>
+
+<p>For a random walk,</p>
+
+<p>
+<md>X_t
+=
+X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>\boxed{
+\Delta X_t
+=
+\varepsilon_t.
+}</md>
+</p>
+
+<p>Thus differencing converts the random walk into white noise.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-second-differences">
+<title>Second Differences</title>
+<p>The second difference is</p>
+
+<p>
+<md>\boxed{
+\Delta^2X_t
+=
+\Delta
+(
+\Delta X_t
+).
+}</md>
+</p>
+
+<p>Expanding,</p>
+
+<p>
+<md>\boxed{
+\Delta^2X_t
+=
+X_t
+-
+2X_{t-1}
++
+X_{t-2}.
+}</md>
+</p>
+
+<p>Higher-order differencing can remove polynomial-type trends, but excessive
+differencing can create unnecessary dependence.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-seasonal-differencing">
+<title>Seasonal Differencing</title>
+<p>For seasonal period <m>s</m>, seasonal differencing is</p>
+
+<p>
+<md>\boxed{
+\Delta_sX_t
+=
+X_t-X_{t-s}.
+}</md>
+</p>
+
+<p>For monthly data with yearly seasonality,</p>
+
+<p>
+<md>\boxed{
+s=12.
+}</md>
+</p>
+
+<p>Seasonal differencing can remove repeating seasonal levels.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-backshift-operator">
+<title>Backshift Operator</title>
+<p>Define the backshift operator <m>B</m> by</p>
+
+<p>
+<md>\boxed{
+BX_t
+=
+X_{t-1}.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+B^kX_t
+=
+X_{t-k}.
+}</md>
+</p>
+
+<p>First differencing becomes</p>
+
+<p>
+<md>\boxed{
+\Delta
+=
+1-B.
+}</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\Delta X_t
+=
+(1-B)X_t.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-seasonal-backshift">
+<title>Seasonal Difference Operator</title>
+<p>Seasonal differencing can be written</p>
+
+<p>
+<md>\boxed{
+\Delta_s
+=
+1-B^s.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\Delta_sX_t
+=
+(
+1-B^s
+)
+X_t.
+}</md>
+</p>
+
+<p>Operator notation makes ARIMA models compact.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-autoregressive-models">
+<title>Autoregressive Models</title>
+<p>An autoregressive model expresses the current value as a linear function
+of previous values plus noise.</p>
+
+<p>An AR(<m>p</m>) model is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+c
++
+\phi_1X_{t-1}
++
+\cdots
++
+\phi_pX_{t-p}
++
+\varepsilon_t.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-model">
+<title>AR(1) Model</title>
+<p>The simplest autoregressive model is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+c
++
+\phi X_{t-1}
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>|\phi|&lt;1,</md>
+</p>
+
+<p>the process has a stationary solution.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-mean">
+<title>Mean of a Stationary AR(1)</title>
+<p>Suppose</p>
+
+<p>
+<md>X_t
+=
+c+\phi X_{t-1}+\varepsilon_t</md>
+</p>
+
+<p>is stationary.</p>
+
+<p>Taking expectations,</p>
+
+<p>
+<md>\mu
+=
+c+\phi\mu.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\mu
+=
+\frac{
+c
+}{
+1-\phi
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-centered-ar1">
+<title>Centered AR(1) Model</title>
+<p>Subtracting the stationary mean gives</p>
+
+<p>
+<md>\boxed{
+X_t-\mu
+=
+\phi
+(
+X_{t-1}-\mu
+)
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>This form simplifies covariance calculations.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-variance">
+<title>Variance of a Stationary AR(1)</title>
+<p>For the centered model,</p>
+
+<p>
+<md>X_t
+=
+\phi X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>assuming mean zero for simplicity.</p>
+
+<p>Taking variances,</p>
+
+<p>
+<md>\gamma(0)
+=
+\phi^2\gamma(0)
++
+\sigma_\varepsilon^2.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\gamma(0)
+=
+\frac{
+\sigma_\varepsilon^2
+}{
+1-\phi^2
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-autocovariance">
+<title>AR(1) Autocovariance</title>
+<p>For <m>h\geq1</m>,</p>
+
+<p>
+<md>\gamma(h)
+=
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+).</md>
+</p>
+
+<p>Using</p>
+
+<p>
+<md>X_t
+=
+\phi X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>and independence of future innovations from past observations,</p>
+
+<p>
+<md>\boxed{
+\gamma(h)
+=
+\phi\gamma(h-1).
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\gamma(h)
+=
+\phi^h\gamma(0).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-autocorrelation">
+<title>AR(1) Autocorrelation</title>
+<p>Dividing by <m>\gamma(0)</m>,</p>
+
+<p>
+<md>\boxed{
+\rho(h)
+=
+\phi^{|h|}.
+}</md>
+</p>
+
+<p>Therefore the ACF of an AR(1) process decays geometrically.</p>
+
+<p>If</p>
+
+<p>
+<md>0&lt;\phi&lt;1,</md>
+</p>
+
+<p>the decay is positive.</p>
+
+<p>If</p>
+
+<p>
+<md>-1&lt;\phi&lt;0,</md>
+</p>
+
+<p>the autocorrelations alternate in sign.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-worked-ar1">
+<title>Worked Example: AR(1) Variance and ACF</title>
+<example>
+<title>Stationary AR(1)</title>
+<p>Suppose</p>
+
+<p>
+<md>X_t
+=
+0.6X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\operatorname{Var}(\varepsilon_t)=4.</md>
+</p>
+
+<p>The stationary variance is</p>
+
+<p>
+<md>\gamma(0)
+=
+\frac{
+4
+}{
+1-0.6^2
+}.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\begin{answerbox}
+\[
+\boxed{
+\gamma(0)
+=
+6.25.
+}</md>
+</p>
+
+<p>Also,</p>
+
+<p>
+<md>\boxed{
+\rho(h)
+=
+0.6^{|h|}.
+}</md>
+</p>
+
+<p>\end{answerbox}</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-ma-infinity">
+<title>Infinite Moving-Average Representation of AR(1)</title>
+<p>If</p>
+
+<p>
+<md>|\phi|&lt;1,</md>
+</p>
+
+<p>then repeatedly substituting gives</p>
+
+<p>
+<md>X_t
+=
+\varepsilon_t
++
+\phi\varepsilon_{t-1}
++
+\phi^2\varepsilon_{t-2}
++
+\cdots</md>
+</p>
+
+<p>for the zero-mean AR(1) model.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\sum_{j=0}^{\infty}
+\phi^j
+\varepsilon_{t-j}.
+}</md>
+</p>
+
+<p>This representation explains stationarity when the coefficients decay
+sufficiently fast.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-arp-operator-form">
+<title>AR(<m>p</m>) Operator Form</title>
+<p>An AR(<m>p</m>) model may be written</p>
+
+<p>
+<md>\boxed{
+\phi(B)X_t
+=
+c+\varepsilon_t,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\phi(B)
+=
+1
+-
+\phi_1B
+-
+\cdots
+-
+\phi_pB^p.
+}</md>
+</p>
+
+<p>Stationarity depends on the roots of the autoregressive polynomial.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar-stationarity-condition">
+<title>AR Stationarity Condition</title>
+<p>The AR(<m>p</m>) process is stationary when the roots of</p>
+
+<p>
+<md>\boxed{
+1
+-
+\phi_1z
+-
+\cdots
+-
+\phi_pz^p
+=
+0
+}</md>
+</p>
+
+<p>lie outside the unit circle:</p>
+
+<p>
+<md>\boxed{
+|z|&gt;1.
+}</md>
+</p>
+
+<p>For AR(1), this reduces to</p>
+
+<p>
+<md>\boxed{
+|\phi|&lt;1.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-yule-walker">
+<title>Yule--Walker Equations</title>
+<p>For a zero-mean stationary AR(<m>p</m>) process,</p>
+
+<p>
+<md>X_t
+=
+\sum_{j=1}^{p}
+\phi_jX_{t-j}
++
+\varepsilon_t,</md>
+</p>
+
+<p>multiply by <m>X_{t-k}</m> and take expectations.</p>
+
+<p>This gives</p>
+
+<p>
+<md>\boxed{
+\gamma(k)
+=
+\sum_{j=1}^{p}
+\phi_j
+\gamma(k-j),
+\qquad
+k\geq1.
+}</md>
+</p>
+
+<p>These are the Yule--Walker equations.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-yule-walker-matrix">
+<title>Yule--Walker Matrix Form</title>
+<p>For the first <m>p</m> equations,</p>
+
+<p>
+<md>\boxed{
+\begin{pmatrix}
+\gamma(0)
+&amp;
+\gamma(1)
+&amp;
+\cdots
+&amp;
+\gamma(p-1)
+\\
+\gamma(1)
+&amp;
+\gamma(0)
+&amp;
+\cdots
+&amp;
+\gamma(p-2)
+\\
+\vdots
+&amp;
+\vdots
+&amp;
+\ddots
+&amp;
+\vdots
+\\
+\gamma(p-1)
+&amp;
+\gamma(p-2)
+&amp;
+\cdots
+&amp;
+\gamma(0)
+\end{pmatrix}
+\begin{pmatrix}
+\phi_1\\
+\phi_2\\
+\vdots\\
+\phi_p
+\end{pmatrix}
+=
+\begin{pmatrix}
+\gamma(1)\\
+\gamma(2)\\
+\vdots\\
+\gamma(p)
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>Sample autocovariances can be substituted to estimate AR parameters.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-moving-average-models">
+<title>Moving-Average Models</title>
+<p>A moving-average model expresses the current observation as a finite
+linear combination of present and past innovations.</p>
+
+<p>An MA(<m>q</m>) model is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\mu
++
+\varepsilon_t
++
+\theta_1\varepsilon_{t-1}
++
+\cdots
++
+\theta_q\varepsilon_{t-q}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ma1-model">
+<title>MA(1) Model</title>
+<p>A zero-mean MA(1) model is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1}.
+}</md>
+</p>
+
+<p>Since it is a finite linear combination of white-noise terms, it is
+stationary for every finite <m>\theta</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ma1-variance">
+<title>Variance of an MA(1)</title>
+<p>For</p>
+
+<p>
+<md>X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1},</md>
+</p>
+
+<p>the variance is</p>
+
+<p>
+<md>\boxed{
+\gamma(0)
+=
+\sigma_\varepsilon^2
+(
+1+\theta^2
+).
+}</md>
+</p>
+
+<p>This follows from independence or zero covariance of innovations at
+different times.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ma1-autocovariance">
+<title>MA(1) Autocovariance</title>
+<p>At lag <m>1</m>,</p>
+
+<p>
+<md>\boxed{
+\gamma(1)
+=
+\theta
+\sigma_\varepsilon^2.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>|h|&gt;1,</md>
+</p>
+
+<p>there are no shared innovation terms, so</p>
+
+<p>
+<md>\boxed{
+\gamma(h)=0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ma1-autocorrelation">
+<title>MA(1) Autocorrelation</title>
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\rho(1)
+=
+\frac{
+\theta
+}{
+1+\theta^2
+},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\rho(h)=0
+\qquad
+|h|&gt;1.
+}</md>
+</p>
+
+<p>Thus the MA(1) ACF cuts off after lag <m>1</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-maq-acf-pattern">
+<title>MA(<m>q</m>) ACF Pattern</title>
+<p>For an MA(<m>q</m>) process,</p>
+
+<p>
+<md>\boxed{
+\rho(h)=0
+\qquad
+|h|&gt;q.
+}</md>
+</p>
+
+<p>Thus the theoretical ACF cuts off after lag <m>q</m>.</p>
+
+<p>This provides a useful identification clue.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ma-invertibility">
+<title>Invertibility</title>
+<p>Invertibility allows an MA process to be expressed uniquely as an
+infinite autoregressive process.</p>
+
+<p>For MA(1),</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1}.
+}</md>
+</p>
+
+<p>The usual invertibility condition is</p>
+
+<p>
+<md>\boxed{
+|\theta|&lt;1.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-general-ma-invertibility">
+<title>General MA Invertibility</title>
+<p>For</p>
+
+<p>
+<md>\theta(B)
+=
+1
++
+\theta_1B
++
+\cdots
++
+\theta_qB^q,</md>
+</p>
+
+<p>invertibility requires the roots of</p>
+
+<p>
+<md>\boxed{
+\theta(z)=0
+}</md>
+</p>
+
+<p>to lie outside the unit circle.</p>
+
+<p>This provides a unique and stable innovation representation.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-arma-models">
+<title>ARMA Models</title>
+<p>An ARMA(<m>p,q</m>) model combines autoregressive and moving-average terms:</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+c
++
+\sum_{j=1}^{p}
+\phi_jX_{t-j}
++
+\varepsilon_t
++
+\sum_{k=1}^{q}
+\theta_k\varepsilon_{t-k}.
+}</md>
+</p>
+
+<p>In operator form,</p>
+
+<p>
+<md>\boxed{
+\phi(B)X_t
+=
+c
++
+\theta(B)\varepsilon_t.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-arma-identification">
+<title>ARMA Identification</title>
+<p>Pure AR and MA models have characteristic ACF and PACF patterns.</p>
+
+<p>For ARMA models, both the ACF and PACF generally decay rather than cut off
+sharply.</p>
+
+<p>Therefore model identification usually combines:</p>
+
+<p>
+<md>\boxed{
+\text{ACF},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{PACF},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{information criteria},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{residual diagnostics}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-partial-autocorrelation">
+<title>Partial Autocorrelation Function</title>
+<p>The partial autocorrelation at lag <m>h</m> measures the linear association
+between</p>
+
+<p>
+<md>X_t</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>X_{t-h}</md>
+</p>
+
+<p>after accounting for the intermediate values</p>
+
+<p>
+<md>X_{t-1},
+\ldots,
+X_{t-h+1}.</md>
+</p>
+
+<p>It is abbreviated PACF.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-pacf-interpretation">
+<title>PACF Interpretation</title>
+<p>For an AR(<m>p</m>) process, the theoretical PACF cuts off after lag <m>p</m>.</p>
+
+<p>For an MA(<m>q</m>) process, the theoretical PACF generally decays.</p>
+
+<p>This complements the ACF behavior.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-acf-pacf-patterns">
+<title>Basic ACF and PACF Patterns</title>
+<p>A common identification summary is:</p>
+
+<p>
+<md>\begin{array}{c|c|c}
+\text{Model}
+&amp;
+\text{ACF}
+&amp;
+\text{PACF}
+\\
+\hline
+AR(p)
+&amp;
+\text{decays}
+&amp;
+\text{cuts off after }p
+\\
+MA(q)
+&amp;
+\text{cuts off after }q
+&amp;
+\text{decays}
+\\
+ARMA(p,q)
+&amp;
+\text{decays}
+&amp;
+\text{decays}
+\end{array}</md>
+</p>
+
+<p>These are theoretical patterns, not exact finite-sample rules.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-arima-models">
+<title>ARIMA Models</title>
+<p>ARIMA stands for</p>
+
+<p>
+<md>\boxed{
+\text{Autoregressive Integrated Moving Average}.
+}</md>
+</p>
+
+<p>An ARIMA(<m>p,d,q</m>) model assumes that after differencing <m>d</m> times,
+the resulting series follows an ARMA(<m>p,q</m>) process.</p>
+
+<p>Symbolically,</p>
+
+<p>
+<md>\boxed{
+\phi(B)
+(
+1-B
+)^d
+X_t
+=
+c
++
+\theta(B)\varepsilon_t.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-meaning-of-integrated-arima">
+<title>Meaning of Integrated</title>
+<p>The term <q>integrated</q> refers to the fact that differencing reverses a
+cumulative or integrated behavior.</p>
+
+<p>For example, a random walk is ARIMA(<m>0,1,0</m>):</p>
+
+<p>
+<md>\boxed{
+(1-B)X_t
+=
+\varepsilon_t.
+}</md>
+</p>
+
+<p>Thus its first difference is white noise.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-worked-arima-identification">
+<title>Worked Example: ARIMA Identification</title>
+<example>
+<title>Random Walk</title>
+<p>Suppose</p>
+
+<p>
+<md>X_t
+=
+X_{t-1}
++
+\varepsilon_t.</md>
+</p>
+
+<p>Subtract <m>X_{t-1}</m>:</p>
+
+<p>
+<md>X_t-X_{t-1}
+=
+\varepsilon_t.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\Delta X_t
+=
+\varepsilon_t,
+}</md>
+</p>
+
+<p>so the process is</p>
+
+<p>
+<md>\boxed{
+ARIMA(0,1,0).
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-seasonal-arima">
+<title>Seasonal ARIMA</title>
+<p>A seasonal ARIMA model is commonly denoted</p>
+
+<p>
+<md>\boxed{
+ARIMA
+(
+p,d,q
+)
+\times
+(
+P,D,Q
+)_s.
+}</md>
+</p>
+
+<p>Here:</p>
+
+<p>
+<md>p,d,q</md>
+</p>
+
+<p>describe nonseasonal structure,</p>
+
+<p>while</p>
+
+<p>
+<md>P,D,Q</md>
+</p>
+
+<p>describe seasonal structure with period</p>
+
+<p>
+<md>s.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-seasonal-arima-operator">
+<title>Seasonal ARIMA Operator Form</title>
+<p>A general multiplicative seasonal ARIMA model can be written</p>
+
+<p>
+<md>\boxed{
+\Phi
+(
+B^s
+)
+\phi(B)
+(
+1-B
+)^d
+(
+1-B^s
+)^D
+X_t
+=
+\Theta
+(
+B^s
+)
+\theta(B)
+\varepsilon_t.
+}</md>
+</p>
+
+<p>This notation compactly represents both ordinary and seasonal
+dependence.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-deterministic-trend">
+<title>Deterministic Trend</title>
+<p>A deterministic trend model may be written</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+m(t)
++
+Y_t,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>m(t)</md>
+</p>
+
+<p>is a deterministic function and</p>
+
+<p>
+<md>Y_t</md>
+</p>
+
+<p>is stationary.</p>
+
+<p>For a linear trend,</p>
+
+<p>
+<md>\boxed{
+m(t)
+=
+\beta_0+\beta_1t.
+}</md>
+</p>
+
+<p>Detrending can be performed by estimating and subtracting <m>m(t)</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-stochastic-trend">
+<title>Stochastic Trend</title>
+<p>A stochastic trend evolves through random shocks.</p>
+
+<p>The random walk</p>
+
+<p>
+<md>X_t
+=
+X_{t-1}
++
+\varepsilon_t</md>
+</p>
+
+<p>is the canonical example.</p>
+
+<p>Shocks have persistent effects because each innovation remains embedded
+in all future values.</p>
+
+<p>Differencing is often appropriate for stochastic trends.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-detrending-versus-differencing">
+<title>Detrending Versus Differencing</title>
+<p>For deterministic trends, regression on time may produce a stationary
+remainder.</p>
+
+<p>For stochastic trends, simply subtracting a deterministic trend may not
+remove the nonstationarity.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{deterministic trend}
+\rightarrow
+\text{detrending},
+}</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>\boxed{
+\text{unit-root-type stochastic trend}
+\rightarrow
+\text{differencing}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-unit-roots">
+<title>Unit Roots</title>
+<p>Consider</p>
+
+<p>
+<md>X_t
+=
+\phi X_{t-1}
++
+\varepsilon_t.</md>
+</p>
+
+<p>When</p>
+
+<p>
+<md>\boxed{
+\phi=1,
+}</md>
+</p>
+
+<p>the autoregressive polynomial has a root on the unit circle.</p>
+
+<p>The process becomes a random walk:</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+X_{t-1}
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>This is called a unit-root process.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-near-unit-roots">
+<title>Near Unit Roots</title>
+<p>If</p>
+
+<p>
+<md>\phi</md>
+</p>
+
+<p>is close to <m>1</m>, the process is stationary when</p>
+
+<p>
+<md>|\phi|&lt;1,</md>
+</p>
+
+<p>but highly persistent.</p>
+
+<p>Autocorrelations decay slowly.</p>
+
+<p>Finite samples can make it difficult to distinguish a highly persistent
+stationary process from a true unit-root process.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-unit-root-testing-preview">
+<title>Unit-Root Testing Preview</title>
+<p>A common test considers</p>
+
+<p>
+<md>H_0:
+\phi=1</md>
+</p>
+
+<p>against</p>
+
+<p>
+<md>H_A:
+|\phi|&lt;1.</md>
+</p>
+
+<p>Ordinary <m>t</m>-test reference distributions do not apply under the unit
+root null.</p>
+
+<p>Tests such as the Dickey--Fuller family use specialized nonstandard null
+distributions.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-spurious-regression">
+<title>Spurious Regression</title>
+<p>Regressing one unrelated nonstationary series on another can produce:</p>
+
+<p>
+<md>\boxed{
+\text{high }R^2,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{apparently significant coefficients},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{misleading relationships}.
+}</md>
+</p>
+
+<p>This phenomenon is called spurious regression.</p>
+
+<p>Stationarity and cointegration must therefore be considered before
+interpreting time-series regressions.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-transformations">
+<title>Transformations</title>
+<p>Transformations can stabilize variance or simplify temporal structure.</p>
+
+<p>Common transformations include:</p>
+
+<p>
+<md>\boxed{
+\log X_t,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\sqrt{X_t},
+}</md>
+</p>
+
+<p>or more generally</p>
+
+<p>
+<md>\boxed{
+g(X_t).
+}</md>
+</p>
+
+<p>The transformation should respect the domain and scientific meaning of
+the data.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-log-differences">
+<title>Log Differences</title>
+<p>For positive <m>X_t</m>,</p>
+
+<p>
+<md>\boxed{
+\Delta\log X_t
+=
+\log X_t
+-
+\log X_{t-1}
+=
+\log
+\left(
+\frac{
+X_t
+}{
+X_{t-1}
+}
+\right).
+}</md>
+</p>
+
+<p>For small relative changes,</p>
+
+<p>
+<md>\boxed{
+\Delta\log X_t
+\approx
+\frac{
+X_t-X_{t-1}
+}{
+X_{t-1}
+}.
+}</md>
+</p>
+
+<p>Thus log differences approximate proportional growth rates.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-box-cox-time-series">
+<title>Box--Cox Transformation Preview</title>
+<p>For positive data, the Box--Cox family is</p>
+
+<p>
+<md>\boxed{
+g_\lambda(x)
+=
+\begin{cases}
+\dfrac{x^\lambda-1}{\lambda},
+&amp;
+\lambda\neq0,
+\\[1em]
+\log x,
+&amp;
+\lambda=0.
+\end{cases}
+}</md>
+</p>
+
+<p>It provides a systematic family for variance-stabilizing
+transformations.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-forecasting">
+<title>Forecasting</title>
+<p>A forecast predicts future observations using information available up to
+the present.</p>
+
+<p>Let</p>
+
+<p>
+<md>\mathcal{F}_t</md>
+</p>
+
+<p>represent information observed through time <m>t</m>.</p>
+
+<p>Under squared-error loss, the optimal forecast of <m>X_{t+h}</m> is</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\mathbb{E}
+[
+X_{t+h}
+\mid
+\mathcal{F}_t
+].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-forecast-error">
+<title>Forecast Error</title>
+<p>The <m>h</m>-step-ahead forecast error is</p>
+
+<p>
+<md>\boxed{
+e_{t+h\mid t}
+=
+X_{t+h}
+-
+\widehat{X}_{t+h\mid t}.
+}</md>
+</p>
+
+<p>Its variance determines forecast uncertainty.</p>
+
+<p>As the forecast horizon increases, uncertainty often increases.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-one-step-forecast">
+<title>One-Step Forecast for AR(1)</title>
+<p>For</p>
+
+<p>
+<md>X_t
+=
+c
++
+\phi X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>the one-step forecast is</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+1\mid t}
+=
+c
++
+\phi X_t.
+}</md>
+</p>
+
+<p>The forecast error is</p>
+
+<p>
+<md>\boxed{
+e_{t+1\mid t}
+=
+\varepsilon_{t+1}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+e_{t+1\mid t}
+)
+=
+\sigma_\varepsilon^2.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-multistep-forecast">
+<title>Multi-Step AR(1) Forecast</title>
+<p>For a stationary AR(1) with mean <m>\mu</m>,</p>
+
+<p>
+<md>X_t-\mu
+=
+\phi
+(
+X_{t-1}-\mu
+)
++
+\varepsilon_t.</md>
+</p>
+
+<p>The <m>h</m>-step forecast is</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\mu
++
+\phi^h
+(
+X_t-\mu
+).
+}</md>
+</p>
+
+<p>As</p>
+
+<p>
+<md>h\to\infty,</md>
+</p>
+
+<p>if <m>|\phi|&lt;1</m>,</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+\to
+\mu.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-forecast-error-variance">
+<title>AR(1) Forecast Error Variance</title>
+<p>For the stationary AR(1),</p>
+
+<p>
+<md>e_{t+h\mid t}
+=
+\sum_{j=0}^{h-1}
+\phi^j
+\varepsilon_{t+h-j}.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+=
+\sigma_\varepsilon^2
+\sum_{j=0}^{h-1}
+\phi^{2j}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+=
+\sigma_\varepsilon^2
+\frac{
+1-\phi^{2h}
+}{
+1-\phi^2
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ar1-long-horizon-uncertainty">
+<title>Long-Horizon AR(1) Forecast Uncertainty</title>
+<p>As</p>
+
+<p>
+<md>h\to\infty,</md>
+</p>
+
+<p>
+<md>\phi^{2h}\to0</md>
+</p>
+
+<p>for <m>|\phi|&lt;1</m>.</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+\to
+\frac{
+\sigma_\varepsilon^2
+}{
+1-\phi^2
+}.
+}</md>
+</p>
+
+<p>This equals the unconditional stationary variance.</p>
+
+<p>At long horizons, current information becomes less useful.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-forecast-intervals-time-series">
+<title>Forecast Intervals</title>
+<p>If forecast errors are approximately normal,</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+\pm
+z_{1-\alpha/2}
+\sqrt{
+\operatorname{Var}
+(
+e_{t+h\mid t}
+)
+}
+}</md>
+</p>
+
+<p>gives an approximate forecast interval when model parameters are treated
+as known.</p>
+
+<p>In practice, parameter estimation adds additional uncertainty.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-random-walk-forecast">
+<title>Forecasting a Random Walk</title>
+<p>For</p>
+
+<p>
+<md>X_t
+=
+X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>the optimal forecast is</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+=
+X_t.
+}</md>
+</p>
+
+<p>The future value is the current value plus future innovations.</p>
+
+<p>The forecast error variance is</p>
+
+<p>
+<md>\boxed{
+h\sigma_\varepsilon^2.
+}</md>
+</p>
+
+<p>Thus forecast uncertainty grows without bound.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-forecast-accuracy">
+<title>Forecast Accuracy</title>
+<p>Common forecast error measures include mean absolute error:</p>
+
+<p>
+<md>\boxed{
+MAE
+=
+\frac1n
+\sum_{i=1}^{n}
+|e_i|,
+}</md>
+</p>
+
+<p>and root mean squared error:</p>
+
+<p>
+<md>\boxed{
+RMSE
+=
+\sqrt{
+\frac1n
+\sum_{i=1}^{n}
+e_i^2
+}.
+}</md>
+</p>
+
+<p>Different measures penalize errors differently.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-mape">
+<title>Mean Absolute Percentage Error</title>
+<p>A common scale-free measure is</p>
+
+<p>
+<md>\boxed{
+MAPE
+=
+\frac{100}{n}
+\sum_{i=1}^{n}
+\left|
+\frac{
+e_i
+}{
+y_i
+}
+\right|.
+}</md>
+</p>
+
+<p>MAPE can behave poorly when actual values are zero or close to zero.</p>
+
+<p>Thus it should not be used mechanically.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-training-test">
+<title>Training and Test Periods</title>
+<p>Forecast performance should be evaluated on future observations not used
+to estimate the model.</p>
+
+<p>Because time order matters, randomly shuffling observations is usually
+inappropriate.</p>
+
+<p>Instead, use an earlier training period and a later test period:</p>
+
+<p>
+<md>\boxed{
+\text{past}
+\rightarrow
+\text{fit},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{future}
+\rightarrow
+\text{evaluate}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-rolling-origin-evaluation">
+<title>Rolling-Origin Evaluation</title>
+<p>Rolling-origin evaluation repeatedly forecasts future observations from
+different historical cutoffs.</p>
+
+<p>For example:</p>
+
+<p>
+<md>1{:}100
+\rightarrow
+101,</md>
+</p>
+
+<p>
+<md>1{:}101
+\rightarrow
+102,</md>
+</p>
+
+<p>and so forth.</p>
+
+<p>This better reflects the sequential forecasting problem than random
+cross-validation.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-expanding-rolling-windows">
+<title>Expanding and Rolling Windows</title>
+<p>An expanding window keeps all previous observations:</p>
+
+<p>
+<md>\boxed{
+1{:}t.
+}</md>
+</p>
+
+<p>A rolling window uses only the most recent <m>w</m> observations:</p>
+
+<p>
+<md>\boxed{
+(t-w+1){:}t.
+}</md>
+</p>
+
+<p>Rolling windows can adapt more quickly when the data-generating process
+changes over time.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-simple-exponential-smoothing">
+<title>Simple Exponential Smoothing</title>
+<p>For a series with approximately constant level and no strong trend or
+seasonality, simple exponential smoothing updates the level as</p>
+
+<p>
+<md>\boxed{
+\ell_t
+=
+\alpha X_t
++
+(1-\alpha)\ell_{t-1},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>0\leq\alpha\leq1.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-exponential-weighting">
+<title>Exponential Weighting</title>
+<p>Repeated substitution yields weights that decay geometrically into the
+past.</p>
+
+<p>Recent observations receive weights such as</p>
+
+<p>
+<md>\alpha,</md>
+</p>
+
+<p>
+<md>\alpha(1-\alpha),</md>
+</p>
+
+<p>
+<md>\alpha(1-\alpha)^2,</md>
+</p>
+
+<p>and so forth.</p>
+
+<p>Thus older observations receive exponentially smaller weights.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ses-forecast">
+<title>Simple Exponential-Smoothing Forecast</title>
+<p>The forecast for all future horizons is</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\ell_t,
+\qquad
+h\geq1.
+}</md>
+</p>
+
+<p>Thus the model forecasts a constant future level.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-holt-linear-trend">
+<title>Holt's Linear Trend Method</title>
+<p>Holt's method extends exponential smoothing by maintaining both a level
+and a trend.</p>
+
+<p>A common form is</p>
+
+<p>
+<md>\boxed{
+\ell_t
+=
+\alpha X_t
++
+(1-\alpha)
+(
+\ell_{t-1}+b_{t-1}
+),
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+b_t
+=
+\beta
+(
+\ell_t-\ell_{t-1}
+)
++
+(1-\beta)b_{t-1}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-holt-forecast">
+<title>Holt Forecast</title>
+<p>The <m>h</m>-step forecast is</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\ell_t
++
+hb_t.
+}</md>
+</p>
+
+<p>Thus the forecast extrapolates the estimated local trend.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-damped-trend">
+<title>Damped Trend Preview</title>
+<p>Long-run extrapolation of a linear trend may be unrealistic.</p>
+
+<p>A damped-trend method uses a damping parameter</p>
+
+<p>
+<md>0&lt;\phi&lt;1</md>
+</p>
+
+<p>so trend contributions gradually decrease with forecast horizon.</p>
+
+<p>This often produces more conservative long-term forecasts.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-holt-winters">
+<title>Holt--Winters Methods</title>
+<p>Holt--Winters methods extend exponential smoothing to include seasonal
+components.</p>
+
+<p>They maintain estimates of:</p>
+
+<p>
+<md>\boxed{
+\text{level},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{trend},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{seasonality}.
+}</md>
+</p>
+
+<p>Additive and multiplicative seasonal versions are commonly used.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-additive-multiplicative-seasonality">
+<title>Additive Versus Multiplicative Seasonality</title>
+<p>Additive seasonality is appropriate when seasonal fluctuations have
+roughly constant magnitude.</p>
+
+<p>Multiplicative seasonality is appropriate when seasonal variation grows
+with the level of the series.</p>
+
+<p>A log transformation can often convert multiplicative structure into an
+approximately additive form.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-regression">
+<title>Time-Series Regression</title>
+<p>A time-series regression may have the form</p>
+
+<p>
+<md>\boxed{
+Y_t
+=
+\beta_0
++
+\beta_1X_{1t}
++
+\cdots
++
+\beta_pX_{pt}
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>Unlike ordinary regression, the error sequence</p>
+
+<p>
+<md>\varepsilon_t</md>
+</p>
+
+<p>may be serially correlated.</p>
+
+<p>Ignoring that dependence can produce incorrect standard errors and
+forecast intervals.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-regression-ar-errors">
+<title>Regression with AR Errors</title>
+<p>One model is</p>
+
+<p>
+<md>\boxed{
+Y_t
+=
+\mathbf{x}_t^T
+\boldsymbol{\beta}
++
+u_t,
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+u_t
+=
+\phi u_{t-1}
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>This combines regression on explanatory variables with autoregressive
+error structure.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-dynamic-regression">
+<title>Dynamic Regression</title>
+<p>A dynamic regression may include current and lagged predictors:</p>
+
+<p>
+<md>\boxed{
+Y_t
+=
+\beta_0
++
+\beta_1X_t
++
+\beta_2X_{t-1}
++
+\phi Y_{t-1}
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>Such models combine regression and time dependence.</p>
+
+<p>Care is required when variables are nonstationary.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-intervention-analysis">
+<title>Intervention Analysis Preview</title>
+<p>An intervention represents a known event that may alter a series.</p>
+
+<p>For example, define</p>
+
+<p>
+<md>I_t
+=
+\begin{cases}
+0,&amp;t&lt;T_0,\\
+1,&amp;t\geq T_0.
+\end{cases}</md>
+</p>
+
+<p>A model such as</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\mu
++
+\beta I_t
++
+u_t
+}</md>
+</p>
+
+<p>can represent a permanent level change while <m>u_t</m> follows a time-series
+model.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-pulse-intervention">
+<title>Pulse Intervention</title>
+<p>A pulse intervention represents an effect occurring at one particular
+time:</p>
+
+<p>
+<md>\boxed{
+P_t
+=
+\begin{cases}
+1,&amp;t=T_0,\\
+0,&amp;t\neq T_0.
+\end{cases}
+}</md>
+</p>
+
+<p>It can represent unusual one-time events.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-transfer-function-models">
+<title>Transfer-Function Models Preview</title>
+<p>A transfer-function model describes how an input series affects an output
+series over time.</p>
+
+<p>One may write schematically</p>
+
+<p>
+<md>\boxed{
+Y_t
+=
+\sum_{j=0}^{\infty}
+\omega_j
+X_{t-j}
++
+N_t,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>N_t</md>
+</p>
+
+<p>is a noise process.</p>
+
+<p>The coefficients <m>\omega_j</m> describe delayed dynamic effects.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-distributed-lag-models">
+<title>Distributed-Lag Models</title>
+<p>A finite distributed-lag model is</p>
+
+<p>
+<md>\boxed{
+Y_t
+=
+\alpha
++
+\beta_0X_t
++
+\beta_1X_{t-1}
++
+\cdots
++
+\beta_qX_{t-q}
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>The total effect of a persistent one-unit change may involve</p>
+
+<p>
+<md>\boxed{
+\sum_{j=0}^{q}\beta_j.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-residuals">
+<title>Residuals</title>
+<p>After fitting a model, residuals are</p>
+
+<p>
+<md>\boxed{
+e_t
+=
+X_t-\widehat{X}_t.
+}</md>
+</p>
+
+<p>A good time-series model should leave residuals that behave approximately
+like unpredictable noise.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-residual-acf">
+<title>Residual ACF</title>
+<p>Residual autocorrelations should be small if the temporal dependence has
+been adequately modeled.</p>
+
+<p>Large residual ACF values indicate remaining structure.</p>
+
+<p>This may suggest:</p>
+
+<p>
+<md>\boxed{
+\text{missing AR terms},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{missing MA terms},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{seasonality},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{structural change}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-ljung-box-preview">
+<title>Ljung--Box Test Preview</title>
+<p>The Ljung--Box statistic jointly evaluates several residual
+autocorrelations.</p>
+
+<p>For lags through <m>m</m>,</p>
+
+<p>
+<md>\boxed{
+Q
+=
+T(T+2)
+\sum_{h=1}^{m}
+\frac{
+\widehat{\rho}(h)^2
+}{
+T-h
+}.
+}</md>
+</p>
+
+<p>Under suitable null conditions, <m>Q</m> has an approximate chi-square
+distribution with degrees of freedom adjusted for fitted model
+parameters.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-model-selection">
+<title>Model Selection</title>
+<p>Time-series model selection should balance fit and complexity.</p>
+
+<p>Common tools include:</p>
+
+<p>
+<md>\boxed{
+AIC,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+BIC,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+ACF/PACF patterns,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+residual diagnostics,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+out-of-sample forecast performance.
+}</md>
+</p>
+
+<p>No single criterion should be used blindly.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-aic">
+<title>Akaike Information Criterion</title>
+<p>For a model with maximized likelihood <m>L</m> and <m>k</m> estimated
+parameters,</p>
+
+<p>
+<md>\boxed{
+AIC
+=
+-2\log L
++
+2k.
+}</md>
+</p>
+
+<p>Smaller AIC values are preferred among models fit to the same data under
+comparable likelihood definitions.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-bic">
+<title>Bayesian Information Criterion</title>
+<p>The Bayesian information criterion is</p>
+
+<p>
+<md>\boxed{
+BIC
+=
+-2\log L
++
+k\log T.
+}</md>
+</p>
+
+<p>BIC penalizes model complexity more strongly than AIC when <m>T</m> is
+sufficiently large.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-state-space-models">
+<title>State-Space Models</title>
+<p>State-space models describe an observed process through an unobserved
+state process.</p>
+
+<p>A linear Gaussian state-space model has:</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}_t
+=
+F\mathbf{x}_{t-1}
++
+\mathbf{w}_t
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\mathbf{y}_t
+=
+H\mathbf{x}_t
++
+\mathbf{v}_t.
+}</md>
+</p>
+
+<p>The first is the state equation.</p>
+
+<p>The second is the observation equation.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-latent-states">
+<title>Latent States</title>
+<p>The state</p>
+
+<p>
+<md>\mathbf{x}_t</md>
+</p>
+
+<p>represents unobserved system information at time <m>t</m>.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{underlying level},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{trend},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{velocity},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{hidden economic condition}.
+}</md>
+</p>
+
+<p>Observed data provide noisy information about these states.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-kalman-filter-preview">
+<title>Kalman Filter Preview</title>
+<p>The Kalman filter recursively estimates latent states in a linear
+Gaussian state-space model.</p>
+
+<p>Each step has two broad stages:</p>
+
+<p>
+<md>\boxed{
+\text{prediction}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{update}.
+}</md>
+</p>
+
+<p>The prediction uses the previous state estimate.</p>
+
+<p>The update incorporates the new observation.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-kalman-prediction">
+<title>Kalman Prediction Step</title>
+<p>If</p>
+
+<p>
+<md>\widehat{\mathbf{x}}_{t-1\mid t-1}</md>
+</p>
+
+<p>is the filtered state estimate, the predicted state is</p>
+
+<p>
+<md>\boxed{
+\widehat{\mathbf{x}}_{t\mid t-1}
+=
+F
+\widehat{\mathbf{x}}_{t-1\mid t-1}.
+}</md>
+</p>
+
+<p>The covariance is also propagated through the state equation.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-kalman-update">
+<title>Kalman Update Idea</title>
+<p>The observed value</p>
+
+<p>
+<md>\mathbf{y}_t</md>
+</p>
+
+<p>is compared with its prediction.</p>
+
+<p>The difference is the innovation:</p>
+
+<p>
+<md>\boxed{
+\mathbf{v}_t
+=
+\mathbf{y}_t
+-
+H
+\widehat{\mathbf{x}}_{t\mid t-1}.
+}</md>
+</p>
+
+<p>The state estimate is corrected using a matrix called the Kalman gain.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-structural-time-series">
+<title>Structural Time-Series Models</title>
+<p>State-space models can represent structural components such as:</p>
+
+<p>
+<md>\boxed{
+\text{local level},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{local trend},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{seasonality},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{regression effects}.
+}</md>
+</p>
+
+<p>This provides an alternative framework to classical ARIMA modeling.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-multivariate-time-series">
+<title>Multivariate Time Series</title>
+<p>A multivariate time series is a vector process</p>
+
+<p>
+<md>\boxed{
+\mathbf{X}_t
+=
+\begin{pmatrix}
+X_{1t}\\
+\vdots\\
+X_{pt}
+\end{pmatrix}.
+}</md>
+</p>
+
+<p>Now dependence can occur:</p>
+
+<p>
+<md>\boxed{
+\text{across time}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{across variables}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-vector-autoregression">
+<title>Vector Autoregression</title>
+<p>A VAR(<m>p</m>) model is</p>
+
+<p>
+<md>\boxed{
+\mathbf{X}_t
+=
+\mathbf{c}
++
+A_1
+\mathbf{X}_{t-1}
++
+\cdots
++
+A_p
+\mathbf{X}_{t-p}
++
+\boldsymbol{\varepsilon}_t.
+}</md>
+</p>
+
+<p>Each variable may depend on past values of all variables in the system.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-var1">
+<title>VAR(1)</title>
+<p>A VAR(1) model is</p>
+
+<p>
+<md>\boxed{
+\mathbf{X}_t
+=
+\mathbf{c}
++
+A
+\mathbf{X}_{t-1}
++
+\boldsymbol{\varepsilon}_t.
+}</md>
+</p>
+
+<p>Its stability depends on the eigenvalues of <m>A</m>.</p>
+
+<p>A standard stationarity condition is</p>
+
+<p>
+<md>\boxed{
+|\lambda_j(A)|&lt;1
+}</md>
+</p>
+
+<p>for every eigenvalue <m>\lambda_j(A)</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-cross-covariance-time-series">
+<title>Cross-Covariance</title>
+<p>For two component series <m>X_t</m> and <m>Y_t</m>, the cross-covariance at lag
+<m>h</m> is</p>
+
+<p>
+<md>\boxed{
+\gamma_{XY}(h)
+=
+\operatorname{Cov}
+(
+X_t,
+Y_{t-h}
+).
+}</md>
+</p>
+
+<p>Unlike ordinary autocovariance,</p>
+
+<p>
+<md>\gamma_{XY}(h)</md>
+</p>
+
+<p>need not be symmetric in <m>h</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-granger-causality-preview">
+<title>Granger Causality Preview</title>
+<p>A series <m>X_t</m> is said to Granger-cause <m>Y_t</m> if past values of <m>X</m>
+improve prediction of <m>Y</m> beyond information already contained in past
+values of <m>Y</m> and other included variables.</p>
+
+<p>This is a predictive concept.</p>
+
+<p>It does not by itself establish structural or scientific causation.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-cointegration">
+<title>Cointegration</title>
+<p>Two nonstationary series may move together so that a particular linear
+combination is stationary.</p>
+
+<p>Suppose <m>X_t</m> and <m>Y_t</m> are individually nonstationary, but</p>
+
+<p>
+<md>\boxed{
+Y_t-\beta X_t
+}</md>
+</p>
+
+<p>is stationary.</p>
+
+<p>Then the series are cointegrated.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-why-cointegration">
+<title>Why Cointegration Matters</title>
+<p>Differencing removes long-run level information.</p>
+
+<p>Cointegration identifies situations where nonstationary variables share a
+stable long-run relationship.</p>
+
+<p>Thus a model can represent:</p>
+
+<p>
+<md>\boxed{
+\text{short-run dynamics}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{long-run equilibrium}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-error-correction-model">
+<title>Error-Correction Model Preview</title>
+<p>A simple error-correction model may have the form</p>
+
+<p>
+<md>\boxed{
+\Delta Y_t
+=
+\alpha
+(
+Y_{t-1}
+-
+\beta X_{t-1}
+)
++
+\gamma
+\Delta X_t
++
+\varepsilon_t.
+}</md>
+</p>
+
+<p>The term</p>
+
+<p>
+<md>Y_{t-1}-\beta X_{t-1}</md>
+</p>
+
+<p>measures deviation from the long-run relationship.</p>
+
+<p>The coefficient <m>\alpha</m> controls adjustment toward equilibrium.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-frequency-domain-view">
+<title>Frequency-Domain View</title>
+<p>Time-domain methods describe dependence through lags.</p>
+
+<p>Frequency-domain methods describe a series through oscillations at
+different frequencies.</p>
+
+<p>Thus the same stochastic behavior can often be studied through:</p>
+
+<p>
+<md>\boxed{
+\text{time}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{frequency}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-sinusoidal-components">
+<title>Sinusoidal Components</title>
+<p>A sinusoidal component has the form</p>
+
+<p>
+<md>\boxed{
+A
+\cos
+(
+\omega t+\phi
+),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>A
+=
+\text{amplitude},</md>
+</p>
+
+<p>
+<md>\omega
+=
+\text{angular frequency},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\phi
+=
+\text{phase}.</md>
+</p>
+
+<p>Repeated cycles in time correspond to concentrated energy at particular
+frequencies.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-spectral-density">
+<title>Spectral Density</title>
+<p>For a weakly stationary process with autocovariance function
+<m>\gamma(h)</m>, the spectral density is formally</p>
+
+<p>
+<md>\boxed{
+f(\omega)
+=
+\frac1{2\pi}
+\sum_{h=-\infty}^{\infty}
+\gamma(h)
+e^{-i\omega h},
+}</md>
+</p>
+
+<p>when the series converges appropriately.</p>
+
+<p>It is the Fourier transform of the autocovariance function.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-inverse-spectral-relation">
+<title>Inverse Spectral Relation</title>
+<p>The autocovariance can be recovered from the spectral density:</p>
+
+<p>
+<md>\boxed{
+\gamma(h)
+=
+\int_{-\pi}^{\pi}
+e^{i\omega h}
+f(\omega)
+\,d\omega.
+}</md>
+</p>
+
+<p>Thus autocovariance and spectrum provide two equivalent descriptions of
+stationary second-order dependence.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-white-noise-spectrum">
+<title>Spectrum of White Noise</title>
+<p>For white noise,</p>
+
+<p>
+<md>\gamma(0)
+=
+\sigma_\varepsilon^2</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\gamma(h)=0
+\qquad
+h\neq0.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+f(\omega)
+=
+\frac{
+\sigma_\varepsilon^2
+}{
+2\pi
+}.
+}</md>
+</p>
+
+<p>The spectrum is constant across frequencies.</p>
+
+<p>This motivates the term <q>white</q> noise by analogy with white light.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-periodogram-preview">
+<title>Periodogram Preview</title>
+<p>The periodogram estimates how sample variation is distributed across
+frequencies.</p>
+
+<p>A common form is</p>
+
+<p>
+<md>\boxed{
+I(\omega)
+=
+\frac1{2\pi T}
+\left|
+\sum_{t=1}^{T}
+X_t
+e^{-i\omega t}
+\right|^2.
+}</md>
+</p>
+
+<p>Large peaks may indicate strong periodic components.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-varying-behavior">
+<title>Time-Varying Behavior</title>
+<p>Real series may change behavior over time.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{changing mean},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{changing variance},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{changing AR coefficients},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{structural breaks}.
+}</md>
+</p>
+
+<p>Stationary models may then provide only local approximations.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-structural-breaks">
+<title>Structural Breaks</title>
+<p>A structural break is a persistent change in the data-generating process.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\mu_t
+=
+\begin{cases}
+\mu_1,&amp;t&lt;T_0,\\
+\mu_2,&amp;t\geq T_0.
+\end{cases}
+}</md>
+</p>
+
+<p>Ignoring such a change can produce misleading estimates and forecasts.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-volatility-clustering">
+<title>Volatility Clustering Preview</title>
+<p>Some time series have little autocorrelation in their levels but strong
+dependence in their squared values.</p>
+
+<p>Large fluctuations tend to be followed by large fluctuations.</p>
+
+<p>This is called volatility clustering.</p>
+
+<p>It motivates models such as ARCH and GARCH.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-arch-preview">
+<title>ARCH Model Preview</title>
+<p>An ARCH(<m>q</m>) model allows conditional variance to depend on past squared
+innovations:</p>
+
+<p>
+<md>\boxed{
+\sigma_t^2
+=
+\alpha_0
++
+\alpha_1
+\varepsilon_{t-1}^2
++
+\cdots
++
+\alpha_q
+\varepsilon_{t-q}^2.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\varepsilon_t
+=
+\sigma_tZ_t,
+}</md>
+</p>
+
+<p>where <m>Z_t</m> is often standardized white noise.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-garch-preview">
+<title>GARCH Model Preview</title>
+<p>A GARCH(<m>p,q</m>) model also includes past conditional variances:</p>
+
+<p>
+<md>\boxed{
+\sigma_t^2
+=
+\alpha_0
++
+\sum_{i=1}^{q}
+\alpha_i
+\varepsilon_{t-i}^2
++
+\sum_{j=1}^{p}
+\beta_j
+\sigma_{t-j}^2.
+}</md>
+</p>
+
+<p>GARCH models are widely used for financial volatility.</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-workflow">
+<title>Time-Series Modeling Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>plot the data against time;</p>
+</li>
+<li>
+<p>identify trend and seasonal structure;</p>
+</li>
+<li>
+<p>inspect changes in variability;</p>
+</li>
+<li>
+<p>transform the data if scientifically appropriate;</p>
+</li>
+<li>
+<p>assess stationarity;</p>
+</li>
+<li>
+<p>remove deterministic trend or difference as needed;</p>
+</li>
+<li>
+<p>inspect the ACF and PACF;</p>
+</li>
+<li>
+<p>identify candidate models;</p>
+</li>
+<li>
+<p>estimate model parameters;</p>
+</li>
+<li>
+<p>compare model-selection criteria;</p>
+</li>
+<li>
+<p>inspect residuals;</p>
+</li>
+<li>
+<p>inspect residual ACF;</p>
+</li>
+<li>
+<p>test for remaining serial dependence when useful;</p>
+</li>
+<li>
+<p>evaluate forecasts using future observations;</p>
+</li>
+<li>
+<p>quantify forecast uncertainty;</p>
+</li>
+<li>
+<p>revise the model if important residual structure remains.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-treating-time-series-observations-as-independent">
+<title>Treating Time-Series Observations as Independent</title>
+<p>Serial dependence changes estimator uncertainty.</p>
+
+<p>Ordinary independent-sample formulas may substantially underestimate or
+overestimate standard errors.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-time-order">
+<title>Ignoring Time Order</title>
+<p>Randomly rearranging a time series destroys dependence and temporal
+structure.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-randomly-splitting-time-series-training-and-test-data">
+<title>Randomly Splitting Time-Series Training and Test Data</title>
+<p>Random splitting can allow future observations to influence models used
+to predict the past.</p>
+
+<p>Use time-respecting validation.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-trend-with-autocorrelation">
+<title>Confusing Trend with Autocorrelation</title>
+<p>A strong deterministic trend can produce large sample autocorrelations
+even if residuals around the trend are independent.</p>
+
+<p>Trend should be handled before interpreting stationary dependence.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-differencing-every-series-automatically">
+<title>Differencing Every Series Automatically</title>
+<p>Differencing can remove useful long-run information and can introduce
+unnecessary moving-average structure.</p>
+
+<p>Use it only when justified.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-failing-to-difference-a-unit-root-process">
+<title>Failing to Difference a Unit-Root Process</title>
+<p>Fitting stationary ARMA models directly to strongly unit-root
+nonstationary data can produce misleading inference.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-deterministic-and-stochastic-trends">
+<title>Confusing Deterministic and Stochastic Trends</title>
+<p>A deterministic trend may be removed by regression on time.</p>
+
+<p>A stochastic unit-root trend generally requires different treatment.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-ordinary-t-critical-values-for-unit-root-tests">
+<title>Using Ordinary <m>t</m>-Critical Values for Unit-Root Tests</title>
+<p>Unit-root null distributions are nonstandard.</p>
+
+<p>Specialized critical values are required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interpreting-acf-cutoffs-too-literally">
+<title>Interpreting ACF Cutoffs Too Literally</title>
+<p>Sample ACF and PACF values are noisy.</p>
+
+<p>Finite-sample plots rarely display perfect theoretical patterns.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-seasonality">
+<title>Ignoring Seasonality</title>
+<p>Seasonal dependence can remain even after ordinary differencing.</p>
+
+<p>Inspect seasonal lags.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-residual-autocorrelation">
+<title>Ignoring Residual Autocorrelation</title>
+<p>A fitted model with strongly autocorrelated residuals has not captured
+all predictable temporal structure.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-in-sample-fit-as-forecast-accuracy">
+<title>Using In-Sample Fit as Forecast Accuracy</title>
+<p>A model can fit historical data very well and forecast poorly.</p>
+
+<p>Evaluate on future or rolling-origin observations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-narrow-parameter-intervals-mean-narrow-forecast-intervals">
+<title>Assuming Narrow Parameter Intervals Mean Narrow Forecast Intervals</title>
+<p>Forecast uncertainty includes future random shocks in addition to
+parameter uncertainty.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-structural-breaks">
+<title>Ignoring Structural Breaks</title>
+<p>A model estimated from old observations may be irrelevant after a regime
+change.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interpreting-granger-causality-as-scientific-causality">
+<title>Interpreting Granger Causality as Scientific Causality</title>
+<p>Granger causality is based on predictive improvement from lagged
+variables.</p>
+
+<p>It does not by itself establish intervention-based causation.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-regressing-unrelated-nonstationary-series">
+<title>Regressing Unrelated Nonstationary Series</title>
+<p>Spurious regression can create apparently strong relationships between
+unrelated trending processes.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-parameter-uncertainty-in-forecasts">
+<title>Ignoring Parameter Uncertainty in Forecasts</title>
+<p>Simple theoretical forecast intervals often condition on estimated
+parameters as if known.</p>
+
+<p>Finite-sample forecast uncertainty may therefore be larger.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Environmental Science.</em>
+Temperature, rainfall, dissolved oxygen, salinity, and sensor
+measurements are often recorded repeatedly through time and exhibit
+seasonal and serial dependence.</p>
+
+<p>\medskip</p>
+
+<p><em>Economics.</em>
+GDP, inflation, employment, interest rates, and other economic indicators
+are modeled using ARIMA, VAR, cointegration, and state-space methods.</p>
+
+<p>\medskip</p>
+
+<p><em>Finance.</em>
+Asset prices, returns, and volatility require models for dependence,
+nonstationarity, and time-varying variance.</p>
+
+<p>\medskip</p>
+
+<p><em>Engineering.</em>
+Sensor streams, vibration measurements, control systems, and reliability
+signals are naturally modeled as stochastic processes.</p>
+
+<p>\medskip</p>
+
+<p><em>Business.</em>
+Sales, demand, inventory, call volume, and web traffic frequently require
+trend and seasonal forecasting.</p>
+
+<p>\medskip</p>
+
+<p><em>Medicine.</em>
+Repeated physiological measurements, monitoring signals, and disease
+trajectories often exhibit temporal dependence.</p>
+
+<p>\medskip</p>
+
+<p><em>Epidemiology.</em>
+Disease counts and incidence rates through time can contain trends,
+seasonality, interventions, and structural changes.</p>
+
+<p>\medskip</p>
+
+<p><em>Operations.</em>
+Forecasts of arrivals, demand, workload, and resource usage support
+scheduling and inventory decisions.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define a time series.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define lag.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define weak stationarity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the autocovariance function.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the autocorrelation function.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define white noise.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an AR(1) process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an MA(1) process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define an ARMA(<m>p,q</m>) process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the meaning of ARIMA(<m>p,d,q</m>).</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define first differencing.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define seasonal differencing.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the PACF conceptually.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a forecast error.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>X_t
+=
+0.4X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>determine whether the AR(1) process is stationary.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>X_t
+=
+1.2X_{t-1}
++
+\varepsilon_t,</md>
+</p>
+
+<p>determine whether the AR(1) process is stationary.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>X_t
+=
+2
++
+0.5X_{t-1}
++
+\varepsilon_t.</md>
+</p>
+
+<p>Find the stationary mean.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose an AR(1) has</p>
+
+<p>
+<md>\phi=0.8</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\sigma_\varepsilon^2=9.</md>
+</p>
+
+<p>Find the stationary variance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the previous AR(1), compute</p>
+
+<p>
+<md>\rho(1),
+\quad
+\rho(2),
+\quad
+\rho(3).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>X_t
+=
+\varepsilon_t
++
+0.5\varepsilon_{t-1}.</md>
+</p>
+
+<p>Find the variance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the previous MA(1), compute <m>\rho(1)</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the previous MA(1), find <m>\rho(2)</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Classify a random walk as an ARIMA model.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write</p>
+
+<p>
+<md>X_t-X_{t-12}</md>
+</p>
+
+<p>using the backshift operator.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Expand</p>
+
+<p>
+<md>(1-B)^2X_t.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For a monthly series with annual seasonality, state the seasonal period.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If the AR(1) stationary mean is <m>\mu=20</m>, <m>\phi=0.7</m>, and
+<m>X_t=25</m>, find the one-step forecast.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the previous model, find the two-step forecast.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For a random walk with innovation variance <m>4</m>, find the variance of a
+five-step forecast error.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose simple exponential smoothing uses</p>
+
+<p>
+<md>\alpha=0.3,</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>X_t=20,
+\qquad
+\ell_{t-1}=18.</md>
+</p>
+
+<p>Find <m>\ell_t</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the stationary mean of an AR(1) process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the stationary variance of an AR(1) process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive</p>
+
+<p>
+<md>\rho(h)
+=
+\phi^{|h|}</md>
+</p>
+
+<p>for a stationary AR(1).</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the infinite moving-average representation of a stationary AR(1).</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the variance of an MA(1) process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the lag-one autocorrelation of an MA(1).</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that an MA(1) has zero autocorrelation beyond lag <m>1</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between stationarity and invertibility.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Yule--Walker equations for an AR(2) process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why the PACF of an AR(<m>p</m>) process cuts off after lag <m>p</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why the ACF of an MA(<m>q</m>) process cuts off after lag <m>q</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why differencing removes a random-walk stochastic trend.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare deterministic detrending and stochastic differencing.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a unit-root test does not use the usual <m>t</m>-distribution.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why two unrelated random walks can produce spurious regression.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the one-step AR(1) forecast.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the <m>h</m>-step AR(1) forecast.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the AR(1) <m>h</m>-step forecast error variance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why random-walk forecast uncertainty grows with horizon.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why time-series validation should preserve temporal ordering.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare expanding-window and rolling-window forecasting.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that exponential-smoothing weights decay geometrically.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain when additive seasonality is more suitable than multiplicative
+seasonality.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why residual autocorrelation indicates model inadequacy.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between an intervention variable and ordinary
+random noise.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the distinction between VAR and univariate AR models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the meaning of cointegration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Granger causality is not equivalent to scientific causality.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that white noise has a constant spectral density.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the stationary solution of a general AR(<m>p</m>) process under its
+root condition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the causal MA(<m>\infty</m>) representation of ARMA models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive invertibility conditions for MA(<m>q</m>) processes.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Yule--Walker estimator for AR(<m>p</m>) parameters.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study maximum likelihood estimation for Gaussian ARMA models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate innovations algorithms for ARMA models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Dickey--Fuller and augmented Dickey--Fuller unit-root tests.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate KPSS-type stationarity tests.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study seasonal unit roots.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive properties of seasonal ARIMA models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study forecast distributions with parameter uncertainty.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate optimal forecast combinations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the Kalman filter equations for a linear Gaussian state-space
+model.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the local-level model as a state-space process.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study vector autoregression estimation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate impulse-response functions in VAR models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Granger-causality tests in VAR systems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study cointegration and error-correction models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate the Engle--Granger cointegration procedure.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the Johansen cointegration framework.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the Wiener--Khinchin relationship between autocovariance and
+spectral density.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the periodogram and its statistical properties.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate ARCH and GARCH models.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study change-point and structural-break models.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-summary">
+<title>Conceptual Summary</title>
+<p>A time series is an ordered stochastic process</p>
+
+<p>
+<md>\boxed{
+\{X_t\}.
+}</md>
+</p>
+
+<p>For a weakly stationary process,</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[X_t]=\mu,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\operatorname{Cov}
+(
+X_t,
+X_{t-h}
+)
+=
+\gamma(h).
+}</md>
+</p>
+
+<p>The autocorrelation function is</p>
+
+<p>
+<md>\boxed{
+\rho(h)
+=
+\frac{
+\gamma(h)
+}{
+\gamma(0)
+}.
+}</md>
+</p>
+
+<p>White noise satisfies</p>
+
+<p>
+<md>\boxed{
+\gamma(h)=0
+\qquad
+h\neq0.
+}</md>
+</p>
+
+<p>A stationary AR(1) process is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+c
++
+\phi X_{t-1}
++
+\varepsilon_t,
+\qquad
+|\phi|&lt;1.
+}</md>
+</p>
+
+<p>Its mean is</p>
+
+<p>
+<md>\boxed{
+\mu
+=
+\frac{
+c
+}{
+1-\phi
+},
+}</md>
+</p>
+
+<p>and its autocorrelation is</p>
+
+<p>
+<md>\boxed{
+\rho(h)
+=
+\phi^{|h|}.
+}</md>
+</p>
+
+<p>An MA(1) process is</p>
+
+<p>
+<md>\boxed{
+X_t
+=
+\varepsilon_t
++
+\theta\varepsilon_{t-1},
+}</md>
+</p>
+
+<p>with autocorrelation</p>
+
+<p>
+<md>\boxed{
+\rho(1)
+=
+\frac{
+\theta
+}{
+1+\theta^2
+}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\rho(h)=0
+\qquad
+|h|&gt;1.
+}</md>
+</p>
+
+<p>ARIMA models combine autoregression, differencing, and moving-average
+structure:</p>
+
+<p>
+<md>\boxed{
+ARIMA(p,d,q).
+}</md>
+</p>
+
+<p>Forecasting uses conditional expectation:</p>
+
+<p>
+<md>\boxed{
+\widehat{X}_{t+h\mid t}
+=
+\mathbb{E}
+[
+X_{t+h}
+\mid
+\mathcal{F}_t
+].
+}</md>
+</p>
+
+<p>Time series analysis therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{probability}
++
+\text{stochastic processes}
++
+\text{regression}
++
+\text{difference equations}
++
+\text{forecasting}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-15-time-series-analysis-subsec-time-series-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Time Series Analysis applies the stochastic-process ideas developed in
+Chapter <xref ref="chap-probability" /> to ordered statistical observations.
+Autoregressive models are stochastic difference equations, while ARIMA
+models combine autoregressive dynamics, differencing, and innovations.
+Regression models can be extended to include serially correlated errors,
+lagged predictors, and interventions. State-space models connect time
+series with dynamical systems and filtering, while vector autoregressions
+extend the framework to multivariate processes. The next section,
+Spatial Statistics, studies dependence indexed by geographic or spatial
+location rather than primarily by time.</p>
+</remark>
+</subsection>
+
 </section>

@@ -1,9 +1,3063 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-04-geometry-13-computational-geometry">
-  <title>Computational Geometry</title>
+<section xml:id="sec-computational-geometry">
+<title>Computational Geometry</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Analytic Geometry, Vector Geometry, Convex Geometry,
+Discrete Geometry, basic Linear Algebra, elementary
+Algorithms, and basic Combinatorics.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain the purpose and scope of computational geometry;</p>
+</li>
+<li>
+<p>represent geometric objects numerically;</p>
+</li>
+<li>
+<p>use orientation tests based on determinants and cross products;</p>
+</li>
+<li>
+<p>test whether line segments intersect;</p>
+</li>
+<li>
+<p>distinguish geometric predicates from geometric constructions;</p>
+</li>
+<li>
+<p>formulate the planar convex hull problem;</p>
+</li>
+<li>
+<p>explain the main ideas of Graham scan and monotone chain algorithms;</p>
+</li>
+<li>
+<p>describe the gift-wrapping method;</p>
+</li>
+<li>
+<p>construct and interpret Voronoi diagrams;</p>
+</li>
+<li>
+<p>explain the dual relationship between Voronoi diagrams and Delaunay triangulations;</p>
+</li>
+<li>
+<p>use the empty circumcircle criterion for Delaunay triangles;</p>
+</li>
+<li>
+<p>formulate nearest-neighbor and closest-pair problems;</p>
+</li>
+<li>
+<p>explain divide-and-conquer approaches to geometric problems;</p>
+</li>
+<li>
+<p>describe point-in-polygon tests;</p>
+</li>
+<li>
+<p>explain polygon triangulation;</p>
+</li>
+<li>
+<p>describe sweep-line algorithms;</p>
+</li>
+<li>
+<p>formulate orthogonal range-searching problems;</p>
+</li>
+<li>
+<p>explain spatial data structures such as <m>k</m>-d trees and quadtrees;</p>
+</li>
+<li>
+<p>distinguish exact geometric reasoning from floating-point computation;</p>
+</li>
+<li>
+<p>explain degeneracy and general-position assumptions;</p>
+</li>
+<li>
+<p>recognize applications in graphics, robotics, GIS, optimization,
+    scientific computing, and data analysis.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-what-is-computational-geometry">
+<title>What Is Computational Geometry?</title>
+<p>Computational geometry studies algorithms for solving geometric problems.</p>
+
+<p>The input typically consists of objects such as</p>
+
+<p>
+<md>\boxed{
+\text{points},
+\quad
+\text{segments},
+\quad
+\text{polygons},
+\quad
+\text{circles},
+\quad
+\text{polyhedra},
+\quad
+\text{meshes}.
+}</md>
+</p>
+
+<p>The goal is not merely to prove that a geometric object exists, but to
+determine how it can be computed efficiently.</p>
+
+<p>\begin{conceptbox}
+Classical geometry asks:</p>
+
+<p>
+<md>\text{What geometric relationships are true?}</md>
+</p>
+
+<p>Computational geometry additionally asks:</p>
+
+<p>
+<md>\boxed{
+\text{How can those relationships be computed efficiently and reliably?}
+}</md>
+</p>
+
+<p>\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-geometry-as-data">
+<title>Geometry as Data</title>
+<p>A point in the plane can be stored as an ordered pair</p>
+
+<p>
+<md>p=(x,y).</md>
+</p>
+
+<p>A segment can be represented by its endpoints</p>
+
+<p>
+<md>\overline{pq}.</md>
+</p>
+
+<p>A polygon can be represented by an ordered sequence of vertices</p>
+
+<p>
+<md>\boxed{
+P=(p_1,p_2,\ldots,p_n).
+}</md>
+</p>
+
+<p>Thus geometric objects become data structures that algorithms can manipulate.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-geometric-predicates">
+<title>Geometric Predicates</title>
+<p>Many geometric algorithms depend on simple yes-or-no questions.</p>
+
+<p>These are called <em>geometric predicates</em>.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{Is a point left of a directed line?}
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Do two segments intersect?}
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Is a point inside a circle?}
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Is a point inside a polygon?}
+}</md>
+</p>
+
+<p>Reliable predicates form the foundation of robust computational geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-orientation-three-points">
+<title>Orientation of Three Points</title>
+<p>Let</p>
+
+<p>
+<md>p=(p_x,p_y),
+\qquad
+q=(q_x,q_y),
+\qquad
+r=(r_x,r_y).</md>
+</p>
+
+<p>Define the orientation determinant</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)
+=
+\begin{vmatrix}
+q_x-p_x &amp; q_y-p_y\\
+r_x-p_x &amp; r_y-p_y
+\end{vmatrix}.
+}</md>
+</p>
+
+<p>Expanding,</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)
+=
+(q_x-p_x)(r_y-p_y)
+-
+(q_y-p_y)(r_x-p_x).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-orientation-interpretation">
+<title>Interpreting the Orientation Test</title>
+<p>The sign of</p>
+
+<p>
+<md>\operatorname{orient}(p,q,r)</md>
+</p>
+
+<p>determines the orientation of the three points.</p>
+
+<p>If</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)&gt;0,
+}</md>
+</p>
+
+<p>then <m>p,q,r</m> make a counterclockwise turn.</p>
+
+<p>If</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)&lt;0,
+}</md>
+</p>
+
+<p>then they make a clockwise turn.</p>
+
+<p>If</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)=0,
+}</md>
+</p>
+
+<p>then the points are collinear.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=.9]</p>
+
+<p>\coordinate (P) at (0,0);
+\coordinate (Q) at (2,0);
+\coordinate (R) at (1.4,1.5);</p>
+
+<p>\draw[-&gt;,thick] (P)--(Q);
+\draw[-&gt;,thick] (Q)--(R);</p>
+
+<p>\fill (P) circle (2pt) node[below] {$p$};
+\fill (Q) circle (2pt) node[below] {$q$};
+\fill (R) circle (2pt) node[above] {$r$};</p>
+
+<p>\node at (1,2.1) {counterclockwise turn};</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-orientation-signed-area">
+<title>Orientation and Signed Area</title>
+<p>The orientation determinant is twice the signed area of the triangle formed
+by <m>p,q,r</m>.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+A_{\text{signed}}
+=
+\frac12
+\operatorname{orient}(p,q,r).
+}</md>
+</p>
+
+<p>The ordinary area is</p>
+
+<p>
+<md>\boxed{
+A
+=
+\frac12
+\left|
+\operatorname{orient}(p,q,r)
+\right|.
+}</md>
+</p>
+
+<p>This illustrates an important computational principle:</p>
+
+<p>\begin{conceptbox}
+A single determinant can encode several geometric properties at once:
+orientation, collinearity, and triangle area.
+\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-worked-orientation">
+<title>Worked Example: Orientation</title>
+<example>
+<title>Determine the Orientation of Three Points</title>
+<p>Let</p>
+
+<p>
+<md>p=(1,1),
+\qquad
+q=(4,2),
+\qquad
+r=(2,5).</md>
+</p>
+
+<p>Compute</p>
+
+<p>
+<md>\operatorname{orient}(p,q,r)
+=
+(4-1)(5-1)-(2-1)(2-1).</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>\operatorname{orient}(p,q,r)
+=
+3(4)-1(1)
+=
+11.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>11&gt;0,</md>
+</p>
+
+<p>the points form a counterclockwise turn.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)=11&gt;0
+}</md>
+</p>
+
+<p>so the orientation is counterclockwise.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-segment-intersection">
+<title>Segment Intersection</title>
+<p>Consider two closed line segments</p>
+
+<p>
+<md>\overline{p_1p_2}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\overline{q_1q_2}.</md>
+</p>
+
+<p>In the nondegenerate case, they properly intersect when the endpoints of
+each segment lie on opposite sides of the line containing the other segment.</p>
+
+<p>Using orientation predicates, this can be tested through</p>
+
+<p>
+<md>\operatorname{orient}(p_1,p_2,q_1)</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\operatorname{orient}(p_1,p_2,q_2),</md>
+</p>
+
+<p>together with the corresponding orientations of <m>p_1,p_2</m> relative to
+the line through <m>q_1,q_2</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-proper-segment-intersection">
+<title>Proper Segment Intersection Test</title>
+<p>For segments in general position, a proper intersection occurs when</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p_1,p_2,q_1)
+\operatorname{orient}(p_1,p_2,q_2)&lt;0
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(q_1,q_2,p_1)
+\operatorname{orient}(q_1,q_2,p_2)&lt;0.
+}</md>
+</p>
+
+<p>Collinear and endpoint-touching cases must be handled separately.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-bounding-box-test">
+<title>Bounding-Box Test</title>
+<p>Before performing more expensive geometric tests, algorithms often compare
+axis-aligned bounding boxes.</p>
+
+<p>Two segments cannot intersect if their <m>x</m>-coordinate intervals are
+disjoint or their <m>y</m>-coordinate intervals are disjoint.</p>
+
+<p>This inexpensive rejection test illustrates a common algorithmic strategy:</p>
+
+<p>
+<md>\boxed{
+\text{eliminate impossible cases quickly before detailed computation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-distance">
+<title>Distance Computations</title>
+<p>For points</p>
+
+<p>
+<md>p=(p_x,p_y),
+\qquad
+q=(q_x,q_y),</md>
+</p>
+
+<p>the Euclidean distance is</p>
+
+<p>
+<md>\boxed{
+d(p,q)
+=
+\sqrt{
+(p_x-q_x)^2+(p_y-q_y)^2
+}.
+}</md>
+</p>
+
+<p>When only comparing distances, the square root is unnecessary.</p>
+
+<p>Instead compare</p>
+
+<p>
+<md>\boxed{
+d^2(p,q)
+=
+(p_x-q_x)^2+(p_y-q_y)^2.
+}</md>
+</p>
+
+<p>This avoids an unnecessary square-root computation.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-closest-pair-problem">
+<title>The Closest-Pair Problem</title>
+<p>Given</p>
+
+<p>
+<md>P=\{p_1,\ldots,p_n\},</md>
+</p>
+
+<p>the <em>closest-pair problem</em> asks for distinct points <m>p_i,p_j</m> that
+minimize</p>
+
+<p>
+<md>\boxed{
+\|p_i-p_j\|.
+}</md>
+</p>
+
+<p>A brute-force algorithm checks every pair.</p>
+
+<p>There are</p>
+
+<p>
+<md>\binom{n}{2}
+=
+\frac{n(n-1)}{2}</md>
+</p>
+
+<p>pairs, giving quadratic running time:</p>
+
+<p>
+<md>\boxed{
+O(n^2).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-closest-pair-divide-conquer">
+<title>Divide and Conquer</title>
+<p>The planar closest-pair problem can be solved more efficiently using
+divide and conquer.</p>
+
+<p>The broad strategy is:</p>
+
+<p>
+<ol>
+<li>
+<p>sort the points;</p>
+</li>
+<li>
+<p>divide them into left and right subsets;</p>
+</li>
+<li>
+<p>recursively find the closest pair in each subset;</p>
+</li>
+<li>
+<p>inspect only a narrow strip near the dividing line;</p>
+</li>
+<li>
+<p>combine the results.</p>
+</li>
+</ol>
+</p>
+
+<p>This yields an algorithm with running time</p>
+
+<p>
+<md>\boxed{
+O(n\log n).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-geometry-algorithmic-complexity">
+<title>Algorithmic Complexity</title>
+<p>Computational geometry evaluates not only whether an algorithm is correct
+but also how efficiently it uses resources.</p>
+
+<p>Common running-time classes include</p>
+
+<p>
+<md>\boxed{O(1)}</md>
+</p>
+
+<p>for constant time,</p>
+
+<p>
+<md>\boxed{O(\log n)}</md>
+</p>
+
+<p>for logarithmic time,</p>
+
+<p>
+<md>\boxed{O(n)}</md>
+</p>
+
+<p>for linear time,</p>
+
+<p>
+<md>\boxed{O(n\log n)}</md>
+</p>
+
+<p>for near-linear sorting-type complexity, and</p>
+
+<p>
+<md>\boxed{O(n^2)}</md>
+</p>
+
+<p>for quadratic time.</p>
+
+<p>The notation <m>O(\cdot)</m>, read <q>big O,</q> describes asymptotic upper
+bounds.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-convex-hull">
+<title>The Convex Hull Problem</title>
+<p>Given a finite point set</p>
+
+<p>
+<md>P\subseteq\R^2,</md>
+</p>
+
+<p>the convex hull problem asks for the boundary of</p>
+
+<p>
+<md>\boxed{
+\operatorname{conv}(P).
+}</md>
+</p>
+
+<p>The output is typically the hull vertices listed in clockwise or
+counterclockwise order.</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=.9]</p>
+
+<p>\coordinate (A) at (-2,-1);
+\coordinate (B) at (-1.5,1.2);
+\coordinate (C) at (.2,1.7);
+\coordinate (D) at (2,.6);
+\coordinate (E) at (1.6,-1.3);
+\coordinate (F) at (-.3,-1.5);</p>
+
+<p>\draw[thick]
+(A)--(B)--(C)--(D)--(E)--(F)--cycle;</p>
+
+<p>\foreach \P in {A,B,C,D,E,F}
+    \fill (\P) circle (2.2pt);</p>
+
+<p>\fill (-.6,.3) circle (2.2pt);
+\fill (.5,-.4) circle (2.2pt);
+\fill (.8,.5) circle (2.2pt);
+\fill (-.4,.9) circle (2.2pt);</p>
+
+<p>\node at (0,-2) {convex hull};</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-gift-wrapping">
+<title>Gift Wrapping</title>
+<p>The <em>gift-wrapping algorithm</em>, also called Jarvis march, constructs the
+convex hull one edge at a time.</p>
+
+<p>Beginning with an extreme point, the algorithm repeatedly selects the next
+point so that all remaining points lie on the same side of the new hull
+edge.</p>
+
+<p>The process resembles wrapping a string around the point set.</p>
+
+<p>If</p>
+
+<p>
+<md>h</md>
+</p>
+
+<p>is the number of hull vertices, the running time is</p>
+
+<p>
+<md>\boxed{
+O(nh).
+}</md>
+</p>
+
+<p>Thus the algorithm is output-sensitive.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-graham-scan">
+<title>Graham Scan</title>
+<p>Graham scan is a classical convex-hull algorithm.</p>
+
+<p>A simplified version proceeds as follows:</p>
+
+<p>
+<ol>
+<li>
+<p>choose a lowest point <m>p_0</m>;</p>
+</li>
+<li>
+<p>sort the remaining points by polar angle around <m>p_0</m>;</p>
+</li>
+<li>
+<p>process the sorted points in order;</p>
+</li>
+<li>
+<p>maintain a stack of candidate hull vertices;</p>
+</li>
+<li>
+<p>remove vertices whenever the stack makes an invalid turn.</p>
+</li>
+</ol>
+</p>
+
+<p>Orientation tests determine whether the current turn should remain on the
+hull.</p>
+
+<p>The sorting step dominates the running time:</p>
+
+<p>
+<md>\boxed{
+O(n\log n).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-monotone-chain-hull">
+<title>Monotone Chain Convex Hull</title>
+<p>The monotone chain algorithm first sorts points lexicographically, usually
+by <m>x</m>-coordinate and then <m>y</m>-coordinate.</p>
+
+<p>It then constructs:</p>
+
+<p>
+<md>\boxed{
+\text{lower hull}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{upper hull}.
+}</md>
+</p>
+
+<p>Orientation tests remove points that would create the wrong turn.</p>
+
+<p>After sorting, each point is processed only a constant number of times.</p>
+
+<p>Hence the total running time is</p>
+
+<p>
+<md>\boxed{
+O(n\log n).
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-hull-interior-example">
+<title>Worked Example: Hull Versus Interior Points</title>
+<example>
+<title>Identify Convex-Hull Candidates</title>
+<p>Consider</p>
+
+<p>
+<md>P=
+\{
+(0,0),
+(4,0),
+(4,3),
+(0,3),
+(2,1),
+(2,2)
+\}.</md>
+</p>
+
+<p>The first four points form the corners of a rectangle.</p>
+
+<p>The points</p>
+
+<p>
+<md>(2,1)</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>(2,2)</md>
+</p>
+
+<p>lie inside that rectangle.</p>
+
+<p>Therefore they cannot be extreme points of the convex hull.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\operatorname{conv}(P)
+=
+\operatorname{conv}
+\{(0,0),(4,0),(4,3),(0,3)\}.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-point-in-polygon">
+<title>Point-in-Polygon Problems</title>
+<p>Given a polygon <m>P</m> and a query point <m>q</m>, the point-in-polygon problem
+asks whether <m>q</m> lies</p>
+
+<p>
+<md>\boxed{
+\text{inside},
+\quad
+\text{outside},
+\quad
+\text{or on the boundary of }P.
+}</md>
+</p>
+
+<p>For convex polygons, the problem can exploit convexity.</p>
+
+<p>For general simple polygons, ray-crossing and winding-number methods are
+common.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-ray-crossing">
+<title>Ray-Crossing Method</title>
+<p>Draw a ray beginning at the query point and extending indefinitely in a
+fixed direction.</p>
+
+<p>Under nondegenerate conditions:</p>
+
+<p>
+<md>\boxed{
+\text{odd number of boundary crossings}
+\Longrightarrow
+\text{inside},
+}</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>\boxed{
+\text{even number of boundary crossings}
+\Longrightarrow
+\text{outside}.
+}</md>
+</p>
+
+<p>Special care is required when the ray passes through polygon vertices or
+overlaps polygon edges.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-winding-number-computational">
+<title>Winding Number</title>
+<p>The winding number records how many times an oriented closed curve winds
+around a point.</p>
+
+<p>For a simple polygon and a point not on its boundary,</p>
+
+<p>
+<md>\boxed{
+\text{winding number}=0
+}</md>
+</p>
+
+<p>indicates that the point lies outside.</p>
+
+<p>A nonzero winding number indicates that it lies inside.</p>
+
+<p>This method generalizes more naturally to oriented curves.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-shoelace-formula">
+<title>Polygon Area: The Shoelace Formula</title>
+<p>Let a simple polygon have vertices</p>
+
+<p>
+<md>(x_1,y_1),\ldots,(x_n,y_n)</md>
+</p>
+
+<p>listed cyclically.</p>
+
+<p>Set</p>
+
+<p>
+<md>(x_{n+1},y_{n+1})=(x_1,y_1).</md>
+</p>
+
+<p>Then its area is</p>
+
+<p>
+<md>\boxed{
+A
+=
+\frac12
+\left|
+\sum_{i=1}^{n}
+(x_i y_{i+1}-y_i x_{i+1})
+\right|.
+}</md>
+</p>
+
+<p>This is commonly called the <em>shoelace formula</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-worked-shoelace">
+<title>Worked Example: Shoelace Formula</title>
+<example>
+<title>Area of a Triangle</title>
+<p>Consider the triangle with vertices</p>
+
+<p>
+<md>(0,0),
+\qquad
+(4,0),
+\qquad
+(1,3).</md>
+</p>
+
+<p>Using the shoelace formula,</p>
+
+<p>
+<md>A
+=
+\frac12
+\left|
+0\cdot0
++
+4\cdot3
++
+1\cdot0
+-
+0\cdot4
+-
+0\cdot1
+-
+3\cdot0
+\right|.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>A
+=
+\frac12(12)
+=
+6.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{A=6}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-polygon-triangulation">
+<title>Polygon Triangulation</title>
+<p>Triangulation decomposes a polygon into triangles whose interiors do not
+overlap.</p>
+
+<p>A simple polygon with <m>n</m> vertices can be triangulated into</p>
+
+<p>
+<md>\boxed{
+n-2
+}</md>
+</p>
+
+<p>triangles using</p>
+
+<p>
+<md>\boxed{
+n-3
+}</md>
+</p>
+
+<p>noncrossing diagonals.</p>
+
+<p>Triangulation is useful because many geometric computations are easier on
+triangles than on arbitrary polygons.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-ear-clipping">
+<title>Ear Clipping</title>
+<p>A common polygon-triangulation strategy is <em>ear clipping</em>.</p>
+
+<p>An <em>ear</em> is formed by three consecutive polygon vertices such that:</p>
+
+<p>
+<ul>
+<li>
+<p>the diagonal connecting the first and third vertices lies inside
+    the polygon; and</p>
+</li>
+<li>
+<p>the corresponding triangle contains no other polygon vertex in its
+    interior.</p>
+</li>
+</ul>
+</p>
+
+<p>Removing ears one at a time eventually triangulates a simple polygon.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-two-ears-theorem">
+<title>The Two-Ears Theorem</title>
+<p>\begin{theorem}[Two-Ears Theorem]
+Every simple polygon with at least four vertices has at least two ears.
+\end{theorem}</p>
+
+<p>This theorem guarantees that the ear-clipping process always has a valid
+next step.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-voronoi">
+<title>Voronoi Diagrams</title>
+<p>Given sites</p>
+
+<p>
+<md>P=\{p_1,\ldots,p_n\},</md>
+</p>
+
+<p>the Voronoi cell of <m>p_i</m> is</p>
+
+<p>
+<md>\boxed{
+V_i
+=
+\{
+x:
+\|x-p_i\|
+\leq
+\|x-p_j\|
+\text{ for all }j
+\}.
+}</md>
+</p>
+
+<p>The collection of these cells forms the Voronoi diagram.</p>
+
+<p>Each cell contains the region for which its site is a nearest site.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-voronoi-boundaries-computational">
+<title>Voronoi Boundaries</title>
+<p>For two sites <m>p_i</m> and <m>p_j</m>, the points satisfying</p>
+
+<p>
+<md>\|x-p_i\|
+=
+\|x-p_j\|</md>
+</p>
+
+<p>lie on their perpendicular bisector.</p>
+
+<p>Thus Voronoi cells are intersections of half-spaces and are convex in the
+Euclidean setting.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-voronoi-vertices">
+<title>Voronoi Vertices</title>
+<p>Under general-position assumptions, a planar Voronoi vertex is equidistant
+from exactly three sites.</p>
+
+<p>Those three sites lie on a common circle centered at the Voronoi vertex.</p>
+
+<p>The interior of that circle contains no other site.</p>
+
+<p>This observation leads directly to Delaunay triangulations.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-delaunay">
+<title>Delaunay Triangulations</title>
+<p>A planar Delaunay triangulation connects sites whose Voronoi cells share an
+edge, assuming the standard nondegenerate setting.</p>
+
+<p>The result is a geometric dual of the Voronoi diagram.</p>
+
+<p>
+<md>\boxed{
+\text{Voronoi edge}
+\longleftrightarrow
+\text{Delaunay edge}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-empty-circumcircle-computational">
+<title>Empty Circumcircle Criterion</title>
+<p>For every triangle in a Delaunay triangulation,</p>
+
+<p>
+<md>\boxed{
+\text{the interior of its circumcircle contains no input site}.
+}</md>
+</p>
+
+<p>This is the empty circumcircle property.</p>
+
+<p>If four sites lie on one circle, the Delaunay triangulation may not be
+unique.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-incircle-predicate">
+<title>The In-Circle Predicate</title>
+<p>Given four planar points <m>a,b,c,d</m>, one may ask whether <m>d</m> lies inside
+the circumcircle through <m>a,b,c</m>.</p>
+
+<p>For consistently oriented <m>a,b,c</m>, this can be determined by the sign of</p>
+
+<p>
+<md>\boxed{
+\begin{vmatrix}
+a_x &amp; a_y &amp; a_x^2+a_y^2 &amp; 1\\
+b_x &amp; b_y &amp; b_x^2+b_y^2 &amp; 1\\
+c_x &amp; c_y &amp; c_x^2+c_y^2 &amp; 1\\
+d_x &amp; d_y &amp; d_x^2+d_y^2 &amp; 1
+\end{vmatrix}.
+}</md>
+</p>
+
+<p>The sign convention depends on the orientation of <m>a,b,c</m>.</p>
+
+<p>This determinant is an important geometric predicate in Delaunay algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-delaunay-angle-property">
+<title>Delaunay Angle Property</title>
+<p>Among triangulations of a planar point set in general position, the Delaunay
+triangulation has a useful angle-quality property.</p>
+
+<p>It maximizes the lexicographically sorted sequence of triangle angles and,
+in particular, maximizes the minimum angle.</p>
+
+<p>Thus Delaunay triangulations tend to avoid very thin triangles.</p>
+
+<p>This makes them useful in mesh generation.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-nearest-neighbor-query">
+<title>Nearest-Neighbor Queries</title>
+<p>Given a stored point set <m>P</m> and a query point <m>q</m>, the nearest-neighbor
+problem asks for</p>
+
+<p>
+<md>\boxed{
+p^*
+=
+\operatorname*{arg\,min}_{p\in P}
+\|q-p\|.
+}</md>
+</p>
+
+<p>The symbol</p>
+
+<p>
+<md>\operatorname*{arg\,min}</md>
+</p>
+
+<p>is read <q>argument of the minimum.</q></p>
+
+<p>It returns the input value where the minimum is achieved rather than the
+minimum value itself.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-voronoi-nearest-neighbor">
+<title>Voronoi Diagrams and Nearest Neighbors</title>
+<p>If a query point <m>q</m> lies inside the Voronoi cell <m>V_i</m>, then</p>
+
+<p>
+<md>\boxed{
+p_i
+}</md>
+</p>
+
+<p>is a nearest site to <m>q</m>.</p>
+
+<p>Therefore Voronoi diagrams convert nearest-neighbor queries into
+point-location problems.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-point-location">
+<title>Point Location</title>
+<p>A planar subdivision divides the plane into vertices, edges, and faces.</p>
+
+<p>The <em>point-location problem</em> asks:</p>
+
+<p>
+<md>\boxed{
+\text{Which face contains a given query point?}
+}</md>
+</p>
+
+<p>Point location is a basic component of</p>
+
+<p>
+<md>\boxed{
+\text{GIS},
+\quad
+\text{computer graphics},
+\quad
+\text{mesh processing},
+\quad
+\text{Voronoi searching}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-range-searching">
+<title>Range Searching</title>
+<p>Suppose a point set</p>
+
+<p>
+<md>P\subseteq\R^d</md>
+</p>
+
+<p>is stored.</p>
+
+<p>A range query asks for all points lying inside a specified region <m>R</m>:</p>
+
+<p>
+<md>\boxed{
+P\cap R.
+}</md>
+</p>
+
+<p>Typical ranges include:</p>
+
+<p>
+<md>\boxed{
+\text{rectangles},
+\quad
+\text{boxes},
+\quad
+\text{circles},
+\quad
+\text{half-spaces}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-orthogonal-range-searching">
+<title>Orthogonal Range Searching</title>
+<p>In orthogonal range searching, query regions are axis-aligned rectangles or
+higher-dimensional boxes.</p>
+
+<p>For example,</p>
+
+<p>
+<md>R=
+[a_1,b_1]\times\cdots\times[a_d,b_d].</md>
+</p>
+
+<p>The goal is to report or count points satisfying</p>
+
+<p>
+<md>\boxed{
+a_i\leq x_i\leq b_i
+}</md>
+</p>
+
+<p>for every coordinate <m>i</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-kd-trees">
+<title>\texorpdfstring{<m>k</m>-d Trees}{k-d Trees}</title>
+<p>A <m>k</m>-d tree is a hierarchical spatial data structure.</p>
+
+<p>The letter <m>k</m> refers to the number of coordinate dimensions.</p>
+
+<p>At each stage, the data are divided using a coordinate-aligned hyperplane.</p>
+
+<p>In two dimensions, the algorithm may alternate between</p>
+
+<p>
+<md>\boxed{x\text{-splits}}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{y\text{-splits}}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-kd-partition">
+<title>Schematic \texorpdfstring{<m>k</m>-d}{k-d} Partition</title>
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[scale=.8]</p>
+
+<p>\draw[thick] (-3,-2.5) rectangle (3,2.5);</p>
+
+<p>\draw[thick] (.3,-2.5)--(.3,2.5);
+\draw[thick] (-3,.5)--(.3,.5);
+\draw[thick] (.3,-.7)--(3,-.7);
+\draw[thick] (-1.2,-2.5)--(-1.2,.5);
+\draw[thick] (1.7,-.7)--(1.7,2.5);</p>
+
+<p>\foreach \p in {
+(-2.3,1.5),
+(-1.8,-1.5),
+(-.5,-.6),
+(-.3,1.6),
+(.8,1.5),
+(2.3,1),
+(.9,-1.6),
+(2.4,-1.5)
+}{
+\fill \p circle (2.3pt);
+}</p>
+
+<p>\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>The diagram illustrates recursive axis-aligned subdivision rather than one
+unique <m>k</m>-d tree.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-quadtrees">
+<title>Quadtrees</title>
+<p>A quadtree recursively divides a two-dimensional region into four
+subregions.</p>
+
+<p>Each subdivision produces four children.</p>
+
+<p>The three-dimensional analogue is an <em>octree</em>, which divides a region
+into eight subregions.</p>
+
+<p>These structures are useful when geometric data are distributed
+nonuniformly through space.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-bounding-volume-hierarchies">
+<title>Bounding-Volume Hierarchies</title>
+<p>A bounding-volume hierarchy groups geometric objects inside simple enclosing
+regions.</p>
+
+<p>Possible bounding volumes include</p>
+
+<p>
+<md>\boxed{
+\text{axis-aligned boxes},
+\quad
+\text{oriented boxes},
+\quad
+\text{spheres}.
+}</md>
+</p>
+
+<p>If two bounding volumes do not intersect, then none of the objects contained
+within them can intersect.</p>
+
+<p>This permits large groups of objects to be rejected at once.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-collision-detection">
+<title>Collision Detection</title>
+<p>Collision detection asks whether moving or stationary geometric objects
+intersect.</p>
+
+<p>A typical strategy has two stages:</p>
+
+<p>
+<md>\boxed{
+\text{broad phase}
+\longrightarrow
+\text{narrow phase}.
+}</md>
+</p>
+
+<p>The broad phase quickly eliminates pairs that clearly cannot collide.</p>
+
+<p>The narrow phase performs more accurate geometric intersection tests on the
+remaining candidates.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-sweep-line-algorithms">
+<title>Sweep-Line Algorithms</title>
+<p>A <em>sweep-line algorithm</em> imagines moving a line across the plane.</p>
+
+<p>The algorithm processes geometric events in the order in which the sweep
+line encounters them.</p>
+
+<p>Usually it maintains:</p>
+
+<p>
+<md>\boxed{
+\text{an event queue}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{a dynamic status structure}.
+}</md>
+</p>
+
+<p>This converts a two-dimensional geometric problem into a sequence of
+one-dimensional updates.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-sweep-segment-intersection">
+<title>Segment Intersection by Sweeping</title>
+<p>Suppose many line segments are given.</p>
+
+<p>Checking every pair requires</p>
+
+<p>
+<md>O(n^2)</md>
+</p>
+
+<p>intersection tests.</p>
+
+<p>A sweep-line algorithm instead processes segment endpoints and intersection
+events while maintaining the vertical ordering of segments crossing the
+sweep line.</p>
+
+<p>This can dramatically reduce unnecessary comparisons.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-bentley-ottmann">
+<title>Bentley--Ottmann Algorithm</title>
+<p>The Bentley--Ottmann algorithm reports intersections among planar line
+segments using a sweep line.</p>
+
+<p>For <m>n</m> segments and <m>k</m> reported intersections, a standard bound is</p>
+
+<p>
+<md>\boxed{
+O((n+k)\log n).
+}</md>
+</p>
+
+<p>This is an example of an <em>output-sensitive algorithm</em>, because the
+running time depends partly on the number of intersections actually found.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-output-sensitive-geometry">
+<title>Output-Sensitive Algorithms</title>
+<p>An algorithm is output-sensitive when its complexity depends on both the
+input size and output size.</p>
+
+<p>For example, Jarvis march computes a planar convex hull in</p>
+
+<p>
+<md>\boxed{
+O(nh),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>h</md>
+</p>
+
+<p>is the number of hull vertices.</p>
+
+<p>This can be advantageous when</p>
+
+<p>
+<md>h\ll n.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-geometric-arrangements">
+<title>Arrangements</title>
+<p>An <em>arrangement</em> is the subdivision of space produced by a collection
+of geometric objects.</p>
+
+<p>For example, a collection of lines in the plane divides the plane into</p>
+
+<p>
+<md>\boxed{
+\text{vertices},
+\quad
+\text{edges},
+\quad
+\text{faces}.
+}</md>
+</p>
+
+<p>Arrangement theory studies the combinatorial complexity of these
+subdivisions and algorithms for constructing them.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-arrangement-lines">
+<title>Arrangement of Lines</title>
+<p>Suppose <m>n</m> lines are in general position in the plane, meaning:</p>
+
+<p>
+<ul>
+<li>
+<p>no two are parallel;</p>
+</li>
+<li>
+<p>no three pass through one point.</p>
+</li>
+</ul>
+</p>
+
+<p>Then the number of intersection vertices is</p>
+
+<p>
+<md>\boxed{
+\binom{n}{2}.
+}</md>
+</p>
+
+<p>The maximum number of regions formed is</p>
+
+<p>
+<md>\boxed{
+1+\frac{n(n+1)}{2}.
+}</md>
+</p>
+
+<p>This is a simple example of combinatorial complexity arising from geometry.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-visibility-problems">
+<title>Visibility Problems</title>
+<p>Two points in a region are mutually visible if the segment joining them lies
+entirely within the allowed region.</p>
+
+<p>Visibility problems arise in</p>
+
+<p>
+<md>\boxed{
+\text{robotics},
+\quad
+\text{graphics},
+\quad
+\text{surveillance},
+\quad
+\text{motion planning}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-visibility-graphs">
+<title>Visibility Graphs</title>
+<p>For polygonal obstacles, one may construct a graph whose vertices include
+obstacle vertices together with start and goal points.</p>
+
+<p>Two vertices are connected when the segment joining them does not pass
+through an obstacle interior.</p>
+
+<p>The resulting <em>visibility graph</em> can convert a geometric shortest-path
+problem into a graph shortest-path problem.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-shortest-path-obstacles">
+<title>Shortest Paths Among Obstacles</title>
+<p>Suppose a point must travel from</p>
+
+<p>
+<md>s</md>
+</p>
+
+<p>to</p>
+
+<p>
+<md>t</md>
+</p>
+
+<p>while avoiding polygonal obstacles.</p>
+
+<p>The objective is to minimize path length.</p>
+
+<p>For polygonal obstacles in the plane, shortest paths bend only where
+necessary, typically at obstacle vertices.</p>
+
+<p>This creates a close connection between geometry and graph algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-motion-planning">
+<title>Motion Planning</title>
+<p>Robotics introduces an additional complication: the moving object may have
+nonzero size and may rotate.</p>
+
+<p>Rather than moving the entire robot directly, one can describe its
+configuration using a point in a higher-dimensional
+<em>configuration space</em>.</p>
+
+<p>Then the motion-planning problem becomes:</p>
+
+<p>
+<md>\boxed{
+\text{find a path through collision-free configuration space}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-configuration-spaces">
+<title>Configuration Spaces</title>
+<p>A configuration records all parameters needed to describe the position of a
+mechanical system.</p>
+
+<p>For a translating point in the plane,</p>
+
+<p>
+<md>\boxed{
+\text{configuration space}=\R^2.
+}</md>
+</p>
+
+<p>For a rigid planar body that can translate and rotate, a configuration may
+be described by</p>
+
+<p>
+<md>\boxed{
+(x,y,\theta),
+}</md>
+</p>
+
+<p>where <m>\theta</m>, read <q>theta,</q> represents orientation.</p>
+
+<p>Configuration-space ideas connect computational geometry with topology and
+robotics.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-minkowski-motion-planning">
+<title>Minkowski Sums in Motion Planning</title>
+<p>Minkowski sums, introduced in Convex Geometry, are useful for handling
+objects with nonzero size.</p>
+
+<p>For sets <m>A</m> and <m>B</m>,</p>
+
+<p>
+<md>A+B
+=
+\{a+b:a\in A,\ b\in B\}.</md>
+</p>
+
+<p>By expanding obstacles according to the robot's shape, a moving-body problem
+can often be transformed into an equivalent point-motion problem.</p>
+
+<p>This is sometimes described as constructing configuration-space obstacles.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-meshes">
+<title>Meshes</title>
+<p>A mesh approximates a geometric domain using simple cells.</p>
+
+<p>In two dimensions, triangular meshes are common.</p>
+
+<p>In three dimensions, tetrahedral meshes are frequently used.</p>
+
+<p>Meshes are central to</p>
+
+<p>
+<md>\boxed{
+\text{finite element methods},
+\quad
+\text{computer graphics},
+\quad
+\text{scientific simulation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-mesh-quality">
+<title>Mesh Quality</title>
+<p>Not all triangulations are equally useful numerically.</p>
+
+<p>Very thin triangles can lead to poor numerical behavior.</p>
+
+<p>Mesh-generation algorithms therefore attempt to control quantities such as</p>
+
+<p>
+<md>\boxed{
+\text{minimum angle},
+\quad
+\text{aspect ratio},
+\quad
+\text{element size}.
+}</md>
+</p>
+
+<p>The favorable angle properties of Delaunay triangulations make them
+especially important in mesh generation.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-geometric-optimization">
+<title>Geometric Optimization</title>
+<p>Many computational geometry problems are optimization problems.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\min_{p_i\neq p_j}
+\|p_i-p_j\|
+}</md>
+</p>
+
+<p>for the closest pair,</p>
+
+<p>
+<md>\boxed{
+\min_{p\in P}
+\|q-p\|
+}</md>
+</p>
+
+<p>for nearest-neighbor search, and</p>
+
+<p>
+<md>\boxed{
+\min_{\gamma}
+L(\gamma)
+}</md>
+</p>
+
+<p>for shortest-path problems.</p>
+
+<p>Thus computational geometry interacts naturally with mathematical
+optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-smallest-enclosing-circle">
+<title>The Smallest Enclosing Circle</title>
+<p>Given a finite planar point set <m>P</m>, the smallest enclosing circle problem
+asks for a circle of minimum radius containing every point.</p>
+
+<p>The solution is determined by a small subset of boundary points.</p>
+
+<p>In the nondegenerate planar case, the optimal circle is typically determined
+by either</p>
+
+<p>
+<md>\boxed{
+\text{two diametrically opposite boundary points}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{three boundary points defining the circle}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometric-duality">
+<title>Geometric Duality</title>
+<p>Geometric duality can transform one type of geometric object into another.</p>
+
+<p>For example, under a suitable point-line duality, a point</p>
+
+<p>
+<md>p=(a,b)</md>
+</p>
+
+<p>may correspond to a line such as</p>
+
+<p>
+<md>\boxed{
+y=ax-b.
+}</md>
+</p>
+
+<p>Conversely, a nonvertical line</p>
+
+<p>
+<md>y=mx-c</md>
+</p>
+
+<p>corresponds to the point</p>
+
+<p>
+<md>\boxed{
+(m,c).
+}</md>
+</p>
+
+<p>Different duality conventions are possible.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-why-computational-duality">
+<title>Why Duality Is Useful</title>
+<p>A difficult problem involving points may become easier after conversion into
+a problem involving lines.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\text{point-line incidences}
+}</md>
+</p>
+
+<p>may be transformed into</p>
+
+<p>
+<md>\boxed{
+\text{dual line-point incidences}.
+}</md>
+</p>
+
+<p>Duality is therefore both a theoretical and algorithmic technique.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-randomized-geometric-algorithms">
+<title>Randomized Geometric Algorithms</title>
+<p>Randomization can simplify geometric algorithms.</p>
+
+<p>A randomized incremental algorithm processes objects in random order and
+updates the geometric structure as each object is inserted.</p>
+
+<p>This approach is used in algorithms for structures such as</p>
+
+<p>
+<md>\boxed{
+\text{convex hulls},
+\quad
+\text{Delaunay triangulations},
+\quad
+\text{arrangements}.
+}</md>
+</p>
+
+<p>Expected running-time analysis is then performed using probability.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-degeneracy">
+<title>Degeneracy</title>
+<p>A geometric input is <em>degenerate</em> when special coincidences occur.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{three collinear points},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{four cocircular points},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{overlapping segments},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{multiple events at the same coordinate}.
+}</md>
+</p>
+
+<p>These cases often require additional algorithmic logic.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-general-position">
+<title>General Position Assumptions</title>
+<p>To simplify theoretical analysis, algorithms are often first described under
+general-position assumptions.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{no three points collinear}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{no four points cocircular}.
+}</md>
+</p>
+
+<p>These assumptions remove degeneracies.</p>
+
+<p>However, practical software must eventually decide how such cases are
+handled.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-exact-floating-geometry">
+<title>Exact Versus Floating-Point Arithmetic</title>
+<p>A mathematical orientation determinant may equal exactly zero.</p>
+
+<p>A computer using floating-point arithmetic may instead obtain a very small
+positive or negative value because of rounding error.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\text{mathematically exact predicate}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{numerically computed predicate}
+}</md>
+</p>
+
+<p>are not automatically the same.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-robust-geometric-computation">
+<title>Robust Geometric Computation</title>
+<p>A geometric algorithm is <em>robust</em> when it behaves correctly even in
+the presence of numerical error and degenerate inputs.</p>
+
+<p>Common strategies include:</p>
+
+<p>
+<ul>
+<li>
+<p>exact arithmetic;</p>
+</li>
+<li>
+<p>adaptive-precision arithmetic;</p>
+</li>
+<li>
+<p>carefully designed robust predicates;</p>
+</li>
+<li>
+<p>symbolic perturbation;</p>
+</li>
+<li>
+<p>explicit degeneracy handling.</p>
+</li>
+</ul>
+</p>
+
+<p>\begin{importantbox}
+In computational geometry, a theoretically correct algorithm can still fail
+in software if its geometric predicates are evaluated unreliably.
+\end{importantbox}</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-symbolic-perturbation">
+<title>Symbolic Perturbation</title>
+<p>Symbolic perturbation conceptually moves input objects by infinitesimally
+small amounts so that degeneracies disappear.</p>
+
+<p>The perturbation is not necessarily performed numerically.</p>
+
+<p>Instead, the algorithm uses a consistent rule that behaves as if the input
+had been slightly perturbed.</p>
+
+<p>This allows general-position reasoning while preserving deterministic
+behavior.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-higher-dimensional-computational-geometry">
+<title>Higher-Dimensional Computational Geometry</title>
+<p>Many planar problems extend to</p>
+
+<p>
+<md>\R^d.</md>
+</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{convex hulls},
+\quad
+\text{Voronoi diagrams},
+\quad
+\text{nearest neighbors},
+\quad
+\text{range searching}.
+}</md>
+</p>
+
+<p>However, computational complexity often increases rapidly with dimension.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-geometry-curse-dimensionality">
+<title>The Curse of Dimensionality</title>
+<p>Algorithms that perform well in two or three dimensions may become
+inefficient in high dimensions.</p>
+
+<p>This phenomenon is commonly associated with the
+<em>curse of dimensionality</em>.</p>
+
+<p>For example, spatial partitions may become less selective as dimension
+increases, while combinatorial complexity can grow rapidly.</p>
+
+<p>This is especially important in high-dimensional data analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-gis">
+<title>Applications to Geographic Information Systems</title>
+<p>Geographic information systems, or GIS, manipulate spatial data such as</p>
+
+<p>
+<md>\boxed{
+\text{roads},
+\quad
+\text{parcels},
+\quad
+\text{boundaries},
+\quad
+\text{elevation},
+\quad
+\text{service regions}.
+}</md>
+</p>
+
+<p>Computational geometry provides algorithms for</p>
+
+<p>
+<md>\boxed{
+\text{intersection},
+\quad
+\text{point location},
+\quad
+\text{nearest neighbors},
+\quad
+\text{spatial indexing}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-graphics">
+<title>Applications to Computer Graphics</title>
+<p>Computer graphics relies heavily on geometric computation.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{mesh construction},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{ray intersection},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{visibility},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{collision detection},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{surface approximation}.
+}</md>
+</p>
+
+<p>Bounding-volume hierarchies and spatial subdivisions are particularly
+important for accelerating large geometric queries.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-robotics">
+<title>Applications to Robotics</title>
+<p>Robotics uses computational geometry for</p>
+
+<p>
+<md>\boxed{
+\text{motion planning},
+\quad
+\text{collision avoidance},
+\quad
+\text{localization},
+\quad
+\text{mapping}.
+}</md>
+</p>
+
+<p>Configuration spaces transform robot motion into geometric path problems.</p>
+
+<p>Voronoi structures can also help construct paths that remain far from
+obstacles.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-data">
+<title>Applications to Data Analysis</title>
+<p>Data points in</p>
+
+<p>
+<md>\R^d</md>
+</p>
+
+<p>can be studied geometrically.</p>
+
+<p>Computational tools include:</p>
+
+<p>
+<md>\boxed{
+\text{nearest neighbors},
+\quad
+\text{convex hulls},
+\quad
+\text{spatial partitions},
+\quad
+\text{proximity graphs}.
+}</md>
+</p>
+
+<p>These ideas appear in classification, clustering, anomaly detection, and
+geometric data analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-scientific-computing">
+<title>Applications to Scientific Computing</title>
+<p>Scientific simulations often require geometric preprocessing.</p>
+
+<p>A physical domain may first be converted into a mesh.</p>
+
+<p>Differential equations are then approximated on that mesh using methods such
+as finite elements.</p>
+
+<p>Thus a pipeline may have the form</p>
+
+<p>
+<md>\boxed{
+\text{geometry}
+\longrightarrow
+\text{mesh}
+\longrightarrow
+\text{numerical model}
+\longrightarrow
+\text{simulation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-confusing-mathematical-geometry-with-computational-geometry">
+<title>Confusing Mathematical Geometry with Computational Geometry</title>
+<p>Computational geometry is not simply geometry performed with a calculator.</p>
+
+<p>The subject studies algorithms, complexity, data structures, numerical
+reliability, and geometric representations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-slope-when-a-determinant-is-better">
+<title>Using Slope When a Determinant Is Better</title>
+<p>Slope calculations can fail for vertical lines and may require division.</p>
+
+<p>Orientation determinants avoid division and treat all directions uniformly.</p>
+
+<p>Thus</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)
+}</md>
+</p>
+
+<p>is usually preferable to comparing slopes.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-taking-square-roots-unnecessarily">
+<title>Taking Square Roots Unnecessarily</title>
+<p>To determine whether</p>
+
+<p>
+<md>d(p,q)&lt;d(p,r),</md>
+</p>
+
+<p>it is enough to compare</p>
+
+<p>
+<md>\boxed{
+d^2(p,q)&lt;d^2(p,r).
+}</md>
+</p>
+
+<p>The square root need not be computed.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-collinear-cases-in-segment-intersection">
+<title>Ignoring Collinear Cases in Segment Intersection</title>
+<p>The strict orientation test detects proper crossings.</p>
+
+<p>Endpoint contact and collinear overlap require additional tests.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-every-point-belongs-on-the-convex-hull">
+<title>Assuming Every Point Belongs on the Convex Hull</title>
+<p>Interior points do not appear as convex-hull vertices.</p>
+
+<p>Only extreme boundary points are required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-every-convex-hull-algorithm-is-quadratic">
+<title>Assuming Every Convex-Hull Algorithm Is Quadratic</title>
+<p>Efficient planar convex-hull algorithms achieve</p>
+
+<p>
+<md>\boxed{
+O(n\log n)
+}</md>
+</p>
+
+<p>running time.</p>
+
+<p>Output-sensitive algorithms may perform differently depending on the number
+of hull vertices.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-04-geometry-13-computational-geometry-subsubsec-assuming-delaunay-triangulations-are-always-unique">
+<title>Assuming Delaunay Triangulations Are Always Unique</title>
+<p>Four cocircular sites can produce multiple valid Delaunay triangulations.</p>
+
+<p>Uniqueness follows under suitable general-position assumptions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-voronoi-and-delaunay-structures">
+<title>Confusing Voronoi and Delaunay Structures</title>
+<p>Voronoi diagrams partition space into nearest-site regions.</p>
+
+<p>Delaunay triangulations connect sites according to adjacency of their
+Voronoi cells.</p>
+
+<p>They are dual structures, not the same structure.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-polygon-orientation">
+<title>Ignoring Polygon Orientation</title>
+<p>The sign of a signed-area or orientation calculation depends on vertex
+ordering.</p>
+
+<p>Clockwise and counterclockwise orderings produce opposite signs.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-floating-point-zero-means-exact-zero">
+<title>Assuming Floating-Point Zero Means Exact Zero</title>
+<p>A computed value such as</p>
+
+<p>
+<md>10^{-14}</md>
+</p>
+
+<p>may represent numerical error rather than genuine geometric separation.</p>
+
+<p>Robust predicates require more care than simply checking approximate values.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-an-arbitrary-tolerance-everywhere">
+<title>Using an Arbitrary Tolerance Everywhere</title>
+<p>Replacing every comparison with a fixed tolerance does not automatically
+make a geometric algorithm robust.</p>
+
+<p>The appropriate numerical scale can vary greatly between problems.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-degenerate-input">
+<title>Ignoring Degenerate Input</title>
+<p>Real data can contain</p>
+
+<p>
+<md>\boxed{
+\text{duplicates},
+\quad
+\text{collinearities},
+\quad
+\text{cocircularities},
+\quad
+\text{overlaps}.
+}</md>
+</p>
+
+<p>A practical algorithm should specify how these cases are treated.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-worst-case-and-expected-complexity">
+<title>Confusing Worst-Case and Expected Complexity</title>
+<p>A randomized algorithm may have good expected running time without having
+the same worst-case bound.</p>
+
+<p>The type of complexity statement must be identified.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-low-dimensional-methods-scale-directly">
+<title>Assuming Low-Dimensional Methods Scale Directly</title>
+<p>An algorithm that is excellent in <m>\R^2</m> may become impractical in high
+dimensions.</p>
+
+<p>Dimensional dependence is an essential part of geometric algorithm design.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-applications">
+<title>Applications and Connections</title>
+<p>\begin{applicationbox}
+<em>Convex Geometry.</em>
+Convex-hull algorithms turn the theoretical convex hull into an explicit
+computational object.</p>
+
+<p>\medskip</p>
+
+<p><em>Discrete Geometry.</em>
+Point configurations, Voronoi diagrams, Delaunay triangulations, packings,
+polytopes, and geometric graphs provide many of the basic inputs and
+structures studied algorithmically.</p>
+
+<p>\medskip</p>
+
+<p><em>Linear Algebra.</em>
+Determinants, vector products, linear systems, and transformations provide
+many of the fundamental computational predicates.</p>
+
+<p>\medskip</p>
+
+<p><em>Algorithms and Data Structures.</em>
+Sorting, divide and conquer, balanced trees, spatial partitions, priority
+queues, and randomized algorithms are central computational tools.</p>
+
+<p>\medskip</p>
+
+<p><em>Optimization.</em>
+Closest-pair, nearest-neighbor, enclosing-shape, and shortest-path problems
+are geometric optimization problems.</p>
+
+<p>\medskip</p>
+
+<p><em>Computer Graphics.</em>
+Ray intersection, meshes, collision detection, visibility, and spatial
+acceleration structures are geometric algorithm problems.</p>
+
+<p>\medskip</p>
+
+<p><em>Robotics.</em>
+Motion planning, configuration spaces, obstacle avoidance, and localization
+depend on geometric computation.</p>
+
+<p>\medskip</p>
+
+<p><em>GIS.</em>
+Spatial indexing, overlay operations, point location, nearest facilities,
+and region queries use computational geometry extensively.</p>
+
+<p>\medskip</p>
+
+<p><em>Scientific Computing.</em>
+Mesh generation provides geometric discretizations for numerical methods
+such as finite element analysis.</p>
+
+<p>\medskip</p>
+
+<p><em>Data Science.</em>
+Nearest-neighbor search, spatial trees, geometric classification, and
+high-dimensional proximity problems connect computational geometry with
+modern data analysis.
+\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>What is a geometric predicate?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>\operatorname{orient}
+((0,0),(2,0),(1,3)).</md>
+</p>
+
+<p>Classify the turn.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>\operatorname{orient}
+((0,0),(2,0),(1,-3)).</md>
+</p>
+
+<p>Classify the turn.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What does</p>
+
+<p>
+<md>\operatorname{orient}(p,q,r)=0</md>
+</p>
+
+<p>tell you?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the area of the triangle with vertices</p>
+
+<p>
+<md>(0,0),
+\quad
+(6,0),
+\quad
+(2,4)</md>
+</p>
+
+<p>using the orientation determinant.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Why can squared distances be compared instead of distances?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many pairs of points must a brute-force closest-pair algorithm examine
+for <m>n</m> points?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is the brute-force complexity of the closest-pair problem?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is the running time of the standard planar divide-and-conquer
+closest-pair algorithm?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the computational convex-hull problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What geometric predicate is repeatedly used in Graham scan?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is the running time of Graham scan?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What does the parameter <m>h</m> represent in the Jarvis march complexity</p>
+
+<p>
+<md>O(nh)?</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the ray-crossing rule for determining whether a point lies inside a
+simple polygon.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the shoelace formula.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many triangles occur in a triangulation of a simple polygon with
+<m>12</m> vertices?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many diagonals are required?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is a Voronoi cell?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is the geometric dual of a Voronoi diagram?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>State the empty circumcircle property.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What can cause a Delaunay triangulation to be nonunique?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is a nearest-neighbor query?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is a range query?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What type of subdivision is used by a quadtree?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What is the three-dimensional analogue of a quadtree?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the segments joining</p>
+
+<p>
+<md>(0,0)\text{ to }(4,4)</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>(0,4)\text{ to }(4,0)</md>
+</p>
+
+<p>properly intersect using orientation tests.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the segments joining</p>
+
+<p>
+<md>(0,0)\text{ to }(2,0)</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>(3,0)\text{ to }(5,0)</md>
+</p>
+
+<p>intersect.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why the second problem requires more than the strict proper
+intersection test.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the squared distance between</p>
+
+<p>
+<md>(2,-1)</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>(7,3).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For the points</p>
+
+<p>
+<md>(0,0),
+(4,0),
+(4,4),
+(0,4),
+(2,2),</md>
+</p>
+
+<p>identify the convex-hull vertices.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why the point</p>
+
+<p>
+<md>(2,2)</md>
+</p>
+
+<p>does not appear on that convex hull.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the shoelace formula to find the area of the polygon with vertices</p>
+
+<p>
+<md>(0,0),
+\quad
+(5,0),
+\quad
+(5,2),
+\quad
+(0,2).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For sites</p>
+
+<p>
+<md>p_1=(0,0),
+\qquad
+p_2=(6,0),</md>
+</p>
+
+<p>find the boundary separating their Voronoi cells.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Euclidean Voronoi cells are convex.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe how Voronoi diagrams can answer nearest-neighbor queries.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between a Voronoi edge and a Delaunay edge.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe the broad-phase and narrow-phase stages of collision detection.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the purpose of a bounding-volume hierarchy.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe the basic structure of a sweep-line algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Why is the Bentley--Ottmann algorithm called output-sensitive?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If <m>n</m> lines are in general position, how many pairwise intersection
+vertices do they determine?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>How many maximum regions are determined by <m>8</m> lines in general position?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how a visibility graph converts geometry into a graph problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>What coordinates can describe the configuration of a planar rigid body that
+translates and rotates?</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Delaunay triangulations are useful in mesh generation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove that the orientation determinant is twice the signed area of a
+triangle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Develop a complete segment-intersection test that includes collinear and
+endpoint cases.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why sorting is responsible for the <m>O(n\log n)</m> complexity of
+Graham scan.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe the upper-hull and lower-hull construction in the monotone chain
+algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the shoelace formula for a simple polygon.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why every simple polygon with <m>n</m> vertices has a triangulation
+containing <m>n-2</m> triangles.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the geometric relationship among a Voronoi vertex, three sites, and
+a Delaunay circumcircle.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the perpendicular-bisector equation defining the boundary between two
+Voronoi sites.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how a <m>k</m>-d tree recursively partitions a planar point set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare <m>k</m>-d trees and quadtrees.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a sweep-line algorithm can outperform checking every pair of
+segments.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Show that <m>n</m> lines in general position divide the plane into</p>
+
+<p>
+<md>1+\frac{n(n+1)}{2}</md>
+</p>
+
+<p>regions.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how Minkowski sums can be used to transform a finite-sized robot into
+a point for obstacle-avoidance calculations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example where floating-point error could change the result of an
+orientation test.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a fixed numerical tolerance does not solve every robustness
+problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between a geometric construction and a geometric
+predicate.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research the divide-and-conquer closest-pair algorithm and prove its</p>
+
+<p>
+<md>O(n\log n)</md>
+</p>
+
+<p>running time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Implement or describe pseudocode for the monotone chain convex-hull
+algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research Fortune's sweep-line algorithm for constructing Voronoi diagrams.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate randomized incremental construction of Delaunay triangulations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research the Bentley--Ottmann algorithm and explain its event structure.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate exact geometric predicates and adaptive-precision arithmetic.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research symbolic perturbation and explain how it handles degeneracies.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate one algorithm for the smallest enclosing circle problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Research configuration-space obstacles for polygonal robots.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate how computational geometry is used in finite element mesh
+generation.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-summary">
+<title>Conceptual Summary</title>
+<p>Computational geometry studies algorithms for geometric objects.</p>
+
+<p>A fundamental planar predicate is</p>
+
+<p>
+<md>\boxed{
+\operatorname{orient}(p,q,r)
+=
+(q_x-p_x)(r_y-p_y)
+-
+(q_y-p_y)(r_x-p_x).
+}</md>
+</p>
+
+<p>Its sign determines clockwise, counterclockwise, or collinear orientation.</p>
+
+<p>Orientation tests support algorithms for</p>
+
+<p>
+<md>\boxed{
+\text{segment intersection},
+\quad
+\text{convex hulls},
+\quad
+\text{polygon processing}.
+}</md>
+</p>
+
+<p>The planar closest-pair problem admits an</p>
+
+<p>
+<md>\boxed{
+O(n\log n)
+}</md>
+</p>
+
+<p>divide-and-conquer algorithm.</p>
+
+<p>Planar convex hulls can also be computed in</p>
+
+<p>
+<md>\boxed{
+O(n\log n)
+}</md>
+</p>
+
+<p>time using algorithms such as Graham scan or monotone chain.</p>
+
+<p>Voronoi diagrams partition space according to nearest sites:</p>
+
+<p>
+<md>\boxed{
+V_i
+=
+\{
+x:
+\|x-p_i\|
+\leq
+\|x-p_j\|
+\text{ for all }j
+\}.
+}</md>
+</p>
+
+<p>Delaunay triangulations are geometric duals of Voronoi diagrams and satisfy
+the empty circumcircle property.</p>
+
+<p>Polygon triangulation reduces complicated polygonal regions to simpler
+triangular pieces.</p>
+
+<p>Spatial data structures such as</p>
+
+<p>
+<md>\boxed{
+k\text{-d trees},
+\quad
+\text{quadtrees},
+\quad
+\text{bounding-volume hierarchies}
+}</md>
+</p>
+
+<p>accelerate geometric queries.</p>
+
+<p>Sweep-line algorithms process geometric events in an organized spatial
+order.</p>
+
+<p>Configuration spaces transform robot motion into path planning through a
+higher-dimensional geometric space.</p>
+
+<p>Finally, reliable implementation requires attention to</p>
+
+<p>
+<md>\boxed{
+\text{degeneracy},
+\quad
+\text{floating-point error},
+\quad
+\text{robust predicates}.
+}</md>
+</p>
+
+<p>Thus computational geometry combines</p>
+
+<p>
+<md>\boxed{
+\text{geometry}
++
+\text{algorithms}
++
+\text{data structures}
++
+\text{numerical computation}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-13-computational-geometry-subsec-computational-geometry-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Computational Geometry completes the Geometry chapter by turning many of its
+theoretical objects into algorithmic problems. Analytic and Vector Geometry
+provide coordinate formulas and orientation predicates. Affine and
+Projective Geometry provide transformations and duality. Convex Geometry
+provides convex hulls, half-spaces, and Minkowski sums. Discrete Geometry
+provides point configurations, Voronoi diagrams, Delaunay triangulations,
+polytopes, and geometric graphs. Algorithmic complexity and spatial data
+structures connect this material with Discrete Mathematics and Numerical
+Computation. Configuration spaces and geometric subdivisions also provide a
+natural transition from Geometry into the next major chapter, Topology.</p>
+</remark>
+</subsection>
+
 </section>

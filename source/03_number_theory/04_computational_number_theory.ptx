@@ -1,9 +1,3057 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-03-number-theory-04-computational-number-theory">
-  <title>Computational Number Theory</title>
+<section xml:id="sec-computational-number-theory">
+<title>Computational Number Theory</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Elementary Number Theory from <xref ref="sec-elementary-number-theory" />, including
+divisibility, greatest common divisors, prime numbers, congruences, modular
+arithmetic, Euler's theorem, and the Chinese Remainder Theorem. Familiarity
+with algorithms and basic programming is helpful but not required.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain the purpose of computational number theory;</p>
+</li>
+<li>
+<p>distinguish mathematical existence from computational feasibility;</p>
+</li>
+<li>
+<p>analyze arithmetic algorithms using basic complexity ideas;</p>
+</li>
+<li>
+<p>implement and apply the Euclidean and extended Euclidean algorithms;</p>
+</li>
+<li>
+<p>compute modular inverses efficiently;</p>
+</li>
+<li>
+<p>perform modular exponentiation using repeated squaring;</p>
+</li>
+<li>
+<p>solve systems of congruences computationally;</p>
+</li>
+<li>
+<p>generate primes using sieve algorithms;</p>
+</li>
+<li>
+<p>distinguish deterministic and probabilistic primality testing;</p>
+</li>
+<li>
+<p>apply Fermat and Miller--Rabin primality tests;</p>
+</li>
+<li>
+<p>explain pseudoprimes and Carmichael numbers;</p>
+</li>
+<li>
+<p>distinguish primality testing from integer factorization;</p>
+</li>
+<li>
+<p>understand trial division, Fermat factorization, Pollard's rho method,
+    and the quadratic sieve conceptually;</p>
+</li>
+<li>
+<p>explain why the number field sieve is important for large integer
+    factorization;</p>
+</li>
+<li>
+<p>compute multiplicative arithmetic functions from prime factorizations;</p>
+</li>
+<li>
+<p>understand discrete logarithm problems;</p>
+</li>
+<li>
+<p>apply the baby-step giant-step algorithm conceptually;</p>
+</li>
+<li>
+<p>understand computational aspects of quadratic residues;</p>
+</li>
+<li>
+<p>apply the Legendre and Jacobi symbols algorithmically;</p>
+</li>
+<li>
+<p>understand the computational role of continued fractions;</p>
+</li>
+<li>
+<p>recognize the mathematical foundations of RSA and Diffie--Hellman;</p>
+</li>
+<li>
+<p>distinguish computational hardness assumptions from mathematical
+    impossibility;</p>
+</li>
+<li>
+<p>understand how computational experiments can guide number-theoretic
+    conjectures without replacing proof.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-what-is-computational-number-theory">
+<title>What Is Computational Number Theory?</title>
+<p>Number theory asks questions about integers, primes, divisibility,
+congruences, and Diophantine equations.</p>
+
+<p>Computational number theory asks an additional question:</p>
+
+<p><em>How can these quantities actually be computed efficiently?</em></p>
+
+<definition>
+<title>Computational Number Theory</title>
+<statement>
+<p><em>Computational number theory</em> is the study of algorithms for solving
+number-theoretic problems and of the computational resources required by
+those algorithms.</p>
+</statement>
+</definition>
+
+<p>Typical computational problems include:</p>
+
+<p>
+<ul>
+<li>
+<p>computing <m>\gcd(a,b)</m>;</p>
+</li>
+<li>
+<p>finding modular inverses;</p>
+</li>
+<li>
+<p>evaluating <m>a^n\bmod m</m>;</p>
+</li>
+<li>
+<p>determining whether a large integer is prime;</p>
+</li>
+<li>
+<p>factoring a large composite integer;</p>
+</li>
+<li>
+<p>solving congruences;</p>
+</li>
+<li>
+<p>computing discrete logarithms;</p>
+</li>
+<li>
+<p>evaluating arithmetic functions;</p>
+</li>
+<li>
+<p>searching for solutions to Diophantine equations.</p>
+</li>
+</ul>
+</p>
+
+<p>\begin{conceptbox}
+A mathematical problem can be theoretically solvable while still being
+computationally difficult.</p>
+
+<p>Computational number theory therefore studies both</p>
+
+<p>
+<md>\boxed{\text{correctness}}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{\text{efficiency}}.</md>
+</p>
+
+<p>\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-number-theoretic-algorithms">
+<title>Algorithms</title>
+<definition>
+<title>Algorithm</title>
+<statement>
+<p>An <em>algorithm</em> is a finite, precisely specified procedure for solving a
+problem or computing an output from given input.</p>
+</statement>
+</definition>
+
+<p>For example, trial division gives an algorithm for determining whether a
+positive integer <m>n</m> has a divisor.</p>
+
+<p>One could test</p>
+
+<p>
+<md>2,3,4,\ldots,n-1.</md>
+</p>
+
+<p>This procedure is correct, but it is unnecessarily inefficient.</p>
+
+<p>A better observation is that if <m>n</m> is composite, then it has a divisor
+not exceeding</p>
+
+<p>
+<md>\sqrt n.</md>
+</p>
+
+<p>Thus only potential divisors through <m>\sqrt n</m> need to be tested.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-integer-input-size">
+<title>Input Size</title>
+<p>When measuring the complexity of an integer algorithm, the size of an integer
+<m>n</m> is not usually measured by <m>n</m> itself.</p>
+
+<p>Instead, it is measured by the number of digits needed to represent <m>n</m>.</p>
+
+<p>In binary, this is approximately</p>
+
+<p>
+<md>\log_2 n.</md>
+</p>
+
+<definition>
+<title>Bit Length</title>
+<statement>
+<p>For a positive integer <m>n</m>, its <em>bit length</em> is</p>
+
+<p>
+<md>\ell(n)=\lfloor\log_2 n\rfloor+1.</md>
+</p>
+</statement>
+</definition>
+
+<p>The symbol</p>
+
+<p>
+<md>\ell</md>
+</p>
+
+<p>is lowercase script-style <em>ell</em> and here denotes length.</p>
+
+<p>For example,</p>
+
+<p>
+<md>13=(1101)_2,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>\ell(13)=4.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-why-bit-length-matters">
+<title>Why Bit Length Matters</title>
+<p>Suppose an algorithm requires approximately</p>
+
+<p>
+<md>\sqrt n</md>
+</p>
+
+<p>operations.</p>
+
+<p>Since</p>
+
+<p>
+<md>n\approx2^{\ell(n)},</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\sqrt n\approx2^{\ell(n)/2}.</md>
+</p>
+
+<p>Thus an algorithm that appears to grow like a square root of the integer may
+actually grow exponentially in the number of input bits.</p>
+
+<p>\begin{importantbox}
+For integer algorithms, computational complexity should generally be measured
+relative to the number of bits in the input, not merely the numerical value
+of the integer.
+\end{importantbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-number-theory-complexity-notation">
+<title>Basic Complexity Notation</title>
+<p>Asymptotic notation provides a convenient way to compare algorithm growth.</p>
+
+<p>If</p>
+
+<p>
+<md>T(n)=O(f(n)),</md>
+</p>
+
+<p>then the running time is bounded above by a constant multiple of <m>f(n)</m> for
+sufficiently large <m>n</m>.</p>
+
+<p>Common growth classes include</p>
+
+<p>
+<md>O(1),\qquad O(\log n),\qquad O(n),\qquad O(n\log n),\qquad O(n^2),
+\qquad O(2^n).</md>
+</p>
+
+<p>A rough hierarchy is</p>
+
+<p>
+<md>O(1)
+\prec
+O(\log n)
+\prec
+O(n)
+\prec
+O(n\log n)
+\prec
+O(n^2)
+\prec
+O(2^n).</md>
+</p>
+
+<p>The symbol</p>
+
+<p>
+<md>\prec</md>
+</p>
+
+<p>is read <q>grows more slowly than</q> in this informal comparison.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-euclidean-algorithm">
+<title>The Euclidean Algorithm</title>
+<p>The Euclidean algorithm is one of the oldest and most important efficient
+algorithms in mathematics.</p>
+
+<p>It is based on the identity</p>
+
+<p>
+<md>\gcd(a,b)=\gcd(b,a\bmod b).</md>
+</p>
+
+<p>Repeated division produces</p>
+
+<p>
+<md>a=bq_1+r_1,\qquad
+b=r_1q_2+r_2,\qquad
+r_1=r_2q_3+r_3,\qquad\ldots</md>
+</p>
+
+<p>until a remainder becomes zero.</p>
+
+<p>The last nonzero remainder is</p>
+
+<p>
+<md>\gcd(a,b).</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-euclidean-algorithm-flow">
+<title>Euclidean Algorithm Flow</title>
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[
+    node distance=8mm,
+    box/.style={draw,rounded corners,align=center,minimum width=3.5cm,
+    minimum height=0.8cm}
+]
+\node[box] (start) {Start with <m>a&gt;b&gt;0</m>};
+\node[box,below=of start] (divide) {Compute <m>a=bq+r</m>};
+\node[box,below=of divide] (check) {Is <m>r=0</m>?};
+\node[box,below left=10mm and 8mm of check] (replace) {Replace\\<m>a\leftarrow b,\ b\leftarrow r</m>};
+\node[box,below right=10mm and 8mm of check] (done) {<m>\gcd(a,b)=b</m>};</p>
+
+<p>\draw[-{Latex[length=2.5mm]}] (start)--(divide);
+\draw[-{Latex[length=2.5mm]}] (divide)--(check);
+\draw[-{Latex[length=2.5mm]}] (check)--node[left]{No}(replace);
+\draw[-{Latex[length=2.5mm]}] (check)--node[right]{Yes}(done);
+\draw[-{Latex[length=2.5mm]}] (replace.west) -| ++(-0.8,0) |- (divide.west);
+\end{tikzpicture}
+\end{centereddiagram}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-worked-euclidean-computation">
+<title>Worked Example: Euclidean Algorithm</title>
+<example>
+<title>Computing a Greatest Common Divisor</title>
+<p>Compute</p>
+
+<p>
+<md>\gcd(252,198).</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+
+<p>The last nonzero remainder is <m>18</m>.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{\gcd(252,198)=18.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-extended-euclidean-algorithm">
+<title>The Extended Euclidean Algorithm</title>
+<p>The Euclidean algorithm can be extended to produce integers <m>x</m> and <m>y</m>
+satisfying Bézout's identity.</p>
+
+<p>\begin{theorem}[Bézout's Identity]
+For integers <m>a,b</m>, not both zero, there exist integers <m>x,y</m> such that</p>
+
+<p>
+<md>\boxed{ax+by=\gcd(a,b).}</md>
+</p>
+
+<p>\end{theorem}</p>
+
+<p>The extended Euclidean algorithm computes these coefficients efficiently.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-worked-extended-euclidean">
+<title>Worked Example: Extended Euclidean Algorithm</title>
+<p>Using the previous divisions,</p>
+
+<p>
+<md>18=54-36.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>36=198-3(54),</md>
+</p>
+
+<p>we obtain</p>
+
+<p>
+<md>18=54-(198-3(54))=4(54)-198.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>54=252-198,</md>
+</p>
+
+<p>we obtain</p>
+
+<p>
+<md>18=4(252-198)-198=4(252)-5(198).</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>\boxed{18=4(252)-5(198).}</md>
+</p>
+
+<p>Thus one Bézout pair is</p>
+
+<p>
+<md>x=4,\qquad y=-5.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computing-modular-inverses">
+<title>Computing Modular Inverses</title>
+<p>An integer <m>a</m> has a multiplicative inverse modulo <m>m</m> precisely when</p>
+
+<p>
+<md>\gcd(a,m)=1.</md>
+</p>
+
+<p>If the extended Euclidean algorithm gives</p>
+
+<p>
+<md>ax+my=1,</md>
+</p>
+
+<p>then reducing modulo <m>m</m> gives</p>
+
+<p>
+<md>ax\equiv1\pmod m.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>\boxed{a^{-1}\equiv x\pmod m.}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-worked-modular-inverse">
+<title>Worked Example: Modular Inverse</title>
+<example>
+<title>Finding a Modular Inverse</title>
+<p>Find</p>
+
+<p>
+<md>17^{-1}\pmod{43}.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+
+<p>Thus</p>
+
+<p>
+<md>-5(17)\equiv1\pmod{43}.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>-5\equiv38\pmod{43},</md>
+</p>
+
+<p>we obtain</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{17^{-1}\equiv38\pmod{43}.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-modular-exponentiation">
+<title>Modular Exponentiation</title>
+<p>Computing</p>
+
+<p>
+<md>a^n\bmod m</md>
+</p>
+
+<p>by first calculating the enormous integer <m>a^n</m> is usually wasteful.</p>
+
+<p>Instead, multiplication and reduction can be interleaved.</p>
+
+<p>A fundamental method is <em>repeated squaring</em>, also called
+<em>binary exponentiation</em>.</p>
+
+<p>For example,</p>
+
+<p>
+<md>a^8=((a^2)^2)^2.</md>
+</p>
+
+<p>More generally, write the exponent in binary.</p>
+
+<p>If</p>
+
+<p>
+<md>n=\sum_{j=0}^{k}b_j2^j,\qquad b_j\in\{0,1\},</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>a^n=\prod_{j:b_j=1}a^{2^j}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-worked-repeated-squaring">
+<title>Worked Example: Repeated Squaring</title>
+<example>
+<title>Fast Modular Exponentiation</title>
+<p>Compute</p>
+
+<p>
+<md>7^{13}\pmod{20}.</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>13=8+4+1,</md>
+</p>
+
+<p>we need <m>7^1,7^4,7^8</m>.</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{7^{13}\equiv7\pmod{20}.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-square-and-multiply">
+<title>Square-and-Multiply Algorithm</title>
+<p>Repeated squaring leads to the square-and-multiply algorithm.</p>
+
+<p>For an exponent with approximately</p>
+
+<p>
+<md>\log_2 n</md>
+</p>
+
+<p>binary digits, modular exponentiation requires only on the order of</p>
+
+<p>
+<md>O(\log n)</md>
+</p>
+
+<p>modular squaring and multiplication steps.</p>
+
+<p>This is dramatically better than performing <m>n-1</m> repeated
+multiplications.</p>
+
+<p>\begin{importantbox}
+Efficient modular exponentiation is one of the fundamental computational
+operations underlying modern number-theoretic cryptography.
+\end{importantbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-linear-congruences">
+<title>Solving Linear Congruences Algorithmically</title>
+<p>Consider</p>
+
+<p>
+<md>ax\equiv b\pmod m.</md>
+</p>
+
+<p>Let</p>
+
+<p>
+<md>d=\gcd(a,m).</md>
+</p>
+
+<p>A solution exists precisely when</p>
+
+<p>
+<md>d\mid b.</md>
+</p>
+
+<p>If <m>d=1</m>, compute</p>
+
+<p>
+<md>a^{-1}\pmod m</md>
+</p>
+
+<p>using the extended Euclidean algorithm and obtain</p>
+
+<p>
+<md>x\equiv a^{-1}b\pmod m.</md>
+</p>
+
+<p>Thus solving a linear congruence reduces computationally to a greatest common
+divisor calculation.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-crt">
+<title>Computational Chinese Remainder Theorem</title>
+<p>Suppose</p>
+
+<p>
+<md>x\equiv a_1\pmod{m_1},\qquad
+x\equiv a_2\pmod{m_2},</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\gcd(m_1,m_2)=1.</md>
+</p>
+
+<p>Let</p>
+
+<p>
+<md>M=m_1m_2,\qquad M_1=\frac{M}{m_1},\qquad M_2=\frac{M}{m_2}.</md>
+</p>
+
+<p>Find</p>
+
+<p>
+<md>y_1\equiv M_1^{-1}\pmod{m_1},\qquad y_2\equiv M_2^{-1}\pmod{m_2}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{x\equiv a_1M_1y_1+a_2M_2y_2\pmod M.}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-worked-computational-crt">
+<title>Worked Example: Chinese Remainder Computation</title>
+<example>
+<title>Solving a Congruence System</title>
+<p>Solve</p>
+
+<p>
+<md>x\equiv2\pmod3,\qquad x\equiv3\pmod5.</md>
+</p>
+
+<p><em>Manual conversion required:</em> This table from the LaTeX source still needs to be converted to native PreTeXt.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{x\equiv8\pmod{15}.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-prime-generation">
+<title>Prime Generation</title>
+<p>A basic computational task is to generate all primes up to a given bound.</p>
+
+<p>Testing each integer independently wastes information.</p>
+
+<p>Sieve algorithms eliminate many composites simultaneously.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-sieve-eratosthenes">
+<title>Sieve of Eratosthenes</title>
+<p>To find all primes not exceeding <m>N</m>:</p>
+
+<p>
+<ol>
+<li>
+<p>List the integers from <m>2</m> through <m>N</m>.</p>
+</li>
+<li>
+<p>Begin with <m>p=2</m>.</p>
+</li>
+<li>
+<p>Mark every multiple of <m>p</m> larger than <m>p</m> as composite.</p>
+</li>
+<li>
+<p>Move to the smallest unmarked integer larger than <m>p</m>.</p>
+</li>
+<li>
+<p>Repeat until <m>p^2&gt;N</m>.</p>
+</li>
+<li>
+<p>The remaining unmarked integers are prime.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-sieve-visual">
+<title>Visual Example of the Sieve</title>
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[
+    cell/.style={draw,minimum width=0.72cm,minimum height=0.55cm}
+]
+\foreach \n in {1,...,30}{
+    \pgfmathtruncatemacro{\row}{int((\n-1)/10)}
+    \pgfmathtruncatemacro{\col}{mod(\n-1,10)}
+    \node[cell] (n\n) at (\col*0.72,-\row*0.55) {\scriptsize \n};
+}
+\foreach \p in {2,3,5,7,11,13,17,19,23,29}{
+    \node[draw=MathBlue,line width=0.9pt,rounded corners,
+    fit=(n\p),inner sep=0pt] {};
+}
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>The highlighted numbers are the primes through <m>30</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-sieve-square-root">
+<title>Why the Sieve Stops at <m>\sqrt N</m></title>
+<p>If a composite integer <m>n\leq N</m> has a factorization</p>
+
+<p>
+<md>n=ab,</md>
+</p>
+
+<p>then at least one factor satisfies</p>
+
+<p>
+<md>a\leq\sqrt n\leq\sqrt N.</md>
+</p>
+
+<p>Therefore every composite number through <m>N</m> has already been marked once
+all primes through</p>
+
+<p>
+<md>\sqrt N</md>
+</p>
+
+<p>have been processed.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-primality-testing">
+<title>Primality Testing</title>
+<definition>
+<title>Primality Test</title>
+<statement>
+<p>A <em>primality test</em> is an algorithm that determines whether a given
+integer <m>n&gt;1</m> is prime.</p>
+</statement>
+</definition>
+
+<p>Primality testing and factorization are different problems.</p>
+
+<p>A primality test answers:</p>
+
+<p><q>Is @@PROTECTED0@@ prime?</q></p>
+
+<p>A factorization algorithm asks:</p>
+
+<p><q>If @@PROTECTED0@@ is composite, what are its prime factors?</q></p>
+
+<p>The second problem is generally much harder computationally.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-trial-division-primality">
+<title>Trial Division</title>
+<p>The simplest primality test checks whether <m>n</m> is divisible by any prime</p>
+
+<p>
+<md>p\leq\sqrt n.</md>
+</p>
+
+<p>If no such prime divides <m>n</m>, then <m>n</m> is prime.</p>
+
+<p>This works well for small numbers but becomes inefficient for very large
+integers.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-fermat-primality-test">
+<title>Fermat's Primality Test</title>
+<p>Fermat's Little Theorem states that if <m>p</m> is prime and</p>
+
+<p>
+<md>\gcd(a,p)=1,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>a^{p-1}\equiv1\pmod p.</md>
+</p>
+
+<p>This suggests a computational test.</p>
+
+<p>Given an odd integer <m>n</m>, choose a base <m>a</m> and compute</p>
+
+<p>
+<md>a^{n-1}\pmod n.</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>a^{n-1}\not\equiv1\pmod n,</md>
+</p>
+
+<p>then <m>n</m> is definitely composite.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-fermat-witnesses">
+<title>Fermat Witnesses and Liars</title>
+<definition>
+<title>Fermat Witness</title>
+<statement>
+<p>If</p>
+
+<p>
+<md>a^{n-1}\not\equiv1\pmod n,</md>
+</p>
+
+<p>then <m>a</m> is called a <em>Fermat witness</em> to the compositeness of <m>n</m>.</p>
+</statement>
+</definition>
+
+<p>If <m>n</m> is composite but nevertheless satisfies</p>
+
+<p>
+<md>a^{n-1}\equiv1\pmod n,</md>
+</p>
+
+<p>then <m>a</m> is sometimes called a <em>Fermat liar</em> for <m>n</m>.</p>
+
+<p>Thus passing a Fermat test does not prove primality.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-pseudoprimes">
+<title>Pseudoprimes</title>
+<definition>
+<title>Pseudoprime to Base <m>a</m></title>
+<statement>
+<p>A composite integer <m>n</m> with</p>
+
+<p>
+<md>\gcd(a,n)=1</md>
+</p>
+
+<p>is a <em>pseudoprime to base @@PROTECTED0@@</em> if</p>
+
+<p>
+<md>a^{n-1}\equiv1\pmod n.</md>
+</p>
+</statement>
+</definition>
+
+<p>For example,</p>
+
+<p>
+<md>341=11\cdot31</md>
+</p>
+
+<p>is composite, yet</p>
+
+<p>
+<md>2^{340}\equiv1\pmod{341}.</md>
+</p>
+
+<p>Thus <m>341</m> is a pseudoprime to base <m>2</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-carmichael-numbers-computational">
+<title>Carmichael Numbers</title>
+<p>Some composite integers pass Fermat's test for every base relatively prime to
+them.</p>
+
+<definition>
+<title>Carmichael Number</title>
+<statement>
+<p>A composite integer <m>n</m> is a <em>Carmichael number</em> if</p>
+
+<p>
+<md>a^{n-1}\equiv1\pmod n</md>
+</p>
+
+<p>for every integer <m>a</m> satisfying</p>
+
+<p>
+<md>\gcd(a,n)=1.</md>
+</p>
+</statement>
+</definition>
+
+<p>The smallest Carmichael number is</p>
+
+<p>
+<md>561=3\cdot11\cdot17.</md>
+</p>
+
+<p>Carmichael numbers demonstrate why the Fermat test alone is insufficient.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-miller-rabin">
+<title>Miller--Rabin Primality Testing</title>
+<p>The Miller--Rabin test strengthens Fermat's idea.</p>
+
+<p>For an odd integer <m>n&gt;2</m>, write</p>
+
+<p>
+<md>n-1=2^sd,</md>
+</p>
+
+<p>where <m>d</m> is odd.</p>
+
+<p>The test examines powers beginning with</p>
+
+<p>
+<md>a^d\pmod n</md>
+</p>
+
+<p>and repeatedly squares them.</p>
+
+<p>For a prime <m>n</m>, the sequence must satisfy particular conditions forced by
+the structure of modular square roots of <m>1</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-strong-probable-primes">
+<title>Strong Probable Primes</title>
+<p>For a chosen base <m>a</m>, an odd integer <m>n</m> passes the Miller--Rabin test if</p>
+
+<p>
+<md>a^d\equiv1\pmod n</md>
+</p>
+
+<p>or if for some</p>
+
+<p>
+<md>0\leq r&lt;s,</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>a^{2^rd}\equiv-1\pmod n.</md>
+</p>
+
+<p>A composite number passing the test for a particular base is called a
+<em>strong pseudoprime</em> to that base.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-probabilistic-primality">
+<title>Probabilistic Primality Testing</title>
+<p>For composite odd <m>n</m>, at most one quarter of the admissible bases can be
+strong liars for the Miller--Rabin test.</p>
+
+<p>Thus independent random bases reduce the probability of repeated false
+acceptance rapidly.</p>
+
+<p>After <m>k</m> suitable independent rounds, a standard error bound is</p>
+
+<p>
+<md>\boxed{\Pr(\text{false probable-prime result})\leq4^{-k}.}</md>
+</p>
+
+<p>The symbol</p>
+
+<p>
+<md>\Pr</md>
+</p>
+
+<p>is read <q>probability.</q></p>
+
+<p>\begin{warningbox}
+A probabilistic primality test can provide extremely high confidence without,
+in its probabilistic form, constituting an unconditional proof of primality.</p>
+
+<p>For bounded input ranges, carefully chosen deterministic Miller--Rabin bases
+can also give deterministic tests.
+\end{warningbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-deterministic-primality">
+<title>Deterministic Primality Testing</title>
+<p>A deterministic primality test always produces a mathematically guaranteed
+answer.</p>
+
+<p>One major theoretical result is the AKS primality test, which established
+that primality testing belongs to deterministic polynomial time.</p>
+
+<p>Its importance is largely theoretical: practical primality testing often
+uses other algorithms that are considerably faster in common applications.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-primality-certificates">
+<title>Primality Certificates</title>
+<p>Another strategy is to produce a certificate that can be checked efficiently.</p>
+
+<p>Instead of merely reporting</p>
+
+<p><q>@@PROTECTED0@@ is prime,</q></p>
+
+<p>an algorithm provides auxiliary information from which primality follows.</p>
+
+<p>Certificate-based methods separate:</p>
+
+<p>
+<md>\boxed{
+\text{finding a proof}
+\qquad\text{from}\qquad
+\text{verifying a proof}.
+}</md>
+</p>
+
+<p>This distinction appears throughout computational mathematics.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-integer-factorization-computational">
+<title>Integer Factorization</title>
+<definition>
+<title>Integer Factorization Problem</title>
+<statement>
+<p>Given a composite positive integer <m>n</m>, the <em>integer factorization
+problem</em> is to determine prime numbers <m>p_1,\ldots,p_r</m> and positive
+integers <m>e_1,\ldots,e_r</m> such that</p>
+
+<p>
+<md>n=p_1^{e_1}\cdots p_r^{e_r}.</md>
+</p>
+</statement>
+</definition>
+
+<p>The Fundamental Theorem of Arithmetic guarantees that this factorization
+exists and is unique.</p>
+
+<p>It does not tell us how efficiently it can be found.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-trial-division-factorization">
+<title>Trial Division Factorization</title>
+<p>The simplest factorization algorithm repeatedly tests possible prime divisors.</p>
+
+<p>For each prime</p>
+
+<p>
+<md>p\leq\sqrt n,</md>
+</p>
+
+<p>check whether</p>
+
+<p>
+<md>p\mid n.</md>
+</p>
+
+<p>Whenever a factor is found, divide it out and continue.</p>
+
+<p>This is practical for small integers but unsuitable for very large
+semiprimes.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-fermat-factorization">
+<title>Fermat Factorization</title>
+<p>Suppose an odd integer <m>n</m> can be written as</p>
+
+<p>
+<md>n=ab.</md>
+</p>
+
+<p>If the factors are near one another, write</p>
+
+<p>
+<md>a=x-y,\qquad b=x+y.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>n=x^2-y^2.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>x^2-n=y^2.</md>
+</p>
+
+<p>Fermat factorization searches for an integer <m>x\geq\sqrt n</m> such that</p>
+
+<p>
+<md>x^2-n</md>
+</p>
+
+<p>is a perfect square.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-worked-fermat-factorization">
+<title>Worked Example: Fermat Factorization</title>
+<example>
+<title>Factoring by a Difference of Squares</title>
+<p>Factor</p>
+
+<p>
+<md>5959.</md>
+</p>
+
+<p>Start near</p>
+
+<p>
+<md>\sqrt{5959}\approx77.2.</md>
+</p>
+
+<p>Try <m>x=78</m>:</p>
+
+<p>
+<md>78^2-5959=6084-5959=125,</md>
+</p>
+
+<p>not a square.</p>
+
+<p>Try <m>x=79</m>:</p>
+
+<p>
+<md>79^2-5959=6241-5959=282.</md>
+</p>
+
+<p>Continue until <m>x=80</m>:</p>
+
+<p>
+<md>80^2-5959=6400-5959=441=21^2.</md>
+</p>
+
+<p>Therefore</p>
+
+<p>
+<md>5959=80^2-21^2=(80-21)(80+21).</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{5959=59\cdot101.}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-pollard-rho">
+<title>Pollard's Rho Method</title>
+<p>Pollard's rho method searches for a nontrivial factor without testing all
+possible divisors.</p>
+
+<p>It constructs a pseudorandom sequence modulo <m>n</m>, often using</p>
+
+<p>
+<md>x_{k+1}\equiv x_k^2+c\pmod n.</md>
+</p>
+
+<p>If two sequence values become equal modulo an unknown factor <m>p</m>, then</p>
+
+<p>
+<md>p\mid x_i-x_j.</md>
+</p>
+
+<p>Consequently,</p>
+
+<p>
+<md>\gcd(|x_i-x_j|,n)</md>
+</p>
+
+<p>may reveal a nontrivial factor of <m>n</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-why-pollard-rho">
+<title>Why the Name Rho?</title>
+<p>A sequence in a finite set must eventually repeat.</p>
+
+<p>Its structure resembles a tail followed by a cycle:</p>
+
+<p>\begin{centereddiagram}
+\begin{tikzpicture}[
+    every node/.style={circle,draw,minimum size=6mm},
+    &gt;=Latex
+]
+\node (a) at (0,0) {};
+\node (b) at (1,0) {};
+\node (c) at (2,0) {};
+\node (d) at (3,0) {};
+\node (e) at (4,0.8) {};
+\node (f) at (5,0) {};
+\node (g) at (4,-0.8) {};</p>
+
+<p>\draw[-&gt;] (a)--(b);
+\draw[-&gt;] (b)--(c);
+\draw[-&gt;] (c)--(d);
+\draw[-&gt;] (d)--(e);
+\draw[-&gt;] (e)--(f);
+\draw[-&gt;] (f)--(g);
+\draw[-&gt;] (g)--(d);
+\end{tikzpicture}
+\end{centereddiagram}</p>
+
+<p>This tail-and-cycle shape resembles the Greek letter</p>
+
+<p>
+<md>\rho,</md>
+</p>
+
+<p>called <em>rho</em>, pronounced <q>row.</q></p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-pollard-cycle-detection">
+<title>Cycle Detection</title>
+<p>Pollard's rho algorithm commonly uses Floyd's cycle-detection method.</p>
+
+<p>One sequence value advances one step at a time:</p>
+
+<p>
+<md>x\leftarrow f(x),</md>
+</p>
+
+<p>while another advances two:</p>
+
+<p>
+<md>y\leftarrow f(f(y)).</md>
+</p>
+
+<p>At each stage compute</p>
+
+<p>
+<md>d=\gcd(|x-y|,n).</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>1&lt;d&lt;n,</md>
+</p>
+
+<p>then <m>d</m> is a nontrivial factor.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-quadratic-sieve">
+<title>Quadratic Sieve</title>
+<p>For larger integers, more sophisticated factorization methods search for
+congruences of squares.</p>
+
+<p>If</p>
+
+<p>
+<md>x^2\equiv y^2\pmod n,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>n\mid(x-y)(x+y).</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>x\not\equiv\pm y\pmod n,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\gcd(x-y,n)</md>
+</p>
+
+<p>often gives a nontrivial factor.</p>
+
+<p>The quadratic sieve constructs many relations whose values factor over a
+small collection of primes called a <em>factor base</em>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-smooth-numbers">
+<title>Smooth Numbers</title>
+<definition>
+<title>Smooth Number</title>
+<statement>
+<p>A positive integer is called <m>B</m>-<em>smooth</em> if all of its prime factors
+are at most <m>B</m>.</p>
+</statement>
+</definition>
+
+<p>For example,</p>
+
+<p>
+<md>72=2^3\cdot3^2</md>
+</p>
+
+<p>is <m>3</m>-smooth.</p>
+
+<p>But</p>
+
+<p>
+<md>77=7\cdot11</md>
+</p>
+
+<p>is not <m>7</m>-smooth because of the factor <m>11</m>.</p>
+
+<p>Smooth numbers are fundamental in modern factorization algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-factorization-linear-algebra">
+<title>Linear Algebra in Factorization</title>
+<p>Suppose several smooth values have prime factorizations</p>
+
+<p>
+<md>Q_i=\prod_{j=1}^{r}p_j^{e_{ij}}.</md>
+</p>
+
+<p>To make a product</p>
+
+<p>
+<md>Q_{i_1}\cdots Q_{i_k}</md>
+</p>
+
+<p>a perfect square, every total exponent must be even.</p>
+
+<p>Thus we consider exponent vectors modulo <m>2</m>:</p>
+
+<p>
+<md>(e_{i1},\ldots,e_{ir})\pmod2.</md>
+</p>
+
+<p>Finding a subset whose sum is zero becomes a linear algebra problem over</p>
+
+<p>
+<md>\mathbf F_2.</md>
+</p>
+
+<p>\begin{conceptbox}
+Modern integer factorization combines several branches of mathematics:</p>
+
+<p>
+<md>\boxed{
+\text{number theory}
++
+\text{probability}
++
+\text{linear algebra}
++
+\text{algorithms}.
+}</md>
+</p>
+
+<p>\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-number-field-sieve">
+<title>The Number Field Sieve</title>
+<p>The general number field sieve is one of the most important classical
+algorithms for factoring very large integers.</p>
+
+<p>Its basic philosophy is to construct smooth-number relations simultaneously
+in two algebraic settings and combine them to obtain a congruence of squares
+modulo the integer being factored.</p>
+
+<p>The full algorithm uses ideas from:</p>
+
+<p>
+<ul>
+<li>
+<p>algebraic number theory;</p>
+</li>
+<li>
+<p>polynomial arithmetic;</p>
+</li>
+<li>
+<p>smooth numbers;</p>
+</li>
+<li>
+<p>finite fields;</p>
+</li>
+<li>
+<p>sparse linear algebra.</p>
+</li>
+</ul>
+</p>
+
+<p>The detailed algorithm belongs at a more advanced computational level, but
+its existence illustrates the practical importance of number fields.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-primality-versus-factorization">
+<title>Primality Testing Versus Factorization</title>
+<p>It is important not to confuse the two problems.</p>
+
+<p>
+<md>\boxed{
+\text{Primality testing: Is }n\text{ prime?}
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Factorization: What are the prime factors of }n\text{?}
+}</md>
+</p>
+
+<p>Efficient algorithms are known for determining primality.</p>
+
+<p>No classical polynomial-time algorithm is currently known for general
+integer factorization.</p>
+
+<p>This distinction is fundamental in computational number theory.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computing-arithmetic-functions">
+<title>Computing Arithmetic Functions</title>
+<p>Once</p>
+
+<p>
+<md>n=p_1^{e_1}\cdots p_r^{e_r}</md>
+</p>
+
+<p>is known, many arithmetic functions can be computed efficiently.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{\tau(n)=\prod_{i=1}^{r}(e_i+1)}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{\sigma(n)=\prod_{i=1}^{r}\frac{p_i^{e_i+1}-1}{p_i-1}}.</md>
+</p>
+
+<p>Euler's phi function is</p>
+
+<p>
+<md>\boxed{\varphi(n)=n\prod_{p\mid n}\left(1-\frac1p\right).}</md>
+</p>
+
+<p>The Möbius function is</p>
+
+<p>
+<md>\mu(n)=
+\begin{cases}
+0, &amp; p^2\mid n\text{ for some prime }p,\\
+(-1)^r, &amp; n\text{ is a product of }r\text{ distinct primes}.
+\end{cases}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-functions-depend-factorization">
+<title>Computational Dependence on Factorization</title>
+<p>These formulas reveal an important computational issue.</p>
+
+<p>The formulas themselves are easy to evaluate once the prime factorization is
+known.</p>
+
+<p>But finding that factorization may be difficult.</p>
+
+<p>Thus the computational cost of evaluating an arithmetic function can depend
+strongly on what information about the input is already available.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-quadratic-residues">
+<title>Quadratic Residues</title>
+<p>For an odd prime <m>p</m>, an integer <m>a</m> is a quadratic residue modulo <m>p</m>
+if</p>
+
+<p>
+<md>x^2\equiv a\pmod p</md>
+</p>
+
+<p>has a solution.</p>
+
+<p>Rather than searching through all possible <m>x</m>, Euler's criterion gives</p>
+
+<p>
+<md>\boxed{a^{(p-1)/2}\equiv\left(\frac ap\right)\pmod p.}</md>
+</p>
+
+<p>The notation</p>
+
+<p>
+<md>\left(\frac ap\right)</md>
+</p>
+
+<p>is the Legendre symbol, introduced in Elementary Number Theory.</p>
+
+<p>It takes values</p>
+
+<p>
+<md>-1,\quad0,\quad1.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computing-legendre-symbols">
+<title>Computing Legendre Symbols</title>
+<p>Quadratic reciprocity allows Legendre symbols to be evaluated without
+computing large powers.</p>
+
+<p>For distinct odd primes <m>p,q</m>,</p>
+
+<p>
+<md>\left(\frac pq\right)
+\left(\frac qp\right)
+=
+(-1)^{\frac{(p-1)(q-1)}4}.</md>
+</p>
+
+<p>Together with</p>
+
+<p>
+<md>\left(\frac{-1}{p}\right)=(-1)^{(p-1)/2}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\left(\frac2p\right)=(-1)^{(p^2-1)/8},</md>
+</p>
+
+<p>this produces an efficient recursive procedure.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-jacobi-symbol-computation">
+<title>Jacobi Symbol</title>
+<p>The Legendre symbol extends to odd composite denominators.</p>
+
+<p>If</p>
+
+<p>
+<md>n=p_1^{e_1}\cdots p_r^{e_r}</md>
+</p>
+
+<p>is odd, define</p>
+
+<p>
+<md>\boxed{
+\left(\frac an\right)
+=
+\prod_{i=1}^{r}
+\left(\frac{a}{p_i}\right)^{e_i}.
+}</md>
+</p>
+
+<p>This is called the <em>Jacobi symbol</em>.</p>
+
+<p>A Jacobi symbol can be computed efficiently without first factoring <m>n</m>,
+using reciprocity identities and a Euclidean-algorithm-style procedure.</p>
+
+<p>\begin{warningbox}
+For composite <m>n</m>,</p>
+
+<p>
+<md>\left(\frac an\right)=1</md>
+</p>
+
+<p>does not necessarily imply that <m>a</m> is a quadratic residue modulo <m>n</m>.
+\end{warningbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-modular-square-roots">
+<title>Modular Square Roots</title>
+<p>Given a prime <m>p</m> and a quadratic residue <m>a</m>, one may wish to solve</p>
+
+<p>
+<md>x^2\equiv a\pmod p.</md>
+</p>
+
+<p>For primes satisfying</p>
+
+<p>
+<md>p\equiv3\pmod4,</md>
+</p>
+
+<p>a particularly simple formula is</p>
+
+<p>
+<md>\boxed{x\equiv a^{(p+1)/4}\pmod p.}</md>
+</p>
+
+<p>For general odd primes, the Tonelli--Shanks algorithm provides an efficient
+method for computing modular square roots.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-discrete-logarithms">
+<title>Discrete Logarithms</title>
+<p>Ordinary logarithms invert exponentiation over the real numbers.</p>
+
+<p>A similar problem arises in finite groups.</p>
+
+<definition>
+<title>Discrete Logarithm</title>
+<statement>
+<p>Let <m>G=\langle g\rangle</m> be a finite cyclic group. Given <m>h\in G</m>, the
+<em>discrete logarithm problem</em> is to find an integer <m>x</m> satisfying</p>
+
+<p>
+<md>\boxed{g^x=h.}</md>
+</p>
+</statement>
+</definition>
+
+<p>For modular arithmetic, this often takes the form</p>
+
+<p>
+<md>g^x\equiv h\pmod p.</md>
+</p>
+
+<p>The unknown <m>x</m> is called a discrete logarithm of <m>h</m> to the base <m>g</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-brute-force-discrete-log">
+<title>Brute-Force Discrete Logarithms</title>
+<p>The simplest method computes</p>
+
+<p>
+<md>g^0,g^1,g^2,g^3,\ldots</md>
+</p>
+
+<p>until <m>h</m> appears.</p>
+
+<p>If the group has order <m>N</m>, this can require approximately</p>
+
+<p>
+<md>O(N)</md>
+</p>
+
+<p>group operations.</p>
+
+<p>A meet-in-the-middle strategy improves this substantially.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-baby-step-giant-step">
+<title>Baby-Step Giant-Step</title>
+<p>Suppose</p>
+
+<p>
+<md>g^x=h</md>
+</p>
+
+<p>in a cyclic group of order approximately <m>N</m>.</p>
+
+<p>Choose</p>
+
+<p>
+<md>m=\lceil\sqrt N\rceil</md>
+</p>
+
+<p>and write</p>
+
+<p>
+<md>x=im+j,</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>0\leq i,j&lt;m.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>g^{im+j}=h</md>
+</p>
+
+<p>implies</p>
+
+<p>
+<md>g^j=h(g^{-m})^i.</md>
+</p>
+
+<p>The algorithm stores the values</p>
+
+<p>
+<md>g^j</md>
+</p>
+
+<p>as <em>baby steps</em> and compares them with the <em>giant steps</em></p>
+
+<p>
+<md>h(g^{-m})^i.</md>
+</p>
+
+<p>The time and memory requirements are approximately</p>
+
+<p>
+<md>O(\sqrt N).</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-pollard-rho-discrete-log">
+<title>Pollard's Rho for Discrete Logarithms</title>
+<p>A variant of Pollard's rho method can solve discrete logarithms using
+approximately</p>
+
+<p>
+<md>O(\sqrt N)</md>
+</p>
+
+<p>group operations while requiring much less memory than baby-step
+giant-step.</p>
+
+<p>This demonstrates an important computational tradeoff:</p>
+
+<p>
+<md>\boxed{
+\text{time}
+\qquad\text{versus}\qquad
+\text{memory}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-continued-fractions">
+<title>Continued Fractions</title>
+<p>Continued fractions provide highly efficient rational approximations to real
+numbers.</p>
+
+<p>A finite continued fraction has the form</p>
+
+<p>
+<md>[a_0;a_1,\ldots,a_n]
+=
+a_0+
+\cfrac{1}{
+a_1+\cfrac{1}{
+a_2+\cfrac{1}{
+\ddots+\cfrac1{a_n}}}}.</md>
+</p>
+
+<p>The semicolon separates the integer part <m>a_0</m> from the remaining partial
+quotients.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-continued-fractions-euclid">
+<title>Continued Fractions and the Euclidean Algorithm</title>
+<p>The Euclidean algorithm naturally produces continued fractions.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\frac{43}{17}=2+\frac9{17}.</md>
+</p>
+
+<p>Continuing the Euclidean divisions gives</p>
+
+<p>
+<md>\frac{43}{17}=[2;1,1,8].</md>
+</p>
+
+<p>Thus the Euclidean algorithm simultaneously computes greatest common divisors
+and continued-fraction expansions of rational numbers.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-continued-fraction-convergents">
+<title>Convergents</title>
+<p>Truncating a continued fraction gives rational approximations called
+<em>convergents</em>.</p>
+
+<p>If</p>
+
+<p>
+<md>\alpha=[a_0;a_1,a_2,\ldots],</md>
+</p>
+
+<p>then its convergents are</p>
+
+<p>
+<md>\frac{p_0}{q_0},
+\frac{p_1}{q_1},
+\frac{p_2}{q_2},
+\ldots.</md>
+</p>
+
+<p>Continued-fraction convergents provide exceptionally good rational
+approximations and are central to computational Diophantine approximation.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-pell-equations">
+<title>Computational Pell Equations</title>
+<p>Continued fractions provide an effective method for solving Pell equations</p>
+
+<p>
+<md>x^2-dy^2=1.</md>
+</p>
+
+<p>The continued-fraction expansion of</p>
+
+<p>
+<md>\sqrt d</md>
+</p>
+
+<p>is periodic when <m>d</m> is a nonsquare positive integer.</p>
+
+<p>Appropriate convergents yield solutions to the Pell equation.</p>
+
+<p>Thus an apparently nonlinear Diophantine equation can be solved through a
+systematic algorithm.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-rsa-arithmetic">
+<title>RSA Arithmetic</title>
+<p>RSA is a classical public-key cryptographic construction based on modular
+arithmetic.</p>
+
+<p>Choose distinct large primes</p>
+
+<p>
+<md>p,\qquad q</md>
+</p>
+
+<p>and form</p>
+
+<p>
+<md>n=pq.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\varphi(n)=(p-1)(q-1).</md>
+</p>
+
+<p>Choose an integer <m>e</m> satisfying</p>
+
+<p>
+<md>\gcd(e,\varphi(n))=1.</md>
+</p>
+
+<p>Compute <m>d</m> such that</p>
+
+<p>
+<md>ed\equiv1\pmod{\varphi(n)}.</md>
+</p>
+
+<p>The pair</p>
+
+<p>
+<md>(n,e)</md>
+</p>
+
+<p>forms the public arithmetic information, while <m>d</m> is derived using
+information about the factorization of <m>n</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-rsa-transformation">
+<title>RSA Transformation</title>
+<p>In the basic mathematical model, a message representative <m>m</m> is
+transformed by</p>
+
+<p>
+<md>c\equiv m^e\pmod n.</md>
+</p>
+
+<p>The inverse transformation uses</p>
+
+<p>
+<md>m\equiv c^d\pmod n.</md>
+</p>
+
+<p>The correctness follows from modular arithmetic, ultimately using Euler's
+theorem or the Chinese Remainder Theorem.</p>
+
+<p>\begin{warningbox}
+Textbook RSA is a mathematical model, not a secure implementation protocol.</p>
+
+<p>Real cryptographic systems require carefully designed encoding, padding,
+key-generation, side-channel protection, and standardized implementation
+procedures.
+\end{warningbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-why-rsa-computational">
+<title>Why RSA Is Computational</title>
+<p>Several algorithms interact:</p>
+
+<p>
+<ul>
+<li>
+<p>large-prime generation;</p>
+</li>
+<li>
+<p>probabilistic primality testing;</p>
+</li>
+<li>
+<p>greatest common divisor computation;</p>
+</li>
+<li>
+<p>modular inversion;</p>
+</li>
+<li>
+<p>modular exponentiation;</p>
+</li>
+<li>
+<p>Chinese remainder computations.</p>
+</li>
+</ul>
+</p>
+
+<p>The underlying asymmetry is that multiplication</p>
+
+<p>
+<md>p,q\longmapsto pq</md>
+</p>
+
+<p>is computationally easy, while recovering <m>p</m> and <m>q</m> from a suitably
+chosen large product is believed to be computationally difficult for
+classical algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-diffie-hellman-number-theory">
+<title>Diffie--Hellman and Discrete Logarithms</title>
+<p>Another classical cryptographic construction uses exponentiation in a finite
+cyclic group.</p>
+
+<p>Given a generator <m>g</m>, users may compute powers such as</p>
+
+<p>
+<md>g^a,\qquad g^b,\qquad g^{ab}.</md>
+</p>
+
+<p>Exponentiation can be performed efficiently using repeated squaring.</p>
+
+<p>Recovering <m>a</m> from</p>
+
+<p>
+<md>g^a</md>
+</p>
+
+<p>is a discrete logarithm problem.</p>
+
+<p>This creates another computational asymmetry:</p>
+
+<p>
+<md>\boxed{
+\text{modular exponentiation is easy}
+\qquad
+\text{while discrete logarithms may be hard}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-hardness-not-impossibility">
+<title>Hardness Is Not Impossibility</title>
+<p>A computational problem being <em>hard</em> does not mean that it is
+mathematically impossible.</p>
+
+<p>For example, a large composite integer certainly has a prime factorization.</p>
+
+<p>The difficulty lies in finding that factorization with feasible resources.</p>
+
+<p>Likewise, a discrete logarithm may exist uniquely within a cyclic group, yet
+computing it may require substantial work.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-deterministic-randomized-number-theory">
+<title>Deterministic and Randomized Algorithms</title>
+<definition>
+<title>Deterministic Algorithm</title>
+<statement>
+<p>A <em>deterministic algorithm</em> follows a completely determined sequence of
+steps for a given input.</p>
+</statement>
+</definition>
+
+<definition>
+<title>Randomized Algorithm</title>
+<statement>
+<p>A <em>randomized algorithm</em> uses random choices as part of its computation.</p>
+</statement>
+</definition>
+
+<p>Randomization can improve expected running time or simplify algorithms.</p>
+
+<p>Examples in computational number theory include:</p>
+
+<p>
+<ul>
+<li>
+<p>Miller--Rabin primality testing;</p>
+</li>
+<li>
+<p>Pollard's rho factorization;</p>
+</li>
+<li>
+<p>random searches for suitable primes.</p>
+</li>
+</ul>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-monte-carlo-las-vegas">
+<title>Monte Carlo and Las Vegas Algorithms</title>
+<p>Randomized algorithms are often divided into two broad types.</p>
+
+<definition>
+<title>Monte Carlo Algorithm</title>
+<statement>
+<p>A <em>Monte Carlo algorithm</em> has bounded running time or predictable
+performance but may have a small probability of returning an incorrect
+answer.</p>
+</statement>
+</definition>
+
+<definition>
+<title>Las Vegas Algorithm</title>
+<statement>
+<p>A <em>Las Vegas algorithm</em> always returns a correct answer, but its running
+time depends on random choices.</p>
+</statement>
+</definition>
+
+<p>Probabilistic Miller--Rabin testing is commonly viewed in a Monte Carlo
+framework, while randomized factor searches can often be interpreted in a
+Las Vegas framework when results are verified before acceptance.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-number-theoretic-verification">
+<title>Verification</title>
+<p>Number theory frequently allows computational outputs to be verified more
+easily than they were discovered.</p>
+
+<p>If an algorithm claims</p>
+
+<p>
+<md>n=ab,</md>
+</p>
+
+<p>verification requires only multiplication.</p>
+
+<p>If it claims that</p>
+
+<p>
+<md>ax+by=\gcd(a,b),</md>
+</p>
+
+<p>the identity can be checked directly.</p>
+
+<p>If it proposes a solution to</p>
+
+<p>
+<md>x^2-dy^2=1,</md>
+</p>
+
+<p>substitution verifies the result.</p>
+
+<p>\begin{conceptbox}
+A recurring computational principle is</p>
+
+<p>
+<md>\boxed{
+\text{finding a solution may be difficult, while checking it may be easy}.
+}</md>
+</p>
+
+<p>\end{conceptbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-number-theory-computational-experiments">
+<title>Computational Experiments</title>
+<p>Computers allow enormous quantities of arithmetic data to be explored.</p>
+
+<p>For example, one may investigate:</p>
+
+<p>
+<ul>
+<li>
+<p>prime gaps;</p>
+</li>
+<li>
+<p>twin primes;</p>
+</li>
+<li>
+<p>values of arithmetic functions;</p>
+</li>
+<li>
+<p>pseudoprimes;</p>
+</li>
+<li>
+<p>quadratic residues;</p>
+</li>
+<li>
+<p>Diophantine solutions;</p>
+</li>
+<li>
+<p>class numbers;</p>
+</li>
+<li>
+<p>zeros of zeta and <m>L</m>-functions.</p>
+</li>
+</ul>
+</p>
+
+<p>Patterns found computationally can suggest conjectures.</p>
+
+<p>However, experimental evidence is not a proof.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-experiment-versus-proof">
+<title>Experiment Versus Proof</title>
+<p>Suppose a property has been verified for the first</p>
+
+<p>
+<md>10^{12}</md>
+</p>
+
+<p>positive integers.</p>
+
+<p>This is powerful evidence.</p>
+
+<p>But it does not prove that the property holds for every positive integer.</p>
+
+<p>A universal theorem requires a mathematical argument covering infinitely many
+cases.</p>
+
+<p>\begin{warningbox}
+No finite computation can by itself prove an unrestricted statement about
+all integers unless additional mathematics reduces the infinite problem to a
+finite verification.
+\end{warningbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-exact-integer-arithmetic">
+<title>Exact Integer Arithmetic</title>
+<p>Number-theoretic computation usually requires exact arithmetic.</p>
+
+<p>Floating-point approximations can introduce errors into calculations involving</p>
+
+<p>
+<md>\gcd,\qquad\text{divisibility},\qquad\text{congruences},</md>
+</p>
+
+<p>and exact factorization.</p>
+
+<p>Computer algebra systems and arbitrary-precision integer libraries therefore
+represent integers exactly, even when they contain thousands or millions of
+digits.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-large-integer-multiplication">
+<title>Large Integer Multiplication</title>
+<p>Many number-theoretic algorithms repeatedly multiply very large integers.</p>
+
+<p>The elementary school multiplication algorithm for <m>n</m>-digit numbers uses
+approximately</p>
+
+<p>
+<md>O(n^2)</md>
+</p>
+
+<p>single-digit operations.</p>
+
+<p>More advanced methods reduce this cost.</p>
+
+<p>Examples include:</p>
+
+<p>
+<ul>
+<li>
+<p>Karatsuba multiplication;</p>
+</li>
+<li>
+<p>Toom--Cook multiplication;</p>
+</li>
+<li>
+<p>Fourier-transform-based multiplication.</p>
+</li>
+</ul>
+</p>
+
+<p>Thus even basic arithmetic becomes an algorithmic subject when integers are
+sufficiently large.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-fast-gcd-modular">
+<title>Fast GCD and Modular Arithmetic</title>
+<p>Efficient implementations combine several layers of algorithms.</p>
+
+<p>For example, modular exponentiation requires repeated modular multiplication,
+which itself requires large-integer multiplication and reduction.</p>
+
+<p>Thus the true cost of</p>
+
+<p>
+<md>a^n\bmod m</md>
+</p>
+
+<p>depends not only on the number of multiplication steps but also on the size
+of the integers being multiplied.</p>
+
+<p>This motivates <em>bit complexity</em>, which counts operations at the level
+of binary representation.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-precomputation-memory">
+<title>Precomputation and Memory</title>
+<p>Algorithms can sometimes become faster by storing previously computed
+information.</p>
+
+<p>Examples include:</p>
+
+<p>
+<ul>
+<li>
+<p>tables of small primes;</p>
+</li>
+<li>
+<p>precomputed modular powers;</p>
+</li>
+<li>
+<p>baby-step tables for discrete logarithms;</p>
+</li>
+<li>
+<p>factor bases in sieve algorithms.</p>
+</li>
+</ul>
+</p>
+
+<p>This creates a general tradeoff:</p>
+
+<p>
+<md>\boxed{\text{more memory}\quad\longleftrightarrow\quad\text{less computation}.}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-number-theory-parallel-computation">
+<title>Parallel Computation</title>
+<p>Many number-theoretic searches can be distributed among multiple processors.</p>
+
+<p>For example:</p>
+
+<p>
+<ul>
+<li>
+<p>different intervals can be searched for primes;</p>
+</li>
+<li>
+<p>candidate factors can be tested independently;</p>
+</li>
+<li>
+<p>smooth-number relations can be collected in parallel;</p>
+</li>
+<li>
+<p>large matrix computations can be distributed.</p>
+</li>
+</ul>
+</p>
+
+<p>However, not every algorithm parallelizes equally well.</p>
+
+<p>Dependencies between computational steps can limit possible speedup.</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-number-theory-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-measuring-complexity-using-the-integer-instead-of-its-bit-length">
+<title>Measuring Complexity Using the Integer Instead of Its Bit Length</title>
+<p>An input integer <m>n</m> requires only about</p>
+
+<p>
+<md>\log_2 n</md>
+</p>
+
+<p>bits.</p>
+
+<p>An algorithm polynomial in <m>n</m> may therefore be exponential in the actual
+input length.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-computing-huge-powers-before-reducing">
+<title>Computing Huge Powers Before Reducing</title>
+<p>To compute</p>
+
+<p>
+<md>a^n\bmod m,</md>
+</p>
+
+<p>do not normally compute the full integer <m>a^n</m> first.</p>
+
+<p>Reduce modulo <m>m</m> throughout the calculation.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-a-fermat-test-proves-primality">
+<title>Assuming a Fermat Test Proves Primality</title>
+<p>Composite pseudoprimes can pass Fermat tests.</p>
+
+<p>Carmichael numbers can pass for every relatively prime base.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-probable-prime-with-proven-prime">
+<title>Confusing Probable Prime with Proven Prime</title>
+<p>A number passing randomized primality tests may be called a probable prime.</p>
+
+<p>A rigorous primality proof requires a deterministic argument or verifiable
+certificate.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-primality-testing-with-factorization">
+<title>Confusing Primality Testing with Factorization</title>
+<p>Knowing that an integer is composite does not automatically reveal its
+factors.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-trial-division-is-efficient-for-huge-integers">
+<title>Assuming Trial Division Is Efficient for Huge Integers</title>
+<p>Trial division is conceptually simple but scales poorly when the input has
+many digits.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-floating-point-arithmetic-for-exact-congruences">
+<title>Using Floating-Point Arithmetic for Exact Congruences</title>
+<p>Congruence calculations require exact integer arithmetic.</p>
+
+<p>Rounding errors can invalidate divisibility conclusions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-the-jacobi-symbol-detects-quadratic-residues">
+<title>Assuming the Jacobi Symbol Detects Quadratic Residues</title>
+<p>For composite <m>n</m>,</p>
+
+<p>
+<md>\left(\frac an\right)=1</md>
+</p>
+
+<p>does not guarantee that <m>a</m> is a square modulo <m>n</m>.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-treating-computational-evidence-as-proof">
+<title>Treating Computational Evidence as Proof</title>
+<p>Checking millions or billions of examples can support a conjecture but does
+not automatically establish a universal theorem.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-cryptographic-hardness-is-a-theorem">
+<title>Assuming Cryptographic Hardness Is a Theorem</title>
+<p>Many cryptographic constructions rely on computational hardness assumptions.</p>
+
+<p>The fact that no efficient classical algorithm is currently known does not
+by itself prove that none exists.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-number-theory-applications">
+<title>Applications and Connections</title>
+<p>\begin{applicationbox}
+<em>Cryptography.</em>
+Modular exponentiation, prime generation, primality testing, factorization,
+and discrete logarithms form the mathematical core of many cryptographic
+constructions.</p>
+
+<p>\medskip</p>
+
+<p><em>Computer Algebra.</em>
+Exact arithmetic algorithms allow symbolic systems to manipulate enormous
+integers, polynomials, algebraic numbers, and finite fields.</p>
+
+<p>\medskip</p>
+
+<p><em>Analytic Number Theory.</em>
+Large computations test conjectures, locate zeros of zeta and <m>L</m>-functions,
+and investigate prime distributions.</p>
+
+<p>\medskip</p>
+
+<p><em>Algebraic Number Theory.</em>
+Algorithms compute rings of integers, ideal factorizations, units, class
+groups, discriminants, and number-field invariants.</p>
+
+<p>\medskip</p>
+
+<p><em>Diophantine Equations.</em>
+Continued fractions, modular methods, lattice algorithms, and exhaustive
+search help locate or exclude integer solutions.</p>
+
+<p>\medskip</p>
+
+<p><em>Finite Fields.</em>
+Efficient finite-field arithmetic is essential in coding theory,
+cryptography, polynomial factorization, and computational algebra.</p>
+
+<p>\medskip</p>
+
+<p><em>Algorithm Design.</em>
+Number theory provides important examples of divide-and-reduce methods,
+randomized algorithms, time--memory tradeoffs, and complexity analysis.</p>
+
+<p>\medskip</p>
+
+<p><em>Experimental Mathematics.</em>
+Large computations can reveal patterns and generate conjectures that later
+motivate theoretical proofs.
+\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-number-theory-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Use the Euclidean algorithm to compute</p>
+
+<p>
+<md>\gcd(414,662).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the extended Euclidean algorithm to find integers <m>x,y</m> satisfying</p>
+
+<p>
+<md>414x+662y=\gcd(414,662).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>19^{-1}\pmod{37}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether <m>24</m> has a multiplicative inverse modulo <m>42</m>.
+Explain.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use repeated squaring to compute</p>
+
+<p>
+<md>3^{100}\pmod7.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use repeated squaring to compute</p>
+
+<p>
+<md>11^{123}\pmod{17}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the exponent</p>
+
+<p>
+<md>157</md>
+</p>
+
+<p>in binary and explain how its binary representation determines which powers
+are multiplied in square-and-multiply.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve</p>
+
+<p>
+<md>7x\equiv5\pmod{19}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve</p>
+
+<p>
+<md>12x\equiv18\pmod{30}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the Chinese Remainder Theorem to solve</p>
+
+<p>
+<md>x\equiv1\pmod4,\qquad x\equiv2\pmod5,\qquad x\equiv3\pmod7.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the Sieve of Eratosthenes to list all primes not exceeding <m>50</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why the Sieve of Eratosthenes only needs to process primes through</p>
+
+<p>
+<md>\sqrt N.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use trial division to determine whether</p>
+
+<p>
+<md>137</md>
+</p>
+
+<p>is prime.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Fermat's test with base <m>2</m> on</p>
+
+<p>
+<md>n=15.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify that</p>
+
+<p>
+<md>341=11\cdot31</md>
+</p>
+
+<p>is composite.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify that</p>
+
+<p>
+<md>2^{340}\equiv1\pmod{341}.</md>
+</p>
+
+<p>Thus show that <m>341</m> is a pseudoprime to base <m>2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Factor</p>
+
+<p>
+<md>561</md>
+</p>
+
+<p>and verify that it is squarefree.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write</p>
+
+<p>
+<md>560=2^sd</md>
+</p>
+
+<p>with <m>d</m> odd in preparation for a Miller--Rabin test on <m>561</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why passing one Fermat test does not establish primality.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between deterministic and probabilistic primality
+testing.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>If <m>10</m> independent Miller--Rabin rounds are performed, use the standard
+bound to estimate the maximum false-acceptance probability.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Factor</p>
+
+<p>
+<md>8051</md>
+</p>
+
+<p>by trial division.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Fermat factorization to factor</p>
+
+<p>
+<md>2021.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why Fermat factorization is especially effective when the two factors
+of <m>n</m> are close together.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>f(x)=x^2+1\pmod{91},</md>
+</p>
+
+<p>compute the first several terms beginning with <m>x_0=2</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how a collision modulo an unknown factor can cause</p>
+
+<p>
+<md>\gcd(x_i-x_j,n)</md>
+</p>
+
+<p>to reveal that factor in Pollard's rho method.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether each number is <m>5</m>-smooth:</p>
+
+<p>
+<md>72,\qquad90,\qquad98,\qquad125,\qquad150.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the parity exponent vectors over <m>\mathbf F_2</m> for</p>
+
+<p>
+<md>12=2^2\cdot3,\qquad18=2\cdot3^2,\qquad24=2^3\cdot3.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why finding a linear dependence among exponent vectors modulo <m>2</m>
+can produce a perfect-square product.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Given</p>
+
+<p>
+<md>n=2^4\cdot3^2\cdot5,</md>
+</p>
+
+<p>compute</p>
+
+<p>
+<md>\tau(n),\qquad\sigma(n),\qquad\varphi(n),\qquad\mu(n).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Euler's criterion to determine whether <m>5</m> is a quadratic residue
+modulo <m>11</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>\left(\frac{7}{19}\right)</md>
+</p>
+
+<p>using quadratic reciprocity.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the Jacobi symbol</p>
+
+<p>
+<md>\left(\frac{5}{21}\right).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a Jacobi symbol equal to <m>1</m> does not necessarily imply a
+quadratic residue when the denominator is composite.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find a square root of <m>4</m> modulo <m>11</m> using</p>
+
+<p>
+<md>x\equiv a^{(p+1)/4}\pmod p.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve the discrete logarithm</p>
+
+<p>
+<md>2^x\equiv8\pmod{11}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve</p>
+
+<p>
+<md>3^x\equiv13\pmod{17}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why baby-step giant-step reduces a search of size <m>N</m> to roughly</p>
+
+<p>
+<md>\sqrt N</md>
+</p>
+
+<p>baby and giant steps.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the continued fraction of</p>
+
+<p>
+<md>\frac{43}{17}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Find the first four convergents of</p>
+
+<p>
+<md>[1;2,2,2,\ldots].</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why continued fractions are useful for Pell equations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify that</p>
+
+<p>
+<md>3^2-2(2^2)=1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose</p>
+
+<p>
+<md>p=11,\qquad q=17.</md>
+</p>
+
+<p>Compute</p>
+
+<p>
+<md>n=pq</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\varphi(n).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Using the previous exercise, choose</p>
+
+<p>
+<md>e=7</md>
+</p>
+
+<p>and compute an inverse</p>
+
+<p>
+<md>d\equiv e^{-1}\pmod{\varphi(n)}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why knowing <m>p</m> and <m>q</m> makes computing <m>\varphi(pq)</m> easy.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why efficient modular exponentiation is essential for RSA-style
+arithmetic.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the distinction between a computationally difficult problem and a
+mathematically impossible problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give one example of a randomized number-theoretic algorithm and explain what
+role randomness plays.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Classify the general behavior of probabilistic Miller--Rabin testing as more
+closely related to a Monte Carlo or Las Vegas algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why verifying</p>
+
+<p>
+<md>n=ab</md>
+</p>
+
+<p>is usually much easier than discovering the factors <m>a</m> and <m>b</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Suppose a conjecture has been verified computationally for every</p>
+
+<p>
+<md>n\leq10^{15}.</md>
+</p>
+
+<p>Explain why this does not automatically prove the conjecture for every
+positive integer.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the computational chain</p>
+
+<p>
+<md>\text{Euclidean algorithm}
+\longrightarrow
+\text{modular inverse}
+\longrightarrow
+\text{modular arithmetic}
+\longrightarrow
+\text{cryptographic computation}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the computational relationship</p>
+
+<p>
+<md>\text{prime generation}
+\longrightarrow
+\text{primality testing}
+\longrightarrow
+\text{large integer arithmetic}
+\longrightarrow
+\text{public-key mathematics}.</md>
+</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-number-theory-summary">
+<title>Conceptual Summary</title>
+<p>Computational number theory studies how arithmetic problems can be solved
+algorithmically.</p>
+
+<p>The Euclidean algorithm efficiently computes</p>
+
+<p>
+<md>\gcd(a,b),</md>
+</p>
+
+<p>while the extended Euclidean algorithm computes Bézout coefficients and
+modular inverses.</p>
+
+<p>Repeated squaring allows powers</p>
+
+<p>
+<md>a^n\bmod m</md>
+</p>
+
+<p>to be evaluated using only logarithmically many exponentiation stages.</p>
+
+<p>The Chinese Remainder Theorem provides an algorithmic method for combining
+compatible congruence information.</p>
+
+<p>Prime-generation algorithms such as the Sieve of Eratosthenes efficiently
+produce collections of primes.</p>
+
+<p>Primality testing asks whether an integer is prime, while factorization asks
+for its prime factors.</p>
+
+<p>Fermat's test motivates probabilistic primality methods but is defeated by
+pseudoprimes and Carmichael numbers.</p>
+
+<p>Miller--Rabin provides a much stronger practical test.</p>
+
+<p>Integer factorization progresses from trial division and Fermat's method to
+Pollard's rho, quadratic-sieve methods, and the number field sieve.</p>
+
+<p>Quadratic residues can be studied computationally through Euler's criterion,
+quadratic reciprocity, Legendre symbols, Jacobi symbols, and modular
+square-root algorithms.</p>
+
+<p>Discrete logarithms reverse exponentiation in finite cyclic groups and lead
+to algorithms such as baby-step giant-step and Pollard's rho.</p>
+
+<p>Continued fractions connect the Euclidean algorithm with rational
+approximation and Pell equations.</p>
+
+<p>Modern cryptographic mathematics depends heavily on efficient prime
+generation, modular inversion, modular exponentiation, factorization
+problems, and discrete logarithms.</p>
+
+<p>Computational experiments can discover patterns and test enormous numbers of
+cases, but computation and proof play different mathematical roles.</p>
+
+<p>The central principle is:</p>
+
+<p>
+<md>\boxed{
+\text{knowing that an arithmetic object exists is different from knowing how
+to compute it efficiently}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-04-computational-number-theory-subsec-computational-number-theory-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Computational Number Theory turns the theoretical structures of Elementary
+Number Theory into explicit algorithms. The Euclidean algorithm, modular
+inverses, fast exponentiation, congruence solving, primality testing, and
+factorization provide the basic computational toolkit. Analytic Number
+Theory motivates large-scale computations involving primes and arithmetic
+functions, while Algebraic Number Theory leads to algorithms for number
+fields, ideals, class groups, and units. Linear Algebra enters modern
+factorization through exponent vectors and sparse systems over finite
+fields. Probability motivates randomized primality and factorization
+algorithms. Continued fractions connect computation with Diophantine
+Approximation. Discrete logarithms and integer factorization connect number
+theory with cryptography. More general questions of numerical efficiency,
+bit complexity, symbolic computation, and high-performance algorithms are
+developed further in Numerical and Computational Mathematics.</p>
+</remark>
+</subsection>
+
 </section>

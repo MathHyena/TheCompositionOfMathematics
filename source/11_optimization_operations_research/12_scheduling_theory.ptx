@@ -1,9 +1,4384 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-11-optimization-operations-research-12-scheduling-theory">
-  <title>Scheduling Theory</title>
+<section xml:id="sec-scheduling-theory">
+<title>Scheduling Theory</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Optimization fundamentals, combinatorial optimization, integer
+programming, dynamic programming, graph theory, queueing concepts,
+probability, and basic algorithmic complexity.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>define a scheduling problem;</p>
+</li>
+<li>
+<p>identify jobs, machines, processing times, release dates, and
+          due dates;</p>
+</li>
+<li>
+<p>define completion time, flow time, lateness, tardiness,
+          earliness, and makespan;</p>
+</li>
+<li>
+<p>distinguish single-machine, parallel-machine, flow-shop,
+          job-shop, and open-shop environments;</p>
+</li>
+<li>
+<p>interpret standard three-field scheduling notation;</p>
+</li>
+<li>
+<p>distinguish preemptive and nonpreemptive scheduling;</p>
+</li>
+<li>
+<p>model precedence constraints;</p>
+</li>
+<li>
+<p>construct precedence graphs;</p>
+</li>
+<li>
+<p>understand critical paths;</p>
+</li>
+<li>
+<p>formulate common scheduling objectives;</p>
+</li>
+<li>
+<p>use shortest-processing-time sequencing;</p>
+</li>
+<li>
+<p>use earliest-due-date sequencing;</p>
+</li>
+<li>
+<p>understand Smith's weighted shortest-processing-time rule;</p>
+</li>
+<li>
+<p>recognize Moore--Hodgson scheduling for minimizing the number
+          of tardy jobs;</p>
+</li>
+<li>
+<p>understand list scheduling;</p>
+</li>
+<li>
+<p>use longest-processing-time scheduling for parallel machines;</p>
+</li>
+<li>
+<p>understand approximation guarantees for list scheduling;</p>
+</li>
+<li>
+<p>apply Johnson's rule to a two-machine flow shop;</p>
+</li>
+<li>
+<p>formulate disjunctive machine constraints;</p>
+</li>
+<li>
+<p>formulate scheduling problems as mixed-integer programs;</p>
+</li>
+<li>
+<p>recognize time-indexed formulations;</p>
+</li>
+<li>
+<p>understand sequence-dependent setup times;</p>
+</li>
+<li>
+<p>distinguish regular and nonregular scheduling objectives;</p>
+</li>
+<li>
+<p>understand release-date scheduling;</p>
+</li>
+<li>
+<p>understand preemptive scheduling conceptually;</p>
+</li>
+<li>
+<p>recognize shortest-remaining-processing-time scheduling;</p>
+</li>
+<li>
+<p>understand weighted completion-time objectives;</p>
+</li>
+<li>
+<p>understand maximum lateness and total tardiness;</p>
+</li>
+<li>
+<p>recognize scheduling problems that are computationally hard;</p>
+</li>
+<li>
+<p>derive lower bounds for makespan;</p>
+</li>
+<li>
+<p>understand branch-and-bound for scheduling;</p>
+</li>
+<li>
+<p>understand dynamic-programming approaches conceptually;</p>
+</li>
+<li>
+<p>recognize local-search and neighborhood methods;</p>
+</li>
+<li>
+<p>understand critical-path scheduling in project networks;</p>
+</li>
+<li>
+<p>distinguish CPM and PERT conceptually;</p>
+</li>
+<li>
+<p>compute basic PERT expected activity times;</p>
+</li>
+<li>
+<p>understand resource-constrained project scheduling conceptually;</p>
+</li>
+<li>
+<p>recognize workforce and shift scheduling;</p>
+</li>
+<li>
+<p>connect scheduling theory with manufacturing, transportation,
+          computing, logistics, healthcare, and project management.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-what-is-scheduling">
+<title>What Is Scheduling?</title>
+<p>Scheduling determines:</p>
+
+<p>
+<md>\boxed{
+\text{when}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{where}
+}</md>
+</p>
+
+<p>jobs should be processed using limited resources.</p>
+
+<p>A typical scheduling problem contains:</p>
+
+<p>
+<md>\boxed{
+\text{jobs}
++
+\text{machines}
++
+\text{processing requirements}
++
+\text{timing constraints}.
+}</md>
+</p>
+
+<p>The objective is usually to improve some measure of:</p>
+
+<p>
+<md>\boxed{
+\text{time},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{delay},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{throughput},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{resource utilization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-jobs">
+<title>Jobs</title>
+<p>Let</p>
+
+<p>
+<md>J
+=
+\{1,2,\ldots,n\}</md>
+</p>
+
+<p>be the set of jobs.</p>
+
+<p>A job may represent:</p>
+
+<p>
+<md>\boxed{
+\text{a manufactured part},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{a computer task},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{an aircraft operation},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{a maintenance request},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{a project activity}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-machines">
+<title>Machines and Resources</title>
+<p>Let</p>
+
+<p>
+<md>M
+=
+\{1,2,\ldots,m\}</md>
+</p>
+
+<p>be the set of machines or resources.</p>
+
+<p>A machine may represent:</p>
+
+<p>
+<md>\boxed{
+\text{physical equipment},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{a worker},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{a runway},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{a processor},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{a service station}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-processing-time">
+<title>Processing Time</title>
+<p>The processing time of job <m>j</m> is commonly denoted</p>
+
+<p>
+<md>\boxed{
+p_j.
+}</md>
+</p>
+
+<p>If processing time depends on the machine, write</p>
+
+<p>
+<md>\boxed{
+p_{ij}
+}</md>
+</p>
+
+<p>for the time required to process job <m>j</m> on machine <m>i</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-start-completion-times">
+<title>Start and Completion Times</title>
+<p>Let</p>
+
+<p>
+<md>S_j
+=
+\text{start time of job }j,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>C_j
+=
+\text{completion time of job }j.</md>
+</p>
+
+<p>For a nonpreemptive job with processing time <m>p_j</m>,</p>
+
+<p>
+<md>\boxed{
+C_j
+=
+S_j+p_j.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-release-dates">
+<title>Release Dates</title>
+<p>A release date</p>
+
+<p>
+<md>\boxed{
+r_j
+}</md>
+</p>
+
+<p>is the earliest time at which job <m>j</m> may begin.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+S_j
+\geq
+r_j.
+}</md>
+</p>
+
+<p>A job cannot be processed before the required material, information, or
+resource becomes available.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-due-dates">
+<title>Due Dates</title>
+<p>A due date</p>
+
+<p>
+<md>\boxed{
+d_j
+}</md>
+</p>
+
+<p>is the desired completion time of job <m>j</m>.</p>
+
+<p>A job completing after <m>d_j</m> is late in the ordinary scheduling sense.</p>
+
+<p>Due dates create several important performance measures.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-completion-time">
+<title>Completion Time</title>
+<p>The completion time of job <m>j</m> is simply</p>
+
+<p>
+<md>\boxed{
+C_j.
+}</md>
+</p>
+
+<p>The sum of completion times,</p>
+
+<p>
+<md>\boxed{
+\sum_{j=1}^{n}
+C_j,
+}</md>
+</p>
+
+<p>is a common measure of total system congestion when all jobs are available
+at time zero.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-flow-time">
+<title>Flow Time</title>
+<p>The flow time of job <m>j</m> is</p>
+
+<p>
+<md>\boxed{
+F_j
+=
+C_j-r_j.
+}</md>
+</p>
+
+<p>It measures how long the job remains in the system after becoming
+available.</p>
+
+<p>If every job has</p>
+
+<p>
+<md>r_j=0,</md>
+</p>
+
+<p>then</p>
+
+<p>
+<md>\boxed{
+F_j=C_j.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-lateness">
+<title>Lateness</title>
+<p>The lateness of job <m>j</m> is</p>
+
+<p>
+<md>\boxed{
+L_j
+=
+C_j-d_j.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>L_j&gt;0,</md>
+</p>
+
+<p>the job finishes late.</p>
+
+<p>If</p>
+
+<p>
+<md>L_j&lt;0,</md>
+</p>
+
+<p>the job finishes early.</p>
+
+<p>Thus lateness can be negative.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-tardiness">
+<title>Tardiness</title>
+<p>The tardiness of job <m>j</m> is</p>
+
+<p>
+<md>\boxed{
+T_j
+=
+\max
+\{
+C_j-d_j,
+0
+\}.
+}</md>
+</p>
+
+<p>Unlike lateness,</p>
+
+<p>
+<md>\boxed{
+T_j\geq0.
+}</md>
+</p>
+
+<p>Early completion does not produce negative tardiness.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-earliness">
+<title>Earliness</title>
+<p>The earliness of job <m>j</m> is</p>
+
+<p>
+<md>\boxed{
+E_j
+=
+\max
+\{
+d_j-C_j,
+0
+\}.
+}</md>
+</p>
+
+<p>A job cannot simultaneously be both early and tardy:</p>
+
+<p>
+<md>\boxed{
+E_jT_j=0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-tardy-job-indicator">
+<title>Tardy-Job Indicator</title>
+<p>Define</p>
+
+<p>
+<md>\boxed{
+U_j
+=
+\begin{cases}
+1,
+&amp;
+C_j&gt;d_j,
+\\
+0,
+&amp;
+C_j\leq d_j.
+\end{cases}
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\sum_jU_j
+}</md>
+</p>
+
+<p>is the number of tardy jobs.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-makespan">
+<title>Makespan</title>
+<p>The makespan is the completion time of the final job:</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+=
+\max_j
+C_j.
+}</md>
+</p>
+
+<p>Minimizing makespan seeks to finish all work as early as possible.</p>
+
+<p>This objective is especially important for parallel-machine and shop
+scheduling.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-maximum-lateness">
+<title>Maximum Lateness</title>
+<p>Maximum lateness is</p>
+
+<p>
+<md>\boxed{
+L_{\max}
+=
+\max_j
+L_j.
+}</md>
+</p>
+
+<p>Minimizing <m>L_{\max}</m> protects against the worst due-date deviation.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-total-tardiness">
+<title>Total Tardiness</title>
+<p>Total tardiness is</p>
+
+<p>
+<md>\boxed{
+\sum_{j=1}^{n}
+T_j.
+}</md>
+</p>
+
+<p>A weighted version is</p>
+
+<p>
+<md>\boxed{
+\sum_{j=1}^{n}
+w_jT_j,
+}</md>
+</p>
+
+<p>where <m>w_j</m> represents the importance of job <m>j</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-weighted-completion-time">
+<title>Weighted Completion Time</title>
+<p>If jobs have weights</p>
+
+<p>
+<md>w_j&gt;0,</md>
+</p>
+
+<p>the total weighted completion time is</p>
+
+<p>
+<md>\boxed{
+\sum_{j=1}^{n}
+w_jC_j.
+}</md>
+</p>
+
+<p>This penalizes delay of high-priority jobs more strongly.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-regular-scheduling-objectives">
+<title>Regular Objectives</title>
+<p>A scheduling objective is regular if delaying any job cannot improve the
+objective while all other completion times remain fixed.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+C_{\max},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\sum C_j,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+L_{\max},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\sum T_j.
+}</md>
+</p>
+
+<p>Regular objectives generally provide no incentive to insert unnecessary
+idle time when a job is available and feasible.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-nonregular-scheduling-objectives">
+<title>Nonregular Objectives</title>
+<p>Objectives involving earliness can be nonregular.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+\sum_j
+(
+\alpha_jE_j+\beta_jT_j
+)
+}</md>
+</p>
+
+<p>may penalize completing jobs too early as well as too late.</p>
+
+<p>In such problems, intentional idle time may be optimal.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-preemption">
+<title>Preemption</title>
+<p>A preemptive schedule allows a job to be interrupted and resumed later.</p>
+
+<p>A nonpreemptive schedule requires a started operation to continue until
+completion.</p>
+
+<p>Preemption is possible in some computer systems but impossible or costly
+in many manufacturing processes.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-machine-environments">
+<title>Machine Environments</title>
+<p>Important scheduling environments include:</p>
+
+<p>
+<md>\boxed{
+\text{single machine},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{parallel machines},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{flow shop},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{job shop},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{open shop}.
+}</md>
+</p>
+
+<p>Each environment imposes different technological restrictions.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-single-machine-scheduling">
+<title>Single-Machine Scheduling</title>
+<p>In single-machine scheduling,</p>
+
+<p>
+<md>\boxed{
+m=1.
+}</md>
+</p>
+
+<p>At most one job can be processed at a time.</p>
+
+<p>The main decision is often the sequence in which jobs should be processed.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-identical-parallel-machines">
+<title>Identical Parallel Machines</title>
+<p>For identical parallel machines, each job has the same processing time on
+every machine.</p>
+
+<p>This environment is commonly denoted</p>
+
+<p>
+<md>\boxed{
+P_m.
+}</md>
+</p>
+
+<p>The scheduling decision determines both:</p>
+
+<p>
+<md>\boxed{
+\text{machine assignment}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{job sequence}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-uniform-parallel-machines">
+<title>Uniform Parallel Machines</title>
+<p>Uniform machines have different speeds.</p>
+
+<p>If machine <m>i</m> has speed</p>
+
+<p>
+<md>s_i,</md>
+</p>
+
+<p>then a job with workload <m>p_j</m> may require</p>
+
+<p>
+<md>\boxed{
+\frac{p_j}{s_i}
+}</md>
+</p>
+
+<p>time on machine <m>i</m>.</p>
+
+<p>This environment is commonly denoted</p>
+
+<p>
+<md>\boxed{
+Q_m.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-unrelated-parallel-machines">
+<title>Unrelated Parallel Machines</title>
+<p>For unrelated machines, processing time may depend arbitrarily on both the
+job and the machine:</p>
+
+<p>
+<md>\boxed{
+p_{ij}.
+}</md>
+</p>
+
+<p>This environment is commonly denoted</p>
+
+<p>
+<md>\boxed{
+R_m.
+}</md>
+</p>
+
+<p>It is substantially more general than identical-machine scheduling.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-flow-shop-scheduling">
+<title>Flow-Shop Scheduling</title>
+<p>In a flow shop, every job visits machines in the same order.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+M_1
+\to
+M_2
+\to
+M_3.
+}</md>
+</p>
+
+<p>A job cannot begin its operation on <m>M_2</m> until it completes its
+operation on <m>M_1</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-job-shop-scheduling">
+<title>Job-Shop Scheduling</title>
+<p>In a job shop, different jobs may require different machine routes.</p>
+
+<p>For example,</p>
+
+<p>
+<md>J_1:
+M_1
+\to
+M_3
+\to
+M_2,</md>
+</p>
+
+<p>while</p>
+
+<p>
+<md>J_2:
+M_2
+\to
+M_1.</md>
+</p>
+
+<p>This flexibility makes job-shop scheduling computationally difficult.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-open-shop-scheduling">
+<title>Open-Shop Scheduling</title>
+<p>In an open shop, each job may require processing on several machines, but
+the order of those operations is not fixed in advance.</p>
+
+<p>The schedule determines both:</p>
+
+<p>
+<md>\boxed{
+\text{operation ordering}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{resource timing}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-three-field-scheduling-notation">
+<title>Three-Field Scheduling Notation</title>
+<p>A scheduling problem is often represented using</p>
+
+<p>
+<md>\boxed{
+\alpha
+\mid
+\beta
+\mid
+\gamma.
+}</md>
+</p>
+
+<p>Here:</p>
+
+<p>
+<md>\alpha
+=
+\text{machine environment},</md>
+</p>
+
+<p>
+<md>\beta
+=
+\text{processing restrictions},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\gamma
+=
+\text{objective}.</md>
+</p>
+
+<p>This is commonly called Graham's three-field notation.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-notation-examples">
+<title>Examples of Scheduling Notation</title>
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+1
+\mid
+\mid
+\sum C_j
+}</md>
+</p>
+
+<p>means:</p>
+
+<p>
+<md>\boxed{
+\text{one machine, no additional restrictions, minimize total completion
+time}.
+}</md>
+</p>
+
+<p>Similarly,</p>
+
+<p>
+<md>\boxed{
+P_m
+\mid
+\mid
+C_{\max}
+}</md>
+</p>
+
+<p>means:</p>
+
+<p>
+<md>\boxed{
+\text{identical parallel machines, minimize makespan}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-restriction-symbols">
+<title>Common Restriction Symbols</title>
+<p>Examples appearing in the middle field include:</p>
+
+<p>
+<md>\boxed{
+r_j
+}</md>
+</p>
+
+<p>for release dates,</p>
+
+<p>
+<md>\boxed{
+\mathrm{prec}
+}</md>
+</p>
+
+<p>for precedence constraints,</p>
+
+<p>
+<md>\boxed{
+\mathrm{pmtn}
+}</md>
+</p>
+
+<p>for preemption,</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+s_{ij}
+}</md>
+</p>
+
+<p>for sequence-dependent setup times.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-spt-rule">
+<title>Shortest Processing Time Rule</title>
+<p>The shortest processing time rule, abbreviated SPT, orders jobs by
+nondecreasing processing time:</p>
+
+<p>
+<md>\boxed{
+p_1
+\leq
+p_2
+\leq
+\cdots
+\leq
+p_n.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>\boxed{
+1\mid\mid\sum C_j,
+}</md>
+</p>
+
+<p>SPT is optimal.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-spt-proof">
+<title>Why SPT Minimizes Total Completion Time</title>
+<p>Suppose two consecutive jobs <m>i</m> and <m>j</m> satisfy</p>
+
+<p>
+<md>p_i&gt;p_j,</md>
+</p>
+
+<p>but <m>i</m> is scheduled before <m>j</m>.</p>
+
+<p>Ignoring the completion time accumulated before them, their contribution
+to total completion time is</p>
+
+<p>
+<md>p_i
++
+(p_i+p_j)
+=
+2p_i+p_j.</md>
+</p>
+
+<p>If their order is reversed, the contribution is</p>
+
+<p>
+<md>p_j
++
+(p_j+p_i)
+=
+p_i+2p_j.</md>
+</p>
+
+<p>The difference is</p>
+
+<p>
+<md>(2p_i+p_j)
+-
+(p_i+2p_j)
+=
+p_i-p_j
+&gt;
+0.</md>
+</p>
+
+<p>Therefore placing the shorter job first improves the objective.</p>
+
+<p>Repeated pairwise exchanges yield SPT order.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-worked-spt">
+<title>Worked Example: SPT</title>
+<example>
+<title>Minimizing Total Completion Time</title>
+<p>Suppose four jobs have processing times</p>
+
+<p>
+<md>p_A=6,
+\qquad
+p_B=2,
+\qquad
+p_C=5,
+\qquad
+p_D=1.</md>
+</p>
+
+<p>SPT order is</p>
+
+<p>
+<md>D,B,C,A.</md>
+</p>
+
+<p>Completion times are</p>
+
+<p>
+<md>C_D=1,</md>
+</p>
+
+<p>
+<md>C_B=3,</md>
+</p>
+
+<p>
+<md>C_C=8,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>C_A=14.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\sum C_j
+=
+1+3+8+14
+=
+26.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+D\to B\to C\to A
+}</md>
+</p>
+
+<p>minimizes total completion time.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-wspt-rule">
+<title>Weighted Shortest Processing Time</title>
+<p>For</p>
+
+<p>
+<md>\boxed{
+1\mid\mid\sum_jw_jC_j,
+}</md>
+</p>
+
+<p>the optimal sequence is obtained by ordering jobs according to</p>
+
+<p>
+<md>\boxed{
+\frac{p_j}{w_j}
+}</md>
+</p>
+
+<p>in nondecreasing order.</p>
+
+<p>Equivalently, order by</p>
+
+<p>
+<md>\boxed{
+\frac{w_j}{p_j}
+}</md>
+</p>
+
+<p>in nonincreasing order.</p>
+
+<p>This is often called Smith's rule or the weighted shortest processing time
+rule.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-smith-rule-proof">
+<title>Pairwise Interchange for Smith's Rule</title>
+<p>Suppose jobs <m>i</m> and <m>j</m> are adjacent.</p>
+
+<p>Scheduling <m>i</m> before <m>j</m> contributes, apart from prior completion
+time,</p>
+
+<p>
+<md>w_i p_i
++
+w_j(p_i+p_j).</md>
+</p>
+
+<p>Scheduling <m>j</m> before <m>i</m> contributes</p>
+
+<p>
+<md>w_j p_j
++
+w_i(p_j+p_i).</md>
+</p>
+
+<p>Placing <m>i</m> before <m>j</m> is no worse when</p>
+
+<p>
+<md>w_jp_i
+\leq
+w_ip_j.</md>
+</p>
+
+<p>Equivalently,</p>
+
+<p>
+<md>\boxed{
+\frac{p_i}{w_i}
+\leq
+\frac{p_j}{w_j}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-edd-rule">
+<title>Earliest Due Date Rule</title>
+<p>The earliest due date rule, abbreviated EDD, orders jobs by nondecreasing
+due date:</p>
+
+<p>
+<md>\boxed{
+d_1
+\leq
+d_2
+\leq
+\cdots
+\leq
+d_n.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>\boxed{
+1\mid\mid L_{\max},
+}</md>
+</p>
+
+<p>EDD minimizes maximum lateness.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-worked-edd">
+<title>Worked Example: EDD</title>
+<example>
+<title>Minimizing Maximum Lateness</title>
+<p>Suppose jobs have</p>
+
+<p>
+<md>(p_A,d_A)=(4,10),</md>
+</p>
+
+<p>
+<md>(p_B,d_B)=(3,5),</md>
+</p>
+
+<p>
+<md>(p_C,d_C)=(2,8).</md>
+</p>
+
+<p>EDD order is</p>
+
+<p>
+<md>B,C,A.</md>
+</p>
+
+<p>Completion times are</p>
+
+<p>
+<md>C_B=3,</md>
+</p>
+
+<p>
+<md>C_C=5,</md>
+</p>
+
+<p>
+<md>C_A=9.</md>
+</p>
+
+<p>Lateness values are</p>
+
+<p>
+<md>L_B=3-5=-2,</md>
+</p>
+
+<p>
+<md>L_C=5-8=-3,</md>
+</p>
+
+<p>
+<md>L_A=9-10=-1.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+L_{\max}=-1.
+}</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+B\to C\to A
+}</md>
+</p>
+
+<p>is an EDD schedule.</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-moore-hodgson">
+<title>Moore--Hodgson Algorithm</title>
+<p>For</p>
+
+<p>
+<md>\boxed{
+1\mid\mid\sum U_j,
+}</md>
+</p>
+
+<p>the Moore--Hodgson algorithm minimizes the number of tardy jobs.</p>
+
+<p>The algorithm:</p>
+
+<p>
+<ol>
+<li>
+<p>orders jobs by EDD;</p>
+</li>
+<li>
+<p>processes jobs in that order;</p>
+</li>
+<li>
+<p>whenever the current sequence becomes tardy, removes the job
+          with the largest processing time among jobs currently scheduled;</p>
+</li>
+<li>
+<p>places removed jobs after the on-time jobs.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-moore-hodgson-interpretation">
+<title>Interpretation of Moore--Hodgson</title>
+<p>When an EDD prefix cannot meet all due dates, removing the longest job
+frees the largest amount of processing time.</p>
+
+<p>This maximizes the opportunity for the remaining jobs to finish on time.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-total-tardiness-hardness">
+<title>Total Tardiness Is Harder</title>
+<p>Although EDD optimizes</p>
+
+<p>
+<md>L_{\max},</md>
+</p>
+
+<p>it does not generally minimize</p>
+
+<p>
+<md>\sum_jT_j.</md>
+</p>
+
+<p>Similarly, Moore--Hodgson minimizes the number of tardy jobs but not their
+total tardiness.</p>
+
+<p>The single-machine total-tardiness problem is substantially more
+difficult.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-critical-ratio-rule">
+<title>Critical Ratio Dispatching Rule</title>
+<p>A common real-time dispatching priority index is</p>
+
+<p>
+<md>\boxed{
+CR_j
+=
+\frac{
+d_j-t
+}{
+p_j^{\mathrm{remaining}}
+},
+}</md>
+</p>
+
+<p>where <m>t</m> is the current time.</p>
+
+<p>A small critical ratio indicates greater urgency.</p>
+
+<p>This is a heuristic dispatching rule, not a general optimality theorem.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-other-dispatching-rules">
+<title>Other Dispatching Rules</title>
+<p>Common shop-floor rules include:</p>
+
+<p>
+<md>\boxed{
+\text{FIFO},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{SPT},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{EDD},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{least slack},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{critical ratio}.
+}</md>
+</p>
+
+<p>Different rules optimize different operational priorities.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-slack">
+<title>Slack</title>
+<p>At time <m>t</m>, the slack of job <m>j</m> is</p>
+
+<p>
+<md>\boxed{
+SL_j
+=
+d_j
+-
+t
+-
+p_j^{\mathrm{remaining}}.
+}</md>
+</p>
+
+<p>A negative slack means the job cannot meet its due date even if processed
+continuously from the current time.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-precedence">
+<title>Precedence Constraints</title>
+<p>Suppose job <m>i</m> must finish before job <m>j</m> begins.</p>
+
+<p>Write</p>
+
+<p>
+<md>\boxed{
+i\prec j.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+S_j
+\geq
+C_i.
+}</md>
+</p>
+
+<p>For nonpreemptive processing,</p>
+
+<p>
+<md>\boxed{
+S_j
+\geq
+S_i+p_i.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-precedence-graph">
+<title>Precedence Graph</title>
+<p>Precedence constraints can be represented by a directed acyclic graph.</p>
+
+<p>A directed edge</p>
+
+<p>
+<md>i\to j</md>
+</p>
+
+<p>means</p>
+
+<p>
+<md>\boxed{
+i
+\text{ must precede }
+j.
+}</md>
+</p>
+
+<p>A feasible schedule must respect a topological ordering of the graph.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-critical-path">
+<title>Critical Path</title>
+<p>In a project network, a path from project start to project completion has
+length equal to the sum of activity durations along that path.</p>
+
+<p>The critical path is a longest-duration path.</p>
+
+<p>Its length gives a lower bound on project completion time:</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+\geq
+\text{critical-path length}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-earliest-start-times">
+<title>Earliest Start Times</title>
+<p>For a precedence-constrained project without resource conflicts, the
+earliest start time of an activity is determined by the completion of all
+its predecessors.</p>
+
+<p>If <m>\operatorname{Pred}(j)</m> is the predecessor set,</p>
+
+<p>
+<md>\boxed{
+ES_j
+=
+\max_{i\in\operatorname{Pred}(j)}
+EF_i,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+EF_i
+=
+ES_i+p_i.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-latest-start-times">
+<title>Latest Start Times</title>
+<p>Working backward from the project completion time gives latest finish and
+latest start times.</p>
+
+<p>For activity <m>j</m>,</p>
+
+<p>
+<md>\boxed{
+LS_j
+=
+LF_j-p_j.
+}</md>
+</p>
+
+<p>The total slack is</p>
+
+<p>
+<md>\boxed{
+LS_j-ES_j.
+}</md>
+</p>
+
+<p>Critical activities have zero slack.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-critical-path-method">
+<title>Critical Path Method</title>
+<p>The Critical Path Method, abbreviated CPM, assumes deterministic activity
+durations.</p>
+
+<p>The basic procedure is:</p>
+
+<p>
+<ol>
+<li>
+<p>construct the precedence network;</p>
+</li>
+<li>
+<p>perform a forward pass;</p>
+</li>
+<li>
+<p>determine project completion time;</p>
+</li>
+<li>
+<p>perform a backward pass;</p>
+</li>
+<li>
+<p>compute activity slack;</p>
+</li>
+<li>
+<p>identify the critical path.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-pert">
+<title>PERT</title>
+<p>The Program Evaluation and Review Technique, abbreviated PERT, introduces
+uncertain activity durations.</p>
+
+<p>A classical PERT model uses:</p>
+
+<p>
+<md>a
+=
+\text{optimistic duration},</md>
+</p>
+
+<p>
+<md>m
+=
+\text{most likely duration},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>b
+=
+\text{pessimistic duration}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-pert-expected-duration">
+<title>PERT Expected Duration</title>
+<p>The classical PERT approximation uses</p>
+
+<p>
+<md>\boxed{
+\mathbb{E}[T]
+\approx
+\frac{
+a+4m+b
+}{
+6
+}.
+}</md>
+</p>
+
+<p>The approximate variance is</p>
+
+<p>
+<md>\boxed{
+\operatorname{Var}(T)
+\approx
+\left(
+\frac{
+b-a
+}{
+6
+}
+\right)^2.
+}</md>
+</p>
+
+<p>These formulas arise from the traditional beta-distribution approximation
+used in PERT.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-worked-pert-duration">
+<title>Worked Example: PERT Duration</title>
+<example>
+<title>Expected Activity Duration</title>
+<p>Suppose an activity has:</p>
+
+<p>
+<md>a=4,
+\qquad
+m=7,
+\qquad
+b=10.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\mathbb{E}[T]
+\approx
+\frac{
+4+4(7)+10
+}{
+6
+}.</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\mathbb{E}[T]
+=
+\frac{42}{6}
+=
+7.</md>
+</p>
+
+<p>The approximate variance is</p>
+
+<p>
+<md>\left(
+\frac{10-4}{6}
+\right)^2
+=
+1.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\mathbb{E}[T]\approx7,
+\qquad
+\operatorname{Var}(T)\approx1.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-resource-constrained-projects">
+<title>Resource Constraints in Projects</title>
+<p>Critical-path calculations assume that precedence is the main restriction.</p>
+
+<p>In practice, multiple activities may compete for limited resources.</p>
+
+<p>A resource capacity constraint may be written</p>
+
+<p>
+<md>\boxed{
+\sum_j
+a_{rj}
+y_{jt}
+\leq
+R_r,
+}</md>
+</p>
+
+<p>where:</p>
+
+<p>
+<md>a_{rj}
+=
+\text{units of resource }r\text{ used by job }j,</md>
+</p>
+
+<p>
+<md>y_{jt}
+=
+\text{whether job }j\text{ is active at time }t,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>R_r
+=
+\text{available capacity}.</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-rcpsp">
+<title>Resource-Constrained Project Scheduling</title>
+<p>The Resource-Constrained Project Scheduling Problem, abbreviated RCPSP,
+combines:</p>
+
+<p>
+<md>\boxed{
+\text{precedence constraints}
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\boxed{
+\text{limited renewable resources}.
+}</md>
+</p>
+
+<p>A common objective is</p>
+
+<p>
+<md>\boxed{
+\min C_{\max}.
+}</md>
+</p>
+
+<p>The RCPSP is computationally difficult in general.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-parallel-machine-makespan">
+<title>Parallel-Machine Makespan Scheduling</title>
+<p>For identical parallel machines,</p>
+
+<p>
+<md>\boxed{
+P_m
+\mid
+\mid
+C_{\max},
+}</md>
+</p>
+
+<p>jobs must be distributed among <m>m</m> machines.</p>
+
+<p>The load on machine <m>i</m> is</p>
+
+<p>
+<md>\boxed{
+L_i
+=
+\sum_{j\text{ assigned to }i}
+p_j.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+=
+\max_i
+L_i.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-parallel-machine-lower-bounds">
+<title>Lower Bounds for Parallel-Machine Makespan</title>
+<p>Any schedule must satisfy</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+\geq
+\frac{
+\sum_jp_j
+}{
+m
+}.
+}</md>
+</p>
+
+<p>Also,</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+\geq
+\max_jp_j.
+}</md>
+</p>
+
+<p>Therefore a basic lower bound is</p>
+
+<p>
+<md>\boxed{
+LB
+=
+\max
+\left\{
+\frac{\sum_jp_j}{m},
+\;
+\max_jp_j
+\right\}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-list-scheduling">
+<title>List Scheduling</title>
+<p>List scheduling processes jobs in a specified list order.</p>
+
+<p>Whenever a machine becomes available, assign the next unscheduled job to
+that machine.</p>
+
+<p>For identical parallel machines and makespan minimization, any list order
+produces a schedule satisfying the classical bound</p>
+
+<p>
+<md>\boxed{
+C_{\max}^{LS}
+\leq
+\left(
+2-\frac1m
+\right)
+C_{\max}^*.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-lpt-rule">
+<title>Longest Processing Time Rule</title>
+<p>Longest Processing Time, abbreviated LPT, first sorts jobs so that</p>
+
+<p>
+<md>\boxed{
+p_1
+\geq
+p_2
+\geq
+\cdots
+\geq
+p_n.
+}</md>
+</p>
+
+<p>Then list scheduling is applied.</p>
+
+<p>Large jobs are distributed early, reducing the risk that a large job
+creates a poor final imbalance.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-lpt-approximation-bound">
+<title>LPT Approximation Bound</title>
+<p>For</p>
+
+<p>
+<md>m\geq2,</md>
+</p>
+
+<p>LPT satisfies the classical bound</p>
+
+<p>
+<md>\boxed{
+C_{\max}^{LPT}
+\leq
+\left(
+\frac43
+-
+\frac{1}{3m}
+\right)
+C_{\max}^*.
+}</md>
+</p>
+
+<p>Thus LPT has a stronger worst-case guarantee than arbitrary list
+scheduling.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-worked-lpt">
+<title>Worked Example: LPT</title>
+<example>
+<title>Three Identical Machines</title>
+<p>Suppose processing times are</p>
+
+<p>
+<md>8,\ 7,\ 6,\ 5,\ 4,\ 3.</md>
+</p>
+
+<p>There are</p>
+
+<p>
+<md>m=3</md>
+</p>
+
+<p>machines.</p>
+
+<p>LPT assigns:</p>
+
+<p>
+<md>M_1:
+8+3=11,</md>
+</p>
+
+<p>
+<md>M_2:
+7+4=11,</md>
+</p>
+
+<p>
+<md>M_3:
+6+5=11.</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>Since</p>
+
+<p>
+<md>\frac{
+8+7+6+5+4+3
+}{
+3
+}
+=
+11,</md>
+</p>
+
+<p>the lower bound is also <m>11</m>.</p>
+
+<p>Hence the LPT schedule is optimal.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+C_{\max}=11.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-load-balancing">
+<title>Load Balancing</title>
+<p>Parallel-machine makespan scheduling is a load-balancing problem.</p>
+
+<p>Each job contributes workload <m>p_j</m>.</p>
+
+<p>The goal is to partition jobs among machines so that the largest total
+load is minimized.</p>
+
+<p>This connects scheduling with partitioning and combinatorial optimization.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-flow-shop-details">
+<title>Flow-Shop Scheduling</title>
+<p>Suppose each job requires processing on two machines in order:</p>
+
+<p>
+<md>M_1
+\to
+M_2.</md>
+</p>
+
+<p>Let</p>
+
+<p>
+<md>p_{1j}</md>
+</p>
+
+<p>be processing time of job <m>j</m> on machine <m>1</m>,</p>
+
+<p>and</p>
+
+<p>
+<md>p_{2j}</md>
+</p>
+
+<p>its processing time on machine <m>2</m>.</p>
+
+<p>The problem</p>
+
+<p>
+<md>\boxed{
+F_2
+\mid
+\mid
+C_{\max}
+}</md>
+</p>
+
+<p>has an elegant optimal sequencing rule.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-johnsons-rule">
+<title>Johnson's Rule</title>
+<p>For the two-machine flow-shop makespan problem, Johnson's rule is:</p>
+
+<p>
+<ol>
+<li>
+<p>find the smallest unscheduled processing time among all remaining
+          operations;</p>
+</li>
+<li>
+<p>if it occurs on machine <m>1</m>, place that job in the earliest
+          available position;</p>
+</li>
+<li>
+<p>if it occurs on machine <m>2</m>, place that job in the latest
+          available position;</p>
+</li>
+<li>
+<p>remove the job and repeat.</p>
+</li>
+</ol>
+</p>
+
+<p>The resulting sequence minimizes makespan.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-johnsons-rule-partition">
+<title>Alternative Statement of Johnson's Rule</title>
+<p>Partition jobs into:</p>
+
+<p>
+<md>\boxed{
+A
+=
+\{
+j:
+p_{1j}\leq p_{2j}
+\},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+B
+=
+\{
+j:
+p_{1j}&gt;p_{2j}
+\}.
+}</md>
+</p>
+
+<p>Schedule jobs in <m>A</m> first in nondecreasing order of <m>p_{1j}</m>.</p>
+
+<p>Then schedule jobs in <m>B</m> in nonincreasing order of <m>p_{2j}</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-worked-johnson">
+<title>Worked Example: Johnson's Rule</title>
+<example>
+<title>Two-Machine Flow Shop</title>
+<p>Suppose:</p>
+
+<p>
+<md>\begin{array}{c|cccc}
+\text{Job}
+&amp;
+A
+&amp;
+B
+&amp;
+C
+&amp;
+D
+\\
+\hline
+p_{1j}
+&amp;
+3
+&amp;
+8
+&amp;
+4
+&amp;
+7
+\\
+p_{2j}
+&amp;
+6
+&amp;
+2
+&amp;
+5
+&amp;
+9
+\end{array}</md>
+</p>
+
+<p>Jobs with</p>
+
+<p>
+<md>p_{1j}\leq p_{2j}</md>
+</p>
+
+<p>are</p>
+
+<p>
+<md>A,C,D.</md>
+</p>
+
+<p>Order these by increasing <m>p_{1j}</m>:</p>
+
+<p>
+<md>A,C,D.</md>
+</p>
+
+<p>Job <m>B</m> belongs to the second group.</p>
+
+<p>Therefore Johnson's sequence is</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+A\to C\to D\to B.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-permutation-flow-shops">
+<title>Permutation Flow Shops</title>
+<p>In a permutation flow shop, all machines process jobs in the same job
+order.</p>
+
+<p>If the sequence is</p>
+
+<p>
+<md>J_3,J_1,J_2,</md>
+</p>
+
+<p>then every machine processes jobs in that order.</p>
+
+<p>For more than two machines, makespan minimization is generally much more
+difficult than the Johnson-rule case.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-job-shop-disjunctive">
+<title>Job-Shop Disjunctive Constraints</title>
+<p>Suppose two operations <m>i</m> and <m>j</m> require the same machine.</p>
+
+<p>They cannot overlap.</p>
+
+<p>Therefore either</p>
+
+<p>
+<md>\boxed{
+S_i+p_i
+\leq
+S_j,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+S_j+p_j
+\leq
+S_i.
+}</md>
+</p>
+
+<p>This is a disjunctive constraint.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-binary-sequencing-variable">
+<title>Binary Sequencing Variable</title>
+<p>Define</p>
+
+<p>
+<md>y_{ij}
+=
+\begin{cases}
+1,
+&amp;
+i\text{ is scheduled before }j,
+\\
+0,
+&amp;
+j\text{ is scheduled before }i.
+\end{cases}</md>
+</p>
+
+<p>A Big-<m>M</m> formulation is</p>
+
+<p>
+<md>\boxed{
+S_i+p_i
+\leq
+S_j
++
+M(1-y_{ij}),
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+S_j+p_j
+\leq
+S_i
++
+My_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-big-m">
+<title>Choosing Big-<m>M</m> in Scheduling</title>
+<p>The value <m>M</m> must be large enough to deactivate the appropriate
+sequencing inequality.</p>
+
+<p>However, an excessively large value can create:</p>
+
+<p>
+<md>\boxed{
+\text{weak LP relaxations}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{poor numerical conditioning}.
+}</md>
+</p>
+
+<p>A valid scheduling horizon often provides a useful upper bound for <m>M</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-makespan-variable-milp">
+<title>Makespan Variable in MILP</title>
+<p>Introduce variable</p>
+
+<p>
+<md>C_{\max}.</md>
+</p>
+
+<p>For every job,</p>
+
+<p>
+<md>\boxed{
+C_j
+\leq
+C_{\max}.
+}</md>
+</p>
+
+<p>Then minimize</p>
+
+<p>
+<md>\boxed{
+C_{\max}.
+}</md>
+</p>
+
+<p>This converts the maximum completion time into a linear objective.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-tardiness-linearization">
+<title>Tardiness Linearization</title>
+<p>Introduce variable</p>
+
+<p>
+<md>T_j\geq0.</md>
+</p>
+
+<p>Impose</p>
+
+<p>
+<md>\boxed{
+T_j
+\geq
+C_j-d_j.
+}</md>
+</p>
+
+<p>Then minimizing</p>
+
+<p>
+<md>\boxed{
+\sum_jT_j
+}</md>
+</p>
+
+<p>forces</p>
+
+<p>
+<md>T_j
+=
+\max
+\{
+C_j-d_j,
+0
+\}</md>
+</p>
+
+<p>at optimality.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-time-indexed-scheduling">
+<title>Time-Indexed Scheduling Formulation</title>
+<p>Suppose time is discretized.</p>
+
+<p>Define</p>
+
+<p>
+<md>x_{jt}
+=
+\begin{cases}
+1,
+&amp;
+\text{job }j\text{ starts at time }t,
+\\
+0,
+&amp;
+\text{otherwise}.
+\end{cases}</md>
+</p>
+
+<p>Each job starts exactly once:</p>
+
+<p>
+<md>\boxed{
+\sum_t
+x_{jt}
+=
+1.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-time-indexed-capacity">
+<title>Time-Indexed Capacity Constraints</title>
+<p>For one machine, at most one job may be active at time <m>\tau</m>.</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\sum_j
+\sum_{
+t:
+t\leq\tau&lt;t+p_j
+}
+x_{jt}
+\leq
+1.
+}</md>
+</p>
+
+<p>Time-indexed formulations can be strong but may require many binary
+variables.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-time-indexed-release-dates">
+<title>Release Dates in Time-Indexed Models</title>
+<p>If job <m>j</m> cannot start before <m>r_j</m>, then simply omit variables with</p>
+
+<p>
+<md>t&lt;r_j,</md>
+</p>
+
+<p>or impose</p>
+
+<p>
+<md>\boxed{
+x_{jt}=0,
+\qquad
+t&lt;r_j.
+}</md>
+</p>
+
+<p>Similarly, a deadline can restrict allowable completion periods.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-sequence-dependent-setup-times">
+<title>Sequence-Dependent Setup Times</title>
+<p>Suppose processing job <m>j</m> immediately after job <m>i</m> requires setup
+time</p>
+
+<p>
+<md>\boxed{
+s_{ij}.
+}</md>
+</p>
+
+<p>Then if <m>i</m> precedes <m>j</m>,</p>
+
+<p>
+<md>\boxed{
+S_j
+\geq
+C_i+s_{ij}.
+}</md>
+</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{machine cleaning},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{tool changes},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{product changeovers}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-sequence-independent-setup-times">
+<title>Sequence-Independent Setup Times</title>
+<p>If setup time depends only on the next job,</p>
+
+<p>
+<md>s_j,</md>
+</p>
+
+<p>then it may often be combined with processing time:</p>
+
+<p>
+<md>\boxed{
+p_j'
+=
+s_j+p_j.
+}</md>
+</p>
+
+<p>Sequence-dependent setup times cannot generally be absorbed this way.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-release-dates-idle-time">
+<title>Release Dates and Idle Time</title>
+<p>Without release dates and with a regular objective, intentional idle time
+on a single machine is usually unnecessary.</p>
+
+<p>With release dates, idle time can be unavoidable.</p>
+
+<p>In some problems, waiting for a future high-priority job can even be
+strategically useful.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-srpt">
+<title>Shortest Remaining Processing Time</title>
+<p>With preemption and release dates, the shortest remaining processing time
+rule, abbreviated SRPT, always processes an available job with minimum
+remaining processing time.</p>
+
+<p>For the classical problem</p>
+
+<p>
+<md>\boxed{
+1
+\mid
+r_j,\mathrm{pmtn}
+\mid
+\sum C_j,
+}</md>
+</p>
+
+<p>SRPT is optimal.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-srpt-interpretation">
+<title>Interpretation of SRPT</title>
+<p>When a shorter job arrives, it may interrupt a longer job.</p>
+
+<p>Completing short jobs quickly reduces the number of unfinished jobs in
+the system.</p>
+
+<p>This is the preemptive analogue of SPT.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-deadlines">
+<title>Scheduling With Deadlines</title>
+<p>A deadline</p>
+
+<p>
+<md>\bar d_j</md>
+</p>
+
+<p>is a hard requirement:</p>
+
+<p>
+<md>\boxed{
+C_j
+\leq
+\bar d_j.
+}</md>
+</p>
+
+<p>A due date is usually a soft target that may be violated with a penalty.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{deadline}
+\neq
+\text{due date}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-feasibility">
+<title>Feasibility Versus Optimization</title>
+<p>Some scheduling problems ask only whether all timing requirements can be
+satisfied.</p>
+
+<p>Others seek the best feasible schedule.</p>
+
+<p>Thus scheduling includes both:</p>
+
+<p>
+<md>\boxed{
+\text{feasibility problems}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{optimization problems}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-lower-bounds">
+<title>Lower Bounds</title>
+<p>Lower bounds are important in exact algorithms.</p>
+
+<p>For makespan, useful bounds can arise from:</p>
+
+<p>
+<md>\boxed{
+\text{total workload},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{largest job},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{critical paths},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{machine workloads}.
+}</md>
+</p>
+
+<p>A lower bound helps determine how close a candidate schedule is to optimal.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-machine-workload-bound">
+<title>Machine-Workload Bound</title>
+<p>Suppose every job shop operation assigned to machine <m>i</m> has processing
+time <m>p_{ij}</m>.</p>
+
+<p>Any schedule must satisfy</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+\geq
+\sum_j
+p_{ij}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+\geq
+\max_i
+\sum_jp_{ij}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-job-shop-critical-path-bound">
+<title>Critical-Path Bound in Job Shops</title>
+<p>For each job, its operations must follow a specified route.</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+\geq
+\sum_{k\in J_j}
+p_{jk}
+}</md>
+</p>
+
+<p>for every job <m>j</m>.</p>
+
+<p>A lower bound is therefore</p>
+
+<p>
+<md>\boxed{
+\max_j
+\{
+\text{total processing requirement of job }j
+\}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-branch-bound">
+<title>Branch-and-Bound for Scheduling</title>
+<p>Branch-and-bound can search over sequencing or assignment decisions.</p>
+
+<p>A node may represent a partially fixed schedule.</p>
+
+<p>At each node:</p>
+
+<p>
+<ol>
+<li>
+<p>compute a lower bound;</p>
+</li>
+<li>
+<p>construct or maintain a feasible incumbent;</p>
+</li>
+<li>
+<p>prune if the lower bound cannot improve the incumbent;</p>
+</li>
+<li>
+<p>otherwise branch on another scheduling decision.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-dynamic-programming">
+<title>Dynamic Programming for Scheduling</title>
+<p>Dynamic programming can be effective when the state is manageable.</p>
+
+<p>A subset state may represent:</p>
+
+<p>
+<md>\boxed{
+S
+=
+\text{set of jobs already completed}.
+}</md>
+</p>
+
+<p>The remaining schedule depends only on <m>S</m> and any additional timing
+information required.</p>
+
+<p>This can reduce repeated enumeration, although the state space may still
+contain</p>
+
+<p>
+<md>\boxed{
+2^n
+}</md>
+</p>
+
+<p>subsets.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-local-search">
+<title>Local Search for Scheduling</title>
+<p>A scheduling neighborhood may use:</p>
+
+<p>
+<md>\boxed{
+\text{adjacent swaps},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{pairwise exchanges},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{job insertion},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{machine reassignment}.
+}</md>
+</p>
+
+<p>Local search repeatedly replaces the current schedule with a better nearby
+schedule.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-adjacent-swap-neighborhood">
+<title>Adjacent Swap Neighborhood</title>
+<p>For a sequence</p>
+
+<p>
+<md>J_1,J_2,\ldots,J_n,</md>
+</p>
+
+<p>an adjacent-swap move exchanges</p>
+
+<p>
+<md>J_k</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>J_{k+1}.</md>
+</p>
+
+<p>There are only</p>
+
+<p>
+<md>\boxed{
+n-1
+}</md>
+</p>
+
+<p>adjacent swaps, making this a small neighborhood.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-insertion-neighborhood">
+<title>Insertion Neighborhood</title>
+<p>An insertion move removes one job from its current position and inserts it
+elsewhere.</p>
+
+<p>This neighborhood is larger than adjacent swaps and can escape some local
+optima that adjacent swaps cannot.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-dispatching-versus-offline">
+<title>Dispatching Versus Offline Scheduling</title>
+<p>Offline scheduling assumes the relevant jobs and information are known
+before scheduling begins.</p>
+
+<p>Online scheduling receives jobs over time.</p>
+
+<p>A dispatching rule makes repeated local decisions as information becomes
+available.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{SPT},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{EDD},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{critical-ratio dispatching}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-online-scheduling">
+<title>Online Scheduling</title>
+<p>In online scheduling, future jobs may be unknown.</p>
+
+<p>An online algorithm must make decisions without full future information.</p>
+
+<p>Performance can be evaluated using competitive analysis, which compares
+the online schedule against an optimal schedule that knows the entire
+input in advance.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-batch-scheduling">
+<title>Batch Scheduling</title>
+<p>Some machines can process several compatible jobs simultaneously as one
+batch.</p>
+
+<p>A batch has:</p>
+
+<p>
+<md>\boxed{
+\text{capacity restrictions}
+}</md>
+</p>
+
+<p>and may have a processing time determined by the jobs assigned to it.</p>
+
+<p>Batch scheduling occurs in ovens, furnaces, chemical processing, and data
+processing.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-no-wait-scheduling">
+<title>No-Wait Scheduling</title>
+<p>In a no-wait flow shop, once a job starts, it must continue through its
+sequence of machines without waiting between operations.</p>
+
+<p>This occurs when intermediate storage is impossible or product quality
+would deteriorate.</p>
+
+<p>No-wait constraints tightly couple operation start times.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-blocking-scheduling">
+<title>Blocking Scheduling</title>
+<p>If there is no buffer between machines, a completed job may remain on its
+current machine until the next machine becomes available.</p>
+
+<p>This is called blocking.</p>
+
+<p>The upstream machine then cannot begin another job.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-workforce-scheduling">
+<title>Workforce Scheduling</title>
+<p>Workforce scheduling assigns employees to shifts or tasks while satisfying
+coverage requirements.</p>
+
+<p>Let</p>
+
+<p>
+<md>x_s
+=
+\text{number of workers assigned to shift }s.</md>
+</p>
+
+<p>If period <m>t</m> requires at least <m>d_t</m> workers,</p>
+
+<p>
+<md>\boxed{
+\sum_s
+a_{ts}x_s
+\geq
+d_t,
+}</md>
+</p>
+
+<p>where <m>a_{ts}=1</m> if shift <m>s</m> covers period <m>t</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-shift-scheduling">
+<title>Shift Scheduling</title>
+<p>A basic shift-scheduling model is</p>
+
+<p>
+<md>\boxed{
+\begin{aligned}
+\min
+\quad&amp;
+\sum_s
+c_sx_s
+\\
+\text{subject to}
+\quad&amp;
+\sum_s
+a_{ts}x_s
+\geq
+d_t,
+\qquad
+t=1,\ldots,T,
+\\
+&amp;
+x_s\in\mathbb{Z}_{\geq0}.
+\end{aligned}
+}</md>
+</p>
+
+<p>More detailed workforce models include:</p>
+
+<p>
+<md>\boxed{
+\text{skills},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{breaks},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{overtime},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{fairness}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-crew-scheduling">
+<title>Crew Scheduling</title>
+<p>Crew scheduling selects feasible sequences of work activities.</p>
+
+<p>Each complete feasible duty can be treated as a column.</p>
+
+<p>This often leads to large set-covering or set-partitioning models.</p>
+
+<p>Column generation is therefore central in airline, rail, and transit crew
+scheduling.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-transportation-scheduling">
+<title>Transportation Scheduling</title>
+<p>Transportation scheduling may involve:</p>
+
+<p>
+<md>\boxed{
+\text{vehicles},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{drivers},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{gates},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{runways},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{loading resources}.
+}</md>
+</p>
+
+<p>Many such problems combine:</p>
+
+<p>
+<md>\boxed{
+\text{network optimization}
++
+\text{integer programming}
++
+\text{scheduling}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-machine-availability">
+<title>Machine Availability</title>
+<p>A machine may be unavailable during maintenance or other downtime.</p>
+
+<p>If machine <m>i</m> is unavailable on interval</p>
+
+<p>
+<md>[a,b],</md>
+</p>
+
+<p>then no nonpreemptive operation assigned to that machine may overlap the
+interval.</p>
+
+<p>Calendar constraints can therefore become part of scheduling feasibility.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-maintenance-scheduling">
+<title>Maintenance Scheduling</title>
+<p>Maintenance scheduling balances:</p>
+
+<p>
+<md>\boxed{
+\text{equipment availability},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{maintenance requirements},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{production demand}.
+}</md>
+</p>
+
+<p>Preventive maintenance can reduce failure risk but temporarily removes
+capacity.</p>
+
+<p>This creates a natural optimization tradeoff.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-stochastic-scheduling-preview">
+<title>Stochastic Scheduling Preview</title>
+<p>Real processing times may be random.</p>
+
+<p>Machines may fail.</p>
+
+<p>Jobs may arrive unexpectedly.</p>
+
+<p>Then the schedule must respond to uncertainty.</p>
+
+<p>Approaches include:</p>
+
+<p>
+<md>\boxed{
+\text{stochastic optimization},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{robust scheduling},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{dynamic rescheduling},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{dispatching policies}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-robust-scheduling-preview">
+<title>Robust Scheduling Preview</title>
+<p>A robust schedule attempts to remain effective under uncertain processing
+times or disruptions.</p>
+
+<p>One may include:</p>
+
+<p>
+<md>\boxed{
+\text{time buffers},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{slack},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{uncertainty sets}.
+}</md>
+</p>
+
+<p>The goal is often to trade nominal efficiency for resilience.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-schedule-stability">
+<title>Schedule Stability</title>
+<p>When disruptions occur, repeatedly replacing the original schedule may be
+operationally expensive.</p>
+
+<p>A rescheduling objective may therefore penalize deviation from the original
+plan:</p>
+
+<p>
+<md>\boxed{
+\text{new performance cost}
++
+\lambda
+(
+\text{schedule-change cost}
+).
+}</md>
+</p>
+
+<p>This distinguishes optimization quality from schedule stability.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-complexity">
+<title>Scheduling Complexity</title>
+<p>Scheduling problems range from very easy to computationally difficult.</p>
+
+<p>Examples with simple optimal rules include:</p>
+
+<p>
+<md>\boxed{
+1\mid\mid\sum C_j
+}</md>
+</p>
+
+<p>using SPT,</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+1\mid\mid L_{\max}
+}</md>
+</p>
+
+<p>using EDD.</p>
+
+<p>Other problems, such as general job-shop makespan scheduling, are NP-hard.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-small-model-changes">
+<title>Why Small Model Changes Matter</title>
+<p>Adding only one feature can dramatically change complexity.</p>
+
+<p>For example:</p>
+
+<p>
+<md>\boxed{
+\text{one machine}
+}</md>
+</p>
+
+<p>may be easy under one objective,</p>
+
+<p>while adding:</p>
+
+<p>
+<md>\boxed{
+\text{release dates},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{sequence-dependent setups},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{multiple machines}
+}</md>
+</p>
+
+<p>can create a much harder problem.</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-workflow">
+<title>Scheduling Optimization Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>identify jobs and operations;</p>
+</li>
+<li>
+<p>identify machines and resources;</p>
+</li>
+<li>
+<p>record processing times;</p>
+</li>
+<li>
+<p>record release dates and due dates;</p>
+</li>
+<li>
+<p>identify precedence requirements;</p>
+</li>
+<li>
+<p>determine whether preemption is allowed;</p>
+</li>
+<li>
+<p>identify setup times;</p>
+</li>
+<li>
+<p>identify machine availability restrictions;</p>
+</li>
+<li>
+<p>define the objective;</p>
+</li>
+<li>
+<p>write the problem using three-field notation when possible;</p>
+</li>
+<li>
+<p>check for a known optimal sequencing rule;</p>
+</li>
+<li>
+<p>derive lower bounds;</p>
+</li>
+<li>
+<p>construct a feasible schedule;</p>
+</li>
+<li>
+<p>choose exact optimization, approximation, or heuristic methods;</p>
+</li>
+<li>
+<p>compute completion-time performance measures;</p>
+</li>
+<li>
+<p>compare against lower bounds or optimality gaps;</p>
+</li>
+<li>
+<p>perform sensitivity analysis;</p>
+</li>
+<li>
+<p>consider robustness and rescheduling needs.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-choosing-scheduling-method">
+<title>Choosing a Scheduling Method</title>
+<p>For</p>
+
+<p>
+<md>1\mid\mid\sum C_j,</md>
+</p>
+
+<p>use:</p>
+
+<p>
+<md>\boxed{
+\text{SPT}.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>1\mid\mid\sum w_jC_j,</md>
+</p>
+
+<p>use:</p>
+
+<p>
+<md>\boxed{
+\text{Smith's rule}.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>1\mid\mid L_{\max},</md>
+</p>
+
+<p>use:</p>
+
+<p>
+<md>\boxed{
+\text{EDD}.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>1\mid\mid\sum U_j,</md>
+</p>
+
+<p>use:</p>
+
+<p>
+<md>\boxed{
+\text{Moore--Hodgson}.
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>F_2\mid\mid C_{\max},</md>
+</p>
+
+<p>use:</p>
+
+<p>
+<md>\boxed{
+\text{Johnson's rule}.
+}</md>
+</p>
+
+<p>For difficult general scheduling problems, consider:</p>
+
+<p>
+<md>\boxed{
+\text{MILP},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{branch-and-bound},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{constraint programming},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{metaheuristics}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-confusing-lateness-and-tardiness">
+<title>Confusing Lateness and Tardiness</title>
+<p>Lateness can be negative:</p>
+
+<p>
+<md>\boxed{
+L_j=C_j-d_j.
+}</md>
+</p>
+
+<p>Tardiness cannot:</p>
+
+<p>
+<md>\boxed{
+T_j=\max\{L_j,0\}.
+}</md>
+</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-due-dates-and-deadlines">
+<title>Confusing Due Dates and Deadlines</title>
+<p>A due date is generally a target.</p>
+
+<p>A deadline is generally a hard feasibility requirement.</p>
+
+<p>They should not be modeled identically unless the application requires it.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-spt-for-every-objective">
+<title>Using SPT for Every Objective</title>
+<p>SPT minimizes total completion time in the classical single-machine
+problem.</p>
+
+<p>It does not generally minimize:</p>
+
+<p>
+<md>\boxed{
+L_{\max},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\sum T_j,
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+}</md>
+</p>
+
+<p>in unrelated scheduling environments.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-edd-to-minimize-total-tardiness">
+<title>Using EDD to Minimize Total Tardiness</title>
+<p>EDD minimizes maximum lateness for the classical single-machine problem.</p>
+
+<p>It does not generally minimize total tardiness.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-release-dates">
+<title>Ignoring Release Dates</title>
+<p>A schedule beginning job <m>j</m> before</p>
+
+<p>
+<md>r_j</md>
+</p>
+
+<p>is infeasible.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-setup-times">
+<title>Ignoring Setup Times</title>
+<p>If changing from job <m>i</m> to job <m>j</m> requires setup time</p>
+
+<p>
+<md>s_{ij},</md>
+</p>
+
+<p>then omitting it can underestimate completion times substantially.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-allowing-machine-overlap">
+<title>Allowing Machine Overlap</title>
+<p>Two nonpreemptive operations requiring the same single-capacity machine
+cannot overlap.</p>
+
+<p>This must be enforced explicitly.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-allowing-a-job-to-use-two-machines-simultaneously">
+<title>Allowing a Job to Use Two Machines Simultaneously</title>
+<p>In ordinary shop scheduling, a job normally processes one operation at a
+time unless the technological model explicitly allows simultaneous
+operations.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-precedence-constraints">
+<title>Ignoring Precedence Constraints</title>
+<p>A schedule can satisfy all machine capacities and still be infeasible if
+job routing or project precedence is violated.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-11-optimization-operations-research-12-scheduling-theory-subsubsec-using-an-excessively-large-big-m">
+<title>Using an Excessively Large Big-<m>M</m></title>
+<p>Very large <m>M</m> values weaken mixed-integer formulations and can damage
+numerical performance.</p>
+
+<p>Use the tightest justified scheduling horizon.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-a-lower-bound-is-a-feasible-schedule">
+<title>Assuming a Lower Bound Is a Feasible Schedule</title>
+<p>A lower bound estimates what no schedule can beat.</p>
+
+<p>It need not itself be attainable.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-a-heuristic-solution-is-optimal">
+<title>Assuming a Heuristic Solution Is Optimal</title>
+<p>Dispatching rules, local search, and metaheuristics can produce good
+schedules without proving optimality.</p>
+
+<p>A valid lower bound or exact algorithm is required for a certificate.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-critical-path-alone-solves-resource-constrained-projects">
+<title>Assuming Critical Path Alone Solves Resource-Constrained Projects</title>
+<p>CPM handles precedence timing.</p>
+
+<p>If several activities compete for scarce resources, additional scheduling
+decisions are required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-interpreting-pert-estimates-as-exact-distributions">
+<title>Interpreting PERT Estimates as Exact Distributions</title>
+<p>Classical PERT expected-time and variance formulas are approximations based
+on modeling assumptions.</p>
+
+<p>Real project durations may not follow those assumptions.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-rescheduling-cost">
+<title>Ignoring Rescheduling Cost</title>
+<p>A mathematically improved schedule may be operationally undesirable if it
+requires large last-minute changes.</p>
+
+<p>Real systems may require schedule-stability objectives.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Manufacturing.</em>
+Jobs must be sequenced across machines while respecting processing routes,
+setups, due dates, and capacity.</p>
+
+<p>\medskip</p>
+
+<p><em>Air Transportation.</em>
+Aircraft, gates, crews, loading equipment, maintenance resources, and
+runways all require coordinated schedules.</p>
+
+<p>\medskip</p>
+
+<p><em>Computing.</em>
+Processors schedule tasks to reduce completion time, response time,
+lateness, or energy use.</p>
+
+<p>\medskip</p>
+
+<p><em>Healthcare.</em>
+Operating rooms, physicians, nurses, diagnostic equipment, and patient
+appointments require scheduling under limited capacity.</p>
+
+<p>\medskip</p>
+
+<p><em>Project Management.</em>
+CPM, PERT, and resource-constrained scheduling coordinate activities with
+precedence relationships.</p>
+
+<p>\medskip</p>
+
+<p><em>Workforce Planning.</em>
+Employees are assigned to shifts while satisfying coverage, qualification,
+labor, and fairness requirements.</p>
+
+<p>\medskip</p>
+
+<p><em>Logistics.</em>
+Vehicles, docks, loading bays, warehouse resources, and delivery windows
+create complex scheduling problems.</p>
+
+<p>\medskip</p>
+
+<p><em>Maintenance.</em>
+Preventive and corrective maintenance must be scheduled while preserving
+operational availability.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define processing time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define release date.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define due date.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define completion time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define flow time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define lateness.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define tardiness.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define makespan.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define preemption.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Interpret</p>
+
+<p>
+<md>1\mid\mid\sum C_j.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>C_j=14,
+\qquad
+d_j=10,</md>
+</p>
+
+<p>compute lateness and tardiness.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>C_j=8,
+\qquad
+d_j=12,</md>
+</p>
+
+<p>compute lateness, tardiness, and earliness.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For</p>
+
+<p>
+<md>r_j=3,
+\qquad
+C_j=11,</md>
+</p>
+
+<p>compute flow time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Order processing times</p>
+
+<p>
+<md>7,2,9,4</md>
+</p>
+
+<p>according to SPT.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Order due dates</p>
+
+<p>
+<md>12,5,9,18</md>
+</p>
+
+<p>according to EDD.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>\rho_j
+=
+\frac{p_j}{w_j}</md>
+</p>
+
+<p>for several jobs and determine Smith's-rule order.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use SPT to minimize total completion time for five jobs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute every <m>C_j</m> and verify the resulting value of</p>
+
+<p>
+<md>\sum C_j.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Smith's rule to minimize</p>
+
+<p>
+<md>\sum w_jC_j</md>
+</p>
+
+<p>for a small job set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use EDD to minimize maximum lateness.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute <m>L_j</m>, <m>T_j</m>, and <m>L_{\max}</m> for the resulting schedule.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply the Moore--Hodgson algorithm to a small set of jobs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine the minimum number of tardy jobs in the previous problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a precedence graph from a list of precedence relations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform a forward pass through a project network.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform a backward pass and compute activity slack.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Identify the critical path.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute a PERT expected duration from optimistic, most-likely, and
+pessimistic values.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the corresponding PERT activity variance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>For three identical parallel machines, compute the workload lower bound
+for makespan.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply arbitrary list scheduling to a set of jobs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply LPT scheduling to the same job set.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare the two makespans.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the lower bound proves the LPT schedule optimal.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply Johnson's rule to a four-job, two-machine flow shop.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the machine completion-time table for the Johnson schedule.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the resulting flow-shop makespan.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write disjunctive constraints for two jobs requiring the same machine.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Convert the previous disjunction to a Big-<m>M</m> formulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Introduce a makespan variable into a scheduling MILP.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Linearize</p>
+
+<p>
+<md>T_j
+=
+\max
+\{
+C_j-d_j,0
+\}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a time-indexed formulation for three jobs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write one-machine capacity constraints in time-indexed form.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Add release dates to the previous formulation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Model sequence-dependent setup times.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute slack and critical ratio for a job at a specified current time.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain when intentional idle time may be useful.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the difference between offline and online scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a basic workforce shift-scheduling model.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a resource-capacity constraint for a project schedule.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why RCPSP cannot generally be solved by CPM alone.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct lower bounds for a small job-shop makespan problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how branch-and-bound can use these lower bounds.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the SPT optimality theorem using adjacent interchange.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove Smith's rule using pairwise interchange.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove EDD optimality for</p>
+
+<p>
+<md>1\mid\mid L_{\max}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove correctness of the Moore--Hodgson algorithm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the list-scheduling bound</p>
+
+<p>
+<md>C_{\max}^{LS}
+\leq
+\left(
+2-\frac1m
+\right)
+C_{\max}^*.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the LPT approximation bound.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove Johnson's rule for</p>
+
+<p>
+<md>F_2\mid\mid C_{\max}.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study single-machine total-tardiness dynamic programming.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study</p>
+
+<p>
+<md>1\mid r_j,\mathrm{pmtn}\mid\sum C_j</md>
+</p>
+
+<p>and prove optimality of SRPT.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study scheduling with precedence constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate Lawler's algorithm for precedence-constrained maximum lateness.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study exact branch-and-bound methods for job-shop scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study disjunctive-graph formulations of job shops.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate time-indexed formulations and LP relaxation strength.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study constraint programming for scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study interval variables and global no-overlap constraints.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate local-search neighborhoods for job-shop scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study tabu search for scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study simulated annealing for scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate crew scheduling using set partitioning and column generation.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study the Resource-Constrained Project Scheduling Problem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study robust project scheduling.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study stochastic scheduling with random processing times.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate competitive analysis for online scheduling.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-summary">
+<title>Conceptual Summary</title>
+<p>Scheduling determines how jobs use limited resources over time.</p>
+
+<p>Important job parameters include:</p>
+
+<p>
+<md>\boxed{
+p_j,
+\quad
+r_j,
+\quad
+d_j.
+}</md>
+</p>
+
+<p>Important performance measures include:</p>
+
+<p>
+<md>\boxed{
+C_j,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+F_j=C_j-r_j,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+L_j=C_j-d_j,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+T_j=\max\{C_j-d_j,0\},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+C_{\max}=\max_jC_j.
+}</md>
+</p>
+
+<p>For classical single-machine problems:</p>
+
+<p>
+<md>\boxed{
+1\mid\mid\sum C_j
+\rightarrow
+\text{SPT},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+1\mid\mid\sum w_jC_j
+\rightarrow
+\text{Smith's rule},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+1\mid\mid L_{\max}
+\rightarrow
+\text{EDD},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+1\mid\mid\sum U_j
+\rightarrow
+\text{Moore--Hodgson}.
+}</md>
+</p>
+
+<p>For two-machine flow-shop makespan:</p>
+
+<p>
+<md>\boxed{
+F_2\mid\mid C_{\max}
+\rightarrow
+\text{Johnson's rule}.
+}</md>
+</p>
+
+<p>For parallel machines, basic makespan bounds include</p>
+
+<p>
+<md>\boxed{
+C_{\max}
+\geq
+\max
+\left\{
+\frac{\sum_jp_j}{m},
+\max_jp_j
+\right\}.
+}</md>
+</p>
+
+<p>Scheduling theory therefore combines</p>
+
+<p>
+<md>\boxed{
+\text{optimization}
++
+\text{combinatorics}
++
+\text{algorithms}
++
+\text{resource allocation}
++
+\text{time}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-12-scheduling-theory-subsec-scheduling-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Scheduling Theory combines the discrete decision structures of
+Section <xref ref="sec-combinatorial-optimization" />, the integer formulations of
+Section <xref ref="sec-integer-programming" />, and the congestion perspective of
+Section <xref ref="sec-queueing-theory" />. Classical rules such as SPT, EDD,
+Smith's rule, Moore--Hodgson, LPT, and Johnson's rule exploit special
+problem structure, while general shop and project scheduling often require
+mixed-integer optimization, dynamic programming, branch-and-bound,
+constraint programming, or heuristics. The next section, Inventory Theory,
+studies another major operations-research problem: how much and when to
+order when demand, holding cost, shortage cost, and replenishment interact
+over time.</p>
+</remark>
+</subsection>
+
 </section>

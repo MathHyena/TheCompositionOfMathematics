@@ -1,9 +1,4726 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<section xml:id="sec-12-numerical-computational-mathematics-02-numerical-linear-algebra">
-  <title>Numerical Linear Algebra</title>
+<section xml:id="sec-numerical-linear-algebra">
+<title>Numerical Linear Algebra</title>
 
-  <p>
-    Content for this section will be added here.
-  </p>
+<introduction>
+<remark>
+<title>Prerequisites</title>
+<p>Linear algebra, matrices, determinants, vector spaces, eigenvalues,
+orthogonality, least squares, numerical analysis, floating-point
+arithmetic, conditioning, and basic algorithmic complexity.</p>
+</remark>
+
+<remark>
+<title>Learning Objectives</title>
+<p>By the end of this section, the reader should be able to:</p>
+
+<p>
+<ul>
+<li>
+<p>explain the goals of numerical linear algebra;</p>
+</li>
+<li>
+<p>distinguish dense and sparse matrix problems;</p>
+</li>
+<li>
+<p>interpret matrix and vector norms;</p>
+</li>
+<li>
+<p>understand induced matrix norms;</p>
+</li>
+<li>
+<p>define the condition number of a linear system;</p>
+</li>
+<li>
+<p>distinguish residual, forward error, and backward error;</p>
+</li>
+<li>
+<p>understand why Gaussian elimination requires pivoting;</p>
+</li>
+<li>
+<p>perform LU factorization;</p>
+</li>
+<li>
+<p>understand partial and complete pivoting;</p>
+</li>
+<li>
+<p>formulate triangular solves;</p>
+</li>
+<li>
+<p>understand computational complexity of direct linear solvers;</p>
+</li>
+<li>
+<p>recognize Cholesky factorization;</p>
+</li>
+<li>
+<p>identify symmetric positive-definite matrices;</p>
+</li>
+<li>
+<p>understand QR factorization;</p>
+</li>
+<li>
+<p>apply Gram--Schmidt conceptually;</p>
+</li>
+<li>
+<p>distinguish classical and modified Gram--Schmidt;</p>
+</li>
+<li>
+<p>understand Householder reflections;</p>
+</li>
+<li>
+<p>understand Givens rotations;</p>
+</li>
+<li>
+<p>solve least-squares problems using QR factorization;</p>
+</li>
+<li>
+<p>explain why normal equations can worsen conditioning;</p>
+</li>
+<li>
+<p>understand singular value decomposition;</p>
+</li>
+<li>
+<p>define singular values;</p>
+</li>
+<li>
+<p>understand matrix rank and numerical rank;</p>
+</li>
+<li>
+<p>compute pseudoinverse solutions conceptually;</p>
+</li>
+<li>
+<p>understand low-rank approximation;</p>
+</li>
+<li>
+<p>state the Eckart--Young theorem conceptually;</p>
+</li>
+<li>
+<p>understand eigenvalue computation;</p>
+</li>
+<li>
+<p>apply the power method;</p>
+</li>
+<li>
+<p>understand inverse iteration;</p>
+</li>
+<li>
+<p>understand Rayleigh quotient iteration conceptually;</p>
+</li>
+<li>
+<p>understand QR iteration conceptually;</p>
+</li>
+<li>
+<p>recognize Hessenberg and tridiagonal reductions;</p>
+</li>
+<li>
+<p>distinguish direct and iterative linear solvers;</p>
+</li>
+<li>
+<p>understand Jacobi iteration;</p>
+</li>
+<li>
+<p>understand Gauss--Seidel iteration;</p>
+</li>
+<li>
+<p>understand successive over-relaxation conceptually;</p>
+</li>
+<li>
+<p>formulate stationary iterations using matrix splittings;</p>
+</li>
+<li>
+<p>understand spectral-radius convergence conditions;</p>
+</li>
+<li>
+<p>recognize Krylov subspaces;</p>
+</li>
+<li>
+<p>understand conjugate-gradient methods;</p>
+</li>
+<li>
+<p>recognize GMRES conceptually;</p>
+</li>
+<li>
+<p>understand preconditioning;</p>
+</li>
+<li>
+<p>recognize sparse matrix storage;</p>
+</li>
+<li>
+<p>understand fill-in;</p>
+</li>
+<li>
+<p>understand iterative refinement;</p>
+</li>
+<li>
+<p>distinguish algebraic error from floating-point error;</p>
+</li>
+<li>
+<p>understand backward stability of linear-system solvers;</p>
+</li>
+<li>
+<p>connect numerical linear algebra with optimization,
+          differential equations, statistics, data science, and
+          scientific computing.</p>
+</li>
+</ul>
+</p>
+</remark>
+</introduction>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-what-is-numerical-linear-algebra">
+<title>What Is Numerical Linear Algebra?</title>
+<p>Numerical linear algebra develops reliable and efficient algorithms for
+matrix computations.</p>
+
+<p>Core problems include:</p>
+
+<p>
+<md>\boxed{
+A\mathbf{x}
+=
+\mathbf{b},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+A\mathbf{x}
+\approx
+\mathbf{b},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+A\mathbf{v}
+=
+\lambda\mathbf{v},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+A
+\approx
+\text{low-rank matrix}.
+}</md>
+</p>
+
+<p>These problems appear throughout applied mathematics.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-why-numerical-linear-algebra-matters">
+<title>Why Numerical Linear Algebra Matters</title>
+<p>Many computational models eventually require one or more matrix
+operations.</p>
+
+<p>Examples include:</p>
+
+<p>
+<md>\boxed{
+\text{Newton steps in optimization},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{finite-difference PDE systems},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{least-squares regression},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{Markov-chain calculations},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{data compression}.
+}</md>
+</p>
+
+<p>The efficiency and stability of the matrix computation can dominate the
+overall computation.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-dense-sparse-matrices">
+<title>Dense and Sparse Matrices</title>
+<p>A dense matrix has many nonzero entries.</p>
+
+<p>A sparse matrix has relatively few nonzero entries.</p>
+
+<p>For a matrix</p>
+
+<p>
+<md>A\in\mathbb{R}^{m\times n},</md>
+</p>
+
+<p>a dense representation stores approximately</p>
+
+<p>
+<md>\boxed{
+mn
+}</md>
+</p>
+
+<p>entries.</p>
+
+<p>For sparse matrices, storing every zero entry may be wasteful.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-numerical-vector-norms">
+<title>Vector Norms</title>
+<p>Important vector norms include:</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{x}\|_1
+=
+\sum_{i=1}^{n}
+|x_i|,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{x}\|_2
+=
+\sqrt{
+\sum_{i=1}^{n}
+x_i^2
+},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{x}\|_\infty
+=
+\max_i
+|x_i|.
+}</md>
+</p>
+
+<p>These norms measure vector size in different ways.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-induced-matrix-norms">
+<title>Induced Matrix Norms</title>
+<p>A vector norm induces a matrix norm defined by</p>
+
+<p>
+<md>\boxed{
+\|A\|
+=
+\max_{\mathbf{x}\neq0}
+\frac{
+\|A\mathbf{x}\|
+}{
+\|\mathbf{x}\|
+}.
+}</md>
+</p>
+
+<p>Important examples include:</p>
+
+<p>
+<md>\boxed{
+\|A\|_1
+=
+\max_j
+\sum_i
+|a_{ij}|,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\|A\|_\infty
+=
+\max_i
+\sum_j
+|a_{ij}|.
+}</md>
+</p>
+
+<p>Thus the <m>1</m>-norm is the maximum absolute column sum, while the
+<m>\infty</m>-norm is the maximum absolute row sum.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-matrix-two-norm">
+<title>Matrix <m>2</m>-Norm</title>
+<p>The matrix <m>2</m>-norm satisfies</p>
+
+<p>
+<md>\boxed{
+\|A\|_2
+=
+\sigma_{\max}(A),
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\sigma_{\max}(A)</md>
+</p>
+
+<p>is the largest singular value of <m>A</m>.</p>
+
+<p>This norm plays an important role in conditioning and least squares.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-frobenius-norm">
+<title>Frobenius Norm</title>
+<p>The Frobenius norm is</p>
+
+<p>
+<md>\boxed{
+\|A\|_F
+=
+\sqrt{
+\sum_{i=1}^{m}
+\sum_{j=1}^{n}
+|a_{ij}|^2
+}.
+}</md>
+</p>
+
+<p>It can also be written</p>
+
+<p>
+<md>\boxed{
+\|A\|_F
+=
+\sqrt{
+\operatorname{tr}(A^TA)
+}.
+}</md>
+</p>
+
+<p>Unlike induced norms, it treats the matrix entries collectively as a
+vector.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-numerical-linear-systems">
+<title>Linear Systems</title>
+<p>Consider</p>
+
+<p>
+<md>\boxed{
+A\mathbf{x}
+=
+\mathbf{b},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>A\in\mathbb{R}^{n\times n}.</md>
+</p>
+
+<p>If <m>A</m> is nonsingular, the exact solution is formally</p>
+
+<p>
+<md>\mathbf{x}
+=
+A^{-1}\mathbf{b}.</md>
+</p>
+
+<p>Numerically, one generally does not compute <m>A^{-1}</m> explicitly.</p>
+
+<p>Instead, one solves the system using factorization or iterative methods.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-avoid-explicit-inverse">
+<title>Why Explicit Matrix Inversion Is Usually Avoided</title>
+<p>Computing</p>
+
+<p>
+<md>A^{-1}</md>
+</p>
+
+<p>explicitly is typically unnecessary when the goal is only to solve</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b}.</md>
+</p>
+
+<p>Factorization-based solves are usually:</p>
+
+<p>
+<md>\boxed{
+\text{more efficient},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{more stable},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{easier to reuse for multiple right-hand sides}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-linear-system-residual">
+<title>Residual of a Linear System</title>
+<p>For an approximate solution</p>
+
+<p>
+<md>\widehat{\mathbf{x}},</md>
+</p>
+
+<p>the residual is</p>
+
+<p>
+<md>\boxed{
+\mathbf{r}
+=
+\mathbf{b}
+-
+A\widehat{\mathbf{x}}.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>\mathbf{r}=0,</md>
+</p>
+
+<p>then the approximation exactly satisfies the original linear equations.</p>
+
+<p>A small residual alone does not guarantee a small forward error.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-linear-system-forward-error">
+<title>Forward Error in Linear Systems</title>
+<p>If <m>\mathbf{x}</m> is the exact solution, the forward error is</p>
+
+<p>
+<md>\boxed{
+\mathbf{e}
+=
+\mathbf{x}
+-
+\widehat{\mathbf{x}}.
+}</md>
+</p>
+
+<p>Because</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>A\widehat{\mathbf{x}}
+=
+\mathbf{b}
+-
+\mathbf{r},</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\boxed{
+A\mathbf{e}
+=
+\mathbf{r}.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\mathbf{e}
+=
+A^{-1}\mathbf{r}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-matrix-condition-number">
+<title>Condition Number</title>
+<p>For nonsingular <m>A</m>, the condition number in a chosen induced norm is</p>
+
+<p>
+<md>\boxed{
+\kappa(A)
+=
+\|A\|
+\|A^{-1}\|.
+}</md>
+</p>
+
+<p>Since</p>
+
+<p>
+<md>\|I\|
+\leq
+\|A\|
+\|A^{-1}\|,</md>
+</p>
+
+<p>we have</p>
+
+<p>
+<md>\boxed{
+\kappa(A)\geq1.
+}</md>
+</p>
+
+<p>Large condition numbers indicate sensitivity.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-condition-number-two-norm">
+<title>Condition Number in the <m>2</m>-Norm</title>
+<p>For nonsingular <m>A</m>,</p>
+
+<p>
+<md>\boxed{
+\kappa_2(A)
+=
+\frac{
+\sigma_{\max}(A)
+}{
+\sigma_{\min}(A)
+}.
+}</md>
+</p>
+
+<p>If the smallest singular value is close to zero, then</p>
+
+<p>
+<md>\kappa_2(A)</md>
+</p>
+
+<p>is large.</p>
+
+<p>Thus nearly singular matrices are ill conditioned.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-linear-relative-error-bound">
+<title>Relative Error Bound</title>
+<p>For perturbations in the right-hand side only, a standard estimate is</p>
+
+<p>
+<md>\boxed{
+\frac{
+\|\Delta\mathbf{x}\|
+}{
+\|\mathbf{x}\|
+}
+\leq
+\kappa(A)
+\frac{
+\|\Delta\mathbf{b}\|
+}{
+\|\mathbf{b}\|
+}
+}</md>
+</p>
+
+<p>under compatible assumptions.</p>
+
+<p>Thus the condition number bounds the amplification of relative input
+errors.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-worked-ill-conditioned-system">
+<title>Worked Example: Ill Conditioning</title>
+<example>
+<title>Nearly Dependent Equations</title>
+<p>Consider</p>
+
+<p>
+<md>\begin{aligned}
+x+y&amp;=2,\\
+x+1.0001y&amp;=2.0001.
+\end{aligned}</md>
+</p>
+
+<p>The equations are nearly parallel.</p>
+
+<p>Small perturbations in the right-hand sides can produce relatively large
+changes in the intersection point.</p>
+
+<p>The matrix</p>
+
+<p>
+<md>A
+=
+\begin{pmatrix}
+1&amp;1\\
+1&amp;1.0001
+\end{pmatrix}</md>
+</p>
+
+<p>is close to singular because its rows are nearly linearly dependent.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\text{The system is sensitive because }A\text{ is nearly singular.}
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-gaussian-elimination-numerical">
+<title>Gaussian Elimination</title>
+<p>Gaussian elimination transforms</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b}</md>
+</p>
+
+<p>into an equivalent upper-triangular system.</p>
+
+<p>At step <m>k</m>, multiples of row <m>k</m> are subtracted from rows below it to
+eliminate entries</p>
+
+<p>
+<md>a_{ik},
+\qquad
+i&gt;k.</md>
+</p>
+
+<p>The multipliers are</p>
+
+<p>
+<md>\boxed{
+m_{ik}
+=
+\frac{
+a_{ik}
+}{
+a_{kk}
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-back-substitution">
+<title>Back Substitution</title>
+<p>After elimination, solve</p>
+
+<p>
+<md>U\mathbf{x}
+=
+\mathbf{c},</md>
+</p>
+
+<p>where <m>U</m> is upper triangular.</p>
+
+<p>Starting with the final equation,</p>
+
+<p>
+<md>\boxed{
+x_n
+=
+\frac{
+c_n
+}{
+u_{nn}
+}.
+}</md>
+</p>
+
+<p>Then for</p>
+
+<p>
+<md>i=n-1,\ldots,1,</md>
+</p>
+
+<p>
+<md>\boxed{
+x_i
+=
+\frac{
+c_i
+-
+\sum_{j=i+1}^{n}
+u_{ij}x_j
+}{
+u_{ii}
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-forward-substitution">
+<title>Forward Substitution</title>
+<p>For a lower-triangular system</p>
+
+<p>
+<md>L\mathbf{y}
+=
+\mathbf{b},</md>
+</p>
+
+<p>solve from the first equation downward.</p>
+
+<p>If <m>L</m> has nonzero diagonal entries,</p>
+
+<p>
+<md>\boxed{
+y_i
+=
+\frac{
+b_i
+-
+\sum_{j=1}^{i-1}
+\ell_{ij}y_j
+}{
+\ell_{ii}
+}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-lu-factorization">
+<title>LU Factorization</title>
+<p>Gaussian elimination can be expressed as</p>
+
+<p>
+<md>\boxed{
+A
+=
+LU,
+}</md>
+</p>
+
+<p>where:</p>
+
+<p>
+<md>L
+=
+\text{lower triangular matrix},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>U
+=
+\text{upper triangular matrix}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b}</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>LU\mathbf{x}
+=
+\mathbf{b}.</md>
+</p>
+
+<p>First solve</p>
+
+<p>
+<md>\boxed{
+L\mathbf{y}
+=
+\mathbf{b},
+}</md>
+</p>
+
+<p>then solve</p>
+
+<p>
+<md>\boxed{
+U\mathbf{x}
+=
+\mathbf{y}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-worked-lu-factorization">
+<title>Worked Example: LU Factorization</title>
+<example>
+<title>Factoring a <m>2\times2</m> Matrix</title>
+<p>Let</p>
+
+<p>
+<md>A
+=
+\begin{pmatrix}
+2&amp;1\\
+6&amp;5
+\end{pmatrix}.</md>
+</p>
+
+<p>The elimination multiplier is</p>
+
+<p>
+<md>m_{21}
+=
+\frac62
+=
+3.</md>
+</p>
+
+<p>Subtract <m>3</m> times row <m>1</m> from row <m>2</m>:</p>
+
+<p>
+<md>U
+=
+\begin{pmatrix}
+2&amp;1\\
+0&amp;2
+\end{pmatrix}.</md>
+</p>
+
+<p>The multiplier is stored in</p>
+
+<p>
+<md>L
+=
+\begin{pmatrix}
+1&amp;0\\
+3&amp;1
+\end{pmatrix}.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+A
+=
+LU
+=
+\begin{pmatrix}
+1&amp;0\\
+3&amp;1
+\end{pmatrix}
+\begin{pmatrix}
+2&amp;1\\
+0&amp;2
+\end{pmatrix}.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-numerical-pivoting">
+<title>Pivoting</title>
+<p>Gaussian elimination can become unstable if a pivot</p>
+
+<p>
+<md>a_{kk}</md>
+</p>
+
+<p>is zero or very small.</p>
+
+<p>Pivoting changes row or column order to select more appropriate pivots.</p>
+
+<p>The most common strategy is partial pivoting.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-partial-pivoting">
+<title>Partial Pivoting</title>
+<p>At elimination step <m>k</m>, partial pivoting selects the entry of largest
+absolute value in column <m>k</m> among rows <m>k,\ldots,n</m>.</p>
+
+<p>Thus choose row <m>p</m> satisfying</p>
+
+<p>
+<md>\boxed{
+|a_{pk}|
+=
+\max_{i\geq k}
+|a_{ik}|.
+}</md>
+</p>
+
+<p>Then interchange rows <m>k</m> and <m>p</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-lu-with-pivoting">
+<title>LU Factorization With Pivoting</title>
+<p>With row pivoting, the factorization becomes</p>
+
+<p>
+<md>\boxed{
+PA
+=
+LU,
+}</md>
+</p>
+
+<p>where <m>P</m> is a permutation matrix.</p>
+
+<p>To solve</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b},</md>
+</p>
+
+<p>rewrite as</p>
+
+<p>
+<md>LU\mathbf{x}
+=
+P\mathbf{b}.</md>
+</p>
+
+<p>Then perform triangular solves.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-complete-pivoting">
+<title>Complete Pivoting</title>
+<p>Complete pivoting searches the remaining submatrix for the largest
+magnitude entry and may interchange both rows and columns.</p>
+
+<p>It can provide stronger pivot control but requires more search and data
+movement.</p>
+
+<p>Partial pivoting is much more common in general-purpose dense linear
+solvers.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-growth-factor">
+<title>Growth Factor</title>
+<p>During Gaussian elimination, matrix entries may become larger than those in
+the original matrix.</p>
+
+<p>A growth factor measures this amplification.</p>
+
+<p>Large growth can amplify rounding effects.</p>
+
+<p>Partial pivoting generally controls growth well in practice, although
+specially constructed matrices can produce large worst-case growth.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-gaussian-elimination-cost">
+<title>Computational Cost of Gaussian Elimination</title>
+<p>For a dense <m>n\times n</m> matrix, LU factorization requires approximately</p>
+
+<p>
+<md>\boxed{
+\frac{2}{3}n^3
+}</md>
+</p>
+
+<p>floating-point arithmetic operations to leading order.</p>
+
+<p>A triangular solve requires only</p>
+
+<p>
+<md>\boxed{
+O(n^2)
+}</md>
+</p>
+
+<p>operations.</p>
+
+<p>Thus factorization dominates the cost.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-multiple-right-hand-sides">
+<title>Multiple Right-Hand Sides</title>
+<p>Suppose</p>
+
+<p>
+<md>A\mathbf{x}^{(k)}
+=
+\mathbf{b}^{(k)}</md>
+</p>
+
+<p>must be solved for many different right-hand sides.</p>
+
+<p>Compute</p>
+
+<p>
+<md>PA=LU</md>
+</p>
+
+<p>once.</p>
+
+<p>Then reuse the same factors for every</p>
+
+<p>
+<md>\mathbf{b}^{(k)}.</md>
+</p>
+
+<p>This makes factorization especially valuable when the coefficient matrix
+does not change.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-symmetric-positive-definite">
+<title>Symmetric Positive-Definite Matrices</title>
+<p>A real matrix <m>A</m> is symmetric positive definite if</p>
+
+<p>
+<md>\boxed{
+A=A^T
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^TA\mathbf{x}&gt;0
+}</md>
+</p>
+
+<p>for every nonzero <m>\mathbf{x}</m>.</p>
+
+<p>Such matrices arise frequently in:</p>
+
+<p>
+<md>\boxed{
+\text{least squares},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{optimization},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{elliptic PDE discretization}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-cholesky-factorization">
+<title>Cholesky Factorization</title>
+<p>If <m>A</m> is symmetric positive definite, then</p>
+
+<p>
+<md>\boxed{
+A
+=
+LL^T,
+}</md>
+</p>
+
+<p>where <m>L</m> is lower triangular with positive diagonal entries.</p>
+
+<p>This is the Cholesky factorization.</p>
+
+<p>It is more efficient than general LU factorization and preserves symmetry.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-worked-cholesky">
+<title>Worked Example: Cholesky Factorization</title>
+<example>
+<title>Factoring a Positive-Definite Matrix</title>
+<p>Let</p>
+
+<p>
+<md>A
+=
+\begin{pmatrix}
+4&amp;2\\
+2&amp;3
+\end{pmatrix}.</md>
+</p>
+
+<p>Assume</p>
+
+<p>
+<md>L
+=
+\begin{pmatrix}
+\ell_{11}&amp;0\\
+\ell_{21}&amp;\ell_{22}
+\end{pmatrix}.</md>
+</p>
+
+<p>From</p>
+
+<p>
+<md>LL^T=A,</md>
+</p>
+
+<p>we obtain</p>
+
+<p>
+<md>\ell_{11}^2=4,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>\ell_{11}=2.</md>
+</p>
+
+<p>Next,</p>
+
+<p>
+<md>\ell_{11}\ell_{21}=2,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>\ell_{21}=1.</md>
+</p>
+
+<p>Finally,</p>
+
+<p>
+<md>\ell_{21}^2+\ell_{22}^2=3,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>\ell_{22}=\sqrt{2}.</md>
+</p>
+
+<p>Therefore,</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+L
+=
+\begin{pmatrix}
+2&amp;0\\
+1&amp;\sqrt{2}
+\end{pmatrix}.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-cholesky-cost">
+<title>Cholesky Cost</title>
+<p>Dense Cholesky factorization requires approximately</p>
+
+<p>
+<md>\boxed{
+\frac{1}{3}n^3
+}</md>
+</p>
+
+<p>floating-point operations to leading order.</p>
+
+<p>This is roughly half the leading arithmetic cost of general LU
+factorization.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-numerical-orthogonal-matrices">
+<title>Orthogonal Matrices</title>
+<p>A square matrix <m>Q</m> is orthogonal if</p>
+
+<p>
+<md>\boxed{
+Q^TQ=I.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+Q^{-1}=Q^T.
+}</md>
+</p>
+
+<p>Orthogonal transformations preserve Euclidean norms:</p>
+
+<p>
+<md>\boxed{
+\|Q\mathbf{x}\|_2
+=
+\|\mathbf{x}\|_2.
+}</md>
+</p>
+
+<p>This makes them numerically valuable.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-qr-factorization">
+<title>QR Factorization</title>
+<p>For</p>
+
+<p>
+<md>A\in\mathbb{R}^{m\times n},
+\qquad
+m\geq n,</md>
+</p>
+
+<p>with linearly independent columns, QR factorization writes</p>
+
+<p>
+<md>\boxed{
+A
+=
+QR,
+}</md>
+</p>
+
+<p>where <m>Q</m> has orthonormal columns and <m>R</m> is upper triangular.</p>
+
+<p>In a thin QR factorization,</p>
+
+<p>
+<md>\boxed{
+Q\in\mathbb{R}^{m\times n},
+\qquad
+R\in\mathbb{R}^{n\times n}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-gram-schmidt">
+<title>Gram--Schmidt Orthogonalization</title>
+<p>Suppose the columns of <m>A</m> are</p>
+
+<p>
+<md>\mathbf{a}_1,\ldots,\mathbf{a}_n.</md>
+</p>
+
+<p>Gram--Schmidt constructs orthonormal vectors</p>
+
+<p>
+<md>\mathbf{q}_1,\ldots,\mathbf{q}_n.</md>
+</p>
+
+<p>Begin with</p>
+
+<p>
+<md>\boxed{
+\mathbf{q}_1
+=
+\frac{
+\mathbf{a}_1
+}{
+\|\mathbf{a}_1\|_2
+}.
+}</md>
+</p>
+
+<p>Then remove from each subsequent column its projections onto previously
+constructed orthonormal directions.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-classical-gram-schmidt">
+<title>Classical Gram--Schmidt</title>
+<p>Classical Gram--Schmidt forms</p>
+
+<p>
+<md>\boxed{
+\mathbf{v}_j
+=
+\mathbf{a}_j
+-
+\sum_{i=1}^{j-1}
+(
+\mathbf{q}_i^T\mathbf{a}_j
+)
+\mathbf{q}_i.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\mathbf{q}_j
+=
+\frac{
+\mathbf{v}_j
+}{
+\|\mathbf{v}_j\|_2
+}.
+}</md>
+</p>
+
+<p>In floating-point arithmetic, classical Gram--Schmidt can lose
+orthogonality for poorly conditioned column sets.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-modified-gram-schmidt">
+<title>Modified Gram--Schmidt</title>
+<p>Modified Gram--Schmidt removes one projection at a time:</p>
+
+<p>
+<md>\mathbf{v}
+\leftarrow
+\mathbf{a}_j.</md>
+</p>
+
+<p>Then for <m>i=1,\ldots,j-1</m>,</p>
+
+<p>
+<md>r_{ij}
+=
+\mathbf{q}_i^T\mathbf{v},</md>
+</p>
+
+<p>
+<md>\boxed{
+\mathbf{v}
+\leftarrow
+\mathbf{v}
+-
+r_{ij}\mathbf{q}_i.
+}</md>
+</p>
+
+<p>This organization generally has better numerical orthogonality properties
+than classical Gram--Schmidt.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-householder-reflections">
+<title>Householder Reflections</title>
+<p>A Householder reflector has form</p>
+
+<p>
+<md>\boxed{
+H
+=
+I
+-
+2
+\frac{
+\mathbf{v}\mathbf{v}^T
+}{
+\mathbf{v}^T\mathbf{v}
+}.
+}</md>
+</p>
+
+<p>It is orthogonal and symmetric:</p>
+
+<p>
+<md>\boxed{
+H^T=H,
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+H^TH=I.
+}</md>
+</p>
+
+<p>Householder transformations can zero several matrix entries at once.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-qr-householder">
+<title>QR by Householder Transformations</title>
+<p>Householder QR repeatedly constructs reflectors</p>
+
+<p>
+<md>H_1,H_2,\ldots</md>
+</p>
+
+<p>that eliminate subdiagonal matrix entries.</p>
+
+<p>The product</p>
+
+<p>
+<md>\boxed{
+Q^T
+=
+H_k\cdots H_2H_1
+}</md>
+</p>
+
+<p>transforms <m>A</m> into upper-triangular form:</p>
+
+<p>
+<md>\boxed{
+Q^TA
+=
+R.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+A=QR.
+}</md>
+</p>
+
+<p>Householder QR is a standard stable choice for dense least-squares
+problems.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-givens-rotations">
+<title>Givens Rotations</title>
+<p>A Givens rotation acts on two coordinates:</p>
+
+<p>
+<md>\boxed{
+G
+=
+\begin{pmatrix}
+c&amp;s\\
+-s&amp;c
+\end{pmatrix},
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+c^2+s^2=1.
+}</md>
+</p>
+
+<p>Parameters <m>c</m> and <m>s</m> are chosen to eliminate one selected component
+of a vector.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-givens-use">
+<title>When Givens Rotations Are Useful</title>
+<p>Givens rotations are useful when:</p>
+
+<p>
+<md>\boxed{
+\text{only a few entries need to be eliminated},
+}</md>
+</p>
+
+<p>or when</p>
+
+<p>
+<md>\boxed{
+\text{matrix structure should be updated incrementally}.
+}</md>
+</p>
+
+<p>They are especially useful in sparse or updating algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-least-squares">
+<title>Least Squares</title>
+<p>For an overdetermined system</p>
+
+<p>
+<md>A\mathbf{x}
+\approx
+\mathbf{b},</md>
+</p>
+
+<p>the least-squares problem is</p>
+
+<p>
+<md>\boxed{
+\min_{\mathbf{x}}
+\|A\mathbf{x}-\mathbf{b}\|_2.
+}</md>
+</p>
+
+<p>If <m>A</m> has full column rank, the solution is unique.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-normal-equations">
+<title>Normal Equations</title>
+<p>The least-squares first-order condition is</p>
+
+<p>
+<md>\boxed{
+A^T
+(
+A\mathbf{x}-\mathbf{b}
+)
+=
+0.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+A^TA\mathbf{x}
+=
+A^T\mathbf{b}.
+}</md>
+</p>
+
+<p>These are the normal equations.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-normal-equations-conditioning">
+<title>Conditioning of Normal Equations</title>
+<p>For full-column-rank <m>A</m>,</p>
+
+<p>
+<md>\boxed{
+\kappa_2(A^TA)
+=
+\kappa_2(A)^2.
+}</md>
+</p>
+
+<p>Thus forming <m>A^TA</m> can square the condition number.</p>
+
+<p>A moderately ill-conditioned matrix can become much more difficult
+numerically.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-least-squares-qr">
+<title>Least Squares Using QR</title>
+<p>Let</p>
+
+<p>
+<md>A=QR,</md>
+</p>
+
+<p>with <m>Q</m> having orthonormal columns.</p>
+
+<p>Then</p>
+
+<p>
+<md>\|A\mathbf{x}-\mathbf{b}\|_2
+=
+\|QR\mathbf{x}-\mathbf{b}\|_2.</md>
+</p>
+
+<p>Using a full orthogonal extension of <m>Q</m>, the least-squares problem
+reduces to solving</p>
+
+<p>
+<md>\boxed{
+R\mathbf{x}
+=
+Q^T\mathbf{b}
+}</md>
+</p>
+
+<p>for the relevant leading components.</p>
+
+<p>This avoids explicitly forming <m>A^TA</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-worked-least-squares-qr">
+<title>Worked Example: Least Squares by QR</title>
+<example>
+<title>Using an Existing QR Factorization</title>
+<p>Suppose</p>
+
+<p>
+<md>A
+=
+QR,</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>R
+=
+\begin{pmatrix}
+2&amp;1\\
+0&amp;3
+\end{pmatrix},</md>
+</p>
+
+<p>and suppose</p>
+
+<p>
+<md>Q^T\mathbf{b}
+=
+\begin{pmatrix}
+5\\
+6
+\end{pmatrix}.</md>
+</p>
+
+<p>Then solve</p>
+
+<p>
+<md>R\mathbf{x}
+=
+Q^T\mathbf{b}.</md>
+</p>
+
+<p>The second equation gives</p>
+
+<p>
+<md>3x_2=6,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>x_2=2.</md>
+</p>
+
+<p>The first equation gives</p>
+
+<p>
+<md>2x_1+x_2=5.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>2x_1=3,</md>
+</p>
+
+<p>so</p>
+
+<p>
+<md>x_1=\frac32.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\mathbf{x}
+=
+\begin{pmatrix}
+3/2\\
+2
+\end{pmatrix}.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-singular-value-decomposition">
+<title>Singular Value Decomposition</title>
+<p>Every matrix</p>
+
+<p>
+<md>A\in\mathbb{R}^{m\times n}</md>
+</p>
+
+<p>has a singular value decomposition</p>
+
+<p>
+<md>\boxed{
+A
+=
+U\Sigma V^T,
+}</md>
+</p>
+
+<p>where <m>U</m> and <m>V</m> are orthogonal matrices and <m>\Sigma</m> is rectangular
+diagonal.</p>
+
+<p>The diagonal entries are the singular values:</p>
+
+<p>
+<md>\boxed{
+\sigma_1
+\geq
+\sigma_2
+\geq
+\cdots
+\geq
+0.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-singular-values">
+<title>Singular Values</title>
+<p>The nonzero singular values satisfy</p>
+
+<p>
+<md>\boxed{
+\sigma_i
+=
+\sqrt{
+\lambda_i(A^TA)
+}.
+}</md>
+</p>
+
+<p>Thus singular values measure how strongly the matrix stretches vectors in
+special orthogonal directions.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-svd-geometric">
+<title>Geometric Interpretation of the SVD</title>
+<p>The transformation</p>
+
+<p>
+<md>\mathbf{x}
+\mapsto
+A\mathbf{x}</md>
+</p>
+
+<p>can be interpreted as:</p>
+
+<p>
+<ol>
+<li>
+<p>rotate or reflect using <m>V^T</m>;</p>
+</li>
+<li>
+<p>scale coordinate directions using <m>\Sigma</m>;</p>
+</li>
+<li>
+<p>rotate or reflect using <m>U</m>.</p>
+</li>
+</ol>
+</p>
+
+<p>Thus the SVD separates direction and scale.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-svd-rank">
+<title>Rank From the SVD</title>
+<p>The exact rank of <m>A</m> equals the number of nonzero singular values:</p>
+
+<p>
+<md>\boxed{
+\operatorname{rank}(A)
+=
+\#\{
+i:
+\sigma_i&gt;0
+\}.
+}</md>
+</p>
+
+<p>In floating-point computation, very small singular values may be treated as
+numerically zero.</p>
+
+<p>This leads to the concept of numerical rank.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-numerical-rank">
+<title>Numerical Rank</title>
+<p>A matrix may be mathematically full rank but effectively rank deficient at
+the available precision.</p>
+
+<p>A practical numerical rank may be defined by thresholding:</p>
+
+<p>
+<md>\boxed{
+\sigma_i
+&gt;
+\tau.
+}</md>
+</p>
+
+<p>The tolerance <m>\tau</m> should reflect matrix scale, dimension, precision,
+and the application.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-moore-penrose-pseudoinverse">
+<title>Pseudoinverse</title>
+<p>If</p>
+
+<p>
+<md>A
+=
+U\Sigma V^T,</md>
+</p>
+
+<p>the Moore--Penrose pseudoinverse is</p>
+
+<p>
+<md>\boxed{
+A^+
+=
+V\Sigma^+U^T,
+}</md>
+</p>
+
+<p>where each nonzero singular value is replaced by its reciprocal.</p>
+
+<p>For suitable least-squares problems,</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^*
+=
+A^+\mathbf{b}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-minimum-norm-solutions">
+<title>Minimum-Norm Solutions</title>
+<p>If a linear system has infinitely many solutions, the pseudoinverse selects
+the solution with minimum Euclidean norm.</p>
+
+<p>That is,</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^*
+=
+A^+\mathbf{b}
+}</md>
+</p>
+
+<p>minimizes</p>
+
+<p>
+<md>\|\mathbf{x}\|_2</md>
+</p>
+
+<p>among all exact solutions when the system is consistent.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-low-rank-approximation">
+<title>Low-Rank Approximation</title>
+<p>Suppose</p>
+
+<p>
+<md>A
+=
+\sum_{i=1}^{r}
+\sigma_i
+\mathbf{u}_i
+\mathbf{v}_i^T.</md>
+</p>
+
+<p>A rank-<m>k</m> approximation is</p>
+
+<p>
+<md>\boxed{
+A_k
+=
+\sum_{i=1}^{k}
+\sigma_i
+\mathbf{u}_i
+\mathbf{v}_i^T.
+}</md>
+</p>
+
+<p>Only the largest <m>k</m> singular components are retained.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-eckart-young">
+<title>Eckart--Young Theorem</title>
+<p>\begin{theorem}[Eckart--Young]
+Among matrices <m>B</m> of rank at most <m>k</m>, the truncated SVD <m>A_k</m>
+provides a best approximation to <m>A</m> in both the spectral and Frobenius
+norms.
+\end{theorem}</p>
+
+<p>In particular,</p>
+
+<p>
+<md>\boxed{
+\|A-A_k\|_2
+=
+\sigma_{k+1}.
+}</md>
+</p>
+
+<p>Also,</p>
+
+<p>
+<md>\boxed{
+\|A-A_k\|_F^2
+=
+\sum_{i=k+1}^{r}
+\sigma_i^2.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-low-rank-applications">
+<title>Applications of Low-Rank Approximation</title>
+<p>Low-rank approximation is used in:</p>
+
+<p>
+<md>\boxed{
+\text{data compression},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{noise reduction},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{latent-factor models},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{dimensionality reduction}.
+}</md>
+</p>
+
+<p>It is a fundamental bridge between numerical linear algebra and data
+analysis.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-numerical-eigenvalue-problems">
+<title>Eigenvalue Problems</title>
+<p>An eigenvalue problem seeks</p>
+
+<p>
+<md>\boxed{
+A\mathbf{v}
+=
+\lambda\mathbf{v},
+}</md>
+</p>
+
+<p>with</p>
+
+<p>
+<md>\mathbf{v}\neq0.</md>
+</p>
+
+<p>Numerically, directly computing roots of the characteristic polynomial</p>
+
+<p>
+<md>\det(A-\lambda I)=0</md>
+</p>
+
+<p>is generally not the preferred method.</p>
+
+<p>Stable matrix algorithms work directly with <m>A</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-rayleigh-quotient">
+<title>Rayleigh Quotient</title>
+<p>For nonzero <m>\mathbf{x}</m>,</p>
+
+<p>
+<md>\boxed{
+\rho_A(\mathbf{x})
+=
+\frac{
+\mathbf{x}^TA\mathbf{x}
+}{
+\mathbf{x}^T\mathbf{x}
+}.
+}</md>
+</p>
+
+<p>If <m>\mathbf{x}</m> is an eigenvector of symmetric <m>A</m>, then</p>
+
+<p>
+<md>\boxed{
+\rho_A(\mathbf{x})
+=
+\lambda.
+}</md>
+</p>
+
+<p>The Rayleigh quotient provides a natural eigenvalue estimate.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-power-method">
+<title>Power Method</title>
+<p>Starting with nonzero vector <m>\mathbf{x}_0</m>, repeatedly compute</p>
+
+<p>
+<md>\boxed{
+\mathbf{y}_{k+1}
+=
+A\mathbf{x}_k,
+}</md>
+</p>
+
+<p>then normalize:</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}_{k+1}
+=
+\frac{
+\mathbf{y}_{k+1}
+}{
+\|\mathbf{y}_{k+1}\|
+}.
+}</md>
+</p>
+
+<p>Under suitable conditions, <m>\mathbf{x}_k</m> converges toward an eigenvector
+associated with the dominant eigenvalue in magnitude.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-why-power-method-works">
+<title>Why the Power Method Works</title>
+<p>Suppose <m>A</m> has eigenvectors <m>\mathbf{v}_i</m> and eigenvalues satisfying</p>
+
+<p>
+<md>|\lambda_1|
+&gt;
+|\lambda_2|
+\geq
+\cdots.</md>
+</p>
+
+<p>Write</p>
+
+<p>
+<md>\mathbf{x}_0
+=
+c_1\mathbf{v}_1
++
+c_2\mathbf{v}_2
++
+\cdots.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>A^k\mathbf{x}_0
+=
+c_1\lambda_1^k\mathbf{v}_1
++
+c_2\lambda_2^k\mathbf{v}_2
++
+\cdots.</md>
+</p>
+
+<p>Factoring <m>\lambda_1^k</m>,</p>
+
+<p>
+<md>A^k\mathbf{x}_0
+=
+\lambda_1^k
+\left[
+c_1\mathbf{v}_1
++
+c_2
+\left(
+\frac{\lambda_2}{\lambda_1}
+\right)^k
+\mathbf{v}_2
++
+\cdots
+\right].</md>
+</p>
+
+<p>The smaller ratios decay when their magnitudes are below <m>1</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-power-method-convergence">
+<title>Power-Method Convergence Rate</title>
+<p>The asymptotic convergence rate is governed by approximately</p>
+
+<p>
+<md>\boxed{
+\left|
+\frac{
+\lambda_2
+}{
+\lambda_1
+}
+\right|.
+}</md>
+</p>
+
+<p>If</p>
+
+<p>
+<md>|\lambda_2|
+\approx
+|\lambda_1|,</md>
+</p>
+
+<p>convergence can be slow.</p>
+
+<p>A large spectral gap improves convergence.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-worked-power-method">
+<title>Worked Example: Power Method</title>
+<example>
+<title>One Power Iteration</title>
+<p>Let</p>
+
+<p>
+<md>A
+=
+\begin{pmatrix}
+3&amp;0\\
+0&amp;1
+\end{pmatrix},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\mathbf{x}_0
+=
+\begin{pmatrix}
+1\\
+1
+\end{pmatrix}.</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>A\mathbf{x}_0
+=
+\begin{pmatrix}
+3\\
+1
+\end{pmatrix}.</md>
+</p>
+
+<p>Normalize using the Euclidean norm:</p>
+
+<p>
+<md>\left\|
+\begin{pmatrix}
+3\\
+1
+\end{pmatrix}
+\right\|_2
+=
+\sqrt{10}.</md>
+</p>
+
+<p>Thus</p>
+
+<p>
+<md>\mathbf{x}_1
+=
+\frac1{\sqrt{10}}
+\begin{pmatrix}
+3\\
+1
+\end{pmatrix}.</md>
+</p>
+
+<p>Repeated multiplication increasingly aligns the vector with</p>
+
+<p>
+<md>\begin{pmatrix}
+1\\
+0
+\end{pmatrix},</md>
+</p>
+
+<p>the eigenvector corresponding to eigenvalue <m>3</m>.</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\lambda_{\max}=3.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-inverse-iteration">
+<title>Inverse Iteration</title>
+<p>Inverse iteration repeatedly solves</p>
+
+<p>
+<md>\boxed{
+A\mathbf{y}_{k+1}
+=
+\mathbf{x}_k
+}</md>
+</p>
+
+<p>and normalizes <m>\mathbf{y}_{k+1}</m>.</p>
+
+<p>Because eigenvalues of <m>A^{-1}</m> are</p>
+
+<p>
+<md>\frac1{\lambda_i},</md>
+</p>
+
+<p>inverse iteration tends toward an eigenvector associated with the
+smallest-magnitude eigenvalue of <m>A</m>, under suitable conditions.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-shifted-inverse-iteration">
+<title>Shifted Inverse Iteration</title>
+<p>To target an eigenvalue near shift <m>\mu</m>, solve repeatedly</p>
+
+<p>
+<md>\boxed{
+(A-\mu I)
+\mathbf{y}_{k+1}
+=
+\mathbf{x}_k.
+}</md>
+</p>
+
+<p>Eigenvalues of</p>
+
+<p>
+<md>(A-\mu I)^{-1}</md>
+</p>
+
+<p>are</p>
+
+<p>
+<md>\frac1{\lambda_i-\mu}.</md>
+</p>
+
+<p>Thus the eigenvalue nearest <m>\mu</m> becomes dominant in magnitude.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-rayleigh-quotient-iteration">
+<title>Rayleigh Quotient Iteration</title>
+<p>Rayleigh quotient iteration updates the shift dynamically:</p>
+
+<p>
+<md>\boxed{
+\mu_k
+=
+\frac{
+\mathbf{x}_k^TA\mathbf{x}_k
+}{
+\mathbf{x}_k^T\mathbf{x}_k
+}.
+}</md>
+</p>
+
+<p>Then solve</p>
+
+<p>
+<md>\boxed{
+(A-\mu_kI)
+\mathbf{y}_{k+1}
+=
+\mathbf{x}_k,
+}</md>
+</p>
+
+<p>and normalize.</p>
+
+<p>For symmetric matrices near an eigenvector, convergence can be extremely
+rapid.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-qr-iteration">
+<title>QR Iteration</title>
+<p>A basic QR eigenvalue iteration performs</p>
+
+<p>
+<md>A_k
+=
+Q_kR_k,</md>
+</p>
+
+<p>then forms</p>
+
+<p>
+<md>\boxed{
+A_{k+1}
+=
+R_kQ_k.
+}</md>
+</p>
+
+<p>Because</p>
+
+<p>
+<md>A_{k+1}
+=
+Q_k^TA_kQ_k,</md>
+</p>
+
+<p>the matrices are orthogonally similar and therefore share eigenvalues.</p>
+
+<p>Repeated iteration can drive <m>A_k</m> toward triangular or nearly diagonal
+form.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-shifted-qr-iteration">
+<title>Shifted QR Iteration</title>
+<p>Practical QR algorithms use shifts:</p>
+
+<p>
+<md>A_k-\mu_kI
+=
+Q_kR_k,</md>
+</p>
+
+<p>followed by</p>
+
+<p>
+<md>\boxed{
+A_{k+1}
+=
+R_kQ_k+\mu_kI.
+}</md>
+</p>
+
+<p>Carefully selected shifts can greatly accelerate convergence.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-hessenberg-reduction">
+<title>Hessenberg Reduction</title>
+<p>Before applying QR iteration to a general dense matrix, it is efficient to
+reduce <m>A</m> to upper Hessenberg form:</p>
+
+<p>
+<md>\boxed{
+h_{ij}=0
+\qquad
+\text{for}
+\qquad
+i&gt;j+1.
+}</md>
+</p>
+
+<p>Householder transformations can perform this reduction while preserving
+eigenvalues.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-symmetric-tridiagonal-reduction">
+<title>Symmetric Tridiagonal Reduction</title>
+<p>If <m>A</m> is symmetric, orthogonal similarity transformations can reduce it
+to a symmetric tridiagonal matrix.</p>
+
+<p>This preserves symmetry and significantly reduces the cost of later
+eigenvalue iterations.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-direct-versus-iterative-linear-solvers">
+<title>Direct and Iterative Linear Solvers</title>
+<p>Direct methods such as LU attempt to obtain the solution after a finite
+sequence of arithmetic operations, apart from floating-point effects.</p>
+
+<p>Iterative methods generate approximations:</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^{(0)},
+\mathbf{x}^{(1)},
+\mathbf{x}^{(2)},
+\ldots
+}</md>
+</p>
+
+<p>and stop when the approximation is sufficiently accurate.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-why-iterative-linear-solvers">
+<title>Why Use Iterative Methods?</title>
+<p>Iterative methods can be preferable when:</p>
+
+<p>
+<md>\boxed{
+A
+\text{ is very large},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+A
+\text{ is sparse},
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{only moderate solution accuracy is needed}.
+}</md>
+</p>
+
+<p>They may avoid the memory and fill-in costs of direct factorization.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-matrix-splitting">
+<title>Matrix Splitting</title>
+<p>Write</p>
+
+<p>
+<md>\boxed{
+A
+=
+M-N,
+}</md>
+</p>
+
+<p>where <m>M</m> is easy to invert.</p>
+
+<p>Then</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b}</md>
+</p>
+
+<p>becomes</p>
+
+<p>
+<md>M\mathbf{x}
+=
+N\mathbf{x}
++
+\mathbf{b}.</md>
+</p>
+
+<p>This motivates iteration</p>
+
+<p>
+<md>\boxed{
+M\mathbf{x}^{(k+1)}
+=
+N\mathbf{x}^{(k)}
++
+\mathbf{b}.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^{(k+1)}
+=
+M^{-1}N\mathbf{x}^{(k)}
++
+M^{-1}\mathbf{b}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-iteration-matrix">
+<title>Iteration Matrix</title>
+<p>Define</p>
+
+<p>
+<md>\boxed{
+G
+=
+M^{-1}N.
+}</md>
+</p>
+
+<p>Then</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^{(k+1)}
+=
+G\mathbf{x}^{(k)}
++
+\mathbf{c}.
+}</md>
+</p>
+
+<p>The error satisfies</p>
+
+<p>
+<md>\boxed{
+\mathbf{e}^{(k+1)}
+=
+G\mathbf{e}^{(k)}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\mathbf{e}^{(k)}
+=
+G^k
+\mathbf{e}^{(0)}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-spectral-radius-iteration">
+<title>Spectral Radius</title>
+<p>The spectral radius of <m>G</m> is</p>
+
+<p>
+<md>\boxed{
+\rho(G)
+=
+\max_i
+|\lambda_i(G)|.
+}</md>
+</p>
+
+<p>For a stationary linear iteration, convergence for every initial guess
+occurs precisely when</p>
+
+<p>
+<md>\boxed{
+\rho(G)&lt;1.
+}</md>
+</p>
+
+<p>This provides a central convergence criterion.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-jacobi-iteration">
+<title>Jacobi Iteration</title>
+<p>Write</p>
+
+<p>
+<md>A
+=
+D+L+U,</md>
+</p>
+
+<p>where:</p>
+
+<p>
+<md>D
+=
+\text{diagonal part},</md>
+</p>
+
+<p>
+<md>L
+=
+\text{strictly lower triangular part},</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>U
+=
+\text{strictly upper triangular part}.</md>
+</p>
+
+<p>Jacobi iteration is</p>
+
+<p>
+<md>\boxed{
+D\mathbf{x}^{(k+1)}
+=
+\mathbf{b}
+-
+(L+U)
+\mathbf{x}^{(k)}.
+}</md>
+</p>
+
+<p>Thus,</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^{(k+1)}
+=
+D^{-1}
+\left[
+\mathbf{b}
+-
+(L+U)\mathbf{x}^{(k)}
+\right].
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-jacobi-component-form">
+<title>Component Form of Jacobi</title>
+<p>For each component,</p>
+
+<p>
+<md>\boxed{
+x_i^{(k+1)}
+=
+\frac1{a_{ii}}
+\left[
+b_i
+-
+\sum_{j\neq i}
+a_{ij}
+x_j^{(k)}
+\right].
+}</md>
+</p>
+
+<p>Every updated component uses only values from the previous iteration.</p>
+
+<p>This makes Jacobi naturally parallelizable.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-gauss-seidel">
+<title>Gauss--Seidel Iteration</title>
+<p>Gauss--Seidel uses newly updated values immediately.</p>
+
+<p>Its matrix form is</p>
+
+<p>
+<md>\boxed{
+(D+L)
+\mathbf{x}^{(k+1)}
+=
+\mathbf{b}
+-
+U\mathbf{x}^{(k)}.
+}</md>
+</p>
+
+<p>Therefore,</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^{(k+1)}
+=
+-(D+L)^{-1}
+U\mathbf{x}^{(k)}
++
+(D+L)^{-1}\mathbf{b}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-gauss-seidel-component">
+<title>Component Form of Gauss--Seidel</title>
+<p>For each <m>i</m>,</p>
+
+<p>
+<md>\boxed{
+x_i^{(k+1)}
+=
+\frac1{a_{ii}}
+\left[
+b_i
+-
+\sum_{j&lt;i}
+a_{ij}
+x_j^{(k+1)}
+-
+\sum_{j&gt;i}
+a_{ij}
+x_j^{(k)}
+\right].
+}</md>
+</p>
+
+<p>Updated values are used as soon as they become available.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-worked-jacobi">
+<title>Worked Example: Jacobi Iteration</title>
+<example>
+<title>One Jacobi Step</title>
+<p>Consider</p>
+
+<p>
+<md>\begin{aligned}
+4x+y&amp;=9,\\
+x+3y&amp;=7.
+\end{aligned}</md>
+</p>
+
+<p>Solve each equation for its diagonal variable:</p>
+
+<p>
+<md>x
+=
+\frac{9-y}{4},</md>
+</p>
+
+<p>
+<md>y
+=
+\frac{7-x}{3}.</md>
+</p>
+
+<p>Starting with</p>
+
+<p>
+<md>(x^{(0)},y^{(0)})
+=
+(0,0),</md>
+</p>
+
+<p>the first Jacobi iteration gives</p>
+
+<p>
+<md>x^{(1)}
+=
+\frac94
+=
+2.25,</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>y^{(1)}
+=
+\frac73
+\approx2.3333.</md>
+</p>
+<p><em>Solution.</em></p>
+<p>
+<md>\boxed{
+\mathbf{x}^{(1)}
+\approx
+\begin{pmatrix}
+2.25\\
+2.3333
+\end{pmatrix}.
+}</md>
+</p>
+</example>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-diagonal-dominance">
+<title>Diagonal Dominance</title>
+<p>A matrix is strictly row diagonally dominant if</p>
+
+<p>
+<md>\boxed{
+|a_{ii}|
+&gt;
+\sum_{j\neq i}
+|a_{ij}|
+}</md>
+</p>
+
+<p>for every row <m>i</m>.</p>
+
+<p>Strict diagonal dominance provides a useful sufficient condition for
+convergence of standard Jacobi and Gauss--Seidel iterations.</p>
+
+<p>It is not a necessary condition.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-successive-over-relaxation">
+<title>Successive Over-Relaxation</title>
+<p>Successive Over-Relaxation, abbreviated SOR, modifies the Gauss--Seidel
+step using relaxation parameter</p>
+
+<p>
+<md>\boxed{
+\omega.
+}</md>
+</p>
+
+<p>Conceptually,</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}^{(k+1)}
+=
+\mathbf{x}^{(k)}
++
+\omega
+\left(
+\mathbf{x}_{GS}^{(k+1)}
+-
+\mathbf{x}^{(k)}
+\right).
+}</md>
+</p>
+
+<p>For</p>
+
+<p>
+<md>\omega=1,</md>
+</p>
+
+<p>SOR reduces to Gauss--Seidel.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-under-over-relaxation">
+<title>Under- and Over-Relaxation</title>
+<p>If</p>
+
+<p>
+<md>0&lt;\omega&lt;1,</md>
+</p>
+
+<p>the method is under-relaxed.</p>
+
+<p>If</p>
+
+<p>
+<md>1&lt;\omega&lt;2,</md>
+</p>
+
+<p>it is over-relaxed.</p>
+
+<p>A good <m>\omega</m> can accelerate convergence for suitable problems.</p>
+
+<p>A poor choice may slow convergence or cause divergence.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-krylov-subspaces">
+<title>Krylov Subspaces</title>
+<p>Given matrix <m>A</m> and vector <m>\mathbf{r}_0</m>, the <m>k</m>-th Krylov
+subspace is</p>
+
+<p>
+<md>\boxed{
+\mathcal{K}_k
+(
+A,\mathbf{r}_0
+)
+=
+\operatorname{span}
+\{
+\mathbf{r}_0,
+A\mathbf{r}_0,
+A^2\mathbf{r}_0,
+\ldots,
+A^{k-1}\mathbf{r}_0
+\}.
+}</md>
+</p>
+
+<p>Many modern iterative methods search for corrections within Krylov
+subspaces.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-conjugate-gradient">
+<title>Conjugate Gradient Method</title>
+<p>The Conjugate Gradient method, abbreviated CG, solves</p>
+
+<p>
+<md>\boxed{
+A\mathbf{x}
+=
+\mathbf{b}
+}</md>
+</p>
+
+<p>when <m>A</m> is symmetric positive definite.</p>
+
+<p>It can also be interpreted as minimizing the quadratic function</p>
+
+<p>
+<md>\boxed{
+\phi(\mathbf{x})
+=
+\frac12
+\mathbf{x}^TA\mathbf{x}
+-
+\mathbf{b}^T\mathbf{x}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-cg-gradient">
+<title>Gradient of the CG Quadratic</title>
+<p>The gradient is</p>
+
+<p>
+<md>\boxed{
+\nabla\phi(\mathbf{x})
+=
+A\mathbf{x}
+-
+\mathbf{b}.
+}</md>
+</p>
+
+<p>Thus the negative gradient is the residual:</p>
+
+<p>
+<md>\boxed{
+-\nabla\phi(\mathbf{x})
+=
+\mathbf{b}
+-
+A\mathbf{x}
+=
+\mathbf{r}.
+}</md>
+</p>
+
+<p>CG chooses search directions more intelligently than ordinary steepest
+descent.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-a-conjugate-directions">
+<title><m>A</m>-Conjugate Directions</title>
+<p>Vectors <m>\mathbf{p}_i</m> and <m>\mathbf{p}_j</m> are <m>A</m>-conjugate if</p>
+
+<p>
+<md>\boxed{
+\mathbf{p}_i^TA\mathbf{p}_j
+=
+0.
+}</md>
+</p>
+
+<p>For symmetric positive-definite <m>A</m>, CG constructs mutually
+<m>A</m>-conjugate search directions.</p>
+
+<p>In exact arithmetic, CG terminates in at most <m>n</m> iterations for an
+<m>n\times n</m> system.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-cg-algorithm">
+<title>Conjugate Gradient Algorithm</title>
+<p>Start from <m>\mathbf{x}_0</m> and compute</p>
+
+<p>
+<md>\boxed{
+\mathbf{r}_0
+=
+\mathbf{b}
+-
+A\mathbf{x}_0,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\mathbf{p}_0
+=
+\mathbf{r}_0.
+}</md>
+</p>
+
+<p>Then iterate:</p>
+
+<p>
+<md>\boxed{
+\alpha_k
+=
+\frac{
+\mathbf{r}_k^T\mathbf{r}_k
+}{
+\mathbf{p}_k^TA\mathbf{p}_k
+},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}_{k+1}
+=
+\mathbf{x}_k
++
+\alpha_k
+\mathbf{p}_k,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\mathbf{r}_{k+1}
+=
+\mathbf{r}_k
+-
+\alpha_k
+A\mathbf{p}_k,
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\beta_k
+=
+\frac{
+\mathbf{r}_{k+1}^T\mathbf{r}_{k+1}
+}{
+\mathbf{r}_k^T\mathbf{r}_k
+},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\mathbf{p}_{k+1}
+=
+\mathbf{r}_{k+1}
++
+\beta_k
+\mathbf{p}_k.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-cg-error-bound">
+<title>CG Error Bound</title>
+<p>For symmetric positive-definite <m>A</m>, a classical bound is</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{x}_k-\mathbf{x}^*\|_A
+\leq
+2
+\left(
+\frac{
+\sqrt{\kappa_2(A)}-1
+}{
+\sqrt{\kappa_2(A)}+1
+}
+\right)^k
+\|\mathbf{x}_0-\mathbf{x}^*\|_A,
+}</md>
+</p>
+
+<p>where</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{v}\|_A
+=
+\sqrt{
+\mathbf{v}^TA\mathbf{v}
+}.
+}</md>
+</p>
+
+<p>This shows why conditioning strongly affects CG convergence.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-gmres">
+<title>GMRES</title>
+<p>The Generalized Minimal Residual method, abbreviated GMRES, is a Krylov
+method for nonsymmetric linear systems.</p>
+
+<p>At iteration <m>k</m>, it seeks</p>
+
+<p>
+<md>\boxed{
+\mathbf{x}_k
+\in
+\mathbf{x}_0
++
+\mathcal{K}_k
+(
+A,\mathbf{r}_0
+)
+}</md>
+</p>
+
+<p>that minimizes the residual norm</p>
+
+<p>
+<md>\boxed{
+\|\mathbf{b}-A\mathbf{x}_k\|_2.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-arnoldi-process">
+<title>Arnoldi Process</title>
+<p>GMRES constructs an orthonormal basis of the Krylov subspace using the
+Arnoldi process.</p>
+
+<p>Arnoldi produces relation</p>
+
+<p>
+<md>\boxed{
+AQ_k
+=
+Q_{k+1}
+\overline{H}_k,
+}</md>
+</p>
+
+<p>where <m>\overline{H}_k</m> is upper Hessenberg.</p>
+
+<p>The large linear problem is reduced to a smaller least-squares problem.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-gmres-restarting">
+<title>GMRES Restarting</title>
+<p>Full GMRES stores an increasing number of Krylov basis vectors.</p>
+
+<p>For large problems, memory and orthogonalization cost increase with each
+iteration.</p>
+
+<p>Restarted GMRES limits the subspace dimension and periodically starts a
+new Krylov cycle.</p>
+
+<p>Restarting reduces storage but can slow convergence.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-preconditioning">
+<title>Preconditioning</title>
+<p>A preconditioner is a matrix <m>M</m> that approximates <m>A</m> but is easier to
+solve with.</p>
+
+<p>Instead of solving</p>
+
+<p>
+<md>A\mathbf{x}
+=
+\mathbf{b},</md>
+</p>
+
+<p>one may solve a transformed system such as</p>
+
+<p>
+<md>\boxed{
+M^{-1}A\mathbf{x}
+=
+M^{-1}\mathbf{b}.
+}</md>
+</p>
+
+<p>The goal is to improve numerical properties and accelerate iterative
+convergence.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-good-preconditioner">
+<title>What Makes a Good Preconditioner?</title>
+<p>A good preconditioner should:</p>
+
+<p>
+<md>\boxed{
+\text{approximate }A\text{ sufficiently well},
+}</md>
+</p>
+
+<p>while also being</p>
+
+<p>
+<md>\boxed{
+\text{cheap to construct}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{cheap to apply}.
+}</md>
+</p>
+
+<p>An excellent approximation that is as expensive as solving the original
+system may provide little practical benefit.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-jacobi-preconditioning">
+<title>Jacobi Preconditioning</title>
+<p>A simple preconditioner is</p>
+
+<p>
+<md>\boxed{
+M
+=
+D,
+}</md>
+</p>
+
+<p>where <m>D</m> is the diagonal of <m>A</m>.</p>
+
+<p>Then applying <m>M^{-1}</m> is inexpensive.</p>
+
+<p>This can improve scaling, although it may be insufficient for difficult
+systems.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-incomplete-factorization">
+<title>Incomplete Factorization</title>
+<p>An incomplete LU factorization constructs approximate factors</p>
+
+<p>
+<md>\boxed{
+A
+\approx
+LU
+}</md>
+</p>
+
+<p>while discarding selected fill-in entries.</p>
+
+<p>Similarly, incomplete Cholesky can be used for suitable symmetric
+positive-definite systems.</p>
+
+<p>These factorizations are widely used as preconditioners.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-sparse-matrix-storage">
+<title>Sparse Matrix Storage</title>
+<p>Sparse matrices should generally store only nonzero values and structural
+information.</p>
+
+<p>Common ideas include storing:</p>
+
+<p>
+<md>\boxed{
+\text{nonzero values},
+}</md>
+</p>
+
+<p>
+<md>\boxed{
+\text{column indices},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{row pointers}.
+}</md>
+</p>
+
+<p>Compressed sparse row and compressed sparse column formats are widely
+used.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-sparse-matrix-vector-product">
+<title>Sparse Matrix-Vector Multiplication</title>
+<p>For a sparse matrix with</p>
+
+<p>
+<md>\operatorname{nnz}(A)</md>
+</p>
+
+<p>nonzero entries, the matrix-vector product</p>
+
+<p>
+<md>A\mathbf{x}</md>
+</p>
+
+<p>can often be computed in approximately</p>
+
+<p>
+<md>\boxed{
+O
+(
+\operatorname{nnz}(A)
+)
+}</md>
+</p>
+
+<p>operations.</p>
+
+<p>This makes matrix-vector-product-based Krylov methods attractive.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-fill-in">
+<title>Fill-In</title>
+<p>During sparse LU or Cholesky factorization, entries that were originally
+zero may become nonzero.</p>
+
+<p>This is called fill-in.</p>
+
+<p>Excessive fill-in can cause:</p>
+
+<p>
+<md>\boxed{
+\text{large memory use},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{large computational cost}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-sparse-reordering">
+<title>Reordering Sparse Systems</title>
+<p>Changing the order of rows and columns can dramatically affect fill-in.</p>
+
+<p>Sparse direct solvers therefore use graph-based ordering strategies before
+factorization.</p>
+
+<p>The algebraically equivalent system may become much cheaper to solve after
+an appropriate permutation.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-iterative-refinement">
+<title>Iterative Refinement</title>
+<p>Suppose an approximate solution <m>\widehat{\mathbf{x}}</m> is available.</p>
+
+<p>Compute residual</p>
+
+<p>
+<md>\boxed{
+\mathbf{r}
+=
+\mathbf{b}
+-
+A\widehat{\mathbf{x}}.
+}</md>
+</p>
+
+<p>Solve the correction equation</p>
+
+<p>
+<md>\boxed{
+A\mathbf{d}
+=
+\mathbf{r}.
+}</md>
+</p>
+
+<p>Then update</p>
+
+<p>
+<md>\boxed{
+\widehat{\mathbf{x}}
+\leftarrow
+\widehat{\mathbf{x}}
++
+\mathbf{d}.
+}</md>
+</p>
+
+<p>Repeated corrections can improve solution accuracy.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-mixed-precision-refinement">
+<title>Mixed-Precision Refinement Preview</title>
+<p>A factorization may sometimes be computed in lower precision for speed,
+while residuals and corrections are evaluated in higher precision.</p>
+
+<p>Under suitable conditioning and algorithmic conditions, iterative
+refinement can recover high-accuracy solutions.</p>
+
+<p>This is an important modern use of mixed-precision arithmetic.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-backward-stability-linear-solvers">
+<title>Backward Stability of Linear Solvers</title>
+<p>A computed solution <m>\widehat{\mathbf{x}}</m> is backward stable if it
+solves a nearby problem exactly:</p>
+
+<p>
+<md>\boxed{
+(A+\Delta A)
+\widehat{\mathbf{x}}
+=
+\mathbf{b}+\Delta\mathbf{b},
+}</md>
+</p>
+
+<p>where the perturbations are small relative to the original data.</p>
+
+<p>Gaussian elimination with partial pivoting is generally backward stable in
+practice, subject to growth-factor considerations.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-conditioning-backward-stability">
+<title>Conditioning and Backward Stability Together</title>
+<p>A backward-stable method solves a nearby problem accurately.</p>
+
+<p>If the original problem is well conditioned, the nearby exact solution is
+also near the original exact solution.</p>
+
+<p>Thus:</p>
+
+<p>
+<md>\boxed{
+\text{backward stability}
++
+\text{good conditioning}
+\Rightarrow
+\text{small forward error}.
+}</md>
+</p>
+
+<p>This principle is central to numerical linear algebra.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-matrix-scaling">
+<title>Scaling</title>
+<p>If rows or columns have very different magnitudes, numerical performance
+can suffer.</p>
+
+<p>Scaling replaces the system with an equivalent or closely related one in
+which magnitudes are better balanced.</p>
+
+<p>For example,</p>
+
+<p>
+<md>\boxed{
+D_rAD_c\mathbf{y}
+=
+D_r\mathbf{b},
+}</md>
+</p>
+
+<p>with diagonal scaling matrices <m>D_r</m> and <m>D_c</m>.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-matrix-equilibration">
+<title>Matrix Equilibration</title>
+<p>Equilibration attempts to scale matrix rows or columns so their norms are
+similar.</p>
+
+<p>The goal is not necessarily to minimize the mathematical condition number
+exactly.</p>
+
+<p>Rather, it can improve numerical behavior and reduce poor scaling effects.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-rank-revealing-factorizations">
+<title>Rank-Revealing Factorizations</title>
+<p>When a matrix may be nearly rank deficient, one wants a factorization that
+exposes weak directions.</p>
+
+<p>Useful approaches include:</p>
+
+<p>
+<md>\boxed{
+\text{SVD},
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{pivoted QR}.
+}</md>
+</p>
+
+<p>These methods help estimate numerical rank and solve rank-deficient least-
+squares problems.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-qr-column-pivoting">
+<title>QR With Column Pivoting</title>
+<p>A pivoted QR factorization has form</p>
+
+<p>
+<md>\boxed{
+AP
+=
+QR,
+}</md>
+</p>
+
+<p>where <m>P</m> permutes columns.</p>
+
+<p>The permutation attempts to place more linearly independent or larger
+directions earlier in the factorization.</p>
+
+<p>The diagonal of <m>R</m> can provide information about numerical rank.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-eigenvalue-conditioning">
+<title>Eigenvalue Conditioning</title>
+<p>Eigenvalues can themselves be sensitive to matrix perturbations.</p>
+
+<p>For symmetric matrices, eigenvalues are relatively well behaved under
+small perturbations.</p>
+
+<p>For general nonsymmetric matrices, eigenvalue sensitivity can be much more
+severe.</p>
+
+<p>Thus eigenvalue algorithms must be interpreted together with problem
+conditioning.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-symmetric-eigenvalue-problems">
+<title>Symmetric Eigenvalue Problems</title>
+<p>If</p>
+
+<p>
+<md>A=A^T,</md>
+</p>
+
+<p>then all eigenvalues are real.</p>
+
+<p>Furthermore, <m>A</m> has an orthonormal eigenvector basis:</p>
+
+<p>
+<md>\boxed{
+A
+=
+Q\Lambda Q^T.
+}</md>
+</p>
+
+<p>This structure permits especially stable and efficient algorithms.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-schur-decomposition">
+<title>Schur Decomposition</title>
+<p>For a real or complex square matrix, a Schur decomposition gives</p>
+
+<p>
+<md>\boxed{
+A
+=
+QTQ^*,
+}</md>
+</p>
+
+<p>where <m>Q</m> is unitary and <m>T</m> is upper triangular in the complex case.</p>
+
+<p>The diagonal entries of <m>T</m> are the eigenvalues of <m>A</m>.</p>
+
+<p>Schur form is central to practical eigenvalue computation.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-workflow">
+<title>Numerical Linear Algebra Workflow</title>
+<p>A practical workflow is:</p>
+
+<p>
+<ol>
+<li>
+<p>determine matrix dimensions;</p>
+</li>
+<li>
+<p>identify symmetry or positive definiteness;</p>
+</li>
+<li>
+<p>determine whether the matrix is dense or sparse;</p>
+</li>
+<li>
+<p>inspect scaling;</p>
+</li>
+<li>
+<p>estimate or diagnose conditioning;</p>
+</li>
+<li>
+<p>identify the required task;</p>
+</li>
+<li>
+<p>choose a factorization or iterative method;</p>
+</li>
+<li>
+<p>avoid unnecessary explicit inverses;</p>
+</li>
+<li>
+<p>use pivoting when appropriate;</p>
+</li>
+<li>
+<p>exploit symmetry and sparsity;</p>
+</li>
+<li>
+<p>monitor residuals;</p>
+</li>
+<li>
+<p>use backward-error reasoning;</p>
+</li>
+<li>
+<p>refine the solution if necessary;</p>
+</li>
+<li>
+<p>verify eigenpairs or least-squares residuals;</p>
+</li>
+<li>
+<p>compare numerical rank with application requirements;</p>
+</li>
+<li>
+<p>evaluate memory and computational cost.</p>
+</li>
+</ol>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-choosing-linear-system-solver">
+<title>Choosing a Linear-System Solver</title>
+<p>For a general dense square system, use:</p>
+
+<p>
+<md>\boxed{
+\text{LU with pivoting}.
+}</md>
+</p>
+
+<p>For symmetric positive-definite systems, use:</p>
+
+<p>
+<md>\boxed{
+\text{Cholesky}.
+}</md>
+</p>
+
+<p>For large sparse symmetric positive-definite systems, consider:</p>
+
+<p>
+<md>\boxed{
+\text{preconditioned CG}.
+}</md>
+</p>
+
+<p>For large sparse nonsymmetric systems, consider:</p>
+
+<p>
+<md>\boxed{
+\text{GMRES or another Krylov method}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-choosing-least-squares-solver">
+<title>Choosing a Least-Squares Solver</title>
+<p>For a well-conditioned full-rank dense least-squares problem, QR is a
+standard choice.</p>
+
+<p>For rank-deficient or highly ill-conditioned problems, consider:</p>
+
+<p>
+<md>\boxed{
+\text{SVD}
+}</md>
+</p>
+
+<p>or</p>
+
+<p>
+<md>\boxed{
+\text{rank-revealing QR}.
+}</md>
+</p>
+
+<p>Normal equations can be faster in some settings but should be used with
+awareness of their squared condition number.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-choosing-eigenvalue-method">
+<title>Choosing an Eigenvalue Method</title>
+<p>For one dominant eigenpair, consider:</p>
+
+<p>
+<md>\boxed{
+\text{power iteration}.
+}</md>
+</p>
+
+<p>For an eigenvalue near a known shift, consider:</p>
+
+<p>
+<md>\boxed{
+\text{shifted inverse iteration}.
+}</md>
+</p>
+
+<p>For dense full-spectrum computations, practical methods are based on:</p>
+
+<p>
+<md>\boxed{
+\text{Hessenberg or tridiagonal reduction}
++
+\text{QR-type iteration}.
+}</md>
+</p>
+
+<p>For large sparse problems, specialized Krylov eigensolvers are often
+preferred.</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-common-errors">
+<title>Common Errors</title>
+<subsubsection xml:id="subsubsec-computing-a-1-to-solve-a-x-b">
+<title>Computing <m>A^{-1}</m> to Solve <m>A\mathbf{x}=\mathbf{b}</m></title>
+<p>Explicit inversion is usually unnecessary.</p>
+
+<p>Use a factorization or iterative solve instead.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-pivoting">
+<title>Ignoring Pivoting</title>
+<p>Gaussian elimination without pivoting can fail even for nonsingular
+matrices or can produce severe numerical error.</p>
+
+<p>Partial pivoting should normally be used for general dense systems.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-treating-a-small-residual-as-proof-of-a-small-error">
+<title>Treating a Small Residual as Proof of a Small Error</title>
+<p>A small residual does not guarantee small forward error when</p>
+
+<p>
+<md>\kappa(A)</md>
+</p>
+
+<p>is large.</p>
+
+<p>Conditioning matters.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-problem-conditioning-and-solver-stability">
+<title>Confusing Problem Conditioning and Solver Stability</title>
+<p>An ill-conditioned system remains sensitive even when solved by an
+excellent algorithm.</p>
+
+<p>A stable method cannot remove information lost in the problem itself.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-cholesky-on-an-indefinite-matrix">
+<title>Using Cholesky on an Indefinite Matrix</title>
+<p>Cholesky requires symmetric positive definiteness in its standard form.</p>
+
+<p>Symmetry alone is not sufficient.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-forming-a-ta-without-considering-conditioning">
+<title>Forming <m>A^TA</m> Without Considering Conditioning</title>
+<p>The condition number satisfies</p>
+
+<p>
+<md>\boxed{
+\kappa_2(A^TA)
+=
+\kappa_2(A)^2
+}</md>
+</p>
+
+<p>for full-column-rank <m>A</m>.</p>
+
+<p>This can significantly reduce numerical accuracy.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-classical-gram-schmidt-is-always-numerically-orthogonal">
+<title>Assuming Classical Gram--Schmidt Is Always Numerically Orthogonal</title>
+<p>Floating-point cancellation can cause loss of orthogonality.</p>
+
+<p>Modified Gram--Schmidt or Householder QR is usually more reliable.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-determinants-to-test-numerical-singularity">
+<title>Using Determinants to Test Numerical Singularity</title>
+<p>Computing</p>
+
+<p>
+<md>\det(A)</md>
+</p>
+
+<p>is usually not a good numerical test for singularity or conditioning.</p>
+
+<p>Factorizations and singular values are more informative.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-confusing-small-singular-values-with-exact-zero">
+<title>Confusing Small Singular Values With Exact Zero</title>
+<p>A singular value may be mathematically nonzero but below a meaningful
+numerical tolerance.</p>
+
+<p>Numerical rank depends on scale and precision.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-applying-cg-to-a-general-nonsymmetric-matrix">
+<title>Applying CG to a General Nonsymmetric Matrix</title>
+<p>Standard conjugate gradient requires</p>
+
+<p>
+<md>\boxed{
+A=A^T
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+A\succ0.
+}</md>
+</p>
+
+<p>For general nonsymmetric systems, another Krylov solver is required.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-assuming-jacobi-or-gauss-seidel-always-converges">
+<title>Assuming Jacobi or Gauss--Seidel Always Converges</title>
+<p>Stationary iteration convergence depends on the iteration matrix.</p>
+
+<p>A sufficient structural condition such as diagonal dominance should not be
+confused with universal convergence.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-preconditioning">
+<title>Ignoring Preconditioning</title>
+<p>A theoretically convergent Krylov method may converge extremely slowly on
+an ill-conditioned system.</p>
+
+<p>A good preconditioner can be more important than changing the iterative
+solver.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-ignoring-sparse-fill-in">
+<title>Ignoring Sparse Fill-In</title>
+<p>A sparse matrix does not guarantee a sparse factorization.</p>
+
+<p>Poor ordering can produce large amounts of fill-in.</p>
+</subsubsection>
+
+<subsubsection xml:id="subsubsec-using-eigenvalue-algorithms-on-the-characteristic-polynomial">
+<title>Using Eigenvalue Algorithms on the Characteristic Polynomial</title>
+<p>Forming and solving the characteristic polynomial numerically is usually
+inferior to matrix-based eigenvalue methods.</p>
+</subsubsection>
+
+<subsubsection xml:id="id-12-numerical-computational-mathematics-02-numerical-linear-algebra-subsubsec-ignoring-scaling">
+<title>Ignoring Scaling</title>
+<p>Large magnitude differences among rows, columns, or variables can create
+avoidable numerical difficulties.</p>
+
+<p>Scaling can improve practical solver behavior.</p>
+</subsubsection>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-applications">
+<title>Applications</title>
+<p>\begin{applicationbox}</p>
+
+<p><em>Optimization.</em>
+Newton, interior-point, sequential quadratic programming, and least-squares
+methods repeatedly solve linear systems.</p>
+
+<p>\medskip</p>
+
+<p><em>Differential Equations.</em>
+Finite-difference and finite-element discretizations produce large sparse
+linear systems.</p>
+
+<p>\medskip</p>
+
+<p><em>Statistics.</em>
+Regression, covariance analysis, principal components, and multivariate
+methods rely on QR, Cholesky, eigenvalue methods, and SVD.</p>
+
+<p>\medskip</p>
+
+<p><em>Data Science.</em>
+Low-rank approximations, dimensionality reduction, matrix completion, and
+latent-factor models depend on matrix factorizations.</p>
+
+<p>\medskip</p>
+
+<p><em>Engineering.</em>
+Structural, circuit, control, and simulation models require repeated matrix
+solves and eigenvalue calculations.</p>
+
+<p>\medskip</p>
+
+<p><em>Networks.</em>
+Graph Laplacians produce sparse linear algebra problems used in diffusion,
+ranking, clustering, and network analysis.</p>
+
+<p>\medskip</p>
+
+<p><em>Scientific Computing.</em>
+Efficient matrix kernels form the computational foundation of many large
+simulation codes.</p>
+
+<p>\end{applicationbox}</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-exercises">
+<title>Exercises</title>
+<exercise>
+<statement>
+<p>Define a vector <m>2</m>-norm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the matrix <m>1</m>-norm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the matrix <m>\infty</m>-norm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the Frobenius norm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the condition number of a nonsingular matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define a linear-system residual.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define LU factorization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define Cholesky factorization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define QR factorization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Define the singular value decomposition.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>\|\mathbf{x}\|_1,
+\qquad
+\|\mathbf{x}\|_2,
+\qquad
+\|\mathbf{x}\|_\infty</md>
+</p>
+
+<p>for a given vector.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute</p>
+
+<p>
+<md>\|A\|_1</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\|A\|_\infty</md>
+</p>
+
+<p>for a given matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Given <m>A</m> and an approximate solution <m>\widehat{\mathbf{x}}</m>, compute
+the residual.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare residual size with actual forward error in a small linear system.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute a condition number for a diagonal matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a nearly singular matrix has a large condition number.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform Gaussian elimination on a <m>3\times3</m> system.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform back substitution.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform forward substitution.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct an LU factorization without pivoting.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify the factorization by multiplying <m>LU</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one step of partial pivoting.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct</p>
+
+<p>
+<md>PA=LU</md>
+</p>
+
+<p>for a small matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a very small pivot can cause numerical problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether a given symmetric matrix is positive definite.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute a <m>2\times2</m> Cholesky factorization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use Cholesky factors to solve a linear system.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare the leading arithmetic cost of LU and Cholesky factorization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify that an orthogonal matrix preserves the Euclidean norm.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply Gram--Schmidt to two vectors.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a QR factorization of a small matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify that</p>
+
+<p>
+<md>Q^TQ=I.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a Householder reflector that maps a vector to a coordinate axis.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a Givens rotation that eliminates one vector component.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve a least-squares problem using QR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Solve the same least-squares problem using normal equations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare the condition numbers of <m>A</m> and <m>A^TA</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the singular values of a diagonal matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the SVD of a simple <m>2\times2</m> matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine the rank from its singular values.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine numerical rank using a specified tolerance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute a pseudoinverse for a simple diagonal matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Use the pseudoinverse to obtain a minimum-norm solution.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a rank-one approximation using the leading singular triplet.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute the spectral-norm truncation error from the next singular value.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one power-method iteration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Apply several power iterations to a diagonalizable matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Estimate the dominant eigenvalue using the Rayleigh quotient.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain how the eigenvalue ratio affects power-method convergence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one shifted inverse-iteration step.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why a shift near an eigenvalue accelerates targeting.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one unshifted QR iteration on a <m>2\times2</m> matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the Jacobi iteration for a given linear system.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Write the Gauss--Seidel iteration for the same system.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform three Jacobi iterations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform three Gauss--Seidel iterations.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compare their observed convergence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct the Jacobi iteration matrix.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Compute its spectral radius.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Determine whether the iteration converges for every initial guess.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Test a matrix for strict diagonal dominance.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one SOR step for a specified <m>\omega</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct</p>
+
+<p>
+<md>\mathcal{K}_3(A,\mathbf{r}_0).</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one conjugate-gradient iteration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Verify that two CG search directions are <m>A</m>-conjugate in exact
+arithmetic for a small example.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain why CG requires symmetric positive definiteness.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the role of the condition number in CG convergence.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Describe how GMRES minimizes residual norm over a Krylov subspace.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Construct a Jacobi preconditioner.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the tradeoff in choosing a preconditioner.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Count the nonzeros in a sparse matrix and estimate sparse matrix-vector
+multiplication cost.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Give an example of fill-in during sparse elimination.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Perform one iterative-refinement correction.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Explain the connection between backward stability and conditioning.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive standard perturbation bounds for linear systems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study growth factors in Gaussian elimination.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study backward stability of LU factorization with partial pivoting.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive Cholesky factorization recursively.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study stability of classical and modified Gram--Schmidt.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive Householder QR.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study rank-revealing QR factorization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove</p>
+
+<p>
+<md>\kappa_2(A^TA)
+=
+\kappa_2(A)^2</md>
+</p>
+
+<p>for full-column-rank <m>A</m>.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the Eckart--Young theorem.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study perturbation theory for singular values.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study eigenvalue conditioning for normal and nonnormal matrices.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the power-method asymptotic convergence rate.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Rayleigh quotient iteration for symmetric matrices.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Hessenberg reduction using Householder reflectors.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study shifted QR eigenvalue algorithms.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Prove the stationary-iteration condition</p>
+
+<p>
+<md>\rho(G)&lt;1.</md>
+</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study optimal SOR parameters for model problems.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive conjugate gradient from quadratic minimization.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Derive the classical CG error estimate.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Lanczos iteration.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study Arnoldi iteration and GMRES.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate incomplete LU preconditioning.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Study sparse ordering strategies and elimination graphs.</p>
+</statement>
+</exercise>
+
+<exercise>
+<statement>
+<p>Investigate mixed-precision iterative refinement.</p>
+</statement>
+</exercise>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-summary">
+<title>Conceptual Summary</title>
+<p>Numerical linear algebra develops stable and efficient matrix algorithms.</p>
+
+<p>A linear system is</p>
+
+<p>
+<md>\boxed{
+A\mathbf{x}
+=
+\mathbf{b}.
+}</md>
+</p>
+
+<p>Its conditioning is measured by</p>
+
+<p>
+<md>\boxed{
+\kappa(A)
+=
+\|A\|
+\|A^{-1}\|.
+}</md>
+</p>
+
+<p>General dense systems are commonly solved using</p>
+
+<p>
+<md>\boxed{
+PA=LU.
+}</md>
+</p>
+
+<p>Symmetric positive-definite systems admit</p>
+
+<p>
+<md>\boxed{
+A=LL^T.
+}</md>
+</p>
+
+<p>Least-squares problems can be solved using</p>
+
+<p>
+<md>\boxed{
+A=QR.
+}</md>
+</p>
+
+<p>The singular value decomposition is</p>
+
+<p>
+<md>\boxed{
+A=U\Sigma V^T.
+}</md>
+</p>
+
+<p>It provides information about:</p>
+
+<p>
+<md>\boxed{
+\text{rank}
++
+\text{conditioning}
++
+\text{least squares}
++
+\text{low-rank approximation}.
+}</md>
+</p>
+
+<p>Large sparse systems often use iterative methods such as</p>
+
+<p>
+<md>\boxed{
+\text{CG}
+}</md>
+</p>
+
+<p>and</p>
+
+<p>
+<md>\boxed{
+\text{GMRES},
+}</md>
+</p>
+
+<p>combined with</p>
+
+<p>
+<md>\boxed{
+\text{preconditioning}.
+}</md>
+</p>
+
+<p>Reliable numerical matrix computation therefore requires attention to</p>
+
+<p>
+<md>\boxed{
+\text{structure}
++
+\text{conditioning}
++
+\text{stability}
++
+\text{sparsity}
++
+\text{computational cost}.
+}</md>
+</p>
+</subsection>
+
+<subsection xml:id="sec-02-numerical-linear-algebra-subsec-nla-connections">
+<title>Section Connections</title>
+<remark>
+<title>Chapter Connection</title>
+<p>Numerical Linear Algebra builds on the error, conditioning, and stability
+ideas of Section <xref ref="sec-numerical-analysis" />. Matrix factorizations such
+as LU, Cholesky, QR, and SVD provide the computational foundation for
+least squares, eigenvalue problems, optimization, differential-equation
+solvers, statistics, and data analysis. Iterative Krylov methods become
+especially important for large sparse systems arising from scientific
+models. The next section, Numerical Optimization, develops computational
+algorithms for minimizing and maximizing nonlinear functions, including
+line-search methods, Newton and quasi-Newton methods, constrained
+optimization, and large-scale numerical optimization.</p>
+</remark>
+</subsection>
+
 </section>
